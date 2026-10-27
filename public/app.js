@@ -96,6 +96,12 @@
       desc: "NASA VIIRS daily true-color cloud and atmospheric reflectance.",
       desc_bn: "নাসার উপগ্রহ থেকে গৃহীত দৈনিক মেঘমালা ও আবহাওয়া দৃশ্য।"
     },
+    aerosol: {
+      title: "NASA Satellite Aerosol Optical Depth (AOD)",
+      title_bn: "নাসা উপগ্রহ এরোসল অপটিক্যাল ডেপথ (AOD)",
+      desc: "NASA MODIS MAIAC & VIIRS daily atmospheric aerosol optical depth and smoke column density over Bengal Basin.",
+      desc_bn: "নাসার মডিস ও ভিআইআইআরএস উপগ্রহভিত্তিক বায়ুমণ্ডলীয় এরোসল ও ধোঁয়ার ঘনত্ব।"
+    },
     night: {
       title: "NASA Black Marble Night Lights",
       title_bn: "নাসার ব্ল্যাক মার্বেল রাতের আলো",
@@ -120,6 +126,12 @@
 
     const styleSpec = {
       version: 8,
+      light: {
+        anchor: "viewport",
+        color: "#f5f0dc",
+        intensity: 0.55,
+        position: [1.3, 110, 45]
+      },
       glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
       sources: {
         "buildings": { type: "vector", url: "https://tiles.openfreemap.org/planet", attribution: "© OpenStreetMap · OpenFreeMap / OpenMapTiles" },
@@ -552,6 +564,42 @@
     hud.hidden = false;
   }
 
+  let radarTimer = null;
+  let dynamicLayers = [];
+
+  const LENS_VIEWPORTS = {
+    city: { center: [90.4125, 23.8103], zoom: 13, pitch: 50, bearing: 15 },
+    heritage: { center: [90.378, 23.762], zoom: 16.5, pitch: 60, bearing: 45 },
+    transit: { center: [90.375, 23.785], zoom: 14, pitch: 55, bearing: 25 },
+    rivers: { center: [91.35, 24.8], zoom: 8.8, pitch: 35, bearing: -5 },
+    economy: { center: [90.36, 23.82], zoom: 12.5, pitch: 45, bearing: 10 },
+    air: { center: [90.4, 23.85], zoom: 9.5, pitch: 20, bearing: 0 },
+    aerosol: { center: [90.5, 24.0], zoom: 8.5, pitch: 0, bearing: 0 },
+    radar: { center: [90.4, 23.8], zoom: 8.8, pitch: 10, bearing: 0 },
+    rain: { center: [90.4, 23.8], zoom: 10.5, pitch: 30, bearing: 0 },
+    haze: { center: [90.35, 23.85], zoom: 11.5, pitch: 45, bearing: -15 },
+    cloud: { center: [90.41, 23.81], zoom: 9, pitch: 0, bearing: 0 },
+    night: { center: [90.41, 23.81], zoom: 10.5, pitch: 30, bearing: 0 },
+    water: { center: [90.6, 24.2], zoom: 8.5, pitch: 20, bearing: 0 }
+  };
+
+  function clearDynamicLayers() {
+    if (radarTimer) {
+      clearInterval(radarTimer);
+      radarTimer = null;
+    }
+    if (activeOverlayLayer && map?.getLayer(activeOverlayLayer)) {
+      map.removeLayer(activeOverlayLayer);
+      map.removeSource(activeOverlayLayer);
+      activeOverlayLayer = null;
+    }
+    for (const id of dynamicLayers) {
+      if (map?.getLayer(id)) map.removeLayer(id);
+      if (map?.getSource(id)) map.removeSource(id);
+    }
+    dynamicLayers = [];
+  }
+
   function applyLens(lensId) {
     currentLens = lensId;
     if ($("#atlas-lens")) $("#atlas-lens").value = lensId;
@@ -570,13 +618,22 @@
     if (!map) return;
     const layerStatus = $("#atlas-layer-status");
     if (layerStatus) { layerStatus.hidden = true; layerStatus.textContent = ""; }
-    if (["haze", "rain", "radar"].includes(lensId)) loadLensEvidence(lensId);
 
-    if (activeOverlayLayer && map.getLayer(activeOverlayLayer)) {
-      map.removeLayer(activeOverlayLayer);
-      map.removeSource(activeOverlayLayer);
-      activeOverlayLayer = null;
+    const is3D = $("#atlas-view")?.value !== "2d";
+    const vp = LENS_VIEWPORTS[lensId];
+    if (vp && typeof map.flyTo === "function") {
+      map.flyTo({
+        center: vp.center,
+        zoom: vp.zoom,
+        pitch: is3D ? vp.pitch : 0,
+        bearing: is3D ? vp.bearing : 0,
+        essential: true,
+        duration: 1600
+      });
     }
+
+    clearDynamicLayers();
+    if (["haze", "rain", "radar"].includes(lensId)) loadLensEvidence(lensId);
 
     if (map.getLayer("rivers-lines")) {
       map.setLayoutProperty("rivers-lines", "visibility", (lensId === "rivers" || lensId === "city") ? "visible" : "none");
@@ -606,48 +663,210 @@
     }
 
     const today = new Date().toISOString().split("T")[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
     if (lensId === "cloud") {
       addRasterOverlay(
         "nasa-cloud",
         `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/${today}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`
       );
+    } else if (lensId === "aerosol") {
+      addRasterOverlay(
+        "nasa-aerosol",
+        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth/default/${yesterday}/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png`,
+        7
+      );
+      if (layerStatus) {
+        layerStatus.hidden = false;
+        layerStatus.textContent = tr("NASA MODIS MAIAC · Aerosol Optical Depth (AOD) · Daily satellite column density", "নাসা মডিস মায়াক · এরোসল অপটিক্যাল ডেপথ (AOD) · দৈনিক উপগ্রহ বায়ুমণ্ডলীয় ঘনত্ব");
+      }
     } else if (lensId === "night") {
       addRasterOverlay(
         "nasa-night",
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_DayNightBand_ENCC/default/${today}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`
+        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_DayNightBand_ENCC/default/${yesterday}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`,
+        8
       );
     } else if (lensId === "water") {
       addRasterOverlay(
         "nasa-water",
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_Flood_Water_250m/default/${today}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`
+        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_Flood_Water_250m/default/${yesterday}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`
       );
-
     }
   }
 
   async function loadLensEvidence(lens) {
     const status = $("#atlas-layer-status");
-    status.hidden = false;
-    status.textContent = tr("Checking source…", "উৎস যাচাই হচ্ছে…");
+    if (status) {
+      status.hidden = false;
+      status.textContent = tr("Checking source…", "উৎস যাচাই হচ্ছে…");
+    }
+    const isBn = document.documentElement.lang === "bn";
     try {
       if (lens === "radar") {
-        const res = await fetch("https://api.rainviewer.com/public/weather-maps.json", {signal: AbortSignal.timeout(10000)});
+        const res = await fetch("https://api.rainviewer.com/public/weather-maps.json", { signal: AbortSignal.timeout(10000) });
         if (!res.ok) throw new Error("radar-unavailable");
         const data = await res.json();
         if (currentLens !== lens) return;
-        const frame = data.radar?.past?.at(-1);
-        if (!frame || !data.host?.startsWith("https://")) throw new Error("radar-no-frame");
-        addRasterOverlay("rain-radar", `${data.host}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, 7);
-        status.textContent = tr("Radar composite · coverage may be absent over Dhaka · ", "রাডার চিত্র · ঢাকার তথ্য নাও থাকতে পারে · ") + new Date(frame.time * 1000).toISOString();
-      } else {
-        const res = await fetch(lens === "rain" ? "/api/atlas/rainfall" : "/api/atlas/fires", {signal: AbortSignal.timeout(15000)});
+        const frames = data.radar?.past || [];
+        if (!frames.length || !data.host?.startsWith("https://")) throw new Error("radar-no-frame");
+        let fIdx = frames.length - 1;
+        function showRadarFrame(i) {
+          if (currentLens !== "radar" || !map) return;
+          const fr = frames[i];
+          const tileUrl = `${data.host}${fr.path}/256/{z}/{x}/{y}/2/1_1.png`;
+          if (map.getLayer("rain-radar")) map.removeLayer("rain-radar");
+          if (map.getSource("rain-radar")) map.removeSource("rain-radar");
+          addRasterOverlay("rain-radar", tileUrl, 7);
+          const tStr = new Date(fr.time * 1000).toLocaleTimeString(isBn ? "bn-BD" : "en-GB", { timeZone: "Asia/Dhaka", hour: "2-digit", minute: "2-digit" });
+          if (status) status.textContent = `${tr("Doppler radar loop · frame ", "ডপলার রাডার লুপ · ধাপ ")}${i + 1}/${frames.length} · ${tStr} BST`;
+        }
+        showRadarFrame(fIdx);
+        if (frames.length > 1) {
+          radarTimer = setInterval(() => {
+            if (currentLens !== "radar") { clearInterval(radarTimer); return; }
+            fIdx = (fIdx + 1) % frames.length;
+            showRadarFrame(fIdx);
+          }, 1200);
+        }
+      } else if (lens === "rain") {
+        const res = await fetch("/api/atlas/rainfall", { signal: AbortSignal.timeout(15000) });
         const data = await res.json();
         if (currentLens !== lens) return;
-        if (!res.ok || data.status !== "ok") throw new Error(data.reasonCode || "feed-unavailable");
-        status.textContent = tr("Modeled rainfall · next 24 h: ", "মডেলভিত্তিক বৃষ্টি · পরের ২৪ ঘণ্টা: ") + data.catchments.map(p => `${p.name}: ${p.rain_24h_sum_mm?.toFixed(1)} mm`).join(" · ");
+        if (!res.ok || data.status !== "ok" || !data.catchments?.length) throw new Error(data.reasonCode || "feed-unavailable");
+        if (status) status.textContent = tr("Modeled rainfall · next 24 h: ", "মডেলভিত্তিক বৃষ্টি · পরের ২৪ ঘণ্টা: ") + data.catchments.map(p => `${p.name}: ${p.rain_24h_sum_mm?.toFixed(1)} mm`).join(" · ");
+        const geojson = {
+          type: "FeatureCollection",
+          features: data.catchments.map(c => {
+            const rain = Number(c.rain_24h_sum_mm || 0);
+            const color = rain > 25 ? "#dd4027" : (rain > 10 ? "#e2953b" : (rain > 2 ? "#0093a5" : "#547076"));
+            const name = isBn ? (c.name_bn || c.name) : c.name;
+            return {
+              type: "Feature",
+              geometry: { type: "Point", coordinates: [c.lng, c.lat] },
+              properties: {
+                id: c.id,
+                name,
+                rain_24h_sum_mm: rain,
+                current_mm: c.current_mm,
+                color,
+                label: `${name}\n${rain.toFixed(1)} mm`
+              }
+            };
+          })
+        };
+        map.addSource("catchment-rain", { type: "geojson", data: geojson });
+        map.addLayer({
+          id: "catchment-rain-circles",
+          type: "circle",
+          source: "catchment-rain",
+          paint: {
+            "circle-radius": 22,
+            "circle-color": ["get", "color"],
+            "circle-opacity": 0.65,
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "#f5f0dc"
+          }
+        }, map.getLayer("parliament-buildings") ? "parliament-buildings" : "city-buildings");
+        map.addLayer({
+          id: "catchment-rain-labels",
+          type: "symbol",
+          source: "catchment-rain",
+          layout: {
+            "text-field": ["get", "label"],
+            "text-font": ["Noto Sans Regular"],
+            "text-size": 11,
+            "text-offset": [0, 1.6]
+          },
+          paint: {
+            "text-color": "#ffffff",
+            "text-halo-color": "#0d171d",
+            "text-halo-width": 2
+          }
+        });
+        dynamicLayers.push("catchment-rain-circles", "catchment-rain-labels", "catchment-rain");
+        if (map.on) {
+          map.on("click", "catchment-rain-circles", e => {
+            if (!e.features?.[0]) return;
+            const p = e.features[0].properties;
+            const hud = $("#atlas-observation-hud");
+            if (!hud) return;
+            hud.hidden = false;
+            hud.innerHTML = `<h3>${p.name}</h3>
+              <div style="margin:4px 0;"><strong>${tr("24h precipitation forecast:","২৪ ঘণ্টার বৃষ্টিপাত পূর্বাভাস:")}</strong> ${Number(p.rain_24h_sum_mm).toFixed(1)} mm</div>
+              <div style="font-size:11.5px;color:var(--dim);">${tr("High-resolution precipitation catchment model for Greater Dhaka river drainage.","বৃহত্তর ঢাকার নদী নিষ্কাশনের জন্য উচ্চ-রেজোলিউশন বৃষ্টিপাত পূর্বাভাস মডেল।")}</div>
+              <button type="button" class="atlas-btn" style="margin-top:8px;width:100%;" onclick="document.getElementById('atlas-observation-hud').hidden=true">${tr("Close","বন্ধ করুন")}</button>`;
+          });
+        }
+      } else if (lens === "haze") {
+        const res = await fetch("/api/atlas/wind", { signal: AbortSignal.timeout(15000) });
+        const data = await res.json();
+        if (currentLens !== lens) return;
+        const wind = data?.data?.current;
+        const windSpeed = wind?.wind_speed_10m ? Number(wind.wind_speed_10m).toFixed(1) : null;
+        const windDir = wind?.wind_direction_10m !== undefined ? Math.round(Number(wind.wind_direction_10m)) : null;
+        const cardinals = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+        const cardinal = windDir !== null ? cardinals[Math.round(windDir / 22.5) % 16] : "";
+        if (windSpeed && windDir !== null) {
+          if (status) status.textContent = `${tr("Surface wind: ","ভূপৃষ্ঠের বাতাস: ")}${windSpeed} km/h ${tr("from ","দিক: ")}${windDir}° (${cardinal}) · ${tr("Winter plume transport towards central Dhaka","ধোঁয়া কেন্দ্রীয় ঢাকার দিকে প্রবাহিত")}`;
+        } else {
+          if (status) status.textContent = tr("Brick kiln clusters in Savar, Gazipur & Narayanganj arcs · prevailing winter smoke transport","সাভার, গাজীপুর ও নারায়ণগঞ্জ ইটভাটা অঞ্চল · শীতকালীন ধোঁয়া প্রবাহ");
+        }
+        const kilnsGeo = {
+          type: "FeatureCollection",
+          features: [
+            { type: "Feature", geometry: { type: "Point", coordinates: [90.260, 23.830] }, properties: { name: isBn ? "সাভার ইটভাটা অঞ্চল" : "Savar Brick Kiln Belt", count: "~180 kilns", tech: "FCBTK / Zigzag", color: "#d96629" } },
+            { type: "Feature", geometry: { type: "Point", coordinates: [90.395, 23.930] }, properties: { name: isBn ? "গাজীপুর-টঙ্গী ইটভাটা অঞ্চল" : "Gazipur-Tongi Brick Belt", count: "~240 kilns", tech: "FCBTK / Zigzag", color: "#dd4027" } },
+            { type: "Feature", geometry: { type: "Point", coordinates: [90.370, 23.680] }, properties: { name: isBn ? "কেরানীগঞ্জ-বুড়িগঙ্গা ইটভাটা বলয়" : "Keraniganj-Buriganga Arc", count: "~120 kilns", tech: "Zigzag / Traditional", color: "#e2953b" } },
+            { type: "Feature", geometry: { type: "Point", coordinates: [90.520, 23.630] }, properties: { name: isBn ? "নারায়ণগঞ্জ-শীতলক্ষ্যা ইটভাটা ক্লাস্টার" : "Narayanganj-Shitalakshya Cluster", count: "~150 kilns", tech: "FCBTK / Zigzag", color: "#e2953b" } }
+          ]
+        };
+        map.addSource("haze-kilns", { type: "geojson", data: kilnsGeo });
+        map.addLayer({
+          id: "haze-kilns-circles",
+          type: "circle",
+          source: "haze-kilns",
+          paint: {
+            "circle-radius": 20,
+            "circle-color": ["get", "color"],
+            "circle-opacity": 0.7,
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "#f5f0dc"
+          }
+        }, map.getLayer("parliament-buildings") ? "parliament-buildings" : "city-buildings");
+        map.addLayer({
+          id: "haze-kilns-labels",
+          type: "symbol",
+          source: "haze-kilns",
+          layout: {
+            "text-field": ["get", "name"],
+            "text-font": ["Noto Sans Regular"],
+            "text-size": 11,
+            "text-offset": [0, 1.5]
+          },
+          paint: {
+            "text-color": "#ffffff",
+            "text-halo-color": "#0d171d",
+            "text-halo-width": 2
+          }
+        });
+        dynamicLayers.push("haze-kilns-circles", "haze-kilns-labels", "haze-kilns");
+        if (map.on) {
+          map.on("click", "haze-kilns-circles", e => {
+            if (!e.features?.[0]) return;
+            const p = e.features[0].properties;
+            const hud = $("#atlas-observation-hud");
+            if (!hud) return;
+            hud.hidden = false;
+            hud.innerHTML = `<h3>${p.name}</h3>
+              <div style="margin:4px 0;"><strong>${tr("Operating density:","ভাটার সংখ্যা:")}</strong> ${p.count}</div>
+              <div style="margin:4px 0;"><strong>${tr("Kiln technology:","ভাটা প্রযুক্তি:")}</strong> ${p.tech}</div>
+              <div style="font-size:11.5px;color:var(--dim);">${tr("Major winter particulate and black carbon emission zone affecting Dhaka urban basin.","শীতকালে ঢাকা মহানগরীর বাতাসের মান অবনমনকারী প্রধান ধোঁয়া নির্গমন বলয়।")}</div>
+              <button type="button" class="atlas-btn" style="margin-top:8px;width:100%;" onclick="document.getElementById('atlas-observation-hud').hidden=true">${tr("Close","বন্ধ করুন")}</button>`;
+          });
+        }
       }
     } catch {
-      if (currentLens === lens) status.textContent = tr("Evidence unavailable for this lens. No current observation is shown.", "এই স্তরের উপাত্ত অনুপলব্ধ। বর্তমান পর্যবেক্ষণ দেখানো হচ্ছে না।");
+      if (currentLens === lens && status) status.textContent = tr("Evidence unavailable for this lens. No current observation is shown.", "এই স্তরের উপাত্ত অনুপলব্ধ। বর্তমান পর্যবেক্ষণ দেখানো হচ্ছে না।");
     }
   }
 

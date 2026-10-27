@@ -18,6 +18,13 @@ Building categories use actual OSM tags, never height, proximity or random color
 
 Spatial Hallucination (SH) Elimination: Overlays are budgeted strictly to prevent map obstruction. The atlas menu bar is halved from 300 px to 150 px with single-column vertical micro-controls; the map key is budgeted to 150 px; the forecast playback panel is halved from 560 px to 280 px; and the observation HUD is tightened from 310 px to 220 px. This preserves the maximum possible operating viewport for the hero 3D map. Height provenance and Parliament courtyards remain intact.
 
+### Satellite Observation, Atmospheric Modeling & 3D Spatial Geometry
+- **NASA Aerosol Optical Depth (AOD)**: NASA MODIS MAIAC (1 km high-resolution Level 7) & VIIRS daily atmospheric aerosol column density measuring transboundary particulate loading and winter smoke over Bengal Basin.
+- **Doppler Rain Radar Playback**: Dynamic RainViewer Doppler radar loop cycling past observation frames with BST timestamps, displaying precipitation movement across the delta.
+- **Catchment Rainfall Modeling**: Modeled 24-hour precipitation accumulation across 5 Greater Dhaka drainage basins (Buriganga, Turag, Balu, Tongi North, Savar West) with intensity-coded badges and interactive hydrologic observation cards.
+- **Winter Smoke Transport & Brick Kiln Arcs**: Live 10m surface wind vectors from Open-Meteo coupled with spatial kiln clusters in Savar, Gazipur, Keraniganj, and Narayanganj, illustrating seasonal particulate drift into central Dhaka.
+- **3D Architectural Sun Lighting & Cinematic Camera Choreography**: Directional sun lighting (`intensity: 0.55, position: [1.3, 110, 45]`) renders authentic architectural relief and depth on 3D building extrusions. Lens transitions smoothly fly to authored scale, pitch, and bearing configurations.
+
 Operational requirements distilled from a private delegate discussion: policy decisions, improvement without demolition/displacement, upstream-driven northeast flash floods, agricultural warning lead time, forecast accuracy and agency implementation. No private transcript is distributed. The talk's numerical accuracy claims are unvalidated and excluded.
 
 The outlook is a model playback, paused by default. CAMS global PM2.5 uses native-scale cells, three-hour frames and a fixed concentration scale. GloFAS discharge uses daily model reaches and ensemble quartiles. Model issue time is not exposed by the provider and remains null; retrieval and valid times are separate. Missing values stay missing.
