@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793129691-0d50add";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793129709-cc4c3b7";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
