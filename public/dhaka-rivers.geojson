@@ -15,11 +15,19 @@
         "recorded_highest_flood_m": 7.58,
         "agency": "BWDB / FFWC",
         "station_id": "SW42",
-        "status": "normal",
-        "current_water_level_m": 3.82,
-        "trend": "steady"
+        "status": "unavailable",
+        "current_water_level_m": null,
+        "trend": "unavailable",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.4150, 23.7001] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.415,
+          23.7001
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -29,16 +37,24 @@
         "name_bn": "তুরাগ নদী (মিরপুর স্টেশন)",
         "river": "Turag",
         "type": "gauge",
-        "danger_level_m": 5.50,
-        "warning_level_m": 5.00,
+        "danger_level_m": 5.5,
+        "warning_level_m": 5.0,
         "recorded_highest_flood_m": 8.35,
         "agency": "BWDB / FFWC",
         "station_id": "SW299",
-        "status": "normal",
-        "current_water_level_m": 3.65,
-        "trend": "falling"
+        "status": "unavailable",
+        "current_water_level_m": null,
+        "trend": "unavailable",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.3420, 23.7980] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.342,
+          23.798
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -53,11 +69,19 @@
         "recorded_highest_flood_m": 7.13,
         "agency": "BWDB / FFWC",
         "station_id": "SW08",
-        "status": "normal",
-        "current_water_level_m": 3.48,
-        "trend": "steady"
+        "status": "unavailable",
+        "current_water_level_m": null,
+        "trend": "unavailable",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.5050, 23.7140] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.505,
+          23.714
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -67,16 +91,24 @@
         "name_bn": "শীতলক্ষ্যা নদী (নারায়ণগঞ্জ স্টেশন)",
         "river": "Shitalakshya",
         "type": "gauge",
-        "danger_level_m": 5.50,
-        "warning_level_m": 5.00,
+        "danger_level_m": 5.5,
+        "warning_level_m": 5.0,
         "recorded_highest_flood_m": 6.93,
         "agency": "BWDB / FFWC",
         "station_id": "SW179",
-        "status": "normal",
-        "current_water_level_m": 3.75,
-        "trend": "steady"
+        "status": "unavailable",
+        "current_water_level_m": null,
+        "trend": "unavailable",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.5110, 23.6190] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.511,
+          23.619
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -91,11 +123,19 @@
         "recorded_highest_flood_m": 7.84,
         "agency": "BWDB / FFWC",
         "station_id": "SW298",
-        "status": "normal",
-        "current_water_level_m": 3.90,
-        "trend": "falling"
+        "status": "unavailable",
+        "current_water_level_m": null,
+        "trend": "unavailable",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.4010, 23.8890] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.401,
+          23.889
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -110,11 +150,19 @@
         "recorded_highest_flood_m": 7.42,
         "agency": "BWDB / FFWC",
         "station_id": "SW68",
-        "status": "normal",
-        "current_water_level_m": 3.35,
-        "trend": "steady"
+        "status": "unavailable",
+        "current_water_level_m": null,
+        "trend": "unavailable",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.4950, 23.5630] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.495,
+          23.563
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -123,18 +171,41 @@
         "name": "Buriganga River Corridor",
         "name_bn": "বুড়িগঙ্গা নদী করিডোর",
         "type": "river_axis",
-        "role": "Southern boundary and commercial water spine"
+        "role": "Southern boundary and commercial water spine",
+        "provenance": "reference",
+        "observedAt": null
       },
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [90.3340, 23.7540],
-          [90.3550, 23.7250],
-          [90.3800, 23.7120],
-          [90.4100, 23.7020],
-          [90.4350, 23.6900],
-          [90.4850, 23.6550],
-          [90.5050, 23.6250]
+          [
+            90.334,
+            23.754
+          ],
+          [
+            90.355,
+            23.725
+          ],
+          [
+            90.38,
+            23.712
+          ],
+          [
+            90.41,
+            23.702
+          ],
+          [
+            90.435,
+            23.69
+          ],
+          [
+            90.485,
+            23.655
+          ],
+          [
+            90.505,
+            23.625
+          ]
         ]
       }
     },
@@ -145,16 +216,33 @@
         "name": "Turag River Corridor",
         "name_bn": "তুরাগ নদী করিডোর",
         "type": "river_axis",
-        "role": "Western boundary and flood discharge route"
+        "role": "Western boundary and flood discharge route",
+        "provenance": "reference",
+        "observedAt": null
       },
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [90.3340, 23.7540],
-          [90.3380, 23.7850],
-          [90.3450, 23.8200],
-          [90.3620, 23.8650],
-          [90.3850, 23.9000]
+          [
+            90.334,
+            23.754
+          ],
+          [
+            90.338,
+            23.785
+          ],
+          [
+            90.345,
+            23.82
+          ],
+          [
+            90.362,
+            23.865
+          ],
+          [
+            90.385,
+            23.9
+          ]
         ]
       }
     },
@@ -165,16 +253,33 @@
         "name": "Balu River Corridor",
         "name_bn": "বালু নদী করিডোর",
         "type": "river_axis",
-        "role": "Eastern drainage receiver"
+        "role": "Eastern drainage receiver",
+        "provenance": "reference",
+        "observedAt": null
       },
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [90.4400, 23.8900],
-          [90.4700, 23.8400],
-          [90.4950, 23.7800],
-          [90.5050, 23.7140],
-          [90.5100, 23.6700]
+          [
+            90.44,
+            23.89
+          ],
+          [
+            90.47,
+            23.84
+          ],
+          [
+            90.495,
+            23.78
+          ],
+          [
+            90.505,
+            23.714
+          ],
+          [
+            90.51,
+            23.67
+          ]
         ]
       }
     },
@@ -185,15 +290,29 @@
         "name": "Tongi Khal Channel",
         "name_bn": "টঙ্গী খাল সংযোগ",
         "type": "canal_axis",
-        "role": "Northern cross-link between Turag and Balu"
+        "role": "Northern cross-link between Turag and Balu",
+        "provenance": "reference",
+        "observedAt": null
       },
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [90.3850, 23.9000],
-          [90.4010, 23.8890],
-          [90.4200, 23.8880],
-          [90.4400, 23.8900]
+          [
+            90.385,
+            23.9
+          ],
+          [
+            90.401,
+            23.889
+          ],
+          [
+            90.42,
+            23.888
+          ],
+          [
+            90.44,
+            23.89
+          ]
         ]
       }
     },
@@ -205,16 +324,33 @@
         "name_bn": "হাতিরঝিল পানি ধারণ জলাধার",
         "type": "retention_basin",
         "capacity_m3": 3000000,
-        "role": "Central stormwater storage, regulates Rampura sluice gate to Balu River"
+        "role": "Central stormwater storage, regulates Rampura sluice gate to Balu River",
+        "provenance": "reference",
+        "observedAt": null
       },
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [90.3955, 23.7550],
-          [90.4040, 23.7650],
-          [90.4130, 23.7710],
-          [90.4220, 23.7680],
-          [90.4310, 23.7640]
+          [
+            90.3955,
+            23.755
+          ],
+          [
+            90.404,
+            23.765
+          ],
+          [
+            90.413,
+            23.771
+          ],
+          [
+            90.422,
+            23.768
+          ],
+          [
+            90.431,
+            23.764
+          ]
         ]
       }
     },
@@ -225,14 +361,25 @@
         "name": "Dhanmondi Lake",
         "name_bn": "ধানমন্ডি লেক",
         "type": "urban_lake",
-        "role": "Natural retention body and recreational civic space in western Dhaka"
+        "role": "Natural retention body and recreational civic space in western Dhaka",
+        "provenance": "reference",
+        "observedAt": null
       },
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [90.3700, 23.7550],
-          [90.3750, 23.7480],
-          [90.3800, 23.7380]
+          [
+            90.37,
+            23.755
+          ],
+          [
+            90.375,
+            23.748
+          ],
+          [
+            90.38,
+            23.738
+          ]
         ]
       }
     },
@@ -245,9 +392,17 @@
         "type": "pumping_station",
         "agency": "Dhaka WASA / BWDB",
         "capacity_cusec": 2200,
-        "role": "Discharges storm runoff from northern Dhaka into Turag River"
+        "role": "Discharges storm runoff from northern Dhaka into Turag River",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.3425, 23.8315] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.3425,
+          23.8315
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -258,9 +413,17 @@
         "type": "pumping_station",
         "agency": "Dhaka WASA / DNCC",
         "capacity_cusec": 1800,
-        "role": "Prevents severe waterlogging across Mirpur and Mohammadpur"
+        "role": "Prevents severe waterlogging across Mirpur and Mohammadpur",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.3540, 23.7780] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.354,
+          23.778
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -271,9 +434,17 @@
         "type": "pumping_station",
         "agency": "DSCC / Dhaka WASA",
         "capacity_cusec": 1200,
-        "role": "Drains stormwater from Old Dhaka into the Buriganga"
+        "role": "Drains stormwater from Old Dhaka into the Buriganga",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.4190, 23.7030] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.419,
+          23.703
+        ]
+      }
     }
   ]
 }

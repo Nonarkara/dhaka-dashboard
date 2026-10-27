@@ -1,0 +1,184 @@
+{
+  "width": 1280,
+  "height": 720,
+  "regions": [
+    {
+      "selector": ".atlas-header",
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 39,
+      "scrollWidth": 1280
+    },
+    {
+      "selector": ".atlas-lenses",
+      "x": 0,
+      "y": 39,
+      "width": 1280,
+      "height": 28,
+      "scrollWidth": 1280
+    },
+    {
+      "selector": ".atlas-lens-story",
+      "x": 0,
+      "y": 67,
+      "width": 1280,
+      "height": 24.9453125,
+      "scrollWidth": 1280
+    },
+    {
+      "selector": ".atlas-map-wrap",
+      "x": 0,
+      "y": 91.9453125,
+      "width": 1280,
+      "height": 628.0546875,
+      "scrollWidth": 1280
+    },
+    {
+      "selector": ".atlas-watch",
+      "x": 190,
+      "y": 619.1015625,
+      "width": 900,
+      "height": 70.8984375,
+      "scrollWidth": 900
+    }
+  ],
+  "controls": [
+    {
+      "id": "language-toggle",
+      "left": 768.5546875,
+      "right": 815.109375,
+      "top": 6,
+      "bottom": 32,
+      "scrollWidth": 45,
+      "width": 46.5546875
+    },
+    {
+      "id": "atlas-view",
+      "left": 888.4921875,
+      "right": 960.9921875,
+      "top": 6,
+      "bottom": 32,
+      "scrollWidth": 71,
+      "width": 72.5
+    },
+    {
+      "id": "atlas-basemap",
+      "left": 1027.203125,
+      "right": 1176.203125,
+      "top": 6,
+      "bottom": 32,
+      "scrollWidth": 147,
+      "width": 149
+    },
+    {
+      "id": "atlas-menu-summary",
+      "left": 1186.203125,
+      "right": 1266,
+      "top": 6,
+      "bottom": 32,
+      "scrollWidth": 78,
+      "width": 79.796875
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1005,
+      "right": 1239,
+      "top": 81,
+      "bottom": 107,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1005,
+      "right": 1239,
+      "top": 117,
+      "bottom": 143,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1005,
+      "right": 1239,
+      "top": 153,
+      "bottom": 179,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1005,
+      "right": 1239,
+      "top": 189,
+      "bottom": 215,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1005,
+      "right": 1239,
+      "top": 225,
+      "bottom": 251,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "download-geojson-btn",
+      "left": 1005,
+      "right": 1239,
+      "top": 328.6875,
+      "bottom": 354.6875,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-theme",
+      "left": 1082.7265625,
+      "right": 1211.7265625,
+      "top": 372.6875,
+      "bottom": 398.6875,
+      "scrollWidth": 127,
+      "width": 129
+    },
+    {
+      "id": "atlas-watch-flood",
+      "left": 191,
+      "right": 414.75,
+      "top": 646.5,
+      "bottom": 689,
+      "scrollWidth": 224,
+      "width": 223.75
+    },
+    {
+      "id": "atlas-watch-air",
+      "left": 415.75,
+      "right": 639.5,
+      "top": 646.5,
+      "bottom": 689,
+      "scrollWidth": 224,
+      "width": 223.75
+    },
+    {
+      "id": "atlas-watch-wind",
+      "left": 640.5,
+      "right": 864.25,
+      "top": 646.5,
+      "bottom": 689,
+      "scrollWidth": 224,
+      "width": 223.75
+    },
+    {
+      "id": "atlas-watch-traffic",
+      "left": 865.25,
+      "right": 1089,
+      "top": 646.5,
+      "bottom": 689,
+      "scrollWidth": 224,
+      "width": 223.75
+    }
+  ],
+  "pass": true
+}

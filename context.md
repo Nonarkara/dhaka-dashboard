@@ -13,3 +13,11 @@
   - 14 authored districts and 16 architectural/historic monuments (Lalbagh Fort, Ahsan Manzil, Louis Kahn Parliament, Curzon Hall, Tara Masjid, Armenian Church, Central Shaheed Minar).
   - 100% bilingual parity (Bengali বাংলা / English).
 - **Design DNA**: Dieter Rams 0-radius geometry, Wada Sanzo Delta & Terracotta palette, mobile-first 390px viewport without horizontal overflow.
+
+## Runtime audit · 28 October 2026
+
+Browser inspection disproved the initial release claims: watch readings were constants; no building extrusion existed; phone header controls overflowed; the 72-hour chart rendered 48 bars. Eight source-presence contracts did not prove these behaviors.
+
+The repair connects watch to city-center modeled air/weather, adds OSM/OpenFreeMap building extrusion at zoom 14+, keeps unavailable gauge/economic/FIRMS readings null, and makes surface-wind/precipitation/seismic failures explicit. Expired model cache is no longer passed off as current. Seven air locations remain a reference registry, not seven measured stations. Numeric economic/corridor claims were removed from public responses and map attributes until dated source evidence exists.
+
+Phone header uses two rows; watch values wrap in bounded grid tracks; the map remains independent of evidence length. Geometry evidence and limitations are in docs/verification/README.md. Runtime regression tests supplement the original presence contracts; deployment now fails on API smoke failure or mismatched public bytes.

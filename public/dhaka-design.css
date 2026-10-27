@@ -152,3 +152,20 @@
   font-weight: 600;
   margin-top: 2px;
 }
+
+.river-reference-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.river-reference-row small { grid-column: 1 / -1; color: var(--dim); }
+.aqi-bar.missing { background: transparent; border-bottom: 1px solid var(--dim); }
+.dashboard-modal a { color: var(--ink); }
+@media (max-width: 600px) {
+  .metric-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .metric-card { padding: 8px; gap: 3px; }
+  .river-reference-row { grid-template-columns: minmax(0, 1fr); }
+  .river-reference-row small { grid-column: 1; }
+  .data-table { font-size: 11px; }
+  .data-table td, .data-table th { padding: 4px; }
+}
+.aqi-bar[data-aqi-class="missing"] { background: var(--dim); }
+
+/* Reading exact values takes precedence over the display face. */
+.metric-value { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }

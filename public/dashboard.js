@@ -7,6 +7,8 @@
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
 
+  const tr = (en, bn) => document.documentElement.lang === "bn" ? bn : en;
+
   async function loadDashboardFeeds() {
     loadEconomy();
     loadRivers();
@@ -18,7 +20,7 @@
     const container = $("#economy-indicators-grid");
     if (!container) return;
     try {
-      const res = await fetch("/api/dhaka/economy");
+      const res = await fetch("/api/dhaka/economy", { signal: AbortSignal.timeout(15000) });
       if (!res.ok) throw new Error("Economy API unavailable");
       const data = await res.json();
       const isBn = document.documentElement.lang === "bn";
@@ -28,12 +30,12 @@
           <span class="metric-category">${ind.category}</span>
           <div class="metric-name">${(isBn && ind.name_bn) ? ind.name_bn : ind.name}</div>
           <div class="metric-value-row">
-            <span class="metric-value">${ind.value}</span>
+            <span class="metric-value">${ind.value ?? tr("Unavailable", "অনুপলব্ধ")}</span>
             <span class="metric-unit">${(isBn && ind.unit_bn) ? ind.unit_bn : ind.unit}</span>
           </div>
           <div class="metric-provenance">
             <span class="provenance-dot ${ind.provenance}"></span>
-            <span>${ind.source}</span>
+            <span>${ind.source} · ${tr("No dated bulletin connected", "তারিখযুক্ত বুলেটিন সংযুক্ত নেই")}</span>
           </div>
           <p style="margin:4px 0 0;font-size:11px;color:var(--dim);">${(isBn && ind.note_bn) ? ind.note_bn : ind.note}</p>
         </div>
@@ -47,46 +49,20 @@
     const container = $("#rivers-list-container");
     if (!container) return;
     try {
-      const res = await fetch("/api/dhaka/rivers");
+      const res = await fetch("/api/dhaka/rivers", { signal: AbortSignal.timeout(15000) });
       if (!res.ok) throw new Error("Rivers API unavailable");
       const data = await res.json();
       const isBn = document.documentElement.lang === "bn";
 
       container.innerHTML = `
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Station / River</th>
-              <th>Current (m MSL)</th>
-              <th>Danger Level</th>
-              <th>Warning Level</th>
-              <th>Historical Peak</th>
-              <th>Trend</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${data.stations.map(st => {
-              const name = (isBn && st.name_bn) ? st.name_bn : st.name;
-              const fillPct = Math.min(100, Math.max(10, (st.current_level_m / st.danger_level_m) * 100));
-              const trendIcon = st.trend === "rising" ? "▲" : st.trend === "falling" ? "▼" : "―";
-              return `
-                <tr>
-                  <td><strong>${name}</strong><br><small style="color:var(--dim)">${st.station_code} · ${st.agency}</small></td>
-                  <td><strong>${st.current_level_m} m</strong></td>
-                  <td style="color:var(--warn)">${st.danger_level_m} m</td>
-                  <td style="color:var(--amber)">${st.warning_level_m} m</td>
-                  <td>${st.highest_flood_level_m} m (${st.highest_flood_year})</td>
-                  <td>${trendIcon} ${st.trend}</td>
-                  <td><span class="hud-badge" style="background:${st.status === 'normal' ? 'var(--bg-strong)' : 'var(--warn)'}">${st.status}</span></td>
-                </tr>
-              `;
-            }).join("")}
-          </tbody>
-        </table>
-        <p style="font-size:11px;color:var(--dim);margin-top:6px;">
-          Source: Bangladesh Water Development Board (BWDB) / FFWC. Datum: Public surveyor benchmarks in metres Above Mean Sea Level (m MSL).
-        </p>
+        <p>${tr("Reference stations only. Current levels and trends are unavailable; no observation feed is connected. Thresholds below are unverified registry values, not a flood warning service.", "শুধু স্টেশনের তথ্যসূত্র। পর্যবেক্ষণ সংযুক্ত না থাকায় বর্তমান পানির স্তর ও প্রবণতা অনুপলব্ধ। নিচের সীমা যাচাইহীন নিবন্ধিত মান; এটি বন্যা সতর্কীকরণ সেবা নয়।")}</p>
+        <div class="river-reference-list">${data.stations.map(st => `
+          <div class="river-reference-row">
+            <strong>${isBn ? st.name_bn : st.name}</strong>
+            <span>${tr("Current", "বর্তমান")}: ${tr("Unavailable", "অনুপলব্ধ")}</span>
+            <small>${st.station_code} · ${st.agency} · ${tr("Danger", "বিপদসীমা")} ${st.danger_level_m} m · ${tr("Warning", "সতর্কসীমা")} ${st.warning_level_m} m · ${tr("Peak", "সর্বোচ্চ")} ${st.highest_flood_level_m} m (${st.highest_flood_year})</small>
+          </div>`).join("")}</div>
+        <p><a href="https://ffwc.gov.bd" target="_blank" rel="noopener">BWDB / FFWC ↗</a> · ${tr("Reference datum: m MSL. Observed time: unavailable.", "তথ্যসূত্র একক: m MSL। পর্যবেক্ষণের সময়: অনুপলব্ধ।")}</p>
       `;
     } catch (err) {
       container.innerHTML = `<p style="color:var(--warn);padding:8px;">River water level feed unavailable.</p>`;
@@ -97,20 +73,17 @@
     const container = $("#air-timeline-container");
     if (!container) return;
     try {
-      const res = await fetch("/api/atlas/air-quality");
+      const res = await fetch("/api/atlas/air-quality", { signal: AbortSignal.timeout(15000) });
       if (!res.ok) throw new Error("Air Quality API unavailable");
       const data = await res.json();
       const hourly = data.data?.hourly;
-      if (!hourly || !hourly.pm2_5) return;
+      if (!hourly?.pm2_5?.length) throw new Error("Missing hourly PM2.5");
 
-      const barsHtml = hourly.pm2_5.slice(0, 48).map((val, idx) => {
+      const barsHtml = hourly.pm2_5.slice(0, 72).map((val, idx) => {
+        if (!Number.isFinite(val)) return `<div class="aqi-bar missing" title="${tr("Unavailable", "অনুপলব্ধ")}"></div>`;
         const height = Math.min(100, Math.max(8, (val / 200) * 80));
-        let aqiClass = "moderate";
-        if (val > 150) aqiClass = "hazardous";
-        else if (val > 100) aqiClass = "very-unhealthy";
-        else if (val > 55) aqiClass = "unhealthy";
-        else if (val > 35) aqiClass = "sensitive";
-        else if (val <= 12) aqiClass = "good";
+        const aqi = hourly.us_aqi?.[idx];
+        const aqiClass = !Number.isFinite(aqi) ? "missing" : aqi <= 50 ? "good" : aqi <= 100 ? "moderate" : aqi <= 150 ? "sensitive" : aqi <= 200 ? "unhealthy" : aqi <= 300 ? "very-unhealthy" : "hazardous";
 
         const hourStr = hourly.time?.[idx]?.split("T")?.[1] || "";
         return `
@@ -119,15 +92,17 @@
       }).join("");
 
       container.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
-          <strong>72-Hour PM2.5 Forecast Curve (CAMS / Open-Meteo)</strong>
-          <span style="font-size:11px;color:var(--dim);">Current PM2.5: ${data.data.current?.pm2_5 ?? 67.5} μg/m³ · US AQI: ${data.data.current?.us_aqi ?? 158}</span>
+        <p>${tr("Model valid time (Asia/Dhaka)", "মডেলের কার্যকর সময় (ঢাকা)")}: ${data.data.current?.time ?? tr("Unavailable", "অনুপলব্ধ")}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+          <strong>${tr("72-hour modeled PM2.5 · CAMS / Open-Meteo", "৭২ ঘণ্টার মডেলভিত্তিক পিএম২.৫ · CAMS / Open-Meteo")}</strong>
+          <span style="font-size:11px;color:var(--dim);">Current PM2.5: ${data.data.current?.pm2_5 ?? tr("Unavailable", "অনুপলব্ধ")} μg/m³ · US AQI: ${data.data.current?.us_aqi ?? tr("Unavailable", "অনুপলব্ধ")}</span>
         </div>
         <div class="aqi-timeline">${barsHtml}</div>
         <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--dim);">
           <span>NOW</span>
           <span>+24 HOURS</span>
           <span>+48 HOURS</span>
+          <span>+72 HOURS</span>
         </div>
       `;
     } catch (err) {
@@ -139,13 +114,14 @@
     const container = $("#weather-detail-container");
     if (!container) return;
     try {
-      const res = await fetch("/api/atlas/weather");
+      const res = await fetch("/api/atlas/weather", { signal: AbortSignal.timeout(15000) });
       if (!res.ok) throw new Error("Weather API unavailable");
       const data = await res.json();
       const cur = data.data?.current;
-      if (!cur) return;
+      if (!cur) throw new Error("Missing current weather");
 
       container.innerHTML = `
+        <p>${tr("Modeled weather · Open-Meteo · Asia/Dhaka", "মডেলভিত্তিক আবহাওয়া · Open-Meteo · ঢাকা")}: ${cur.time}</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;margin-bottom:12px;">
           <div class="metric-card">
             <span class="metric-category">Temperature</span>
@@ -178,6 +154,8 @@
         const targetId = btn.getAttribute("data-open");
         const modal = document.getElementById(targetId);
         if (modal && typeof modal.showModal === "function") {
+          const menu = document.getElementById("atlas-menu");
+          if (menu) menu.open = false;
           modal.showModal();
         }
       });
@@ -194,6 +172,7 @@
       window.location.href = "/api/atlas/export";
     });
 
+    window.addEventListener("atlas:language", loadDashboardFeeds);
     loadDashboardFeeds();
   }
 

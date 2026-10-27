@@ -12,12 +12,12 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
-| **City in 3D** | 3D urban fabric, street grid, landmark elevations, and calculated sun lighting | OpenStreetMap, Esri Satellite, RAJUK |
+| **City in 3D** | OSM building extrusions at zoom 14+ (mapped or inferred heights), satellite imagery and authored landmark references | OpenStreetMap, Esri Satellite, RAJUK |
 | **Rivers & flood risk** | The five peripheral rivers (Buriganga, Turag, Balu, Shitalakshya, Dhaleshwari) and Tongi Khal with 6 BWDB gauge stations and surveyed danger levels (m MSL) | Bangladesh Water Development Board (BWDB) / FFWC |
 | **Economic engine** | Ready-Made Garment (RMG) export corridors, Savar DEPZ, Adamjee EPZ, Motijheel financial district, and wholesale hubs (Kawran Bazar, Islampur, Chawkbazar) | Export Promotion Bureau (EPB), Bangladesh Bank, DSE |
 | **Transit & Metro** | Dhaka Metro Rail (MRT Line 6) stations, Dhaka Elevated Expressway, Kamalapur central rail terminal, and Sadarghat launch terminal | DMTCL, DTCA, Bangladesh Railway, BIWTA |
-| **Air & 72h timeline** | Multi-station live monitoring (Uttara, Mirpur, Gulshan, Farmgate, Motijheel, Sadarghat, Savar) with 72-hour PM2.5 & US AQI forecast curves | Copernicus CAMS / Open-Meteo |
-| **Brick kilns & smoke** | Thermal anomaly fire detections across Savar/Gazipur brick kiln arcs with 10m & 925 hPa wind transport vectors | NASA FIRMS (VIIRS NOAA-20 375m), ECMWF |
+| **Air & 72h timeline** | City-center modeled air quality (the seven locations are a reference registry, not seven sensor readings); (Uttara, Mirpur, Gulshan, Farmgate, Motijheel, Sadarghat, Savar) with 72-hour PM2.5 & US AQI forecast curves | Copernicus CAMS / Open-Meteo |
+| **Brick kilns & smoke** | Explicit unavailable state until FIRMS retrieval is configured; surface wind only, no 925 hPa field | NASA FIRMS (VIIRS NOAA-20 375m), ECMWF |
 | **Architectural heritage** | Mughal, colonial, and modern masterworks: Lalbagh Fort (1678), Ahsan Manzil (1872), Louis Kahn's Jatiya Sangsad Bhaban (1982), Curzon Hall (1904) | Directorate of Archaeology, Survey of Bangladesh |
 | **Rain · next 24 h** | Catchment-level precipitation accumulation forecasts across the Greater Dhaka river basin | Open-Meteo High-Resolution Precipitation Models |
 | **Rain radar** | Live Doppler radar precipitation loop over the Bengal Delta | RainViewer Doppler Radar Mosaic |
@@ -29,13 +29,9 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 
 ## 2. Macroeconomic & Industrial Engine
 
-Dhaka is the manufacturing and financial engine of Bangladesh. DHKx tracks the macroeconomic pulse through an authoritative sourced ledger:
+The eight macroeconomic indicator definitions and industrial corridors are retained as a reference registry. Numeric values are unavailable because the original implementation supplied undated constants rather than retrieved bulletins. The interface links to providers and explicitly shows the missing dated bulletin. It must not be used as a live market or inflation monitor.
 
-- **Ready-Made Garments (RMG)**: Monthly Knitwear ($2.15B/mo) and Woven ($1.85B/mo) export values (EPB / Bangladesh Bank).
-- **Remittance Inflows**: Official monthly inward foreign remittance ($2.4B/mo) driving urban consumption and housing.
-- **Capital Markets**: Dhaka Stock Exchange (DSE) DSEX benchmark index, turnover, and market capitalization.
-- **Consumer Inflation**: Bangladesh Bureau of Statistics (BBS) CPI Headline (9.92%), Food (10.40%), and Non-food inflation.
-- **External Balances**: Gross Foreign Exchange Reserves & IMF BPM6 standard ($19.89B), and the crawling-peg USD/BDT exchange rate.
+Rivers likewise retain station geography and threshold references, but current levels and trends are null until a verified observation feed is connected. Registry thresholds are unverified and are not an operational flood warning service.
 
 ---
 

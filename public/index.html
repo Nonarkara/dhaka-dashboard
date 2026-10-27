@@ -6,12 +6,12 @@
   <title>DHKx 3D Atlas · Dhaka block by block</title>
   <meta name="description" content="Dhaka 3D urban atlas & operational civic dashboard: 3D urban form, river ring hydrology and BWDB flood risk, macroeconomic and industrial engine, MRT Line 6 metro transit, and live air quality and winter smoke plumes." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script src="/theme.js?v=dhaka-atlas-20261027-1793121253-895d1b6"></script>
-  <script src="/translations.js?v=dhaka-atlas-20261027-1793121253-895d1b6"></script>
-  <script src="/i18n.js?v=dhaka-atlas-20261027-1793121253-895d1b6"></script>
+  <script src="/theme.js?v=dhaka-atlas-20261027-1793123003-a00ea3c"></script>
+  <script src="/translations.js?v=dhaka-atlas-20261027-1793123003-a00ea3c"></script>
+  <script src="/i18n.js?v=dhaka-atlas-20261027-1793123003-a00ea3c"></script>
   <link href="/vendor/maplibre-6.4.1/maplibre-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261027-1793121253-895d1b6" />
-  <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261027-1793121253-895d1b6" />
+  <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261027-1793123003-a00ea3c" />
+  <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261027-1793123003-a00ea3c" />
   <noscript>
     <style>
       .atlas-loading-screen { display: none !important; }
@@ -105,6 +105,7 @@
         <span class="loading-text">Loading Dhaka 3D Atlas &amp; Layers…</span>
       </div>
 
+      <p id="atlas-layer-status" class="atlas-layer-status" role="status" hidden></p>
       <aside class="atlas-observation-hud" id="atlas-observation-hud" hidden aria-label="Selected spatial feature details"></aside>
 
       <section class="atlas-watch" id="atlas-watch" aria-label="City watch">
@@ -152,7 +153,7 @@
     </div>
     <div class="modal-body">
       <p style="margin-top:0;font-size:12px;color:var(--dim);">
-        Live peripheral river water levels from Bangladesh Water Development Board (BWDB) and Flood Forecasting &amp; Warning Centre (FFWC).
+        Reference river station registry. Current BWDB / FFWC readings are unavailable until an observation feed is connected.
       </p>
       <div id="rivers-list-container">Loading river gauge data…</div>
     </div>
@@ -179,7 +180,7 @@
     </div>
     <div class="modal-body">
       <p style="margin-top:0;font-size:12px;color:var(--dim);">
-        Sourced metrics for Bangladesh's primary manufacturing, export, and capital market hubs. Every number includes unit, reporting period, and publisher source.
+        Indicator definitions only. No dated bulletin is connected; current numeric values are unavailable.
       </p>
       <div class="metric-grid" id="economy-indicators-grid">Loading economic indicators…</div>
     </div>
@@ -192,7 +193,7 @@
     </div>
     <div class="modal-body">
       <p style="margin-top:0;font-size:12px;color:var(--dim);">
-        Dhaka Mass Rapid Transit (DMTCL) MRT Line 6, Dhaka Elevated Expressway, central rail stations and interstate bus terminals.
+        Reference network registry; routes, lengths and capacities below are unverified reference entries, not current operating status.
       </p>
       <table class="data-table">
         <thead>
@@ -208,33 +209,33 @@
             <td><strong>MRT Line 6 (Metro Rail)</strong><br><small style="color:var(--dim)">Uttara North to Kamalapur</small></td>
             <td>Elevated Electric Rail</td>
             <td>21.26 km · 16 Stations</td>
-            <td><span class="hud-badge" style="background:var(--ok)">Operational</span></td>
+            <td><span class="hud-badge" style="background:var(--bg-strong)">Reference only</span></td>
           </tr>
           <tr>
             <td><strong>Dhaka Elevated Expressway</strong><br><small style="color:var(--dim)">Kawla (Airport) to Farmgate</small></td>
             <td>Grade-separated Expressway</td>
             <td>19.73 km (Phase 1)</td>
-            <td><span class="hud-badge" style="background:var(--ok)">Operational</span></td>
+            <td><span class="hud-badge" style="background:var(--bg-strong)">Reference only</span></td>
           </tr>
           <tr>
             <td><strong>Sadarghat Launch Terminal</strong><br><small style="color:var(--dim)">Buriganga River Passenger Port</small></td>
             <td>Inland River Port</td>
             <td>200+ launches daily</td>
-            <td><span class="hud-badge" style="background:var(--ok)">Active</span></td>
+            <td><span class="hud-badge" style="background:var(--bg-strong)">Reference only</span></td>
           </tr>
           <tr>
             <td><strong>Kamalapur Railway Station</strong><br><small style="color:var(--dim)">Central Bangladesh Railway hub</small></td>
             <td>National Heavy Rail</td>
             <td>Primary passenger terminus</td>
-            <td><span class="hud-badge" style="background:var(--ok)">Active</span></td>
+            <td><span class="hud-badge" style="background:var(--bg-strong)">Reference only</span></td>
           </tr>
         </tbody>
       </table>
     </div>
   </dialog>
 
-  <script type="module" src="/loader.js?v=dhaka-atlas-20261027-1793121253-895d1b6"></script>
-  <script src="/app.js?v=dhaka-atlas-20261027-1793121253-895d1b6" defer></script>
-  <script src="/dashboard.js?v=dhaka-atlas-20261027-1793121253-895d1b6" defer></script>
+  <script type="module" src="/loader.js?v=dhaka-atlas-20261027-1793123003-a00ea3c"></script>
+  <script src="/app.js?v=dhaka-atlas-20261027-1793123003-a00ea3c" defer></script>
+  <script src="/dashboard.js?v=dhaka-atlas-20261027-1793123003-a00ea3c" defer></script>
 </body>
 </html>

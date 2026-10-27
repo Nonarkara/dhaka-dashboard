@@ -10,13 +10,13 @@ export interface MacroIndicator {
   category: "export" | "remittance" | "market" | "inflation" | "reserves" | "currency";
   name: string;
   name_bn: string;
-  value: string;
+  value: null;
   unit: string;
   unit_bn: string;
   period: string;
   source: string;
   source_url: string;
-  provenance: "measured" | "reference";
+  provenance: "unavailable";
   note: string;
   note_bn: string;
 }
@@ -27,13 +27,13 @@ export const MACRO_INDICATORS: MacroIndicator[] = [
     category: "export",
     name: "RMG Knitwear Exports",
     name_bn: "নিটওয়্যার তৈরি পোশাক রপ্তানি",
-    value: "2,154.20",
+    value: null,
     unit: "Million USD / month",
     unit_bn: "মিলিয়ন মার্কিন ডলার / মাস",
     period: "Monthly bulletin",
     source: "Export Promotion Bureau (EPB) / Bangladesh Bank",
     source_url: "https://www.bb.org.bd",
-    provenance: "measured",
+    provenance: "unavailable",
     note: "Primary manufacturing export engine centered in Savar, Gazipur and Narayanganj corridors.",
     note_bn: "সাভার, গাজীপুর ও নারায়ণগঞ্জ শিল্প অঞ্চলের প্রধান রপ্তানি চালিকাশক্তি।"
   },
@@ -42,13 +42,13 @@ export const MACRO_INDICATORS: MacroIndicator[] = [
     category: "export",
     name: "RMG Woven Garments Exports",
     name_bn: "ওভেন তৈরি পোশাক রপ্তানি",
-    value: "1,848.50",
+    value: null,
     unit: "Million USD / month",
     unit_bn: "মিলিয়ন মার্কিন ডলার / মাস",
     period: "Monthly bulletin",
     source: "Export Promotion Bureau (EPB) / Bangladesh Bank",
     source_url: "https://www.bb.org.bd",
-    provenance: "measured",
+    provenance: "unavailable",
     note: "Second largest export sector supplying top EU and US apparel retail partners.",
     note_bn: "ইউরোপ ও মার্কিন বাজারের শীর্ষ ব্র্যান্ডসমূহের দ্বিতীয় বৃহত্তম রপ্তানি খাত।"
   },
@@ -57,13 +57,13 @@ export const MACRO_INDICATORS: MacroIndicator[] = [
     category: "remittance",
     name: "Inward Foreign Remittance",
     name_bn: "প্রবাসী আয় (রেমিট্যান্স)",
-    value: "2,398.60",
+    value: null,
     unit: "Million USD / month",
     unit_bn: "মিলিয়ন মার্কিন ডলার / মাস",
     period: "Monthly receipts",
     source: "Bangladesh Bank Foreign Exchange Policy Dept",
     source_url: "https://www.bb.org.bd",
-    provenance: "measured",
+    provenance: "unavailable",
     note: "Direct household income driver fueling consumer spending and real estate construction across Dhaka.",
     note_bn: "ঢাকার আবাসন ও ভোক্তা ব্যয়ের প্রধান সহায়ক বৈদেশিক মুদ্রা প্রবাহ।"
   },
@@ -72,13 +72,13 @@ export const MACRO_INDICATORS: MacroIndicator[] = [
     category: "market",
     name: "Dhaka Stock Exchange DSEX Index",
     name_bn: "ডিএসইএক্স বেঞ্চমার্ক সূচক",
-    value: "5,420.15",
+    value: null,
     unit: "Index points",
     unit_bn: "সূচক পয়েন্ট",
     period: "Latest session close",
     source: "Dhaka Stock Exchange (DSE)",
     source_url: "https://www.dsebd.org",
-    provenance: "measured",
+    provenance: "unavailable",
     note: "Core equity benchmark tracking capital market valuation in Motijheel financial district.",
     note_bn: "মতিঝিল আর্থিক কেন্দ্রের পুঁজিবাজার মূল্যায়নের প্রধান বেঞ্চমার্ক।"
   },
@@ -87,13 +87,13 @@ export const MACRO_INDICATORS: MacroIndicator[] = [
     category: "inflation",
     name: "Headline Inflation (CPI)",
     name_bn: "সার্বিক মূল্যস্ফীতি (সিপিআই)",
-    value: "9.92",
+    value: null,
     unit: "% YoY",
     unit_bn: "% বার্ষিক",
     period: "BBS Monthly Consumer Price Index",
     source: "Bangladesh Bureau of Statistics (BBS)",
     source_url: "http://www.bbs.gov.bd",
-    provenance: "measured",
+    provenance: "unavailable",
     note: "General consumer price inflation reflecting living costs in urban metropolitan Dhaka.",
     note_bn: "ঢাকা মেট্রোপলিটন এলাকায় জীবনযাত্রার ব্যয়ের সার্বিক প্রতিফলন।"
   },
@@ -102,13 +102,13 @@ export const MACRO_INDICATORS: MacroIndicator[] = [
     category: "inflation",
     name: "Food Price Inflation",
     name_bn: "খাদ্য মূল্যস্ফীতি",
-    value: "10.40",
+    value: null,
     unit: "% YoY",
     unit_bn: "% বার্ষিক",
     period: "BBS Monthly Consumer Price Index",
     source: "Bangladesh Bureau of Statistics (BBS)",
     source_url: "http://www.bbs.gov.bd",
-    provenance: "measured",
+    provenance: "unavailable",
     note: "Food inflation index affecting wholesale markets like Kawran Bazar and retail supply chains.",
     note_bn: "কাওরান বাজারসহ খুচরা খাদ্য সরবরাহ চেইনে খাদ্যপণ্যের মূল্যের চাপ।"
   },
@@ -117,13 +117,13 @@ export const MACRO_INDICATORS: MacroIndicator[] = [
     category: "reserves",
     name: "Foreign Exchange Reserves (BPM6)",
     name_bn: "বৈদেশিক মুদ্রার রিজার্ভ (বিপিএম৬)",
-    value: "19,890.00",
+    value: null,
     unit: "Million USD",
     unit_bn: "মিলিয়ন মার্কিন ডলার",
     period: "Official balance",
     source: "Bangladesh Bank Accounts & Budgeting Dept",
     source_url: "https://www.bb.org.bd",
-    provenance: "measured",
+    provenance: "unavailable",
     note: "Net usable reserves evaluated under IMF BPM6 accounting standards.",
     note_bn: "আইএমএফ বিপিএম৬ হিসাবরীতি অনুযায়ী নিট ব্যবহারযোগ্য রিজার্ভ।"
   },
@@ -132,13 +132,13 @@ export const MACRO_INDICATORS: MacroIndicator[] = [
     category: "currency",
     name: "Interbank USD / BDT Rate",
     name_bn: "আন্তঃব্যাংক ডলার / টাকা বিনিময় হার",
-    value: "120.00",
+    value: null,
     unit: "BDT per USD",
     unit_bn: "টাকা / মার্কিন ডলার",
     period: "Crawling peg benchmark",
     source: "Bangladesh Bank Interbank Foreign Exchange Desk",
     source_url: "https://www.bb.org.bd",
-    provenance: "measured",
+    provenance: "unavailable",
     note: "Crawling peg corridor exchange rate governing import-export settlement.",
     note_bn: "আমদানি ও রপ্তানি নিষ্পত্তির মধ্যবর্তী বিনিময় হার।"
   }
@@ -155,9 +155,9 @@ export interface RiverStation {
   warning_level_m: number;
   highest_flood_level_m: number;
   highest_flood_year: number;
-  current_level_m: number;
-  trend: "rising" | "falling" | "steady";
-  status: "normal" | "warning" | "danger" | "extreme";
+  current_level_m: null;
+  trend: "unavailable";
+  status: "unavailable";
   lat: number;
   lng: number;
   agency: string;
@@ -176,9 +176,9 @@ export const RIVER_STATIONS: RiverStation[] = [
     warning_level_m: 5.05,
     highest_flood_level_m: 7.58,
     highest_flood_year: 1988,
-    current_level_m: 3.82,
-    trend: "steady",
-    status: "normal",
+    current_level_m: null,
+    trend: "unavailable",
+    status: "unavailable",
     lat: 23.7001,
     lng: 90.4150,
     agency: "BWDB / FFWC",
@@ -195,9 +195,9 @@ export const RIVER_STATIONS: RiverStation[] = [
     warning_level_m: 5.00,
     highest_flood_level_m: 8.35,
     highest_flood_year: 1998,
-    current_level_m: 3.65,
-    trend: "falling",
-    status: "normal",
+    current_level_m: null,
+    trend: "unavailable",
+    status: "unavailable",
     lat: 23.7980,
     lng: 90.3420,
     agency: "BWDB / FFWC",
@@ -214,9 +214,9 @@ export const RIVER_STATIONS: RiverStation[] = [
     warning_level_m: 5.25,
     highest_flood_level_m: 7.13,
     highest_flood_year: 1998,
-    current_level_m: 3.48,
-    trend: "steady",
-    status: "normal",
+    current_level_m: null,
+    trend: "unavailable",
+    status: "unavailable",
     lat: 23.7140,
     lng: 90.5050,
     agency: "BWDB / FFWC",
@@ -233,9 +233,9 @@ export const RIVER_STATIONS: RiverStation[] = [
     warning_level_m: 5.00,
     highest_flood_level_m: 6.93,
     highest_flood_year: 1998,
-    current_level_m: 3.75,
-    trend: "steady",
-    status: "normal",
+    current_level_m: null,
+    trend: "unavailable",
+    status: "unavailable",
     lat: 23.6190,
     lng: 90.5110,
     agency: "BWDB / FFWC",
@@ -252,9 +252,9 @@ export const RIVER_STATIONS: RiverStation[] = [
     warning_level_m: 5.58,
     highest_flood_level_m: 7.84,
     highest_flood_year: 1998,
-    current_level_m: 3.90,
-    trend: "falling",
-    status: "normal",
+    current_level_m: null,
+    trend: "unavailable",
+    status: "unavailable",
     lat: 23.8890,
     lng: 90.4010,
     agency: "BWDB / FFWC",
@@ -271,9 +271,9 @@ export const RIVER_STATIONS: RiverStation[] = [
     warning_level_m: 4.68,
     highest_flood_level_m: 7.42,
     highest_flood_year: 1988,
-    current_level_m: 3.35,
-    trend: "steady",
-    status: "normal",
+    current_level_m: null,
+    trend: "unavailable",
+    status: "unavailable",
     lat: 23.5630,
     lng: 90.4950,
     agency: "BWDB / FFWC",

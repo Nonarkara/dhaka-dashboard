@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793121253-895d1b6";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793123003-a00ea3c";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -19,6 +19,9 @@
   let economyData = null;
   let areasData = [];
   let loadingHidden = false;
+  let bootAttempts = 0;
+  let watchData = null;
+  const tr = (en, bn) => document.documentElement.lang === "bn" ? bn : en;
 
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
@@ -34,8 +37,8 @@
     city: {
       title: "Read the city, from skyline to street",
       title_bn: "আকাশরেখা থেকে অলিগলি: ঢাকার প্রতিটি স্তরের পাঠ",
-      desc: "3D urban form, landmarks and civic topography on satellite basemap.",
-      desc_bn: "উপগ্রহ চিত্রে ত্রিমাত্রিক নগর রূপ, ঐতিহাসিক স্থাপত্য ও নাগরিক ভূসংস্থান।"
+      desc: "Zoom in for OSM building extrusions (mapped or inferred heights). Select a feature for reference details.",
+      desc_bn: "জুম করে OSM ভবনের ত্রিমাত্রিক রূপ দেখুন (নথিভুক্ত বা আনুমানিক উচ্চতা)। তথ্যের জন্য স্থাপনা নির্বাচন করুন।"
     },
     rivers: {
       title: "Five Rivers Ring & Flood Risk",
@@ -108,8 +111,8 @@
   function initMap() {
     const maplibregl = window.maplibregl;
     if (!maplibregl || typeof maplibregl.Map !== "function") {
-      console.warn("MapLibre GL not available yet, retrying in 100ms...");
-      setTimeout(initMap, 100);
+      if (++bootAttempts < 80) setTimeout(initMap, 100);
+      else showMapFailure();
       return;
     }
 
@@ -117,6 +120,7 @@
       version: 8,
       glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
       sources: {
+        "buildings": { type: "vector", url: "https://tiles.openfreemap.org/planet", attribution: "© OpenStreetMap · OpenFreeMap / OpenMapTiles" },
         "esri-satellite": {
           type: "raster",
           tiles: [ESRI_IMAGERY],
@@ -150,6 +154,11 @@
       ]
     };
 
+    styleSpec.layers.push({
+      id: "city-buildings", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 14,
+      paint: { "fill-extrusion-color": "#f5f0dc", "fill-extrusion-height": ["coalesce", ["get", "render_height"], 0], "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0], "fill-extrusion-opacity": 0.8 }
+    });
+
     try {
       map = new maplibregl.Map({
         container: "atlas-map",
@@ -168,8 +177,6 @@
       map.on("load", async () => {
         hideLoading();
         await loadDataLayers();
-        wireUIEvents();
-        pollCityWatch();
       });
 
       map.on("idle", hideLoading);
@@ -178,21 +185,29 @@
       });
       map.on("error", (e) => {
         console.warn("[atlas] map notice:", e);
-        hideLoading();
+        const status = $("#atlas-layer-status");
+        if (status) { status.hidden = false; status.textContent = tr("A map source is unavailable. Visible reference layers remain usable.", "মানচিত্রের একটি উৎস অনুপলব্ধ। দৃশ্যমান তথ্যসূত্র স্তর ব্যবহারযোগ্য।"); }
       });
 
       // Hard timeout failsafe so loading overlay NEVER gets stuck
-      setTimeout(hideLoading, 3000);
+      setTimeout(() => {
+        if (!loadingHidden) showMapFailure();
+      }, 12000);
     } catch (e) {
       console.error("Map initialization error:", e);
-      hideLoading();
+      showMapFailure();
     }
+  }
+
+  function showMapFailure() {
+    const el = $("#atlas-map-loading");
+    if (el) { el.classList.remove("loaded"); el.innerHTML = `<strong>${tr("Map unavailable", "মানচিত্র অনুপলব্ধ")}</strong><p>${tr("Map initialization failed. Reload to retry; civic data remains available from City watch.", "মানচিত্র চালু হয়নি। আবার চেষ্টা করতে রিলোড করুন; নগর পর্যবেক্ষণে তথ্য পাওয়া যাবে।")}</p><button class="atlas-btn" onclick="location.reload()">${tr("Retry", "আবার চেষ্টা")}</button>`; }
   }
 
   async function loadDataLayers() {
     // 1. Landmarks
     try {
-      const resLandmarks = await fetch("/dhaka-landmarks.geojson");
+      const resLandmarks = await fetch("/dhaka-landmarks.geojson", { signal: AbortSignal.timeout(10000) });
       if (resLandmarks.ok) {
         landmarksData = await resLandmarks.json();
         if (!map.getSource("landmarks")) {
@@ -235,7 +250,7 @@
 
     // 2. Rivers & Khals
     try {
-      const resRivers = await fetch("/dhaka-rivers.geojson");
+      const resRivers = await fetch("/dhaka-rivers.geojson", { signal: AbortSignal.timeout(10000) });
       if (resRivers.ok) {
         riversData = await resRivers.json();
         if (!map.getSource("rivers")) {
@@ -273,7 +288,7 @@
 
     // 3. Transit & MRT Line 6
     try {
-      const resTransit = await fetch("/dhaka-mrt.geojson");
+      const resTransit = await fetch("/dhaka-mrt.geojson", { signal: AbortSignal.timeout(10000) });
       if (resTransit.ok) {
         transitData = await resTransit.json();
         if (!map.getSource("transit")) {
@@ -323,7 +338,7 @@
 
     // 4. Economy & Industry
     try {
-      const resEconomy = await fetch("/dhaka-economy.geojson");
+      const resEconomy = await fetch("/dhaka-economy.geojson", { signal: AbortSignal.timeout(10000) });
       if (resEconomy.ok) {
         economyData = await resEconomy.json();
         if (!map.getSource("economy")) {
@@ -348,7 +363,7 @@
 
     // 5. Curated Areas for Quick Jump
     try {
-      const resAreas = await fetch("/dhaka-areas.json");
+      const resAreas = await fetch("/dhaka-areas.json", { signal: AbortSignal.timeout(10000) });
       if (resAreas.ok) {
         areasData = await resAreas.json();
         populateQuickJump(areasData);
@@ -404,8 +419,8 @@
         <div class="hud-row"><span class="hud-label">River:</span><span class="hud-value">${props.river || "Buriganga"}</span></div>
         <div class="hud-row"><span class="hud-label">Station Code:</span><span class="hud-value">${props.station_id || "SW42"}</span></div>
         <div class="hud-row"><span class="hud-label">Danger Level:</span><span class="hud-value">${props.danger_level_m} m MSL</span></div>
-        <div class="hud-row"><span class="hud-label">Current Reading:</span><span class="hud-value" style="color:var(--ok)">${props.current_water_level_m} m MSL</span></div>
-        <div class="hud-row"><span class="hud-label">Status:</span><span class="hud-value">${props.status} (${props.trend})</span></div>
+        <div class="hud-row"><span class="hud-label">Current Reading:</span><span class="hud-value" style="color:var(--dim)">${tr("Unavailable · no connected gauge feed", "অনুপলব্ধ · পর্যবেক্ষণ সংযুক্ত নেই")}</span></div>
+        <div class="hud-row"><span class="hud-label">Status:</span><span class="hud-value">${tr("Reference station · not a live reading", "তথ্যসূত্র স্টেশন · সরাসরি পর্যবেক্ষণ নয়")}</span></div>
       `;
     } else if (type === "landmark") {
       rowsHtml = `
@@ -455,6 +470,9 @@
     if (descEl) descEl.textContent = isBn ? story.desc_bn : story.desc;
 
     if (!map) return;
+    const layerStatus = $("#atlas-layer-status");
+    if (layerStatus) { layerStatus.hidden = true; layerStatus.textContent = ""; }
+    if (["haze", "rain", "radar"].includes(lensId)) loadLensEvidence(lensId);
 
     if (activeOverlayLayer && map.getLayer(activeOverlayLayer)) {
       map.removeLayer(activeOverlayLayer);
@@ -480,6 +498,8 @@
     if (map.getLayer("economy-hubs")) {
       map.setLayoutProperty("economy-hubs", "visibility", (lensId === "economy" || lensId === "city") ? "visible" : "none");
     }
+    if (map.getLayer("city-buildings")) map.setLayoutProperty("city-buildings", "visibility", lensId === "city" && $("#atlas-view")?.value !== "2d" ? "visible" : "none");
+    if (map.getLayer("landmarks-labels")) map.setLayoutProperty("landmarks-labels", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
     if (map.getLayer("landmarks-points")) {
       map.setLayoutProperty("landmarks-points", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
     }
@@ -508,12 +528,39 @@
     }
   }
 
-  function addRasterOverlay(id, tileUrl) {
+  async function loadLensEvidence(lens) {
+    const status = $("#atlas-layer-status");
+    status.hidden = false;
+    status.textContent = tr("Checking source…", "উৎস যাচাই হচ্ছে…");
+    try {
+      if (lens === "radar") {
+        const res = await fetch("https://api.rainviewer.com/public/weather-maps.json", {signal: AbortSignal.timeout(10000)});
+        if (!res.ok) throw new Error("radar-unavailable");
+        const data = await res.json();
+        if (currentLens !== lens) return;
+        const frame = data.radar?.past?.at(-1);
+        if (!frame || !data.host?.startsWith("https://")) throw new Error("radar-no-frame");
+        addRasterOverlay("rain-radar", `${data.host}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, 7);
+        status.textContent = tr("Radar composite · coverage may be absent over Dhaka · ", "রাডার চিত্র · ঢাকার তথ্য নাও থাকতে পারে · ") + new Date(frame.time * 1000).toISOString();
+      } else {
+        const res = await fetch(lens === "rain" ? "/api/atlas/rainfall" : "/api/atlas/fires", {signal: AbortSignal.timeout(15000)});
+        const data = await res.json();
+        if (currentLens !== lens) return;
+        if (!res.ok || data.status !== "ok") throw new Error(data.reasonCode || "feed-unavailable");
+        status.textContent = tr("Modeled rainfall · next 24 h: ", "মডেলভিত্তিক বৃষ্টি · পরের ২৪ ঘণ্টা: ") + data.catchments.map(p => `${p.name}: ${p.rain_24h_sum_mm?.toFixed(1)} mm`).join(" · ");
+      }
+    } catch {
+      if (currentLens === lens) status.textContent = tr("Evidence unavailable for this lens. No current observation is shown.", "এই স্তরের উপাত্ত অনুপলব্ধ। বর্তমান পর্যবেক্ষণ দেখানো হচ্ছে না।");
+    }
+  }
+
+  function addRasterOverlay(id, tileUrl, maxzoom = 9) {
     if (!map || map.getSource(id)) return;
     try {
       map.addSource(id, {
         type: "raster",
         tiles: [tileUrl],
+        maxzoom,
         tileSize: 256
       });
       map.addLayer({
@@ -544,6 +591,7 @@
     $("#atlas-view")?.addEventListener("change", e => {
       const is3D = e.target.value === "3d";
       if (map) {
+        if (map.getLayer("city-buildings")) map.setLayoutProperty("city-buildings", "visibility", is3D && currentLens === "city" ? "visible" : "none");
         map.easeTo({
           pitch: is3D ? 50 : 0,
           bearing: is3D ? 15 : 0,
@@ -552,9 +600,6 @@
       }
     });
 
-    $("#atlas-watch-flood")?.addEventListener("click", () => { $("#flood-dialog")?.showModal(); });
-    $("#atlas-watch-air")?.addEventListener("click", () => { $("#air-dialog")?.showModal(); });
-    $("#atlas-watch-traffic")?.addEventListener("click", () => { $("#economy-dialog")?.showModal(); });
 
     const searchInput = $("#atlas-search-input");
     searchInput?.addEventListener("keydown", async e => {
@@ -565,6 +610,8 @@
 
     window.addEventListener("atlas:language", () => {
       applyLens(currentLens);
+      populateQuickJump(areasData);
+      renderCityWatch();
     });
   }
 
@@ -611,39 +658,49 @@
     });
   }
 
+  function renderCityWatch() {
+    const ind = watchData?.indicators;
+    const unknown = tr("Unavailable", "অনুপলব্ধ");
+    const modeled = tr("Model", "মডেল");
+    const category = {Good:"ভালো", Moderate:"মাঝারি", "Unhealthy for Sensitive Groups":"সংবেদনশীলদের জন্য অস্বাস্থ্যকর", Unhealthy:"অস্বাস্থ্যকর", "Very Unhealthy":"অত্যন্ত অস্বাস্থ্যকর", Hazardous:"বিপজ্জনক"};
+    const values = {
+      flood: unknown + tr(" · gauge feed", " · নদী পর্যবেক্ষণ"),
+      air: Number.isFinite(ind?.airQuality?.us_aqi) ? `${modeled} · AQI ${ind.airQuality.us_aqi} · ${tr(ind.airQuality.category, category[ind.airQuality.category])}` : unknown,
+      wind: Number.isFinite(ind?.weather?.wind_speed_10m) ? `${modeled} · ${ind.weather.wind_speed_10m} km/h · ${ind.weather.wind_direction_10m}°` : unknown,
+      traffic: unknown + tr(" · dated bulletin", " · তারিখযুক্ত বুলেটিন"),
+    };
+    for (const [key, value] of Object.entries(values)) {
+      const el = $(`#atlas-watch-${key}-value`);
+      if (el) el.textContent = value;
+      const item = $(`#atlas-watch-${key}`);
+      if (item) {
+        const feed = ind?.[({flood:"floodRisk",air:"airQuality",wind:"weather",traffic:"economy"})[key]];
+        item.dataset.tier = feed?.status || "unavailable";
+        item.title = `${feed?.source || ""} · ${feed?.observedAt || feed?.reasonCode || "unavailable"}`;
+      }
+    }
+  }
+
   async function pollCityWatch() {
     try {
-      const res = await fetch("/api/atlas/watch");
-      if (!res.ok) return;
-      const data = await res.json();
-      const ind = data.indicators;
-      if (ind) {
-        if ($("#atlas-watch-flood-value")) {
-          $("#atlas-watch-flood-value").textContent = ind.floodRisk.status_text;
-          $("#atlas-watch-flood").dataset.tier = ind.floodRisk.status;
-        }
-        if ($("#atlas-watch-air-value")) {
-          $("#atlas-watch-air-value").textContent = `US AQI ${ind.airQuality.us_aqi} (${ind.airQuality.category})`;
-          $("#atlas-watch-air").dataset.tier = ind.airQuality.status;
-        }
-        if ($("#atlas-watch-wind-value")) {
-          $("#atlas-watch-wind-value").textContent = `${ind.weather.condition} · ${ind.weather.wind_vector}`;
-          $("#atlas-watch-wind").dataset.tier = ind.weather.status;
-        }
-        if ($("#atlas-watch-traffic-value")) {
-          $("#atlas-watch-traffic-value").textContent = `RMG: ${ind.economy.rmg_run_rate} · DSEX: ${ind.economy.dsex}`;
-          $("#atlas-watch-traffic").dataset.tier = "ok";
-        }
-      }
-    } catch (e) {
-      console.warn("Poll city watch failed", e);
-    }
+      const res = await fetch("/api/atlas/watch", { signal: AbortSignal.timeout(15000) });
+      if (!res.ok) throw new Error("Watch unavailable");
+      watchData = await res.json();
+    } catch { watchData = null; }
+    renderCityWatch();
+  }
+
+  function bootAtlas() {
+    wireUIEvents();
+    pollCityWatch();
+    setInterval(pollCityWatch, 5 * 60 * 1000);
+    initMap();
   }
 
   // Safe boot: runs immediately if DOM is ready, or on DOMContentLoaded
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initMap);
+    document.addEventListener("DOMContentLoaded", bootAtlas);
   } else {
-    initMap();
+    bootAtlas();
   }
 })();

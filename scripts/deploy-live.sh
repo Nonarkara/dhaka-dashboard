@@ -28,6 +28,7 @@ echo "==> 6. Verifying live deployment..."
 ATLAS_URL="https://dhaka.nonarkara.org"
 sleep 5
 npm run smoke
-npm run smoke:api || echo "Note: DNS propagation to dhaka.nonarkara.org may take a moment."
+npm run smoke:api
+node scripts/verify-live-bytes.mjs
 
 echo "==> Deploy complete: dhaka.nonarkara.org is live!"

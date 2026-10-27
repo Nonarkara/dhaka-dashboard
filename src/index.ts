@@ -75,14 +75,12 @@ async function fetchWithCache<T>(
     memoryCache.set(cacheKey, { data, timestamp: now });
     return { data, fromCache: false };
   } catch (err: unknown) {
-    if (cached) {
-      return { data: cached.data, fromCache: true, error: String(err) };
-    }
+    // Expired model output must not masquerade as a current reading.
     return { data: fallback, fromCache: false, error: String(err) };
   }
 }
 
-export default {
+const worker = {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
@@ -244,10 +242,12 @@ export default {
         async () => {
           const res = await fetch(
             `https://api.open-meteo.com/v1/forecast?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure&hourly=temperature_2m,precipitation_probability,rain&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=Asia%2FDhaka&forecast_days=3`,
-            { headers: { "user-agent": "dhaka-3d-atlas/1.0 (dhaka.nonarkara.org)" } },
+            { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0 (dhaka.nonarkara.org)" } },
           );
           if (!res.ok) throw new Error(`Open-Meteo returned status ${res.status}`);
-          return await res.json();
+          const payload = await res.json() as { current?: Record<string, unknown> };
+          if (!payload.current || typeof payload.current.time !== "string") throw new Error("invalid-model-payload");
+          return payload;
         },
         null,
       );
@@ -285,10 +285,12 @@ export default {
         async () => {
           const res = await fetch(
             `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,us_aqi&hourly=pm2_5,pm10,us_aqi&timezone=Asia%2FDhaka&forecast_hours=72`,
-            { headers: { "user-agent": "dhaka-3d-atlas/1.0 (dhaka.nonarkara.org)" } },
+            { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0 (dhaka.nonarkara.org)" } },
           );
           if (!res.ok) throw new Error(`Open-Meteo Air API returned ${res.status}`);
-          return await res.json();
+          const payload = await res.json() as { current?: Record<string, unknown> };
+          if (!payload.current || typeof payload.current.time !== "string") throw new Error("invalid-model-payload");
+          return payload;
         },
         null,
       );
@@ -337,18 +339,19 @@ export default {
               try {
                 const r = await fetch(
                   `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&current=precipitation,rain&hourly=precipitation,rain&forecast_hours=24&timezone=Asia%2FDhaka`,
-                  { headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
+                  { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
                 );
-                if (!r.ok) return { ...p, status: "unavailable" };
+                if (!r.ok) throw new Error(`upstream-http-${r.status}`);
                 const j = (await r.json()) as { current?: { precipitation?: number }; hourly?: { precipitation?: number[] } };
+                if (!Number.isFinite(j.current?.precipitation) || !j.hourly?.precipitation?.length || !j.hourly.precipitation.every(Number.isFinite)) throw new Error("invalid-rainfall-payload");
                 return {
                   ...p,
                   status: "ok",
-                  current_mm: j.current?.precipitation ?? 0,
-                  rain_24h_sum_mm: j.hourly?.precipitation?.reduce((a: number, b: number) => a + (b || 0), 0) ?? 0,
+                  current_mm: j.current!.precipitation,
+                  rain_24h_sum_mm: j.hourly!.precipitation!.reduce((a: number, b: number) => a + b, 0),
                 };
               } catch {
-                return { ...p, status: "unavailable" };
+                return { ...p, status: "unavailable", reasonCode: "upstream-or-invalid-rainfall", timestamp: new Date().toISOString(), current_mm: null, rain_24h_sum_mm: null };
               }
             }),
           );
@@ -358,7 +361,9 @@ export default {
       );
 
       return jsonResponse({
-        status: "ok",
+        status: data.length && data.every(p => p.status === "ok") ? "ok" : "unavailable",
+        timestamp: new Date().toISOString(),
+        reasonCode: data.length && data.every(p => p.status === "ok") ? null : "rainfall-incomplete",
         city: "Dhaka",
         source: "Open-Meteo High-Resolution Precipitation Models",
         provenance: "modeled",
@@ -369,19 +374,13 @@ export default {
 
     // ── /api/atlas/fires ─────────────────────────────────────────────────────
     if (url.pathname === "/api/atlas/fires") {
-      // NASA FIRMS active fire detections for Bengal Basin / brick kiln zones
       return jsonResponse({
-        status: "ok",
-        city: "Dhaka & Surrounding Division",
-        bbox: { minLat: 23.0, maxLat: 24.5, minLon: 89.5, maxLon: 91.0 },
-        source: "NASA FIRMS / VIIRS NOAA-20 375m Active Fire",
-        source_url: "https://firms.modaps.eosdis.nasa.gov",
-        provenance: "measured",
-        scan_time_utc: new Date().toISOString(),
-        brick_kiln_hotspots_detected: 42,
-        density_zone: "Savar-Gazipur-Keraniganj Industrial Arc",
-        note: "Thermal anomaly pixels represent industrial brick kilns (FCK/Zigzag) and crop residue burns.",
-      });
+        status: "unavailable", provenance: "unavailable",
+        reasonCode: "firms-feed-not-configured", timestamp: new Date().toISOString(),
+        source: "NASA FIRMS", source_url: "https://firms.modaps.eosdis.nasa.gov",
+        brick_kiln_hotspots_detected: null,
+        note: "No authenticated FIRMS retrieval is configured. Thermal anomalies alone cannot identify brick kilns.",
+      }, { status: 503 });
     }
 
     // ── /api/atlas/wind ──────────────────────────────────────────────────────
@@ -393,24 +392,24 @@ export default {
         async () => {
           const res = await fetch(
             `https://api.open-meteo.com/v1/forecast?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=wind_speed_10m,wind_direction_10m&timezone=Asia%2FDhaka&forecast_hours=12`,
-            { headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
+            { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
           );
           if (!res.ok) throw new Error("Wind fetch failed");
-          return await res.json();
+          const payload = await res.json() as { current?: Record<string, unknown> };
+          if (!payload.current || typeof payload.current.time !== "string") throw new Error("invalid-model-payload");
+          return payload;
         },
         null,
       );
 
       return jsonResponse({
-        status: "ok",
-        city: "Dhaka",
-        provenance: "modeled",
-        source: "ECMWF / Open-Meteo 10m & 925 hPa Wind Field",
-        data: data || {
-          current: { wind_speed_10m: 11.2, wind_direction_10m: 340, wind_gusts_10m: 18.5 },
-        },
-        haze_transport_vector: "North-Northwest (340°) -> carrying winter smoke toward Southern Dhaka",
-      });
+        status: data ? "ok" : "unavailable",
+        provenance: data ? "modeled" : "unavailable",
+        reasonCode: data ? null : "upstream-unreachable",
+        timestamp: new Date().toISOString(),
+        source: "Open-Meteo · surface wind at 10 m (no 925 hPa field)",
+        data,
+      }, { status: data ? 200 : 503 });
     }
 
     // ── /api/atlas/environment ───────────────────────────────────────────────
@@ -471,7 +470,7 @@ export default {
         async () => {
           const res = await fetch(
             "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=3.0&minlatitude=20.5&maxlatitude=27.0&minlongitude=88.0&maxlongitude=93.0&limit=5",
-            { headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
+            { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
           );
           if (!res.ok) throw new Error("USGS query failed");
           return (await res.json()) as UsgsResponse;
@@ -480,12 +479,14 @@ export default {
       );
 
       return jsonResponse({
-        status: "ok",
+        status: data ? "ok" : "unavailable",
+        timestamp: new Date().toISOString(),
+        reasonCode: data ? null : "upstream-unreachable",
         region: "Bengal Basin & Dauki Fault Seismic Zone",
         provenance: "measured",
         source: "USGS Earthquake Hazards Program",
         source_url: "https://earthquake.usgs.gov",
-        events: data?.features || [],
+        events: data?.features ?? null,
         error: error || null,
       });
     }
@@ -539,39 +540,32 @@ export default {
 
     // ── /api/atlas/watch ─────────────────────────────────────────────────────
     if (url.pathname === "/api/atlas/watch") {
+      const read = async (path: string) => {
+        const response = await worker.fetch(new Request(new URL(path, request.url), { headers: request.headers }), env);
+        return await response.json() as { status: string; provenance: string; reasonCode?: string; source?: string; data?: { current?: { time?: string; us_aqi?: number; wind_speed_10m?: number; wind_direction_10m?: number } } };
+      };
+      const [air, weather] = await Promise.all([read("/api/atlas/air-quality"), read("/api/atlas/weather")]);
+      const aqi = air.data?.current?.us_aqi;
+      const wind = weather.data?.current;
+      const missing = (source: string, reasonCode: string) => ({
+        status: "unavailable", provenance: "unavailable", reasonCode, source,
+        timestamp: new Date().toISOString(), observedAt: null,
+      });
       return jsonResponse({
-        status: "ok",
-        city: "Dhaka",
-        provenance: "modeled",
-        timestamp: new Date().toISOString(),
+        status: "partial", city: "Dhaka", timestamp: new Date().toISOString(),
         indicators: {
-          airQuality: {
-            status: "warning",
-            us_aqi: 158,
-            category: "Unhealthy for Sensitive Groups",
-            primary_pollutant: "PM2.5",
-            source: "Copernicus CAMS / Open-Meteo",
-          },
-          floodRisk: {
-            status: "normal",
-            critical_rivers: 0,
-            monitored_stations: RIVER_STATIONS.length,
-            status_text: "All 6 peripheral river stations below danger level",
-            source: "BWDB / FFWC",
-          },
-          weather: {
-            status: "normal",
-            condition: "Dry winter haze",
-            wind_vector: "NNW 11 km/h",
-            source: "Open-Meteo",
-          },
-          economy: {
-            status: "operational",
-            rmg_run_rate: "$4.0B / month",
-            dsex: "5,420.15",
-            remittance: "$2.4B / month",
-            source: "Bangladesh Bank / DSE",
-          },
+          airQuality: typeof aqi === "number" ? {
+            status: aqi > 150 ? "danger" : aqi > 100 ? "warning" : "ok",
+            provenance: "modeled", us_aqi: aqi, observedAt: air.data?.current?.time,
+            category: aqi <= 50 ? "Good" : aqi <= 100 ? "Moderate" : aqi <= 150 ? "Unhealthy for Sensitive Groups" : aqi <= 200 ? "Unhealthy" : aqi <= 300 ? "Very Unhealthy" : "Hazardous",
+            source: air.source,
+          } : missing("CAMS / Open-Meteo", air.reasonCode || "invalid-current-aqi"),
+          weather: typeof wind?.wind_speed_10m === "number" ? {
+            status: "ok", provenance: "modeled", wind_speed_10m: wind.wind_speed_10m,
+            wind_direction_10m: wind.wind_direction_10m, observedAt: wind.time, source: weather.source,
+          } : missing("Open-Meteo", weather.reasonCode || "invalid-current-wind"),
+          floodRisk: missing("BWDB / FFWC", "river-observations-not-connected"),
+          economy: missing("Bangladesh Bank / DSE", "dated-bulletin-not-connected"),
         },
       });
     }
@@ -583,7 +577,10 @@ export default {
         city: "Dhaka",
         agency: "Bangladesh Water Development Board (BWDB) / Flood Forecasting & Warning Centre (FFWC)",
         agency_url: "https://ffwc.gov.bd",
-        provenance: "measured",
+        provenance: "reference",
+        reasonCode: "river-observations-not-connected",
+        observedAt: null,
+        readingsStatus: "unavailable",
         stations: RIVER_STATIONS,
         timestamp: new Date().toISOString(),
         note: "Danger levels are officially surveyed benchmarks in metres Above Mean Sea Level (m MSL).",
@@ -596,7 +593,10 @@ export default {
         status: "ok",
         city: "Dhaka",
         country: "Bangladesh",
-        provenance: "measured",
+        provenance: "unavailable",
+        statusReason: "Indicator registry only; no dated bulletin has been ingested.",
+        reasonCode: "dated-bulletin-not-connected",
+        observedAt: null,
         indicators: MACRO_INDICATORS,
         corridors: [
           { name: "Savar & Ashulia RMG Belt", workforce: 450000, annual_export: "$7.5B", sector: "Apparel" },
@@ -607,7 +607,7 @@ export default {
           { name: "Motijheel Financial Core", sector: "Central Banking & Capital Markets" },
           { name: "Kawran Bazar Wholesale Hub", daily_turnover: "400M BDT", sector: "Agri-commodities" },
           { name: "Islampur Textile Market", daily_turnover: "600M BDT", sector: "Wholesale Fabric" },
-        ],
+        ].map(({ name, sector }) => ({ name, sector, provenance: "reference" })),
         timestamp: new Date().toISOString(),
       });
     }
@@ -632,3 +632,5 @@ export default {
     return env.ASSETS.fetch(request);
   },
 };
+
+export default worker;

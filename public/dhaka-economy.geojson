@@ -9,13 +9,21 @@
         "name": "Dhaka Export Processing Zone (DEPZ)",
         "name_bn": "ঢাকা রপ্তানি প্রক্রিয়াকরণ এলাকা (ডিইপিজেড)",
         "sector": "RMG & Electronics Export",
-        "workforce": 95000,
+        "workforce": null,
         "type": "epz",
-        "annual_export_usd": 2200000000,
+        "annual_export_usd": null,
         "description": "Premier export processing zone in Savar hosting over 100 foreign and local manufacturing enterprises across apparel, electronics, and textiles.",
-        "description_bn": "সাভারে অবস্থিত শীর্ষস্থানীয় রপ্তানি প্রক্রিয়াকরণ এলাকা যেখানে তৈরি পোশাক, ইলেকট্রনিক্স ও টেক্সটাইলের শতাধিক আন্তর্জাতিক প্রতিষ্ঠান কর্মরত।"
+        "description_bn": "সাভারে অবস্থিত শীর্ষস্থানীয় রপ্তানি প্রক্রিয়াকরণ এলাকা যেখানে তৈরি পোশাক, ইলেকট্রনিক্স ও টেক্সটাইলের শতাধিক আন্তর্জাতিক প্রতিষ্ঠান কর্মরত।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.2800, 23.9400] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.28,
+          23.94
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -24,13 +32,21 @@
         "name": "Adamjee Export Processing Zone",
         "name_bn": "আদমজী রপ্তানি প্রক্রিয়াকরণ এলাকা",
         "sector": "Apparel, Jute & High-Tech Manufacturing",
-        "workforce": 62000,
+        "workforce": null,
         "type": "epz",
-        "annual_export_usd": 1100000000,
+        "annual_export_usd": null,
         "description": "Historic site of the world's largest jute mill revitalized into a modern multi-sector export processing zone on the Shitalakshya River.",
-        "description_bn": "শীতলক্ষ্যা নদীর তীরে বিশ্বের সর্ববৃহৎ সাবেক পাটকলকে আধুনিক বহু-খাতভিত্তিক রপ্তানি প্রক্রিয়াকরণ এলাকায় রূপান্তর।"
+        "description_bn": "শীতলক্ষ্যা নদীর তীরে বিশ্বের সর্ববৃহৎ সাবেক পাটকলকে আধুনিক বহু-খাতভিত্তিক রপ্তানি প্রক্রিয়াকরণ এলাকায় রূপান্তর।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.5280, 23.6750] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.528,
+          23.675
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -39,13 +55,21 @@
         "name": "Ashulia-Zirabo RMG Belt",
         "name_bn": "আশুলিয়া-জিরাবো তৈরি পোশাক করিডোর",
         "sector": "Ready-Made Garments (Woven & Knitwear)",
-        "workforce": 450000,
+        "workforce": null,
         "type": "industrial_cluster",
-        "annual_export_usd": 7500000000,
+        "annual_export_usd": null,
         "description": "Highest-density knitwear and woven apparel manufacturing corridor in Bangladesh, supplying major global retail brands in EU and North America.",
-        "description_bn": "দেশের সর্বাধিক ঘনত্ববিশিষ্ট নিটওয়্যার ও ওভেন পোশাক শিল্প বেল্ট, যা ইউরোপ ও উত্তর আমেরিকার শীর্ষ বৈশ্বিক ব্র্যান্ডসমূহে রপ্তানি করে।"
+        "description_bn": "দেশের সর্বাধিক ঘনত্ববিশিষ্ট নিটওয়্যার ও ওভেন পোশাক শিল্প বেল্ট, যা ইউরোপ ও উত্তর আমেরিকার শীর্ষ বৈশ্বিক ব্র্যান্ডসমূহে রপ্তানি করে।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.3150, 23.9100] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.315,
+          23.91
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -54,13 +78,21 @@
         "name": "Hemayetpur Tannery Industrial Estate",
         "name_bn": "হেমায়েতপুর চামড়া শিল্প নগরী (সাভার)",
         "sector": "Leather, Tanning & Footwear",
-        "workforce": 35000,
+        "workforce": null,
         "type": "industrial_estate",
-        "annual_export_usd": 850000000,
+        "annual_export_usd": null,
         "description": "Centralized 200-acre tannery park with Central Effluent Treatment Plant (CETP) relocated from historic Hazaribagh to protect the Buriganga River.",
-        "description_bn": "বুড়িগঙ্গা নদীকে দূষণমুক্ত করতে হাজারীবাগ থেকে স্থানান্তরিত ২০০ একরের কেন্দ্রীয় তরল বর্জ্য পরিশোধনাগার (সিইটিপি) সমৃদ্ধ আধুনিক চামড়া শিল্প নগরী।"
+        "description_bn": "বুড়িগঙ্গা নদীকে দূষণমুক্ত করতে হাজারীবাগ থেকে স্থানান্তরিত ২০০ একরের কেন্দ্রীয় তরল বর্জ্য পরিশোধনাগার (সিইটিপি) সমৃদ্ধ আধুনিক চামড়া শিল্প নগরী।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.2780, 23.7900] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.278,
+          23.79
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -69,12 +101,20 @@
         "name": "Tejgaon Light Industrial District",
         "name_bn": "তেজগাঁও শিল্প এলাকা",
         "sector": "Light Engineering, Media & Tech Hub",
-        "workforce": 80000,
+        "workforce": null,
         "type": "urban_industrial",
         "description": "Central Dhaka's 500-acre master-planned industrial zone currently evolving into a high-density hub of media studios, tech offices, and auto engineering.",
-        "description_bn": "ঢাকার কেন্দ্রস্থলে অবস্থিত ৫০০ একরের পরিকল্পিত শিল্প এলাকা যা দ্রুত মিডিয়া স্টুডিও, টেক অফিস ও অটোমোবাইল ইঞ্জিনিয়ারিং হাবে রূপ নিচ্ছে।"
+        "description_bn": "ঢাকার কেন্দ্রস্থলে অবস্থিত ৫০০ একরের পরিকল্পিত শিল্প এলাকা যা দ্রুত মিডিয়া স্টুডিও, টেক অফিস ও অটোমোবাইল ইঞ্জিনিয়ারিং হাবে রূপ নিচ্ছে।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.3980, 23.7650] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.398,
+          23.765
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -85,9 +125,17 @@
         "sector": "Central Banking & Capital Markets",
         "type": "cbd",
         "description": "Headquarters of Bangladesh Bank, Dhaka Stock Exchange, state-owned and commercial bank headquarters, insurance, and monetary regulators.",
-        "description_bn": "বাংলাদেশ ব্যাংক, ঢাকা স্টক এক্সচেঞ্জ, রাষ্ট্রায়ত্ত ও বেসরকারি ব্যাংক সদর দফতর এবং জাতীয় মুদ্রা নিয়ন্ত্রক সংস্থাসমূহের কেন্দ্র।"
+        "description_bn": "বাংলাদেশ ব্যাংক, ঢাকা স্টক এক্সচেঞ্জ, রাষ্ট্রায়ত্ত ও বেসরকারি ব্যাংক সদর দফতর এবং জাতীয় মুদ্রা নিয়ন্ত্রক সংস্থাসমূহের কেন্দ্র।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.4172, 23.7330] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.4172,
+          23.733
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -96,12 +144,20 @@
         "name": "Kawran Bazar Wholesale Produce Terminal",
         "name_bn": "কাওরান বাজার পাইকারি আড়ত",
         "sector": "Agri-commodity Wholesale",
-        "daily_turnover_bdt": 400000000,
+        "daily_turnover_bdt": null,
         "type": "wholesale_market",
         "description": "The capital's primary wholesale terminal for perishables, receiving over 3,000 trucks nightly with agricultural produce from all national divisions.",
-        "description_bn": "রাজধানীর প্রধান পাইকারি খাদ্য আড়ত, যেখানে প্রতিদিন রাতে সারাদেশ থেকে ৩,০০০-এর বেশি ট্রাকে কাঁচামাল ও কৃষিপণ্য আসে।"
+        "description_bn": "রাজধানীর প্রধান পাইকারি খাদ্য আড়ত, যেখানে প্রতিদিন রাতে সারাদেশ থেকে ৩,০০০-এর বেশি ট্রাকে কাঁচামাল ও কৃষিপণ্য আসে।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.3934, 23.7508] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.3934,
+          23.7508
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -112,9 +168,17 @@
         "sector": "Traditional Consumer Goods & Perfumes",
         "type": "wholesale_market",
         "description": "Centuries-old hub for consumer goods wholesale, cosmetics, traditional attar perfumes, plastics, and Old Dhaka trade networks.",
-        "description_bn": "মুঘল আমলের ঐতিহ্যবাহী পাইকারি পণ্যের কেন্দ্র: প্রসাধন, ঐতিহ্যবাহী আতর, গৃহস্থালি সামগ্রী এবং প্রাচীন বাণিজ্যিক নেটওয়ার্ক।"
+        "description_bn": "মুঘল আমলের ঐতিহ্যবাহী পাইকারি পণ্যের কেন্দ্র: প্রসাধন, ঐতিহ্যবাহী আতর, গৃহস্থালি সামগ্রী এবং প্রাচীন বাণিজ্যিক নেটওয়ার্ক।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.3956, 23.7153] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.3956,
+          23.7153
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -123,12 +187,20 @@
         "name": "Islampur Wholesale Fabric Market",
         "name_bn": "ইসলামপুর পাইকারি কাপড়ের বাজার",
         "sector": "Textiles, Cloth & Apparel Fabrics",
-        "daily_turnover_bdt": 600000000,
+        "daily_turnover_bdt": null,
         "type": "wholesale_market",
         "description": "The largest wholesale cloth and fabric market in South Asia, supplying tailoring, retail fabric shops, and small garment producers nationwide.",
-        "description_bn": "দক্ষিণ এশিয়ার বৃহত্তম পাইকারি কাপড়ের বাজার, যা দেশের প্রতিটি জেলায় থান কাপড় ও বস্ত্রের জোগান দেয়।"
+        "description_bn": "দক্ষিণ এশিয়ার বৃহত্তম পাইকারি কাপড়ের বাজার, যা দেশের প্রতিটি জেলায় থান কাপড় ও বস্ত্রের জোগান দেয়।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.4045, 23.7085] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.4045,
+          23.7085
+        ]
+      }
     },
     {
       "type": "Feature",
@@ -139,9 +211,17 @@
         "sector": "Inland Port Fruit Import",
         "type": "wholesale_market",
         "description": "River port on the Buriganga receiving river cargo and sea-container imports of apples, oranges, grapes, and delta-grown seasonal fruits.",
-        "description_bn": "বুড়িগঙ্গা নদীর তীরে অবস্থিত প্রধান ফল আমদানির নদীবন্দর ও পাইকারি আড়ত।"
+        "description_bn": "বুড়িগঙ্গা নদীর তীরে অবস্থিত প্রধান ফল আমদানির নদীবন্দর ও পাইকারি আড়ত।",
+        "provenance": "reference",
+        "observedAt": null
       },
-      "geometry": { "type": "Point", "coordinates": [90.4020, 23.7065] }
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.402,
+          23.7065
+        ]
+      }
     }
   ]
 }
