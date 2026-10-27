@@ -1,0 +1,576 @@
+/* DHKx 3D Atlas & Civic Dashboard -- dhaka.nonarkara.org
+   House rules:
+   - ZERO border-radius, ZERO box-shadow, ZERO gradients
+   - hairline borders (1px solid var(--line)), signal palette only
+   - sharp modernist edges, Dieter Rams functional geometry
+   - Wada Sanzo Delta & Terracotta Palette
+*/
+
+@font-face {
+  font-family: "Universa";
+  src: url("/fonts/universa/UniversaMediumUpright.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Sans 3";
+  src: url("/fonts/SourceSans3-variable.woff2") format("woff2-variations");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #0d171d;
+  --bg-raised: #122129;
+  --bg-strong: #172a34;
+  --line: #2e4450;
+  --line-bright: #476677;
+  --ink: #f5f0dc;
+  --dim: #b8af94;
+  --accent: #d9583b;
+  --accent-ink: #0d171d;
+  --accent-hover: #f5f0dc;
+  --cool: #257da4;
+  --amber: #e68a2e;
+  --warn: #e5484d;
+  --ok: #2bb071;
+  --water: #257da4;
+  --metro: #008751;
+  --expressway: #e65100;
+  --bus: #f59e0b;
+  --rail: #6366f1;
+  --heritage: #d9583b;
+  --economy: #10b981;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Bengali", sans-serif;
+  --font-display: "Universa", "Source Sans 3", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+:root[data-theme="light"] {
+  --bg: #fcf8ed;
+  --bg-raised: #f5eed8;
+  --bg-strong: #eee2be;
+  --line: #a89f86;
+  --line-bright: #69604c;
+  --ink: #0d171d;
+  --dim: #45555f;
+  --accent: #b33a1e;
+  --accent-ink: #fcf8ed;
+  --accent-hover: #822712;
+  --water: #1b5b7a;
+  --metro: #00663d;
+  --ok: #1e824c;
+}
+
+:root[data-theme="contrast"] {
+  --bg: #050a0d;
+  --bg-raised: #0a141a;
+  --bg-strong: #102029;
+  --line: #f5f0dc;
+  --line-bright: #ffffff;
+  --ink: #ffffff;
+  --dim: #f5f0dc;
+  --accent: #ff6f4f;
+  --accent-ink: #050a0d;
+  --accent-hover: #ffffff;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.atlas-page *,
+.atlas-page *::before,
+.atlas-page *::after,
+.dashboard-modal *,
+.dashboard-modal *::before,
+.dashboard-modal *::after {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.atlas-skip {
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 6px 12px;
+  z-index: 9999;
+  font-weight: 700;
+  text-decoration: none;
+}
+.atlas-skip:focus { top: 8px; }
+
+/* ── Workbench Shell ──────────────────────────────────────────────────────── */
+.atlas-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.atlas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+  flex-shrink: 0;
+  gap: 12px;
+  min-height: 38px;
+  z-index: 30;
+}
+
+.atlas-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.city-brand-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 2px 7px;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+
+.atlas-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.atlas-title-phone { display: none; }
+
+.atlas-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.atlas-control-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dim);
+}
+
+.atlas-select,
+.atlas-control-label select,
+.atlas-btn {
+  background: var(--bg-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  padding: 3px 8px;
+  outline: none;
+  cursor: pointer;
+  height: 26px;
+}
+.atlas-btn:hover,
+.atlas-select:hover {
+  border-color: var(--line-bright);
+}
+.atlas-btn:active {
+  background: var(--bg-strong);
+}
+
+.atlas-btn-accent {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.atlas-btn-accent:hover {
+  background: var(--accent-hover);
+  color: var(--accent-ink);
+}
+
+.atlas-menu-summary {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  padding: 3px 10px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  list-style: none;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+}
+.atlas-menu-summary::-webkit-details-marker { display: none; }
+
+.atlas-menu-body {
+  position: absolute;
+  top: 36px;
+  right: 14px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line-bright);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 260px;
+  z-index: 100;
+}
+.atlas-menu-body a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 4px;
+}
+.atlas-menu-body a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── Lens Navigation Strip ────────────────────────────────────────────────── */
+.atlas-lenses {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  background: var(--line);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+  z-index: 25;
+}
+.atlas-lenses::-webkit-scrollbar { display: none; }
+
+.atlas-lenses button {
+  background: var(--bg);
+  color: var(--dim);
+  border: none;
+  padding: 5px 12px;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+  height: 27px;
+  display: inline-flex;
+  align-items: center;
+}
+.atlas-lenses button:hover {
+  color: var(--ink);
+  background: var(--bg-raised);
+}
+.atlas-lenses button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+/* ── Lens Story Bar ──────────────────────────────────────────────────────── */
+.atlas-lens-story {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 14px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--dim);
+  flex-shrink: 0;
+  gap: 12px;
+  min-height: 24px;
+}
+.atlas-lens-story strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ── Map Canvas & Overlays ────────────────────────────────────────────────── */
+.atlas-map-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.atlas-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+}
+
+/* ── City Watch Strip ─────────────────────────────────────────────────────── */
+.atlas-watch {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  max-width: 900px;
+  margin: 0 auto;
+  z-index: 20;
+  pointer-events: none;
+}
+.atlas-watch-shell {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  pointer-events: auto;
+}
+.atlas-watch-shell summary {
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  background: var(--bg-strong);
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  list-style: none;
+}
+.atlas-watch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+}
+.atlas-watch-item {
+  background: var(--bg);
+  padding: 6px 10px;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--ink);
+}
+.atlas-watch-item:hover {
+  background: var(--bg-raised);
+}
+.atlas-watch-item small {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  color: var(--dim);
+  letter-spacing: 0.05em;
+}
+.atlas-watch-item strong {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.atlas-watch-item[data-tier="warning"] strong { color: var(--amber); }
+.atlas-watch-item[data-tier="danger"] strong { color: var(--warn); }
+.atlas-watch-item[data-tier="ok"] strong { color: var(--ok); }
+
+/* ── Floating Observation HUD ─────────────────────────────────────────────── */
+.atlas-observation-hud {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 310px;
+  max-height: calc(100% - 100px);
+  overflow-y: auto;
+  background: var(--bg-raised);
+  border: 1px solid var(--line-bright);
+  padding: 12px;
+  z-index: 22;
+  font-size: 12px;
+}
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+.hud-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+.hud-badge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  padding: 1px 5px;
+  background: var(--bg-strong);
+  color: var(--dim);
+  border: 1px solid var(--line);
+  text-transform: uppercase;
+}
+.hud-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  border-bottom: 1px dotted var(--line);
+}
+.hud-label { color: var(--dim); font-size: 11px; }
+.hud-value { font-weight: 600; text-align: right; }
+
+/* ── Modals / Dialogs ─────────────────────────────────────────────────────── */
+.dashboard-modal {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line-bright);
+  padding: 0;
+  max-width: 760px;
+  width: 90vw;
+  max-height: 85vh;
+  z-index: 1000;
+}
+.dashboard-modal::backdrop {
+  background: rgba(5, 10, 13, 0.75);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--bg-strong);
+  border-bottom: 1px solid var(--line);
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+}
+.modal-close-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.modal-close-btn:hover { background: var(--accent); color: var(--accent-ink); }
+.modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: calc(85vh - 50px);
+}
+
+/* ── Tables & Provenance ──────────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 8px 0;
+}
+.data-table th,
+.data-table td {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+.data-table th {
+  background: var(--bg-strong);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.data-table tr:hover {
+  background: var(--bg-raised);
+}
+
+/* ── Loading Spinner / Splash ─────────────────────────────────────────────── */
+.atlas-loading-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  gap: 12px;
+}
+.atlas-loading-screen.loaded { display: none; }
+.loading-logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 4px 16px;
+  letter-spacing: 0.1em;
+}
+.loading-text {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--dim);
+}
+
+/* ── Mobile Responsive Geometry (390px phone tested) ─────────────────────── */
+@media (max-width: 768px) {
+  body { overflow: hidden; }
+  .atlas-title-desk { display: none; }
+  .atlas-title-phone { display: inline; }
+  .atlas-header { padding: 4px 8px; }
+  .atlas-control-label span { display: none; }
+  .atlas-watch-grid { grid-template-columns: repeat(2, 1fr); }
+  .atlas-observation-hud {
+    top: auto;
+    bottom: 80px;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-height: 200px;
+  }
+}

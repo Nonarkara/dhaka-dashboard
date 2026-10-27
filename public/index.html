@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DHKx 3D Atlas · Dhaka block by block</title>
+  <meta name="description" content="Dhaka 3D urban atlas & operational civic dashboard: 3D urban form, river ring hydrology and BWDB flood risk, macroeconomic and industrial engine, MRT Line 6 metro transit, and live air quality and winter smoke plumes." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <script src="/theme.js"></script>
+  <script src="/translations.js"></script>
+  <script src="/i18n.js"></script>
+  <link href="/vendor/maplibre-6.4.1/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/dhaka-design.css" />
+  <noscript>
+    <style>
+      .atlas-loading-screen { display: none !important; }
+      body { overflow: auto; }
+      .atlas-page { height: auto; }
+    </style>
+  </noscript>
+</head>
+<body data-surface="dhaka-atlas">
+  <a class="atlas-skip" href="#atlas-lenses">Skip to map controls</a>
+  
+  <div class="atlas-page">
+    <header class="atlas-header">
+      <div class="atlas-header-meta">
+        <a href="/" class="city-brand-badge" aria-label="DHKx · Dhaka Civic Atlas">DHKx</a>
+        <h1 class="atlas-title">
+          <span class="atlas-title-desk">Dhaka, block by block</span>
+          <span class="atlas-title-phone">Dhaka 3D</span>
+        </h1>
+      </div>
+
+      <nav class="atlas-header-nav" aria-label="Atlas controls">
+        <button type="button" id="language-toggle" class="atlas-btn atlas-btn-accent" aria-label="Switch language">English</button>
+        
+        <label class="atlas-control-label">
+          <span>Map view</span>
+          <select id="atlas-view" class="atlas-select" aria-label="Map view">
+            <option value="3d" selected>3D city</option>
+            <option value="2d">2D map</option>
+          </select>
+        </label>
+
+        <label class="atlas-control-label">
+          <span>Basemap</span>
+          <select id="atlas-basemap" class="atlas-select" aria-label="Basemap">
+            <option value="esri" selected>Esri satellite</option>
+            <option value="osm">OpenStreetMap streets</option>
+          </select>
+        </label>
+
+        <details class="atlas-menu" id="atlas-menu">
+          <summary class="atlas-menu-summary">Controls</summary>
+          <div class="atlas-menu-body">
+            <button type="button" class="atlas-btn" data-open="quick-jump-dialog">Quick jump</button>
+            <button type="button" class="atlas-btn" data-open="flood-dialog">Rivers &amp; flood desk</button>
+            <button type="button" class="atlas-btn" data-open="air-dialog">Air quality &amp; smoke</button>
+            <button type="button" class="atlas-btn" data-open="economy-dialog">Macroeconomic engine</button>
+            <button type="button" class="atlas-btn" data-open="transit-dialog">Metro &amp; mobility</button>
+            <a href="/research">How it is built (Research &amp; Method) ↗</a>
+            <a href="/api/atlas/watch" target="_blank" rel="noopener">City watch API (JSON) ↗</a>
+            <button type="button" id="download-geojson-btn" class="atlas-btn">Download view (GeoJSON)</button>
+            
+            <label class="atlas-control-label" style="margin-top:8px;">
+              <span>Appearance</span>
+              <select id="atlas-theme" class="atlas-select" aria-label="Appearance">
+                <option value="dark" selected>Dark · delta night</option>
+                <option value="light">Light · city daylight</option>
+                <option value="contrast">High contrast</option>
+              </select>
+            </label>
+          </div>
+        </details>
+      </nav>
+    </header>
+
+    <nav class="atlas-lenses" id="atlas-lenses" aria-label="Explore city conditions">
+      <button data-lens="city" aria-pressed="true">City in 3D</button>
+      <button data-lens="rivers" aria-pressed="false">Rivers &amp; flood risk</button>
+      <button data-lens="economy" aria-pressed="false">Economic engine</button>
+      <button data-lens="transit" aria-pressed="false">Transit &amp; Metro</button>
+      <button data-lens="air" aria-pressed="false">Air &amp; 72h timeline</button>
+      <button data-lens="haze" aria-pressed="false">Brick kilns &amp; smoke</button>
+      <button data-lens="heritage" aria-pressed="false">Architectural heritage</button>
+      <button data-lens="rain" aria-pressed="false">Rain · next 24 h</button>
+      <button data-lens="radar" aria-pressed="false">Rain radar</button>
+      <button data-lens="cloud" aria-pressed="false">Satellite clouds</button>
+      <button data-lens="night" aria-pressed="false">Night lights</button>
+      <button data-lens="water" aria-pressed="false">Flood inundation</button>
+    </nav>
+
+    <section class="atlas-lens-story" aria-live="polite">
+      <strong id="atlas-lens-title">Read the city, from skyline to street</strong>
+      <span id="atlas-lens-description">Choose a map lens. Sources and valid times stay with the evidence.</span>
+    </section>
+
+    <div class="atlas-map-wrap">
+      <div id="atlas-map" class="atlas-map" aria-label="3D Map of Dhaka"></div>
+
+      <div id="atlas-map-loading" class="atlas-loading-screen">
+        <span class="loading-logo">DHKx</span>
+        <span class="loading-text">Loading Dhaka 3D Atlas &amp; Layers…</span>
+      </div>
+
+      <aside class="atlas-observation-hud" id="atlas-observation-hud" hidden aria-label="Selected spatial feature details"></aside>
+
+      <section class="atlas-watch" id="atlas-watch" aria-label="City watch">
+        <details class="atlas-watch-shell" id="atlas-watch-shell" open>
+          <summary>City watch</summary>
+          <div class="atlas-watch-grid">
+            <button type="button" class="atlas-watch-item" id="atlas-watch-flood" data-open="flood-dialog">
+              <small>Flood and rivers</small>
+              <strong id="atlas-watch-flood-value">Checking open data…</strong>
+            </button>
+            <button type="button" class="atlas-watch-item" id="atlas-watch-air" data-open="air-dialog">
+              <small>Air particles</small>
+              <strong id="atlas-watch-air-value">Checking open data…</strong>
+            </button>
+            <button type="button" class="atlas-watch-item" id="atlas-watch-wind" data-open="air-dialog">
+              <small>Wind and storms</small>
+              <strong id="atlas-watch-wind-value">Checking open data…</strong>
+            </button>
+            <button type="button" class="atlas-watch-item" id="atlas-watch-traffic" data-open="economy-dialog">
+              <small>Economic engine status</small>
+              <strong id="atlas-watch-traffic-value">Checking open data…</strong>
+            </button>
+          </div>
+        </details>
+      </section>
+    </div>
+  </div>
+
+  <!-- Dialogs / Modals -->
+  <dialog id="quick-jump-dialog" class="dashboard-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Quick jump to Dhaka districts</h3>
+      <button class="modal-close-btn" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-top:0;font-size:12px;color:var(--dim);">Select an authored district to fly the camera into the neighborhood and read its spatial context.</p>
+      <div class="jump-grid" id="quick-jump-grid"></div>
+    </div>
+  </dialog>
+
+  <dialog id="flood-dialog" class="dashboard-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Rivers &amp; Flood Desk (BWDB / FFWC)</h3>
+      <button class="modal-close-btn" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-top:0;font-size:12px;color:var(--dim);">
+        Live peripheral river water levels from Bangladesh Water Development Board (BWDB) and Flood Forecasting &amp; Warning Centre (FFWC).
+      </p>
+      <div id="rivers-list-container">Loading river gauge data…</div>
+    </div>
+  </dialog>
+
+  <dialog id="air-dialog" class="dashboard-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Air Quality &amp; Winter Smoke Timeline (CAMS / Open-Meteo)</h3>
+      <button class="modal-close-btn" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="weather-detail-container"></div>
+      <div id="air-timeline-container">Loading air quality timeline…</div>
+      <p style="font-size:11px;color:var(--dim);margin-top:12px;">
+        Data from European Centre for Medium-Range Weather Forecasts (ECMWF) Copernicus Atmosphere Monitoring Service (CAMS) via Open-Meteo API. Model updates every 6 hours.
+      </p>
+    </div>
+  </dialog>
+
+  <dialog id="economy-dialog" class="dashboard-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Macroeconomic &amp; Industrial Engine Desk</h3>
+      <button class="modal-close-btn" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-top:0;font-size:12px;color:var(--dim);">
+        Sourced metrics for Bangladesh's primary manufacturing, export, and capital market hubs. Every number includes unit, reporting period, and publisher source.
+      </p>
+      <div class="metric-grid" id="economy-indicators-grid">Loading economic indicators…</div>
+    </div>
+  </dialog>
+
+  <dialog id="transit-dialog" class="dashboard-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Dhaka Metro Rail &amp; Mobility Network</h3>
+      <button class="modal-close-btn" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-top:0;font-size:12px;color:var(--dim);">
+        Dhaka Mass Rapid Transit (DMTCL) MRT Line 6, Dhaka Elevated Expressway, central rail stations and interstate bus terminals.
+      </p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Corridor / System</th>
+            <th>Type</th>
+            <th>Length / Capacity</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>MRT Line 6 (Metro Rail)</strong><br><small style="color:var(--dim)">Uttara North to Kamalapur</small></td>
+            <td>Elevated Electric Rail</td>
+            <td>21.26 km · 16 Stations</td>
+            <td><span class="hud-badge" style="background:var(--ok)">Operational</span></td>
+          </tr>
+          <tr>
+            <td><strong>Dhaka Elevated Expressway</strong><br><small style="color:var(--dim)">Kawla (Airport) to Farmgate</small></td>
+            <td>Grade-separated Expressway</td>
+            <td>19.73 km (Phase 1)</td>
+            <td><span class="hud-badge" style="background:var(--ok)">Operational</span></td>
+          </tr>
+          <tr>
+            <td><strong>Sadarghat Launch Terminal</strong><br><small style="color:var(--dim)">Buriganga River Passenger Port</small></td>
+            <td>Inland River Port</td>
+            <td>200+ launches daily</td>
+            <td><span class="hud-badge" style="background:var(--ok)">Active</span></td>
+          </tr>
+          <tr>
+            <td><strong>Kamalapur Railway Station</strong><br><small style="color:var(--dim)">Central Bangladesh Railway hub</small></td>
+            <td>National Heavy Rail</td>
+            <td>Primary passenger terminus</td>
+            <td><span class="hud-badge" style="background:var(--ok)">Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </dialog>
+
+  <script defer src="/loader.js" data-app="/app.js"></script>
+  <script defer src="/dashboard.js"></script>
+</body>
+</html>

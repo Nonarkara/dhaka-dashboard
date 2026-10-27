@@ -1,0 +1,171 @@
+{
+  "type": "FeatureCollection",
+  "name": "Dhaka Transit Network: Metro Rail MRT Line 6, Elevated Expressway and Terminals",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "mrt-line-6-track",
+        "name": "MRT Line 6 Alignment",
+        "name_bn": "এমআরটি লাইন ৬ (মেট্রোরেল ট্র্যাক)",
+        "type": "rapid_transit",
+        "operator": "DMTCL",
+        "status": "operational",
+        "length_km": 21.26,
+        "mode": "Viaduct-elevated electric rail",
+        "color": "#008751"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [90.3802, 23.8744],
+          [90.3855, 23.8640],
+          [90.3852, 23.8540],
+          [90.3650, 23.8320],
+          [90.3662, 23.8185],
+          [90.3685, 23.8070],
+          [90.3725, 23.7940],
+          [90.3745, 23.7850],
+          [90.3780, 23.7740],
+          [90.3870, 23.7630],
+          [90.3888, 23.7565],
+          [90.3925, 23.7505],
+          [90.3955, 23.7385],
+          [90.3995, 23.7310],
+          [90.4075, 23.7275],
+          [90.4180, 23.7290],
+          [90.4255, 23.7319]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "elevated-expressway",
+        "name": "Dhaka Elevated Expressway",
+        "name_bn": "ঢাকা এলিভেটেড এক্সপ্রেসওয়ে",
+        "type": "expressway",
+        "operator": "First Dhaka Elevated Expressway Co.",
+        "status": "operational_phase_1",
+        "length_km": 19.73,
+        "color": "#e65100"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [90.4040, 23.8520],
+          [90.4160, 23.8190],
+          [90.4080, 23.7930],
+          [90.4020, 23.7770],
+          [90.3980, 23.7650],
+          [90.3890, 23.7560]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-uttara-north", "name": "Uttara North Station", "name_bn": "উত্তরা উত্তর", "type": "metro_station", "line": "Line 6", "code": "UTN" },
+      "geometry": { "type": "Point", "coordinates": [90.3802, 23.8744] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-uttara-center", "name": "Uttara Center Station", "name_bn": "উত্তরা সেন্টার", "type": "metro_station", "line": "Line 6", "code": "UTC" },
+      "geometry": { "type": "Point", "coordinates": [90.3855, 23.8640] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-uttara-south", "name": "Uttara South Station", "name_bn": "উত্তরা দক্ষিণ", "type": "metro_station", "line": "Line 6", "code": "UTS" },
+      "geometry": { "type": "Point", "coordinates": [90.3852, 23.8540] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-pallabi", "name": "Pallabi Station", "name_bn": "পল্লবী", "type": "metro_station", "line": "Line 6", "code": "PAL" },
+      "geometry": { "type": "Point", "coordinates": [90.3650, 23.8320] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-mirpur-11", "name": "Mirpur 11 Station", "name_bn": "মিরপুর ১১", "type": "metro_station", "line": "Line 6", "code": "M11" },
+      "geometry": { "type": "Point", "coordinates": [90.3662, 23.8185] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-mirpur-10", "name": "Mirpur 10 Station", "name_bn": "মিরপুর ১০", "type": "metro_station", "line": "Line 6", "code": "M10" },
+      "geometry": { "type": "Point", "coordinates": [90.3685, 23.8070] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-kazipara", "name": "Kazipara Station", "name_bn": "কাজীপাড়া", "type": "metro_station", "line": "Line 6", "code": "KAZ" },
+      "geometry": { "type": "Point", "coordinates": [90.3725, 23.7940] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-shewrapara", "name": "Shewrapara Station", "name_bn": "শেওড়াপাড়া", "type": "metro_station", "line": "Line 6", "code": "SHW" },
+      "geometry": { "type": "Point", "coordinates": [90.3745, 23.7850] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-agargaon", "name": "Agargaon Station", "name_bn": "আগারগাঁও", "type": "metro_station", "line": "Line 6", "code": "AGA" },
+      "geometry": { "type": "Point", "coordinates": [90.3780, 23.7740] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-bijoy-sarani", "name": "Bijoy Sarani Station", "name_bn": "বিজয় সরণি", "type": "metro_station", "line": "Line 6", "code": "BJS" },
+      "geometry": { "type": "Point", "coordinates": [90.3870, 23.7630] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-farmgate", "name": "Farmgate Station", "name_bn": "ফার্মগেট", "type": "metro_station", "line": "Line 6", "code": "FRM" },
+      "geometry": { "type": "Point", "coordinates": [90.3888, 23.7565] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-karwan-bazar", "name": "Karwan Bazar Station", "name_bn": "কাওরান বাজার", "type": "metro_station", "line": "Line 6", "code": "KWB" },
+      "geometry": { "type": "Point", "coordinates": [90.3925, 23.7505] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-shahbagh", "name": "Shahbagh Station", "name_bn": "শাহবাগ", "type": "metro_station", "line": "Line 6", "code": "SHB" },
+      "geometry": { "type": "Point", "coordinates": [90.3955, 23.7385] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-dhaka-univ", "name": "Dhaka University Station", "name_bn": "ঢাকা বিশ্ববিদ্যালয়", "type": "metro_station", "line": "Line 6", "code": "DKU" },
+      "geometry": { "type": "Point", "coordinates": [90.3995, 23.7310] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-secretariat", "name": "Bangladesh Secretariat Station", "name_bn": "বাংলাদেশ সচিবালয়", "type": "metro_station", "line": "Line 6", "code": "SEC" },
+      "geometry": { "type": "Point", "coordinates": [90.4075, 23.7275] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-motijheel", "name": "Motijheel Station", "name_bn": "মতিঝিল", "type": "metro_station", "line": "Line 6", "code": "MJL" },
+      "geometry": { "type": "Point", "coordinates": [90.4180, 23.7290] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "st-kamalapur", "name": "Kamalapur Station (Extension)", "name_bn": "কমলাপুর", "type": "metro_station", "line": "Line 6", "code": "KML" },
+      "geometry": { "type": "Point", "coordinates": [90.4255, 23.7319] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "term-gabtoli", "name": "Gabtoli Inter-District Bus Terminal", "name_bn": "গাবতলী বাস টার্মিনাল", "type": "bus_terminal", "role": "North and Western Bangladesh routes" },
+      "geometry": { "type": "Point", "coordinates": [90.3470, 23.7855] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "term-mohakhali", "name": "Mohakhali Inter-District Bus Terminal", "name_bn": "মহাখালী বাস টার্মিনাল", "type": "bus_terminal", "role": "Mymensingh, Tangail, Sylhet routes" },
+      "geometry": { "type": "Point", "coordinates": [90.4005, 23.7770] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "term-sayedabad", "name": "Sayedabad Inter-District Bus Terminal", "name_bn": "সায়েদাবাদ বাস টার্মিনাল", "type": "bus_terminal", "role": "Chattogram, Sylhet, Barishal routes" },
+      "geometry": { "type": "Point", "coordinates": [90.4300, 23.7160] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "term-airport-rail", "name": "Dhaka Airport Railway Station", "name_bn": "বিমানবন্দর রেলওয়ে স্টেশন", "type": "railway_station", "role": "Intercity train stop and airport connector" },
+      "geometry": { "type": "Point", "coordinates": [90.4070, 23.8510] }
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+/* DHKx specific component and graphic styles */
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.metric-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.metric-card:hover {
+  border-color: var(--line-bright);
+}
+.metric-category {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+}
+.metric-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.metric-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 4px 0;
+}
+.metric-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.metric-unit {
+  font-size: 11px;
+  color: var(--dim);
+}
+.metric-provenance {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--dim);
+}
+.provenance-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--ok);
+  display: inline-block;
+}
+.provenance-dot.modeled { background: var(--amber); }
+.provenance-dot.reference { background: var(--cool); }
+
+/* River Level Gauge Component */
+.river-meter {
+  margin: 8px 0;
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.river-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  margin-bottom: 6px;
+}
+.river-bar-track {
+  height: 10px;
+  background: var(--bg-strong);
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+}
+.river-bar-fill {
+  height: 100%;
+  background: var(--water);
+}
+.river-danger-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--warn);
+  z-index: 2;
+}
+
+/* Air Quality Timeline Chart */
+.aqi-timeline {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 80px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 6px 4px 2px;
+  margin: 10px 0;
+}
+.aqi-bar {
+  flex: 1 1 0;
+  background: var(--ok);
+  min-height: 4px;
+  cursor: pointer;
+  position: relative;
+}
+.aqi-bar:hover {
+  filter: brightness(1.2);
+}
+.aqi-bar[data-aqi-class="moderate"] { background: #eab308; }
+.aqi-bar[data-aqi-class="sensitive"] { background: #f97316; }
+.aqi-bar[data-aqi-class="unhealthy"] { background: #ef4444; }
+.aqi-bar[data-aqi-class="very-unhealthy"] { background: #8b5cf6; }
+.aqi-bar[data-aqi-class="hazardous"] { background: #7e22ce; }
+
+/* Quick Jump Grid */
+.jump-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+.jump-btn {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 8px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.jump-btn:hover {
+  border-color: var(--accent);
+  background: var(--bg-raised);
+}
+.jump-btn-cat {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.jump-btn-name {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 2px;
+}

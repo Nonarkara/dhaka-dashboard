@@ -1,0 +1,246 @@
+{
+  "type": "FeatureCollection",
+  "name": "Dhaka Landmarks and Cultural Heritage",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "lalbagh-fort",
+        "name": "Lalbagh Fort",
+        "name_bn": "লালবাগ কেল্লা",
+        "category": "heritage",
+        "year": "1678",
+        "architect": "Subahdar Shaista Khan / Prince Muhammad Azam",
+        "height_m": 12.0,
+        "description": "Uncompleted 17th-century Mughal fort complex comprising the Tomb of Pari Bibi, the Diwan-i-Aam, and the Lalbagh Fort Mosque.",
+        "description_bn": "১৭শ শতাব্দীর অসমাপ্ত মুঘল দুর্গ কমপ্লেক্স যাতে রয়েছে পরী বিবির মাজার, দেওয়ান-ই-আম এবং লালবাগ কেল্লা মসজিদ।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.3882, 23.7196] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ahsan-manzil",
+        "name": "Ahsan Manzil (Pink Palace)",
+        "name_bn": "আহসান মঞ্জিল (গোলাপি প্রাসাদ)",
+        "category": "heritage",
+        "year": "1872",
+        "architect": "Nawab Abdul Ghani / Martin & Co.",
+        "height_m": 18.5,
+        "description": "Official residential palace and seat of the Nawab of Dhaka on the bank of the Buriganga River; Indo-Saracenic Revival architecture.",
+        "description_bn": "বুড়িগঙ্গার তীরে ঢাকার নবাবদের আনুষ্ঠানিক আবাসিক প্রাসাদ ও দরবার; ইন্দো-সারাসেনিক স্থাপত্যের অপরূপ নিদর্শন।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4060, 23.7086] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jatiya-sangsad",
+        "name": "Jatiya Sangsad Bhaban (National Parliament)",
+        "name_bn": "জাতীয় সংসদ ভবন",
+        "category": "civic",
+        "year": "1982",
+        "architect": "Louis I. Kahn",
+        "height_m": 35.7,
+        "description": "National Parliament of Bangladesh, one of the supreme architectural masterworks of the 20th century, surrounded by Crescent Lake.",
+        "description_bn": "বাংলাদেশের জাতীয় সংসদ ভবন, প্রখ্যাত স্থপতি লুই কানের নকশায় নির্মিত বিংশ শতাব্দীর বিশ্বমানের স্থাপত্য নিদর্শন।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.3787, 23.7629] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "curzon-hall",
+        "name": "Curzon Hall",
+        "name_bn": "কার্জন হল",
+        "category": "heritage",
+        "year": "1904",
+        "architect": "Lord Curzon era / PWD",
+        "height_m": 22.0,
+        "description": "University of Dhaka Faculty of Science; exquisite red brick building blending European and Mughal Indo-Saracenic elements.",
+        "description_bn": "ঢাকা বিশ্ববিদ্যালয়ের বিজ্ঞান অনুষদ ভবন; ইউরোপীয় ও মুঘল ইন্দো-সারাসেনিকরীতির রক্তিম মার্বেল ও লাল ইটের সমন্বয়।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4048, 23.7275] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tara-masjid",
+        "name": "Tara Masjid (Star Mosque)",
+        "name_bn": "তারা মসজিদ",
+        "category": "heritage",
+        "year": "Early 18th c. / Renovated 1926",
+        "architect": "Mirza Ghulam Pir / Ali Jan Bepari",
+        "height_m": 15.0,
+        "description": "Historic Armanitola mosque decorated with intricate Chinitikri (broken chinaware mosaic) white marble and blue porcelain stars.",
+        "description_bn": "আরমানিটোলার ঐতিহাসিক মসজিদ যা চিনিতিকরি (কাচ ও চীনামাটির টুকরো) মোজাইক এবং নীল তারায় সুশোভিত।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4022, 23.7156] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "armenian-church",
+        "name": "Armenian Church of the Holy Resurrection",
+        "name_bn": "আর্মেনিয়ান চার্চ অব দ্য হোলি রেজারেকশন",
+        "category": "heritage",
+        "year": "1781",
+        "architect": "Armenian merchant community",
+        "height_m": 14.0,
+        "description": "Historic monument in Armanitola testifying to the flourishing 18th-century Armenian trading community in Bengal.",
+        "description_bn": "আরমানিটোলার প্রাচীন চার্চ যা বাংলায় ১৮শ শতাব্দীর প্রভাবশালী আর্মেনিয়ান ব্যবসায়ী সম্প্রদায়ের স্মৃতি বহন করে।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4064, 23.7142] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "dhakeshwari-temple",
+        "name": "Dhakeshwari National Temple",
+        "name_bn": "ঢাকেশ্বরী জাতীয় মন্দির",
+        "category": "heritage",
+        "year": "12th c. origin",
+        "architect": "Ballal Sena era tradition",
+        "height_m": 14.5,
+        "description": "National Hindu temple of Bangladesh, from which the name 'Dhaka' (Goddess of Dhaka) is traditionally thought to originate.",
+        "description_bn": "বাংলাদেশের জাতীয় হিন্দু মন্দির, যাঁর নামানুসারে 'ঢাকা' নামের উৎপত্তি বলে ঐতিহ্যগতভাবে বিশ্বাস করা হয়।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.3900, 23.7231] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "central-shaheed-minar",
+        "name": "Central Shaheed Minar",
+        "name_bn": "কেন্দ্রীয় শহীদ মিনার",
+        "category": "civic",
+        "year": "1957",
+        "architect": "Hamidur Rahman and Novera Ahmed",
+        "height_m": 14.0,
+        "description": "National monument commemorating the martyrs of the historic 1952 Bengali Language Movement, birthplace of International Mother Language Day.",
+        "description_bn": "১৯৫২ সালের ভাষা আন্দোলনের অমর শহীদদের স্মৃতিবিজড়িত জাতীয় মিনার; আন্তর্জাতিক মাতৃভাষা দিবসের অনুপ্রেরণা।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.3989, 23.7275] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "baitul-mukarram",
+        "name": "Baitul Mukarram National Mosque",
+        "name_bn": "বায়তুল মোকাররম জাতীয় মসজিদ",
+        "category": "civic",
+        "year": "1968",
+        "architect": "A. H. Thariani",
+        "height_m": 30.0,
+        "description": "National Mosque of Bangladesh in central Paltan/Motijheel; modernist cubic design evoking the Kaaba in Mecca.",
+        "description_bn": "পল্টন-মতিঝিল এলাকায় অবস্থিত বাংলাদেশের জাতীয় মসজিদ; পবিত্র কাবার আদলে নির্মিত কিউবিক আধুনিক স্থাপত্য।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4124, 23.7314] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bangladesh-bank",
+        "name": "Bangladesh Bank Headquarters",
+        "name_bn": "বাংলাদেশ ব্যাংক প্রধান কার্যালয়",
+        "category": "finance",
+        "year": "1972",
+        "architect": "Central Bank Compound",
+        "height_m": 115.0,
+        "description": "The central bank of Bangladesh in Motijheel C/A, managing national monetary policy, foreign exchange reserves, and banking supervision.",
+        "description_bn": "মতিঝিলে অবস্থিত দেশের কেন্দ্রীয় ব্যাংক, যা মুদ্রানীতি, বৈদেশিক মুদ্রার রিজার্ভ এবং ব্যাংক খাত পরিচালনা করে।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4189, 23.7278] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "city-centre-tower",
+        "name": "City Centre Dhaka",
+        "name_bn": "সিটি সেন্টার ঢাকা",
+        "category": "finance",
+        "year": "2012",
+        "architect": "Belhasen Engineering",
+        "height_m": 171.0,
+        "description": "Tallest commercial skyscraper in Bangladesh (37 floors) located in Motijheel central business district.",
+        "description_bn": "মতিঝিল বাণিজ্যিক এলাকায় অবস্থিত ১৭১ মিটার উচ্চতার বাংলাদেশের অন্যতম সর্বোচ্চ বাণিজ্যিক আকাশচুম্বী ভবন (৩৭ তলা)।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4168, 23.7303] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "sadarghat-launch-terminal",
+        "name": "Sadarghat Launch Terminal",
+        "name_bn": "সদরঘাট লঞ্চ টার্মিনাল",
+        "category": "transit",
+        "year": "1880s / BIWTA Modernized",
+        "architect": "BIWTA",
+        "height_m": 10.0,
+        "description": "The primary passenger port for inland river navigation in Bangladesh, connecting the delta to the southern coastal divisions.",
+        "description_bn": "বাংলাদেশের অভ্যন্তরীণ নদীপথে যাত্রী পরিবহনের প্রধান কেন্দ্র, যা দক্ষিণাঞ্চলের উপকূলীয় এলাকার সাথে ঢাকার যোগসূত্র।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4132, 23.7042] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kamalapur-railway-station",
+        "name": "Kamalapur Central Railway Station",
+        "name_bn": "কমলাপুর কেন্দ্রীয় রেলওয়ে স্টেশন",
+        "category": "transit",
+        "year": "1968",
+        "architect": "Daniel Dunham and Robert Boughey",
+        "height_m": 18.0,
+        "description": "Bangladesh Railway central terminal; famed for its rhythmic thin-shell concrete parasol arches.",
+        "description_bn": "বাংলাদেশ রেলওয়ের প্রধান স্টেশন; ছাতার মতো কংক্রিটের অনন্য প্যারাসল খিলান ছাদের আধুনিক স্থাপত্যের নিদর্শন।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4255, 23.7319] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "shankhari-bazaar",
+        "name": "Shankhari Bazaar",
+        "name_bn": "শাখারি বাজার",
+        "category": "heritage",
+        "year": "17th c. Mughal era",
+        "architect": "Traditional linear artisan strip",
+        "height_m": 16.0,
+        "description": "Historic narrow urban lane of traditional artisan conch-shell carvers and jewelers with deep, narrow heritage townhouse facades.",
+        "description_bn": "মুঘল আমল থেকে প্রচলিত শাঁখা শিল্পীদের ঐতিহ্যবাহী সংকীর্ণ গলি ও অনন্য প্রাচীন স্থাপত্যের টাউনহাউস।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4079, 23.7118] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "national-martyrs-memorial",
+        "name": "National Martyrs' Memorial (Jatiya Smriti Soudho)",
+        "name_bn": "জাতীয় স্মৃতিসৌধ (সাভার)",
+        "category": "civic",
+        "year": "1982",
+        "architect": "Syed Mainul Hossain",
+        "height_m": 45.7,
+        "description": "National monument in Savar honoring those who died in the 1971 Bangladesh Liberation War, composed of seven pairs of triangular wall prisms.",
+        "description_bn": "১৯৭১ সালের মহান স্বাধীনতা যুদ্ধের বীর শহীদদের স্মরণে সাভারে নির্মিত ৭ জোড়া ত্রিভুজাকার দেয়ালের জাতীয় স্মৃতিসৌধ।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.2544, 23.9117] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "hatirjheel-bridge-1",
+        "name": "Hatirjheel Overpass & Amphitheatre",
+        "name_bn": "হাতিরঝিল ওভারপাস ও এম্ফিথিয়েটার",
+        "category": "hydrology",
+        "year": "2013",
+        "architect": "Bangladesh Army & BUET / RAJUK",
+        "height_m": 15.0,
+        "description": "Iconic rainbow-lit curved bridges and integrated drainage viaduct spanning Hatirjheel retention basin.",
+        "description_bn": "হাতিরঝিল জলাধারের ওপর দৃষ্টিনন্দন বাঁকানো সেতু, ঝুলন্ত ওয়াকওয়ে এবং ড্রেনেজ ভায়াডাক্ট।"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4095, 23.7698] }
+    }
+  ]
+}

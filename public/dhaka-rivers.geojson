@@ -1,0 +1,279 @@
+{
+  "type": "FeatureCollection",
+  "name": "Dhaka River Ring, Canals and BWDB Gauge Network",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bwdb-buriganga-dhaka",
+        "name": "Buriganga River at Dhaka (Mill Barrage)",
+        "name_bn": "বুড়িগঙ্গা নদী (ঢাকা মিল ব্যারাজ)",
+        "river": "Buriganga",
+        "type": "gauge",
+        "danger_level_m": 5.55,
+        "warning_level_m": 5.05,
+        "recorded_highest_flood_m": 7.58,
+        "agency": "BWDB / FFWC",
+        "station_id": "SW42",
+        "status": "normal",
+        "current_water_level_m": 3.82,
+        "trend": "steady"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4150, 23.7001] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bwdb-turag-mirpur",
+        "name": "Turag River at Mirpur",
+        "name_bn": "তুরাগ নদী (মিরপুর স্টেশন)",
+        "river": "Turag",
+        "type": "gauge",
+        "danger_level_m": 5.50,
+        "warning_level_m": 5.00,
+        "recorded_highest_flood_m": 8.35,
+        "agency": "BWDB / FFWC",
+        "station_id": "SW299",
+        "status": "normal",
+        "current_water_level_m": 3.65,
+        "trend": "falling"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.3420, 23.7980] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bwdb-balu-demra",
+        "name": "Balu River at Demra",
+        "name_bn": "বালু নদী (ডেমরা স্টেশন)",
+        "river": "Balu",
+        "type": "gauge",
+        "danger_level_m": 5.75,
+        "warning_level_m": 5.25,
+        "recorded_highest_flood_m": 7.13,
+        "agency": "BWDB / FFWC",
+        "station_id": "SW08",
+        "status": "normal",
+        "current_water_level_m": 3.48,
+        "trend": "steady"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.5050, 23.7140] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bwdb-lakhya-narayanganj",
+        "name": "Lakhya River at Narayanganj",
+        "name_bn": "শীতলক্ষ্যা নদী (নারায়ণগঞ্জ স্টেশন)",
+        "river": "Shitalakshya",
+        "type": "gauge",
+        "danger_level_m": 5.50,
+        "warning_level_m": 5.00,
+        "recorded_highest_flood_m": 6.93,
+        "agency": "BWDB / FFWC",
+        "station_id": "SW179",
+        "status": "normal",
+        "current_water_level_m": 3.75,
+        "trend": "steady"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.5110, 23.6190] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bwdb-tongi-khal",
+        "name": "Tongi Khal at Tongi",
+        "name_bn": "টঙ্গী খাল (টঙ্গী স্টেশন)",
+        "river": "Tongi Khal",
+        "type": "gauge",
+        "danger_level_m": 6.08,
+        "warning_level_m": 5.58,
+        "recorded_highest_flood_m": 7.84,
+        "agency": "BWDB / FFWC",
+        "station_id": "SW298",
+        "status": "normal",
+        "current_water_level_m": 3.90,
+        "trend": "falling"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4010, 23.8890] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bwdb-dhaleshwari-rekabi",
+        "name": "Dhaleshwari River at Rekabi Bazar",
+        "name_bn": "ধলেশ্বরী নদী (রেকাবি বাজার)",
+        "river": "Dhaleshwari",
+        "type": "gauge",
+        "danger_level_m": 5.18,
+        "warning_level_m": 4.68,
+        "recorded_highest_flood_m": 7.42,
+        "agency": "BWDB / FFWC",
+        "station_id": "SW68",
+        "status": "normal",
+        "current_water_level_m": 3.35,
+        "trend": "steady"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4950, 23.5630] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "buriganga-corridor",
+        "name": "Buriganga River Corridor",
+        "name_bn": "বুড়িগঙ্গা নদী করিডোর",
+        "type": "river_axis",
+        "role": "Southern boundary and commercial water spine"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [90.3340, 23.7540],
+          [90.3550, 23.7250],
+          [90.3800, 23.7120],
+          [90.4100, 23.7020],
+          [90.4350, 23.6900],
+          [90.4850, 23.6550],
+          [90.5050, 23.6250]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "turag-corridor",
+        "name": "Turag River Corridor",
+        "name_bn": "তুরাগ নদী করিডোর",
+        "type": "river_axis",
+        "role": "Western boundary and flood discharge route"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [90.3340, 23.7540],
+          [90.3380, 23.7850],
+          [90.3450, 23.8200],
+          [90.3620, 23.8650],
+          [90.3850, 23.9000]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "balu-corridor",
+        "name": "Balu River Corridor",
+        "name_bn": "বালু নদী করিডোর",
+        "type": "river_axis",
+        "role": "Eastern drainage receiver"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [90.4400, 23.8900],
+          [90.4700, 23.8400],
+          [90.4950, 23.7800],
+          [90.5050, 23.7140],
+          [90.5100, 23.6700]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tongi-khal-corridor",
+        "name": "Tongi Khal Channel",
+        "name_bn": "টঙ্গী খাল সংযোগ",
+        "type": "canal_axis",
+        "role": "Northern cross-link between Turag and Balu"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [90.3850, 23.9000],
+          [90.4010, 23.8890],
+          [90.4200, 23.8880],
+          [90.4400, 23.8900]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "hatirjheel-basin",
+        "name": "Hatirjheel Water Retention Basin",
+        "name_bn": "হাতিরঝিল পানি ধারণ জলাধার",
+        "type": "retention_basin",
+        "capacity_m3": 3000000,
+        "role": "Central stormwater storage, regulates Rampura sluice gate to Balu River"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [90.3955, 23.7550],
+          [90.4040, 23.7650],
+          [90.4130, 23.7710],
+          [90.4220, 23.7680],
+          [90.4310, 23.7640]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "dhanmondi-lake",
+        "name": "Dhanmondi Lake",
+        "name_bn": "ধানমন্ডি লেক",
+        "type": "urban_lake",
+        "role": "Natural retention body and recreational civic space in western Dhaka"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [90.3700, 23.7550],
+          [90.3750, 23.7480],
+          [90.3800, 23.7380]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "pump-goran-chatbari",
+        "name": "Goran Chatbari Stormwater Pumping Station",
+        "name_bn": "গোরান চটবাড়ি পাম্পিং স্টেশন",
+        "type": "pumping_station",
+        "agency": "Dhaka WASA / BWDB",
+        "capacity_cusec": 2200,
+        "role": "Discharges storm runoff from northern Dhaka into Turag River"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.3425, 23.8315] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "pump-kalyanpur",
+        "name": "Kalyanpur Stormwater Pumping Station",
+        "name_bn": "কল্যাণপুর পাম্পিং স্টেশন",
+        "type": "pumping_station",
+        "agency": "Dhaka WASA / DNCC",
+        "capacity_cusec": 1800,
+        "role": "Prevents severe waterlogging across Mirpur and Mohammadpur"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.3540, 23.7780] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "pump-dholaikhal",
+        "name": "Dholai Khal Pumping Station",
+        "name_bn": "ধোলাইখাল পাম্পিং স্টেশন",
+        "type": "pumping_station",
+        "agency": "DSCC / Dhaka WASA",
+        "capacity_cusec": 1200,
+        "role": "Drains stormwater from Old Dhaka into the Buriganga"
+      },
+      "geometry": { "type": "Point", "coordinates": [90.4190, 23.7030] }
+    }
+  ]
+}

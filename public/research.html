@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DHKx · Research, Data Sources &amp; Methodology</title>
+  <meta name="description" content="Methodology, data sources, license registry, provenance tiers, and refusal contracts for the Dhaka 3D Atlas and Civic Dashboard." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <script src="/theme.js"></script>
+  <script src="/translations.js"></script>
+  <script src="/i18n.js"></script>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/dhaka-design.css" />
+  <style>
+    body { overflow-y: auto; height: auto; }
+    .research-container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+    .research-header {
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .research-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 700;
+      margin: 4px 0 8px;
+    }
+    .research-subtitle {
+      color: var(--dim);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .research-section {
+      margin-bottom: 36px;
+    }
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+      margin: 24px 0 12px;
+      color: var(--ink);
+    }
+    .provenance-box {
+      background: var(--bg-raised);
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12.5px;
+    }
+  </style>
+</head>
+<body data-surface="dhaka-research">
+  <div class="research-container">
+    <header class="research-header">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <a href="/" class="city-brand-badge">DHKx</a>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button type="button" id="language-toggle" class="atlas-btn atlas-btn-accent">English</button>
+          <a href="/" class="atlas-btn">← Back to 3D Atlas</a>
+        </div>
+      </div>
+      <h1 class="research-title">Data Sources, Provenance &amp; Methodology</h1>
+      <p class="research-subtitle">
+        Every number, polygon, and status displayed on <strong>dhaka.nonarkara.org</strong> carries its source, collection time, reporting units, and license terms. This document details the open data infrastructure, validation standards, and refusal contracts.
+      </p>
+    </header>
+
+    <main>
+      <section class="research-section">
+        <h2 class="section-heading">1. Core Design &amp; Architectural Laws</h2>
+        <div class="provenance-box">
+          <strong>The Refusal Contract:</strong> If an upstream API is unreachable, times out, or produces malformed fields, the dashboard displays <code>unavailable</code> with an explicit machine-readable <code>reasonCode</code> and timestamp. It never invents a zero, never displays an empty widget as "normal", and never converts a lack of measurement into an "all-clear" signal.
+        </div>
+        <p>
+          Following Dr Non's cross-project principles (tested across Bangkok, Ho Chi Minh City, Jakarta, and Kuala Lumpur):
+        </p>
+        <ul>
+          <li><strong>Provenance Tiers:</strong> Every feed is labeled with one of five tiers: <code>measured</code> (in-situ sensors), <code>modeled</code> (physical numerical simulations), <code>simulated</code> (urban scenarios), <code>reference</code> (official gazetteers/registers), or <code>unavailable</code>.</li>
+          <li><strong>Cache stamp, not Date.now():</strong> Build IDs are deterministic stamps committed to source, preventing hydration mismatches and guaranteeing reproducible releases.</li>
+          <li><strong>Dieter Rams Geometry:</strong> Zero border-radius, zero drop-shadows, zero decorative gradients, hairline 1px borders, and a strict signal palette.</li>
+          <li><strong>Bilingual Parity:</strong> Complete native Bengali (বাংলা) and English translation across all titles, descriptions, status pills, and error notifications.</li>
+        </ul>
+      </section>
+
+      <section class="research-section">
+        <h2 class="section-heading">2. Authoritative Data Source Register</h2>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Publisher / Provider</th>
+              <th>Dataset / Indicators</th>
+              <th>Provenance Tier</th>
+              <th>Update Frequency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Hydrology &amp; Floods</strong></td>
+              <td>Bangladesh Water Development Board (BWDB) / FFWC</td>
+              <td>6 Peripheral river water levels (Buriganga, Turag, Balu, Shitalakshya, Tongi Khal, Dhaleshwari) vs official Danger Levels (m MSL)</td>
+              <td><code>measured</code></td>
+              <td>Daily bulletin (hourly during monsoon)</td>
+            </tr>
+            <tr>
+              <td><strong>Macroeconomy</strong></td>
+              <td>Bangladesh Bank</td>
+              <td>Foreign exchange reserves (Gross &amp; BPM6), Worker inward remittances, USD/BDT crawling peg exchange rate</td>
+              <td><code>measured</code></td>
+              <td>Monthly bulletins &amp; trends</td>
+            </tr>
+            <tr>
+              <td><strong>Export Engine</strong></td>
+              <td>Export Promotion Bureau (EPB) / BGMEA</td>
+              <td>Ready-Made Garments (RMG) Knitwear and Woven monthly export values</td>
+              <td><code>measured</code></td>
+              <td>Monthly official release</td>
+            </tr>
+            <tr>
+              <td><strong>Capital Markets</strong></td>
+              <td>Dhaka Stock Exchange (DSE)</td>
+              <td>DSEX benchmark index, market turnover, market capitalization</td>
+              <td><code>measured</code></td>
+              <td>Session close</td>
+            </tr>
+            <tr>
+              <td><strong>Inflation</strong></td>
+              <td>Bangladesh Bureau of Statistics (BBS)</td>
+              <td>Consumer Price Index (CPI) Headline, Food, and Non-Food Inflation</td>
+              <td><code>measured</code></td>
+              <td>Monthly bulletin</td>
+            </tr>
+            <tr>
+              <td><strong>Air Quality</strong></td>
+              <td>Copernicus CAMS / Open-Meteo</td>
+              <td>7-Station Grid (Uttara, Mirpur, Gulshan, Farmgate, Motijheel, Sadarghat, Savar): PM2.5, PM10, NO2, SO2, CO, Ozone, US AQI</td>
+              <td><code>modeled</code></td>
+              <td>Hourly update, 72h forecast</td>
+            </tr>
+            <tr>
+              <td><strong>Weather &amp; Rain</strong></td>
+              <td>ECMWF / Open-Meteo</td>
+              <td>Current temperature, relative humidity, apparent temp, 24h catchment precipitation accumulation</td>
+              <td><code>modeled</code></td>
+              <td>Hourly</td>
+            </tr>
+            <tr>
+              <td><strong>Active Fires</strong></td>
+              <td>NASA FIRMS (NOAA-20 / VIIRS)</td>
+              <td>375m active thermal detections over brick kiln clusters in Savar, Gazipur, and Keraniganj</td>
+              <td><code>measured</code></td>
+              <td>Daily satellite pass</td>
+            </tr>
+            <tr>
+              <td><strong>Night Radiance</strong></td>
+              <td>NASA GIBS (Suomi NPP Black Marble)</td>
+              <td>VNP46A2 day/night band nighttime lights and urban electrification</td>
+              <td><code>measured</code></td>
+              <td>Daily composite</td>
+            </tr>
+            <tr>
+              <td><strong>Rapid Transit</strong></td>
+              <td>Dhaka Mass Transit Company (DMTCL) / RAJUK</td>
+              <td>MRT Line 6 stations, elevated alignment, Dhaka Elevated Expressway</td>
+              <td><code>reference</code></td>
+              <td>Surveyed alignments</td>
+            </tr>
+            <tr>
+              <td><strong>Seismic Risk</strong></td>
+              <td>USGS Earthquake Hazards Program</td>
+              <td>Magnitude 3.0+ events in Bengal Basin, Dauki Fault, and Tripura Fold Belt</td>
+              <td><code>measured</code></td>
+              <td>Real-time seismic network</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="research-section">
+        <h2 class="section-heading">3. Geographic Scope &amp; Bounding Coordinates</h2>
+        <p>
+          The atlas covers Greater Metropolitan Dhaka and its primary industrial and hydrological catchment:
+        </p>
+        <div class="provenance-box">
+          <strong>Bounding Box (WGS84):</strong><br />
+          South: <code>23.60°N</code> (Narayanganj / Dhaleshwari confluence)<br />
+          North: <code>23.95°N</code> (Tongi Khal / Gazipur boundary / DEPZ Savar)<br />
+          West: <code>90.25°E</code> (National Martyrs' Memorial, Savar / Western Embankment)<br />
+          East: <code>90.55°E</code> (Balu River / Shitalakshya River / Adamjee EPZ)<br />
+          <strong>Center:</strong> <code>23.8103°N, 90.4125°E</code>
+        </div>
+      </section>
+
+      <section class="research-section">
+        <h2 class="section-heading">4. Author &amp; Institutional Attribution</h2>
+        <p>
+          <strong>Dr Non Arkaraprasertkul</strong><br />
+          Senior Expert in Smart City Promotion, Digital Economy Promotion Agency (DEPA) of Thailand.<br />
+          Lover of Southeast Asian and South Asian delta cities; builder of open civic instruments across ASEAN (Bangkok, Jakarta, Kuala Lumpur, Ho Chi Minh City) and now Dhaka.
+        </p>
+        <p style="font-size:12px;color:var(--dim);margin-top:20px;">
+          Deployed live at <a href="https://dhaka.nonarkara.org" style="color:var(--accent);">dhaka.nonarkara.org</a> · Cloudflare Workers Edge Infrastructure.
+        </p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

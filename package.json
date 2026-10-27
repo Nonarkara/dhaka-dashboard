@@ -1,0 +1,28 @@
+{
+  "name": "dhaka-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Bengali–English research atlas and operational dashboard for Dhaka: 3D urban form, river ring hydrology & flood risk, macroeconomic & industrial engine, transit networks, and live air quality & smoke transport.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "stamp": "node scripts/stamp-build-id.mjs",
+    "deploy": "bash scripts/deploy-live.sh",
+    "deploy:live": "bash scripts/deploy-live.sh",
+    "release": "bash scripts/deploy-live.sh",
+    "typecheck": "tsc --noEmit",
+    "verify": "node scripts/verify-local.mjs",
+    "smoke": "node scripts/smoke-atlas.mjs",
+    "smoke:api": "node scripts/smoke-atlas-api.mjs",
+    "test": "node scripts/test-release-contract.mjs && node scripts/test-client-contract.mjs && node scripts/test-theme-contract.mjs && node scripts/test-environment-contract.mjs && node scripts/test-i18n-contract.mjs && node scripts/test-dhaka-contract.mjs && node scripts/test-anti-slop-design.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261016.1",
+    "typescript": "5.9.3",
+    "wrangler": "4.149.0"
+  },
+  "dependencies": {
+    "fast-xml-parser": "5.11.2",
+    "pmtiles": "^4.4.1"
+  }
+}
