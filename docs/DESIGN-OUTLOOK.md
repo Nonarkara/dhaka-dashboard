@@ -4,7 +4,19 @@ The first task is to locate and inspect a place. The old four-band header consum
 
 Typography: Barlow Semi Condensed 400/500/600 for Latin; Hind Siliguri 400/500/600 for Bengali, locally served, SIL OFL licenses in public/fonts. Compact infrastructural lettering gives Dhaka its own voice. Values use tabular numerals, not a third decorative face.
 
-Building categories use actual OSM tags, never height, proximity or random color. Palette plate 241 (local Palette data/colors.json) provides Red Orange #dd4027 for civic/community, Dark Medici Blue #547076 for commerce, Isabella Color #c5a56e for homes and Pale Lemon Yellow #ffefae for industry/utilities. Neutral #b4b0a3 marks unknown use, dominating the city because streamed tiles omit use tags. Unequal weights follow mapped evidence. The dark Delta shell and sparse terracotta actions remain. Text is not placed on the categorical fills. Civic includes community institutions, not a claim of government ownership. Precedence: explicit government/community tags, industry, residential, commercial, unknown; building:use takes precedence over building. Height provenance and Parliament courtyards remain intact.
+Building categories use actual OSM tags, never height, proximity or random color. Sanzo Wada Plate 001 (Palette 1: English Red #d96629 and Cerulian Blue #0093a5) sets the tone for the entire system:
+- **Civic & Government (Palette 1 Anchor 1)**: English Red `#d96629`
+- **Commerce & Corporate Office (Palette 1 Anchor 2)**: Cerulian Blue `#0093a5`
+- **Retail & Markets**: Warm Amber `#e2953b`
+- **Apartments & Towers**: Terracotta Brick `#d17b58`
+- **Houses & Residential**: Isabella Sand `#c5a56e`
+- **Mosques & Places of Worship**: Mosque Jade Teal `#2d8a88`
+- **Education & Campuses**: Academic Lapis `#2563a8`
+- **Healthcare & Hospitals**: Medical Celadon `#10b981`
+- **Industry & RMG Factories**: Industrial Slate `#5a6772`
+- **General / Unknown**: Neutral Ground `#b4b0a3` marks unclassified footprints. Streamed OpenFreeMap vector tiles map available class/use tags.
+
+Spatial Hallucination (SH) Elimination: Overlays are budgeted strictly to prevent map obstruction. The atlas menu bar is halved from 300 px to 150 px with single-column vertical micro-controls; the map key is budgeted to 150 px; the forecast playback panel is halved from 560 px to 280 px; and the observation HUD is tightened from 310 px to 220 px. This preserves the maximum possible operating viewport for the hero 3D map. Height provenance and Parliament courtyards remain intact.
 
 Operational requirements distilled from a private delegate discussion: policy decisions, improvement without demolition/displacement, upstream-driven northeast flash floods, agricultural warning lead time, forecast accuracy and agency implementation. No private transcript is distributed. The talk's numerical accuracy claims are unvalidated and excluded.
 

@@ -179,33 +179,37 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-lens-choice { display:block; flex:1; min-width:0; max-width:270px; }
 .atlas-lens-choice select { width:100%; height:40px; padding:0 24px 0 8px; border:0; border-left:1px solid var(--line); background:var(--bg); color:var(--ink); font:500 16px var(--font-sans); }
 .atlas-header-nav { display:flex; margin-left:auto; gap:8px; align-items:center; }
-.atlas-header-nav > .atlas-btn,.atlas-menu-summary { min-height:40px; height:40px; padding:7px 8px; border:0; font:500 16px var(--font-sans); background:transparent; color:var(--ink); }
+.atlas-header-nav > .atlas-btn,.atlas-menu-summary { min-height:40px; height:40px; padding:7px 8px; border:0; font:500 16px var(--font-sans); background:transparent; color:var(--ink); cursor:pointer; }
 .atlas-menu { position:relative; }
-.atlas-menu-body { top:44px; right:0; width:300px; max-width:calc(100vw - 16px); max-height:calc(100dvh - 62px); overflow:auto; }
-.atlas-menu-body .atlas-control-label { display:grid; grid-template-columns:90px minmax(0,1fr); align-items:center; gap:8px; margin:0 0 8px; }
-.atlas-menu-body .atlas-control-label > span { display:block; font-size:14px; }
-.atlas-menu-body select { min-width:0; width:100%; }
-.atlas-map-key { position:absolute; z-index:3; top:10px; left:10px; max-width:min(320px,calc(100% - 70px)); background:var(--bg); color:var(--ink); border-left:2px solid var(--accent); font-size:13px; }
-.atlas-map-key summary { cursor:pointer; min-height:32px; padding:5px 10px; font-weight:500; }
-.atlas-map-key p { margin:6px 10px; font-size:13px; }
-.atlas-lens-story { display:block; padding:0; border:0; background:transparent; font-size:13px; }
-.atlas-lens-story strong,.atlas-lens-story > span { display:block; padding:4px 10px; font-size:13px; line-height:1.4; }
-.building-swatches { display:grid; grid-template-columns:1fr 1fr; gap:5px 12px; padding:4px 10px; }
-.building-swatches span { display:flex; align-items:center; gap:6px; }
-.building-swatches i { width:12px; height:12px; border:1px solid var(--dim); flex-shrink:0; }
-.forecast-player { position:absolute; z-index:5; bottom:68px; left:10px; width:min(560px,calc(100% - 20px)); padding:10px 12px; background:var(--bg); border-top:2px solid var(--accent); font-size:14px; line-height:1.35; }
+.atlas-menu-body { top:44px; right:0; width:150px; min-width:150px; max-width:150px; max-height:calc(100dvh - 62px); padding:6px; gap:4px; display:flex; flex-direction:column; background:var(--bg-raised); border:1px solid var(--line-bright); overflow-y:auto; overflow-x:hidden; z-index:100; }
+.atlas-menu-body .atlas-control-label { display:flex; flex-direction:column; gap:2px; margin:0 0 4px; }
+.atlas-menu-body .atlas-control-label > span { display:block; font-family:var(--font-mono); font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--dim); }
+.atlas-menu-body select { min-width:0; width:100%; height:24px; min-height:24px; padding:1px 4px; font-size:11px; background:var(--bg); border:1px solid var(--line); color:var(--ink); }
+.atlas-menu-body .atlas-btn { display:block; width:100%; min-height:24px; height:24px; padding:2px 5px; font-size:10.5px; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.atlas-menu-body .atlas-btn:hover { background:var(--line); color:var(--accent); }
+.atlas-menu-body a { color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); padding:2px 0; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+.atlas-menu-body a:hover { color:var(--accent); }
+.atlas-map-key { position:absolute; z-index:3; top:8px; left:8px; width:150px; max-width:150px; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-left:2px solid var(--accent); font-size:11px; }
+.atlas-map-key summary { cursor:pointer; min-height:24px; padding:3px 6px; font-weight:600; font-size:10.5px; }
+.atlas-map-key p { margin:3px 6px; font-size:9.5px; line-height:1.25; }
+.atlas-lens-story { display:block; padding:0; border:0; background:transparent; font-size:11px; }
+.atlas-lens-story strong,.atlas-lens-story > span { display:block; padding:2px 6px; font-size:10px; line-height:1.3; }
+.building-swatches { display:flex; flex-direction:column; gap:2px; padding:3px 6px; }
+.building-swatches span { display:flex; align-items:center; gap:5px; font-size:9.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.building-swatches i { width:9px; height:9px; border:1px solid var(--dim); flex-shrink:0; }
+.forecast-player { position:absolute; z-index:5; bottom:68px; left:8px; width:min(280px,calc(100% - 16px)); padding:6px 8px; background:var(--bg); border:1px solid var(--line); border-top:2px solid var(--accent); font-size:11.5px; line-height:1.3; }
 .forecast-player[hidden] { display:none; }
-.forecast-player h2 { font:600 18px var(--font-sans); margin:0; }
-.forecast-player p { margin:4px 0; }
-.forecast-player .forecast-controls { display:flex; gap:10px; align-items:center; }
+.forecast-player h2 { font:600 13px var(--font-sans); margin:0 0 2px; }
+.forecast-player p { margin:3px 0; font-size:11px; }
+.forecast-player .forecast-controls { display:flex; gap:6px; align-items:center; }
 .forecast-player input[type="range"] { flex:1; min-width:30px; accent-color:var(--accent); }
-.forecast-player button { min-height:36px; background:var(--bg); color:var(--ink); border:1px solid var(--line); padding:4px 12px; font:500 15px var(--font-sans); }
-.forecast-player output { display:block; font-variant-numeric:tabular-nums; }
+.forecast-player button { min-height:26px; height:26px; background:var(--bg); color:var(--ink); border:1px solid var(--line); padding:2px 8px; font:500 12px var(--font-sans); cursor:pointer; }
+.forecast-player output { display:block; font-variant-numeric:tabular-nums; font-size:11px; }
 .forecast-player a { color:var(--ink); }
-.forecast-player details { margin-top:4px; }
-.forecast-player details[open] { max-height:180px; overflow:auto; }
-.forecast-scale { display:flex; gap:12px; flex-wrap:wrap; font-size:12px; }
-.forecast-scale span { border-bottom:4px solid var(--value-color); }
+.forecast-player details { margin-top:3px; }
+.forecast-player details[open] { max-height:140px; overflow:auto; }
+.forecast-scale { display:flex; gap:8px; flex-wrap:wrap; font-size:10.5px; }
+.forecast-scale span { border-bottom:3px solid var(--value-color); }
 @media(max-width:600px) {
  .atlas-header { display:flex; gap:5px; padding:2px 8px; }
  .atlas-header-nav { display:flex; gap:0; }
@@ -222,12 +226,12 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 
 /* Northeast Agricultural Early Warning & Harvest Advisory */
 .forecast-harvest-card {
-  margin: 8px 0;
-  padding: 8px 10px;
+  margin: 4px 0;
+  padding: 4px 6px;
   background: var(--bg-raised);
   border-left: 3px solid var(--accent);
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 11px;
+  line-height: 1.3;
 }
 .forecast-harvest-card.harvest-alert {
   border-left-color: #dd4027;
