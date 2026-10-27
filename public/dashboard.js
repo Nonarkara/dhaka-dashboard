@@ -172,8 +172,7 @@
     }
   }
 
-  // Setup modal openers
-  document.addEventListener("DOMContentLoaded", () => {
+  function bootDashboard() {
     $$("[data-open]").forEach(btn => {
       btn.addEventListener("click", () => {
         const targetId = btn.getAttribute("data-open");
@@ -196,5 +195,11 @@
     });
 
     loadDashboardFeeds();
-  });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootDashboard);
+  } else {
+    bootDashboard();
+  }
 })();

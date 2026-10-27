@@ -541,7 +541,7 @@ body {
   z-index: 50;
   gap: 12px;
 }
-.atlas-loading-screen.loaded { display: none; }
+.atlas-loading-screen.loaded { display: none !important; }
 .loading-logo {
   font-family: var(--font-display);
   font-size: 28px;

@@ -4,13 +4,7 @@
 (function () {
   'use strict';
 
-  const maplibregl = window.maplibregl;
-  if (!maplibregl) {
-    console.error("MapLibre GL is not loaded.");
-    return;
-  }
-
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793120359-f133c2d";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793121253-895d1b6";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -24,9 +18,17 @@
   let transitData = null;
   let economyData = null;
   let areasData = [];
+  let loadingHidden = false;
 
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+  function hideLoading() {
+    if (loadingHidden) return;
+    loadingHidden = true;
+    const el = $("#atlas-map-loading");
+    if (el) el.classList.add("loaded");
+  }
 
   const LENS_STORIES = {
     city: {
@@ -104,8 +106,16 @@
   };
 
   function initMap() {
+    const maplibregl = window.maplibregl;
+    if (!maplibregl || typeof maplibregl.Map !== "function") {
+      console.warn("MapLibre GL not available yet, retrying in 100ms...");
+      setTimeout(initMap, 100);
+      return;
+    }
+
     const styleSpec = {
       version: 8,
+      glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
       sources: {
         "esri-satellite": {
           type: "raster",
@@ -140,180 +150,215 @@
       ]
     };
 
-    map = new maplibregl.Map({
-      container: "atlas-map",
-      style: styleSpec,
-      center: CITY_CENTER,
-      zoom: 12.5,
-      pitch: 50,
-      bearing: 15,
-      maxPitch: 75,
-      attributionControl: true
-    });
+    try {
+      map = new maplibregl.Map({
+        container: "atlas-map",
+        style: styleSpec,
+        center: CITY_CENTER,
+        zoom: 12.5,
+        pitch: 50,
+        bearing: 15,
+        maxPitch: 75,
+        attributionControl: true
+      });
 
-    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+      map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
 
-    map.on("load", async () => {
-      $("#atlas-map-loading")?.classList.add("loaded");
-      await loadDataLayers();
-      wireUIEvents();
-      pollCityWatch();
-    });
+      // Dismiss overlay when map renders or on error
+      map.on("load", async () => {
+        hideLoading();
+        await loadDataLayers();
+        wireUIEvents();
+        pollCityWatch();
+      });
+
+      map.on("idle", hideLoading);
+      map.on("render", () => {
+        if (map.loaded()) hideLoading();
+      });
+      map.on("error", (e) => {
+        console.warn("[atlas] map notice:", e);
+        hideLoading();
+      });
+
+      // Hard timeout failsafe so loading overlay NEVER gets stuck
+      setTimeout(hideLoading, 3000);
+    } catch (e) {
+      console.error("Map initialization error:", e);
+      hideLoading();
+    }
   }
 
   async function loadDataLayers() {
+    // 1. Landmarks
     try {
-      // 1. Landmarks
       const resLandmarks = await fetch("/dhaka-landmarks.geojson");
       if (resLandmarks.ok) {
         landmarksData = await resLandmarks.json();
-        map.addSource("landmarks", { type: "geojson", data: landmarksData });
+        if (!map.getSource("landmarks")) {
+          map.addSource("landmarks", { type: "geojson", data: landmarksData });
 
-        // 3D Landmark Extrusion Points / Markers
-        map.addLayer({
-          id: "landmarks-points",
-          type: "circle",
-          source: "landmarks",
-          paint: {
-            "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 5, 16, 9],
-            "circle-color": "#d9583b",
-            "circle-stroke-width": 2,
-            "circle-stroke-color": "#ffffff"
-          }
-        });
+          map.addLayer({
+            id: "landmarks-points",
+            type: "circle",
+            source: "landmarks",
+            paint: {
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 5, 16, 9],
+              "circle-color": "#d9583b",
+              "circle-stroke-width": 2,
+              "circle-stroke-color": "#ffffff"
+            }
+          });
 
-        map.addLayer({
-          id: "landmarks-labels",
-          type: "symbol",
-          source: "landmarks",
-          minzoom: 12,
-          layout: {
-            "text-field": ["get", "name"],
-            "text-font": ["Universa", "Source Sans 3"],
-            "text-size": 11,
-            "text-offset": [0, 1.2],
-            "text-anchor": "top"
-          },
-          paint: {
-            "text-color": "#f5f0dc",
-            "text-halo-color": "#0d171d",
-            "text-halo-width": 2
-          }
-        });
+          map.addLayer({
+            id: "landmarks-labels",
+            type: "symbol",
+            source: "landmarks",
+            minzoom: 12,
+            layout: {
+              "text-field": ["get", "name"],
+              "text-size": 11,
+              "text-offset": [0, 1.2],
+              "text-anchor": "top"
+            },
+            paint: {
+              "text-color": "#f5f0dc",
+              "text-halo-color": "#0d171d",
+              "text-halo-width": 2
+            }
+          });
+        }
       }
+    } catch (e) {
+      console.warn("Could not load landmarks layer:", e);
+    }
 
-      // 2. Rivers & Khals
+    // 2. Rivers & Khals
+    try {
       const resRivers = await fetch("/dhaka-rivers.geojson");
       if (resRivers.ok) {
         riversData = await resRivers.json();
-        map.addSource("rivers", { type: "geojson", data: riversData });
+        if (!map.getSource("rivers")) {
+          map.addSource("rivers", { type: "geojson", data: riversData });
 
-        // River Lines
-        map.addLayer({
-          id: "rivers-lines",
-          type: "line",
-          source: "rivers",
-          filter: ["==", "$type", "LineString"],
-          paint: {
-            "line-color": "#257da4",
-            "line-width": ["interpolate", ["linear"], ["zoom"], 10, 3, 16, 8],
-            "line-opacity": 0.85
-          }
-        });
+          map.addLayer({
+            id: "rivers-lines",
+            type: "line",
+            source: "rivers",
+            filter: ["==", "$type", "LineString"],
+            paint: {
+              "line-color": "#257da4",
+              "line-width": ["interpolate", ["linear"], ["zoom"], 10, 3, 16, 8],
+              "line-opacity": 0.85
+            }
+          });
 
-        // BWDB Gauge Points
-        map.addLayer({
-          id: "rivers-gauges",
-          type: "circle",
-          source: "rivers",
-          filter: ["==", "type", "gauge"],
-          paint: {
-            "circle-radius": 7,
-            "circle-color": "#257da4",
-            "circle-stroke-width": 2,
-            "circle-stroke-color": "#f5f0dc"
-          }
-        });
+          map.addLayer({
+            id: "rivers-gauges",
+            type: "circle",
+            source: "rivers",
+            filter: ["==", "type", "gauge"],
+            paint: {
+              "circle-radius": 7,
+              "circle-color": "#257da4",
+              "circle-stroke-width": 2,
+              "circle-stroke-color": "#f5f0dc"
+            }
+          });
+        }
       }
+    } catch (e) {
+      console.warn("Could not load rivers layer:", e);
+    }
 
-      // 3. Transit & MRT Line 6
+    // 3. Transit & MRT Line 6
+    try {
       const resTransit = await fetch("/dhaka-mrt.geojson");
       if (resTransit.ok) {
         transitData = await resTransit.json();
-        map.addSource("transit", { type: "geojson", data: transitData });
+        if (!map.getSource("transit")) {
+          map.addSource("transit", { type: "geojson", data: transitData });
 
-        // MRT Track
-        map.addLayer({
-          id: "mrt-track",
-          type: "line",
-          source: "transit",
-          filter: ["==", "id", "mrt-line-6-track"],
-          paint: {
-            "line-color": "#008751",
-            "line-width": 5,
-            "line-opacity": 0.95
-          }
-        });
+          map.addLayer({
+            id: "mrt-track",
+            type: "line",
+            source: "transit",
+            filter: ["==", "id", "mrt-line-6-track"],
+            paint: {
+              "line-color": "#008751",
+              "line-width": 5,
+              "line-opacity": 0.95
+            }
+          });
 
-        // Expressway Track
-        map.addLayer({
-          id: "expressway-track",
-          type: "line",
-          source: "transit",
-          filter: ["==", "id", "elevated-expressway"],
-          paint: {
-            "line-color": "#e65100",
-            "line-width": 4,
-            "line-dasharray": [2, 1]
-          }
-        });
+          map.addLayer({
+            id: "expressway-track",
+            type: "line",
+            source: "transit",
+            filter: ["==", "id", "elevated-expressway"],
+            paint: {
+              "line-color": "#e65100",
+              "line-width": 4,
+              "line-dasharray": [2, 1]
+            }
+          });
 
-        // Stations
-        map.addLayer({
-          id: "transit-stations",
-          type: "circle",
-          source: "transit",
-          filter: ["==", "type", "metro_station"],
-          paint: {
-            "circle-radius": 5,
-            "circle-color": "#ffffff",
-            "circle-stroke-width": 3,
-            "circle-stroke-color": "#008751"
-          }
-        });
+          map.addLayer({
+            id: "transit-stations",
+            type: "circle",
+            source: "transit",
+            filter: ["==", "type", "metro_station"],
+            paint: {
+              "circle-radius": 5,
+              "circle-color": "#ffffff",
+              "circle-stroke-width": 3,
+              "circle-stroke-color": "#008751"
+            }
+          });
+        }
       }
+    } catch (e) {
+      console.warn("Could not load transit layer:", e);
+    }
 
-      // 4. Economy & Industry
+    // 4. Economy & Industry
+    try {
       const resEconomy = await fetch("/dhaka-economy.geojson");
       if (resEconomy.ok) {
         economyData = await resEconomy.json();
-        map.addSource("economy", { type: "geojson", data: economyData });
+        if (!map.getSource("economy")) {
+          map.addSource("economy", { type: "geojson", data: economyData });
 
-        map.addLayer({
-          id: "economy-hubs",
-          type: "circle",
-          source: "economy",
-          paint: {
-            "circle-radius": 7,
-            "circle-color": "#10b981",
-            "circle-stroke-width": 2,
-            "circle-stroke-color": "#ffffff"
-          }
-        });
+          map.addLayer({
+            id: "economy-hubs",
+            type: "circle",
+            source: "economy",
+            paint: {
+              "circle-radius": 7,
+              "circle-color": "#10b981",
+              "circle-stroke-width": 2,
+              "circle-stroke-color": "#ffffff"
+            }
+          });
+        }
       }
+    } catch (e) {
+      console.warn("Could not load economy layer:", e);
+    }
 
-      // 5. Curated Areas for Quick Jump
+    // 5. Curated Areas for Quick Jump
+    try {
       const resAreas = await fetch("/dhaka-areas.json");
       if (resAreas.ok) {
         areasData = await resAreas.json();
         populateQuickJump(areasData);
       }
-
-      setupClickInspectors();
-      applyLens(currentLens);
     } catch (e) {
-      console.error("Error loading spatial data layers:", e);
+      console.warn("Could not load areas json:", e);
     }
+
+    setupClickInspectors();
+    applyLens(currentLens);
   }
 
   function setupClickInspectors() {
@@ -337,10 +382,11 @@
       showInspectionHUD("economy", e.features[0].properties);
     });
 
-    // Pointer cursor
     ["landmarks-points", "rivers-gauges", "transit-stations", "economy-hubs"].forEach(layerId => {
-      map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
-      map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
+      if (map.getLayer(layerId)) {
+        map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
+        map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
+      }
     });
   }
 
@@ -403,17 +449,19 @@
 
     const isBn = document.documentElement.lang === "bn";
     const story = LENS_STORIES[lensId] || LENS_STORIES.city;
-    $("#atlas-lens-title").textContent = isBn ? story.title_bn : story.title;
-    $("#atlas-lens-description").textContent = isBn ? story.desc_bn : story.desc;
+    const titleEl = $("#atlas-lens-title");
+    const descEl = $("#atlas-lens-description");
+    if (titleEl) titleEl.textContent = isBn ? story.title_bn : story.title;
+    if (descEl) descEl.textContent = isBn ? story.desc_bn : story.desc;
 
-    // Reset raster overlay if active
+    if (!map) return;
+
     if (activeOverlayLayer && map.getLayer(activeOverlayLayer)) {
       map.removeLayer(activeOverlayLayer);
       map.removeSource(activeOverlayLayer);
       activeOverlayLayer = null;
     }
 
-    // Toggle vector layers
     if (map.getLayer("rivers-lines")) {
       map.setLayoutProperty("rivers-lines", "visibility", (lensId === "rivers" || lensId === "city") ? "visible" : "none");
     }
@@ -436,7 +484,6 @@
       map.setLayoutProperty("landmarks-points", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
     }
 
-    // Handle satellite overlays for specific lenses
     const today = new Date().toISOString().split("T")[0];
     if (lensId === "cloud") {
       addRasterOverlay(
@@ -462,56 +509,53 @@
   }
 
   function addRasterOverlay(id, tileUrl) {
-    if (map.getSource(id)) return;
-    map.addSource(id, {
-      type: "raster",
-      tiles: [tileUrl],
-      tileSize: 256
-    });
-    map.addLayer({
-      id: id,
-      type: "raster",
-      source: id,
-      paint: { "raster-opacity": 0.75 }
-    });
-    activeOverlayLayer = id;
+    if (!map || map.getSource(id)) return;
+    try {
+      map.addSource(id, {
+        type: "raster",
+        tiles: [tileUrl],
+        tileSize: 256
+      });
+      map.addLayer({
+        id: id,
+        type: "raster",
+        source: id,
+        paint: { "raster-opacity": 0.75 }
+      });
+      activeOverlayLayer = id;
+    } catch (e) {
+      console.warn("Could not add raster overlay:", id, e);
+    }
   }
 
   function wireUIEvents() {
-    // Lens buttons
     $$(".atlas-lenses button").forEach(btn => {
       btn.addEventListener("click", () => applyLens(btn.dataset.lens));
     });
 
-    // Basemap toggle
     $("#atlas-basemap")?.addEventListener("change", e => {
       currentBasemap = e.target.value;
-      map.setLayoutProperty("basemap-esri", "visibility", currentBasemap === "esri" ? "visible" : "none");
-      map.setLayoutProperty("basemap-osm", "visibility", currentBasemap === "osm" ? "visible" : "none");
+      if (map) {
+        if (map.getLayer("basemap-esri")) map.setLayoutProperty("basemap-esri", "visibility", currentBasemap === "esri" ? "visible" : "none");
+        if (map.getLayer("basemap-osm")) map.setLayoutProperty("basemap-osm", "visibility", currentBasemap === "osm" ? "visible" : "none");
+      }
     });
 
-    // 2D / 3D toggle
     $("#atlas-view")?.addEventListener("change", e => {
       const is3D = e.target.value === "3d";
-      map.easeTo({
-        pitch: is3D ? 50 : 0,
-        bearing: is3D ? 15 : 0,
-        duration: 1000
-      });
+      if (map) {
+        map.easeTo({
+          pitch: is3D ? 50 : 0,
+          bearing: is3D ? 15 : 0,
+          duration: 1000
+        });
+      }
     });
 
-    // Watch item clicks open detail dialogs
-    $("#atlas-watch-flood")?.addEventListener("click", () => {
-      $("#flood-dialog")?.showModal();
-    });
-    $("#atlas-watch-air")?.addEventListener("click", () => {
-      $("#air-dialog")?.showModal();
-    });
-    $("#atlas-watch-traffic")?.addEventListener("click", () => {
-      $("#economy-dialog")?.showModal();
-    });
+    $("#atlas-watch-flood")?.addEventListener("click", () => { $("#flood-dialog")?.showModal(); });
+    $("#atlas-watch-air")?.addEventListener("click", () => { $("#air-dialog")?.showModal(); });
+    $("#atlas-watch-traffic")?.addEventListener("click", () => { $("#economy-dialog")?.showModal(); });
 
-    // Search bar
     const searchInput = $("#atlas-search-input");
     searchInput?.addEventListener("keydown", async e => {
       if (e.key === "Enter" && searchInput.value.trim().length >= 2) {
@@ -531,12 +575,14 @@
       const data = await res.json();
       if (data.results && data.results.length > 0) {
         const first = data.results[0];
-        map.flyTo({
-          center: [Number(first.lon), Number(first.lat)],
-          zoom: 15,
-          pitch: 50,
-          duration: 1500
-        });
+        if (map) {
+          map.flyTo({
+            center: [Number(first.lon), Number(first.lat)],
+            zoom: 15,
+            pitch: 50,
+            duration: 1500
+          });
+        }
       }
     } catch (err) {
       console.warn("Search error:", err);
@@ -559,7 +605,7 @@
         const lat = Number(btn.dataset.lat);
         const lng = Number(btn.dataset.lng);
         const zoom = Number(btn.dataset.zoom) || 15;
-        map.flyTo({ center: [lng, lat], zoom, pitch: 45, duration: 1500 });
+        if (map) map.flyTo({ center: [lng, lat], zoom, pitch: 45, duration: 1500 });
         $("#quick-jump-dialog")?.close();
       });
     });
@@ -594,5 +640,10 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", initMap);
+  // Safe boot: runs immediately if DOM is ready, or on DOMContentLoaded
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMap);
+  } else {
+    initMap();
+  }
 })();

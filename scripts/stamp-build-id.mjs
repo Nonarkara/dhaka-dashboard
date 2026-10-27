@@ -31,7 +31,8 @@ if (readFileSync(indexHtml)) {
     .replace(/src="\/i18n\.js(?:\?v=[^"]*)?"/g, `src="/i18n.js?v=${stamp}"`)
     .replace(/href="\/style\.css(?:\?v=[^"]*)?"/g, `href="/style.css?v=${stamp}"`)
     .replace(/href="\/dhaka-design\.css(?:\?v=[^"]*)?"/g, `href="/dhaka-design.css?v=${stamp}"`)
-    .replace(/data-app="\/app\.js(?:\?v=[^"]*)?"/g, `data-app="/app.js?v=${stamp}"`)
+    .replace(/src="\/loader\.js(?:\?v=[^"]*)?"/g, `src="/loader.js?v=${stamp}"`)
+    .replace(/src="\/app\.js(?:\?v=[^"]*)?"/g, `src="/app.js?v=${stamp}"`)
     .replace(/src="\/dashboard\.js(?:\?v=[^"]*)?"/g, `src="/dashboard.js?v=${stamp}"`);
   writeFileSync(indexHtml, html, "utf8");
 }
