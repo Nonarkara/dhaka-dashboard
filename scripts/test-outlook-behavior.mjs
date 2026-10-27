@@ -13,6 +13,11 @@ assert.throws(()=>normalizeOutlook({...air,hourly_units:{pm2_5:'ppm'}},'air',now
 assert.throws(()=>normalizeOutlook(air,'air',now+10*86400000));
 const flood={latitude:25.075,longitude:91.375,daily_units:{river_discharge:'m³/s',river_discharge_p25:'m³/s',river_discharge_p75:'m³/s'},daily:{time:['2026-10-28','2026-10-29'],river_discharge:[450,430],river_discharge_p25:[440,null],river_discharge_p75:[470,450]}};
 const f=normalizeOutlook(flood,'flood',now);assert.equal(f.frames[0].cells[0].p25,440);assert.equal(f.frames[1].cells[0].p25,null);
+assert.equal(f.frames[0].cells[0].station,'Sunamganj Sadar');
+assert.equal(f.frames[0].cells[0].river,'Surma River');
+assert.equal(f.frames[0].cells[0].peakValue,450);
+assert.ok(f.frames[0].cells[0].harvestAdvisory);
+assert.ok(f.reaches?.length === 1 && f.reaches[0].station === 'Sunamganj Sadar');
 const original=globalThis.fetch;globalThis.fetch=async()=>{throw Error('offline')};
 const missing=await getOutlook('flood'); assert.equal(missing.status,'unavailable');assert.ok(missing.reasonCode&&missing.timestamp);assert.deepEqual(missing.frames,[]);globalThis.fetch=original;
 const context={document:{addEventListener(){}}};
