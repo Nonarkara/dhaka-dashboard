@@ -2,6 +2,9 @@
 // Keys are the canonical English source strings.
 
 window.ATLAS_BN = {
+  "Explore city conditions": "নগরের অবস্থা দেখুন", "Forecast playback": "পূর্বাভাসের চলচিত্র", "Dhaka Civic Atlas": "ঢাকা নাগরিক অ্যাটলাস", "3D Map of Dhaka": "ঢাকার ত্রিমাত্রিক মানচিত্র",
+  "Dhaka": "ঢাকা", "Map": "ম্যাপ", "River outlook": "নদী পূর্বাভাস", "Air forecast": "বায়ু পূর্বাভাস", "Map evidence": "মানচিত্রের তথ্য",
+  "CAMS global: approximately 45 km; native 3-hour steps, updated every 12 hours.": "CAMS বৈশ্বিক: প্রায় ৪৫ কিমি; মূল ধাপ ৩ ঘণ্টা, প্রতি ১২ ঘণ্টায় হালনাগাদ।",
   // Navigation & Headers
   "Dhaka, block by block": "ঢাকা, মহল্লায় মহল্লায়",
   "Dhaka 3D": "ঢাকা ৩ডি",

@@ -169,3 +169,53 @@
 
 /* Reading exact values takes precedence over the display face. */
 .metric-value { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* The map is the object; one operating row, with evidence at its edge. */
+html { font-synthesis: none; }
+html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-serif; --font-display: var(--font-sans); --font-mono: var(--font-sans); }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.atlas-header { display:flex; flex-wrap:nowrap; gap:12px; height:48px; min-height:48px; padding:2px 12px; align-items:center; }
+.atlas-wordmark { font-family:var(--font-display); font-weight:600; font-size:24px; color:var(--ink); text-decoration:none; line-height:1; }
+.atlas-lens-choice { display:block; flex:1; min-width:0; max-width:270px; }
+.atlas-lens-choice select { width:100%; height:40px; padding:0 24px 0 8px; border:0; border-left:1px solid var(--line); background:var(--bg); color:var(--ink); font:500 16px var(--font-sans); }
+.atlas-header-nav { display:flex; margin-left:auto; gap:8px; align-items:center; }
+.atlas-header-nav > .atlas-btn,.atlas-menu-summary { min-height:40px; height:40px; padding:7px 8px; border:0; font:500 16px var(--font-sans); background:transparent; color:var(--ink); }
+.atlas-menu { position:relative; }
+.atlas-menu-body { top:44px; right:0; width:300px; max-width:calc(100vw - 16px); max-height:calc(100dvh - 62px); overflow:auto; }
+.atlas-menu-body .atlas-control-label { display:grid; grid-template-columns:90px minmax(0,1fr); align-items:center; gap:8px; margin:0 0 8px; }
+.atlas-menu-body .atlas-control-label > span { display:block; font-size:14px; }
+.atlas-menu-body select { min-width:0; width:100%; }
+.atlas-map-key { position:absolute; z-index:3; top:10px; left:10px; max-width:min(320px,calc(100% - 70px)); background:var(--bg); color:var(--ink); border-left:2px solid var(--accent); font-size:13px; }
+.atlas-map-key summary { cursor:pointer; min-height:32px; padding:5px 10px; font-weight:500; }
+.atlas-map-key p { margin:6px 10px; font-size:13px; }
+.atlas-lens-story { display:block; padding:0; border:0; background:transparent; font-size:13px; }
+.atlas-lens-story strong,.atlas-lens-story > span { display:block; padding:4px 10px; font-size:13px; line-height:1.4; }
+.building-swatches { display:grid; grid-template-columns:1fr 1fr; gap:5px 12px; padding:4px 10px; }
+.building-swatches span { display:flex; align-items:center; gap:6px; }
+.building-swatches i { width:12px; height:12px; border:1px solid var(--dim); flex-shrink:0; }
+.forecast-player { position:absolute; z-index:5; bottom:68px; left:10px; width:min(560px,calc(100% - 20px)); padding:10px 12px; background:var(--bg); border-top:2px solid var(--accent); font-size:14px; line-height:1.35; }
+.forecast-player[hidden] { display:none; }
+.forecast-player h2 { font:600 18px var(--font-sans); margin:0; }
+.forecast-player p { margin:4px 0; }
+.forecast-player .forecast-controls { display:flex; gap:10px; align-items:center; }
+.forecast-player input[type="range"] { flex:1; min-width:30px; accent-color:var(--accent); }
+.forecast-player button { min-height:36px; background:var(--bg); color:var(--ink); border:1px solid var(--line); padding:4px 12px; font:500 15px var(--font-sans); }
+.forecast-player output { display:block; font-variant-numeric:tabular-nums; }
+.forecast-player a { color:var(--ink); }
+.forecast-player details { margin-top:4px; }
+.forecast-player details[open] { max-height:180px; overflow:auto; }
+.forecast-scale { display:flex; gap:12px; flex-wrap:wrap; font-size:12px; }
+.forecast-scale span { border-bottom:4px solid var(--value-color); }
+@media(max-width:600px) {
+ .atlas-header { display:flex; gap:5px; padding:2px 8px; }
+ .atlas-header-nav { display:flex; gap:0; }
+ .atlas-header-nav > .atlas-btn,.atlas-menu-summary { padding:7px 6px; font-size:15px; }
+ .atlas-wordmark { font-size:23px; }
+ .atlas-lens-choice { max-width:none; }
+ .atlas-lens-choice select { font-size:15px; padding-left:7px; }
+ .atlas-menu-body { right:0; top:44px; }
+ .atlas-map-key { top:8px; left:8px; }
+ .forecast-player { bottom:66px; font-size:13px; padding:8px 10px; }
+}
+
+.forecast-reaches { white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; }

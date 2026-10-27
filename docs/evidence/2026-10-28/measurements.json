@@ -1,0 +1,1218 @@
+[
+  {
+    "width": 390,
+    "height": 844,
+    "state": "w=390&h=844&lang=bn",
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 48,
+        "scrollWidth": 390
+      },
+      "rail": null,
+      "story": {
+        "x": 10,
+        "y": 88,
+        "width": 103.0625,
+        "height": 32,
+        "scrollWidth": 103
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 390,
+        "height": 796,
+        "scrollWidth": 390
+      },
+      "watch": {
+        "x": 8,
+        "y": 689.6015625,
+        "width": 374,
+        "height": 124.3984375,
+        "scrollWidth": 374
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 55.734375,
+        "y": 3.5,
+        "width": 224.4921875,
+        "height": 40,
+        "scrollWidth": 223
+      },
+      {
+        "id": "language-toggle",
+        "x": 285.2265625,
+        "y": 3.5,
+        "width": 58.265625,
+        "height": 40,
+        "scrollWidth": 58
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 343.4921875,
+        "y": 3.5,
+        "width": 38.5078125,
+        "height": 40,
+        "scrollWidth": 39
+      },
+      {
+        "id": "atlas-view",
+        "x": 193,
+        "y": 100.5,
+        "width": 176,
+        "height": 36,
+        "scrollWidth": 174
+      },
+      {
+        "id": "atlas-basemap",
+        "x": 193,
+        "y": 154.5,
+        "width": 176,
+        "height": 36,
+        "scrollWidth": 174
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 208.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 254.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 300.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 346.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 392.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "download-geojson-btn",
+        "x": 95,
+        "y": 506.1875,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-theme",
+        "x": 193,
+        "y": 560.1875,
+        "width": 176,
+        "height": 36,
+        "scrollWidth": 174
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 0,
+    "pass": true
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "state": "w=390&h=844&lang=bn&menu=1&key=1",
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 48,
+        "scrollWidth": 390
+      },
+      "rail": null,
+      "story": {
+        "x": 10,
+        "y": 212.21875,
+        "width": 318,
+        "height": 32,
+        "scrollWidth": 318
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 390,
+        "height": 796,
+        "scrollWidth": 390
+      },
+      "watch": {
+        "x": 8,
+        "y": 689.6015625,
+        "width": 374,
+        "height": 124.3984375,
+        "scrollWidth": 374
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 55.734375,
+        "y": 3.5,
+        "width": 224.4921875,
+        "height": 40,
+        "scrollWidth": 223
+      },
+      {
+        "id": "language-toggle",
+        "x": 285.2265625,
+        "y": 3.5,
+        "width": 58.265625,
+        "height": 40,
+        "scrollWidth": 58
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 343.4921875,
+        "y": 3.5,
+        "width": 38.5078125,
+        "height": 40,
+        "scrollWidth": 39
+      },
+      {
+        "id": "atlas-view",
+        "x": 193,
+        "y": 60.5,
+        "width": 176,
+        "height": 36,
+        "scrollWidth": 174
+      },
+      {
+        "id": "atlas-basemap",
+        "x": 193,
+        "y": 114.5,
+        "width": 176,
+        "height": 36,
+        "scrollWidth": 174
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 168.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 214.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 260.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 306.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-btn",
+        "x": 95,
+        "y": 352.5,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "download-geojson-btn",
+        "x": 95,
+        "y": 466.1875,
+        "width": 274,
+        "height": 36,
+        "scrollWidth": 272
+      },
+      {
+        "id": "atlas-theme",
+        "x": 193,
+        "y": 520.1875,
+        "width": 176,
+        "height": 36,
+        "scrollWidth": 174
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 0,
+    "pass": true
+  },
+  {
+    "width": 1024,
+    "height": 900,
+    "state": "w=1024&h=900&lang=en",
+    "page": {
+      "width": 1024,
+      "height": 900
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 48,
+        "scrollWidth": 1024
+      },
+      "rail": null,
+      "story": {
+        "x": 12,
+        "y": 90,
+        "width": 100.515625,
+        "height": 32,
+        "scrollWidth": 101
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 1024,
+        "height": 852,
+        "scrollWidth": 1024
+      },
+      "watch": {
+        "x": 62,
+        "y": 800.6015625,
+        "width": 900,
+        "height": 69.3984375,
+        "scrollWidth": 900
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 83.09375,
+        "y": 3.5,
+        "width": 270,
+        "height": 40,
+        "scrollWidth": 269
+      },
+      {
+        "id": "language-toggle",
+        "x": 911,
+        "y": 3.5,
+        "width": 51.5390625,
+        "height": 40,
+        "scrollWidth": 52
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 970.5390625,
+        "y": 3.5,
+        "width": 41.4609375,
+        "height": 40,
+        "scrollWidth": 41
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 0,
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "state": "w=1440&h=900&lang=en",
+    "page": {
+      "width": 1440,
+      "height": 900
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 48,
+        "scrollWidth": 1440
+      },
+      "rail": null,
+      "story": {
+        "x": 12,
+        "y": 90,
+        "width": 100.515625,
+        "height": 32,
+        "scrollWidth": 101
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 1440,
+        "height": 852,
+        "scrollWidth": 1440
+      },
+      "watch": {
+        "x": 270,
+        "y": 800.6015625,
+        "width": 900,
+        "height": 69.3984375,
+        "scrollWidth": 900
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 83.09375,
+        "y": 3.5,
+        "width": 270,
+        "height": 40,
+        "scrollWidth": 269
+      },
+      {
+        "id": "language-toggle",
+        "x": 1327,
+        "y": 3.5,
+        "width": 51.5390625,
+        "height": 40,
+        "scrollWidth": 52
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 1386.5390625,
+        "y": 3.5,
+        "width": 41.4609375,
+        "height": 40,
+        "scrollWidth": 41
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 0,
+    "pass": true
+  },
+  {
+    "width": 1280,
+    "height": 720,
+    "state": "w=1280&h=720&lang=bn",
+    "page": {
+      "width": 1280,
+      "height": 720
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 48,
+        "scrollWidth": 1280
+      },
+      "rail": null,
+      "story": {
+        "x": 12,
+        "y": 90,
+        "width": 103.0625,
+        "height": 32,
+        "scrollWidth": 103
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 1280,
+        "height": 672,
+        "scrollWidth": 1280
+      },
+      "watch": {
+        "x": 190,
+        "y": 612.1015625,
+        "width": 900,
+        "height": 77.8984375,
+        "scrollWidth": 900
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 68.59375,
+        "y": 3.5,
+        "width": 270,
+        "height": 40,
+        "scrollWidth": 269
+      },
+      {
+        "id": "language-toggle",
+        "x": 1150.375,
+        "y": 3.5,
+        "width": 65.3515625,
+        "height": 40,
+        "scrollWidth": 65
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 1223.7265625,
+        "y": 3.5,
+        "width": 44.2734375,
+        "height": 40,
+        "scrollWidth": 44
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 0,
+    "pass": true
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "state": "w=390&h=844&lang=bn&old=1",
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 85,
+        "scrollWidth": 390
+      },
+      "rail": {
+        "x": 0,
+        "y": 85,
+        "width": 390,
+        "height": 37,
+        "scrollWidth": 1501
+      },
+      "story": {
+        "x": 0,
+        "y": 122,
+        "width": 390,
+        "height": 58.8359375,
+        "scrollWidth": 390
+      },
+      "map": {
+        "x": 0,
+        "y": 180.8359375,
+        "width": 390,
+        "height": 663.1640625,
+        "scrollWidth": 390
+      },
+      "watch": {
+        "x": 8,
+        "y": 692.6015625,
+        "width": 374,
+        "height": 121.3984375,
+        "scrollWidth": 374
+      },
+      "player": null
+    },
+    "controls": [
+      {
+        "id": "language-toggle",
+        "x": 256.5,
+        "y": 4,
+        "width": 57.921875,
+        "height": 36,
+        "scrollWidth": 56
+      },
+      {
+        "id": "atlas-view",
+        "x": 8,
+        "y": 44,
+        "width": 240.5,
+        "height": 36,
+        "scrollWidth": 239
+      },
+      {
+        "id": "atlas-basemap",
+        "x": 256.5,
+        "y": 44,
+        "width": 125.5,
+        "height": 36,
+        "scrollWidth": 124
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 322.421875,
+        "y": 4,
+        "width": 57.3203125,
+        "height": 36,
+        "scrollWidth": 55
+      }
+    ],
+    "combinedChrome": 180.8359375,
+    "informationActionDistance": 0,
+    "pass": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "state": "w=390&h=844&lang=bn&lens=air",
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 48,
+        "scrollWidth": 390
+      },
+      "rail": null,
+      "story": {
+        "x": 10,
+        "y": 88,
+        "width": 103.0625,
+        "height": 32,
+        "scrollWidth": 103
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 390,
+        "height": 796,
+        "scrollWidth": 390
+      },
+      "watch": {
+        "x": 8,
+        "y": 689.6015625,
+        "width": 374,
+        "height": 124.3984375,
+        "scrollWidth": 374
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 55.734375,
+        "y": 3.5,
+        "width": 224.4921875,
+        "height": 40,
+        "scrollWidth": 223
+      },
+      {
+        "id": "language-toggle",
+        "x": 285.2265625,
+        "y": 3.5,
+        "width": 58.265625,
+        "height": 40,
+        "scrollWidth": 58
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 343.4921875,
+        "y": 3.5,
+        "width": 38.5078125,
+        "height": 40,
+        "scrollWidth": 39
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 4.5,
+    "pass": true
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "state": "w=390&h=844&lang=bn&lens=air",
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 48,
+        "scrollWidth": 390
+      },
+      "rail": null,
+      "story": {
+        "x": 10,
+        "y": 88,
+        "width": 103.0625,
+        "height": 32,
+        "scrollWidth": 103
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 390,
+        "height": 796,
+        "scrollWidth": 390
+      },
+      "watch": {
+        "x": 8,
+        "y": 785.6015625,
+        "width": 374,
+        "height": 28.3984375,
+        "scrollWidth": 374
+      },
+      "player": {
+        "x": 10,
+        "y": 596.21875,
+        "width": 370,
+        "height": 185.3828125,
+        "scrollWidth": 370
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 55.734375,
+        "y": 3.5,
+        "width": 224.4921875,
+        "height": 40,
+        "scrollWidth": 223
+      },
+      {
+        "id": "language-toggle",
+        "x": 285.2265625,
+        "y": 3.5,
+        "width": 58.265625,
+        "height": 40,
+        "scrollWidth": 58
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 343.4921875,
+        "y": 3.5,
+        "width": 38.5078125,
+        "height": 40,
+        "scrollWidth": 39
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 4.5,
+    "pass": true
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "state": "w=390&h=844&lang=en&lens=rivers",
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 48,
+        "scrollWidth": 390
+      },
+      "rail": null,
+      "story": {
+        "x": 10,
+        "y": 88,
+        "width": 100.515625,
+        "height": 32,
+        "scrollWidth": 101
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 390,
+        "height": 796,
+        "scrollWidth": 390
+      },
+      "watch": {
+        "x": 8,
+        "y": 785.6015625,
+        "width": 374,
+        "height": 28.3984375,
+        "scrollWidth": 374
+      },
+      "player": {
+        "x": 10,
+        "y": 623.9140625,
+        "width": 370,
+        "height": 157.6875,
+        "scrollWidth": 370
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 69.6328125,
+        "y": 3.5,
+        "width": 226.1796875,
+        "height": 40,
+        "scrollWidth": 225
+      },
+      {
+        "id": "language-toggle",
+        "x": 300.8125,
+        "y": 3.5,
+        "width": 45.3203125,
+        "height": 40,
+        "scrollWidth": 45
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 346.1328125,
+        "y": 3.5,
+        "width": 35.8671875,
+        "height": 40,
+        "scrollWidth": 36
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 4.5,
+    "pass": true
+  },
+  {
+    "width": 599,
+    "height": 844,
+    "state": "w=599&h=844&lang=bn",
+    "page": {
+      "width": 599,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 599,
+        "height": 48,
+        "scrollWidth": 599
+      },
+      "rail": null,
+      "story": {
+        "x": 10,
+        "y": 88,
+        "width": 103.0625,
+        "height": 32,
+        "scrollWidth": 103
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 599,
+        "height": 796,
+        "scrollWidth": 599
+      },
+      "watch": {
+        "x": 8,
+        "y": 689.6015625,
+        "width": 583,
+        "height": 124.3984375,
+        "scrollWidth": 583
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 55.734375,
+        "y": 3.5,
+        "width": 433.4921875,
+        "height": 40,
+        "scrollWidth": 432
+      },
+      {
+        "id": "language-toggle",
+        "x": 494.2265625,
+        "y": 3.5,
+        "width": 58.265625,
+        "height": 40,
+        "scrollWidth": 58
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 552.4921875,
+        "y": 3.5,
+        "width": 38.5078125,
+        "height": 40,
+        "scrollWidth": 39
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 4.5,
+    "pass": true
+  },
+  {
+    "width": 600,
+    "height": 844,
+    "state": "w=600&h=844&lang=bn",
+    "page": {
+      "width": 600,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 600,
+        "height": 48,
+        "scrollWidth": 600
+      },
+      "rail": null,
+      "story": {
+        "x": 10,
+        "y": 88,
+        "width": 103.0625,
+        "height": 32,
+        "scrollWidth": 103
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 600,
+        "height": 796,
+        "scrollWidth": 600
+      },
+      "watch": {
+        "x": 8,
+        "y": 689.6015625,
+        "width": 584,
+        "height": 124.3984375,
+        "scrollWidth": 584
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 55.734375,
+        "y": 3.5,
+        "width": 434.4921875,
+        "height": 40,
+        "scrollWidth": 433
+      },
+      {
+        "id": "language-toggle",
+        "x": 495.2265625,
+        "y": 3.5,
+        "width": 58.265625,
+        "height": 40,
+        "scrollWidth": 58
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 553.4921875,
+        "y": 3.5,
+        "width": 38.5078125,
+        "height": 40,
+        "scrollWidth": 39
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 4.5,
+    "pass": true
+  },
+  {
+    "width": 601,
+    "height": 844,
+    "state": "w=601&h=844&lang=en",
+    "page": {
+      "width": 601,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 601,
+        "height": 48,
+        "scrollWidth": 601
+      },
+      "rail": null,
+      "story": {
+        "x": 12,
+        "y": 90,
+        "width": 100.515625,
+        "height": 32,
+        "scrollWidth": 101
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 601,
+        "height": 796,
+        "scrollWidth": 601
+      },
+      "watch": {
+        "x": 8,
+        "y": 706.6015625,
+        "width": 585,
+        "height": 107.3984375,
+        "scrollWidth": 585
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 83.09375,
+        "y": 3.5,
+        "width": 270,
+        "height": 40,
+        "scrollWidth": 269
+      },
+      {
+        "id": "language-toggle",
+        "x": 488,
+        "y": 3.5,
+        "width": 51.5390625,
+        "height": 40,
+        "scrollWidth": 52
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 547.5390625,
+        "y": 3.5,
+        "width": 41.4609375,
+        "height": 40,
+        "scrollWidth": 41
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 4.5,
+    "pass": true
+  },
+  {
+    "width": 1024,
+    "height": 900,
+    "state": "w=1024&h=900&lang=en&key=1",
+    "page": {
+      "width": 1024,
+      "height": 900
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 48,
+        "scrollWidth": 1024
+      },
+      "rail": null,
+      "story": {
+        "x": 12,
+        "y": 214.21875,
+        "width": 318,
+        "height": 32,
+        "scrollWidth": 318
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 1024,
+        "height": 852,
+        "scrollWidth": 1024
+      },
+      "watch": {
+        "x": 62,
+        "y": 800.6015625,
+        "width": 900,
+        "height": 69.3984375,
+        "scrollWidth": 900
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "scrollWidth": 0
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 83.09375,
+        "y": 3.5,
+        "width": 270,
+        "height": 40,
+        "scrollWidth": 269
+      },
+      {
+        "id": "language-toggle",
+        "x": 911,
+        "y": 3.5,
+        "width": 51.5390625,
+        "height": 40,
+        "scrollWidth": 52
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 970.5390625,
+        "y": 3.5,
+        "width": 41.4609375,
+        "height": 40,
+        "scrollWidth": 41
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 4.5,
+    "pass": true
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "state": "w=390&h=844&lang=en&lens=air&error=1",
+    "page": {
+      "width": 390,
+      "height": 844
+    },
+    "regions": {
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 48,
+        "scrollWidth": 390
+      },
+      "rail": null,
+      "story": {
+        "x": 10,
+        "y": 88,
+        "width": 100.515625,
+        "height": 32,
+        "scrollWidth": 101
+      },
+      "map": {
+        "x": 0,
+        "y": 48,
+        "width": 390,
+        "height": 796,
+        "scrollWidth": 390
+      },
+      "watch": {
+        "x": 8,
+        "y": 785.6015625,
+        "width": 374,
+        "height": 28.3984375,
+        "scrollWidth": 374
+      },
+      "player": {
+        "x": 10,
+        "y": 662.9609375,
+        "width": 370,
+        "height": 118.640625,
+        "scrollWidth": 370
+      }
+    },
+    "controls": [
+      {
+        "id": "atlas-lens",
+        "x": 69.6328125,
+        "y": 3.5,
+        "width": 226.1796875,
+        "height": 40,
+        "scrollWidth": 225
+      },
+      {
+        "id": "language-toggle",
+        "x": 300.8125,
+        "y": 3.5,
+        "width": 45.3203125,
+        "height": 40,
+        "scrollWidth": 45
+      },
+      {
+        "id": "atlas-menu-summary",
+        "x": 346.1328125,
+        "y": 3.5,
+        "width": 35.8671875,
+        "height": 40,
+        "scrollWidth": 36
+      }
+    ],
+    "combinedChrome": 48,
+    "informationActionDistance": 4.5,
+    "pass": true
+  }
+]

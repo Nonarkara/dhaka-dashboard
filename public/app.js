@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793125055-52b7d9c";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793127265-45664f3";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -43,10 +43,10 @@
       desc_bn: "ভবনের রূপ দেখতে জুম করুন; উৎসের তথ্য পেতে স্থাপনা নির্বাচন করুন।"
     },
     rivers: {
-      title: "Five Rivers Ring & Flood Risk",
-      title_bn: "পাঁচ নদী ও বন্যা ঝুঁকি",
-      desc: "Buriganga, Turag, Balu, Shitalakshya and Dhaleshwari with official BWDB danger levels.",
-      desc_bn: "পানি উন্নয়ন বোর্ডের (BWDB) বিপদসীমাসহ বুড়িগঙ্গা, তুরাগ, বালু, শীতলক্ষ্যা ও ধলেশ্বরী নদী।"
+      title: "Northeast River Outlook & Dhaka References",
+      title_bn: "উত্তর-পূর্বের নদী পূর্বাভাস ও ঢাকার তথ্যসূত্র",
+      desc: "GloFAS daily discharge at northeast model reaches; Dhaka reference gauges have no connected observations. Discharge is not an inundation forecast.",
+      desc_bn: "উত্তর-পূর্বের নদীখণ্ডে GloFAS দৈনিক প্রবাহ; ঢাকার তথ্যসূত্র স্টেশনের পর্যবেক্ষণ সংযুক্ত নেই। প্রবাহ প্লাবনের পূর্বাভাস নয়।"
     },
     economy: {
       title: "Macroeconomic & Industrial Engine",
@@ -61,10 +61,10 @@
       desc_bn: "এমআরটি লাইন ৬ স্টেশন, এলিভেটেড এক্সপ্রেসওয়ে, কেন্দ্রীয় রেলওয়ে ও সদরঘাট নদীবন্দর।"
     },
     air: {
-      title: "Air Quality & 72h Timeline",
-      title_bn: "বায়ুমান ও ৭২ ঘণ্টার পূর্বাভাস",
-      desc: "Multi-station PM2.5, PM10 and US AQI monitoring with CAMS 72-hour forecast timeline.",
-      desc_bn: "কোপারনিকাস সিএএমএস মডেলের ৭২ ঘণ্টার পূর্বাভাসসহ বহু-স্টেশনভিত্তিক পিএম২.৫ ও একিউআই।"
+      title: "Regional PM2.5 Forecast Playback",
+      title_bn: "আঞ্চলিক পিএম২.৫ পূর্বাভাসের চলচিত্র",
+      desc: "CAMS global PM2.5 model cells at approximately 45 km, shown in native three-hour steps for the next 48 hours. Not street-level measurements.",
+      desc_bn: "প্রায় ৪৫ কিমি সেলে CAMS বৈশ্বিক পিএম২.৫ মডেল; আগামী ৪৮ ঘণ্টার মূল ৩ ঘণ্টা ধাপ। রাস্তার সরাসরি পরিমাপ নয়।"
     },
     haze: {
       title: "Winter Brick Kilns & Smoke Plumes",
@@ -184,6 +184,7 @@
       // Dismiss overlay when map renders or on error
       map.on("load", async () => {
         hideLoading();
+        window.AtlasForecast?.attach(map);
         await Promise.all([loadDataLayers(), loadParliamentBuildings()]);
       });
 
@@ -216,7 +217,7 @@
   function buildingPaint(heightKey, baseKey) {
     const base = ["max", 0, ["to-number", ["get", baseKey], 0]];
     return {
-      "fill-extrusion-color": "#f5f0dc",
+      "fill-extrusion-color": window.DhakaDesign?.paint || "#b4b0a3",
       "fill-extrusion-height": ["case", [">", ["to-number", ["get", heightKey], 0], base], ["to-number", ["get", heightKey], 0], ["+", base, 6]],
       "fill-extrusion-base": base,
       "fill-extrusion-opacity": 0.9
@@ -259,6 +260,7 @@
       const data = await res.json();
       if (data.type !== "FeatureCollection" || !data.features?.length || data.bbox?.length !== 4
         || !data.features.some(f => f.id === "relation/18085267")) throw new Error("invalid-detail-footprints");
+      data.features.forEach(f => { f.properties.use_class = window.DhakaDesign?.classify(f.properties) || "unknown"; });
       parliamentSnapshot = data;
       const onData = event => {
         if (event.sourceId === "parliament-detail" && event.isSourceLoaded) {
@@ -450,7 +452,7 @@
         populateQuickJump(areasData);
         const areaId = new URLSearchParams(window.location.search).get("area");
         const initialArea = areasData.find(area => area.id === areaId);
-        if (initialArea) flyToArea(initialArea, 0);
+        if (initialArea && !["air", "rivers"].includes(currentLens)) flyToArea(initialArea, 0);
       }
     } catch (e) {
       console.warn("Could not load areas json:", e);
@@ -507,7 +509,9 @@
         <div class="hud-row"><span class="hud-label">Status:</span><span class="hud-value">${tr("Reference station · not a live reading", "তথ্যসূত্র স্টেশন · সরাসরি পর্যবেক্ষণ নয়")}</span></div>
       `;
     } else if (type === "building") {
+      const use = ({civic:tr("Civic / community","নাগরিক / সামাজিক"), commerce:tr("Commerce","বাণিজ্য"), homes:tr("Homes","আবাসন"), industry:tr("Industry / utilities","শিল্প / পরিষেবা"), unknown:tr("Use unknown","ব্যবহার অজানা")})[props.use_class] || tr("Use unknown","ব্যবহার অজানা");
       rowsHtml = `
+        <div class="hud-row"><span class="hud-label">${tr("Mapped use", "নথিভুক্ত ব্যবহার")}</span><span class="hud-value">${use}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Block height", "ভবনের উচ্চতা")}</span><span class="hud-value">${props.height_m} m</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${props.height_method === "levels-times-3m" ? tr("OSM levels × 3 m (estimate)", "OSM তলা × ৩ মিটার (আনুমানিক)") : props.height_method === "osm-height-tag" ? tr("OSM height tag", "OSM উচ্চতার তথ্য") : tr("6 m estimate; no mapped height", "৬ মিটার আনুমানিক; উচ্চতার তথ্য নেই")}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Snapshot", "উপাত্ত সংগ্রহ")}</span><span class="hud-value">${parliamentSnapshot.metadata.retrieved_at.slice(0, 10)}</span></div>
@@ -550,6 +554,8 @@
 
   function applyLens(lensId) {
     currentLens = lensId;
+    if ($("#atlas-lens")) $("#atlas-lens").value = lensId;
+    window.AtlasForecast?.activate(lensId);
     $$(".atlas-lenses button").forEach(btn => {
       btn.setAttribute("aria-pressed", btn.dataset.lens === lensId ? "true" : "false");
     });
@@ -615,11 +621,7 @@
         "nasa-water",
         `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_Flood_Water_250m/default/${today}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`
       );
-    } else if (lensId === "air") {
-      addRasterOverlay(
-        "nasa-aerosol",
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_Aerosol_Optical_Depth_Deep_Blue_Daily/default/${today}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`
-      );
+
     }
   }
 
@@ -671,6 +673,7 @@
   }
 
   function wireUIEvents() {
+    $("#atlas-lens")?.addEventListener("change", e => applyLens(e.target.value));
     $$(".atlas-lenses button").forEach(btn => {
       btn.addEventListener("click", () => applyLens(btn.dataset.lens));
     });

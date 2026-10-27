@@ -1,3 +1,4 @@
+import { getOutlook } from "./outlook.js";
 import { BUILD_ID, ATLAS_VERSION } from "./build-id.js";
 import { checkRateLimit } from "./rate-limit.js";
 import type { RateLimitEnv } from "./rate-limit.js";
@@ -568,6 +569,13 @@ const worker = {
           economy: missing("Bangladesh Bank / DSE", "dated-bulletin-not-connected"),
         },
       });
+    }
+
+    if (url.pathname === "/api/atlas/outlook") {
+      const kind = url.searchParams.get("kind");
+      if (kind !== "air" && kind !== "flood") return jsonResponse({status:"unavailable",reasonCode:"invalid-outlook-kind",timestamp:new Date().toISOString()}, {status:400});
+      const data = await getOutlook(kind) as {status:string};
+      return jsonResponse(data, {status:data.status === "ok" ? 200 : 503,headers:{"cache-control":"public, max-age=60"}});
     }
 
     // ── /api/dhaka/rivers ────────────────────────────────────────────────────

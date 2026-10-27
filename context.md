@@ -25,3 +25,9 @@ Phone header uses two rows; watch values wrap in bounded grid tracks; the map re
 ## Persistent 3D and Kahn complex · 28 October 2026
 
 Mapped blocks persist in all lenses when 3D is selected. A self-hosted OSM Parliament-area snapshot preserves 4,076 building footprints, including National Parliament relation 18085267 with 14 courtyard rings. Heights are explicitly mapped/estimated (levels×3m or 6 m fallback), not architectural survey claims. Native and snapshot layers switch as whole layers only when the entire viewport fits safely inside loaded local coverage; no unsupported polygon-within masking or batched-ID deletion is used. See docs/verification/parliament/README.md for regeneration and evidence. `?area=parliament` opens the authored close view;2D remains respected by quick jumps.
+
+## Map-first design and regional outlook · 28 October 2026
+
+The two-row header is superseded by a 48px operating row. Barlow Semi Condensed/Hind Siliguri replace the active typography; Palette plate241 colors mapped OSM building uses while unknown use remains neutral. The Parliament snapshot retains actual use/amenity/office tags, courtyards and exclusive native/detail switching.
+
+`/api/atlas/outlook?kind=air|flood` supplies validated CAMS global PM2.5 (native three-hour steps, ~45km cells) or GloFAS v4 daily discharge at northeast reference queries. Playback starts paused, supports scrub/retry, labels valid/retrieval times, suppresses missing cells and invalid quartile pairs, deduplicates returned coordinates and rejects expired horizons. Run issue time/local accuracy are unavailable. These are not ground observations, calibrated inundation extents or flash-flood arrival predictions. Daily northeast model reaches are not yet validated against FFWC stations. Private delegate material is not distributed. See docs/DESIGN-OUTLOOK.md and docs/evidence/2026-10-28.

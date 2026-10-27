@@ -61,6 +61,8 @@ def feature(kind, e, t, geometry):
       'source_url':'https://www.openstreetmap.org/'+kind+'/'+e.attrib['id'],
       'osm_modified_at':e.attrib['timestamp'], 'provenance':'reference',
     }
+    for key in ['amenity','office','shop','historic','building:use']:
+        if key in t: props[key]=t[key]
     if levels is not None: props['levels']=levels
     features.append({'type':'Feature','id':props['osm_id'],'properties':props,'geometry':geometry})
 for e in root.findall('relation'):
@@ -94,7 +96,7 @@ result={
   'metadata':{'source':'OpenStreetMap contributors','source_url':'https://api.openstreetmap.org/api/0.6/map?bbox='+','.join(map(str,bbox)),
     'input_sha256':{Path(p).name:hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in sys.argv[1:]},
     'license':'ODbL-1.0','license_url':'https://www.openstreetmap.org/copyright',
-    'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'retrieved_at':datetime.datetime.fromtimestamp(Path(sys.argv[1]).stat().st_mtime,datetime.timezone.utc).isoformat(),
     'height_note':'Mapped heights when tagged; otherwise OSM levels x 3 m or 6 m estimate. Not an architectural survey.',
     'geometry_note':'Actual mapped building footprints, including multipolygon courtyards. No generated replacement shapes.'},
   'features':features}

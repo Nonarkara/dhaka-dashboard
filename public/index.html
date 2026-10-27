@@ -6,12 +6,12 @@
   <title>DHKx 3D Atlas · Dhaka block by block</title>
   <meta name="description" content="Dhaka 3D urban atlas & operational civic dashboard: 3D urban form, river ring hydrology and BWDB flood risk, macroeconomic and industrial engine, MRT Line 6 metro transit, and live air quality and winter smoke plumes." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script src="/theme.js?v=dhaka-atlas-20261027-1793125055-52b7d9c"></script>
-  <script src="/translations.js?v=dhaka-atlas-20261027-1793125055-52b7d9c"></script>
-  <script src="/i18n.js?v=dhaka-atlas-20261027-1793125055-52b7d9c"></script>
+  <script src="/theme.js?v=dhaka-atlas-20261027-1793127265-45664f3"></script>
+  <script src="/translations.js?v=dhaka-atlas-20261027-1793127265-45664f3"></script>
+  <script src="/i18n.js?v=dhaka-atlas-20261027-1793127265-45664f3"></script>
   <link href="/vendor/maplibre-6.4.1/maplibre-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261027-1793125055-52b7d9c" />
-  <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261027-1793125055-52b7d9c" />
+  <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261027-1793127265-45664f3" />
+  <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261027-1793127265-45664f3" />
   <noscript>
     <style>
       .atlas-loading-screen { display: none !important; }
@@ -25,18 +25,22 @@
   
   <div class="atlas-page">
     <header class="atlas-header">
-      <div class="atlas-header-meta">
-        <a href="/" class="city-brand-badge" aria-label="DHKx · Dhaka Civic Atlas">DHKx</a>
-        <h1 class="atlas-title">
-          <span class="atlas-title-desk">Dhaka, block by block</span>
-          <span class="atlas-title-phone">Dhaka 3D</span>
-        </h1>
-      </div>
-
+      <a href="/" class="atlas-wordmark" aria-label="Dhaka Civic Atlas">Dhaka</a>
+      <label id="atlas-lenses" class="atlas-lens-choice"><span class="sr-only">Explore city conditions</span>
+        <select id="atlas-lens" aria-label="Explore city conditions">
+          <option value="city">City in 3D</option><option value="rivers">River outlook</option>
+          <option value="air">Air forecast</option><option value="economy">Economic engine</option>
+          <option value="transit">Transit &amp; Metro</option><option value="heritage">Architectural heritage</option>
+          <option value="haze">Brick kilns &amp; smoke</option><option value="rain">Rain · next 24 h</option>
+          <option value="radar">Rain radar</option><option value="cloud">Satellite clouds</option>
+          <option value="night">Night lights</option><option value="water">Flood inundation</option>
+        </select>
+      </label>
       <nav class="atlas-header-nav" aria-label="Atlas controls">
-        <button type="button" id="language-toggle" class="atlas-btn atlas-btn-accent" aria-label="Switch language">English</button>
-        
-        <label class="atlas-control-label">
+        <button type="button" id="language-toggle" class="atlas-btn" aria-label="Switch language">English</button>
+        <details class="atlas-menu" id="atlas-menu">
+          <summary class="atlas-menu-summary">Map</summary>
+          <div class="atlas-menu-body">        <label class="atlas-control-label">
           <span>Map view</span>
           <select id="atlas-view" class="atlas-select" aria-label="Map view">
             <option value="3d" selected>3D city</option>
@@ -52,9 +56,7 @@
           </select>
         </label>
 
-        <details class="atlas-menu" id="atlas-menu">
-          <summary class="atlas-menu-summary">Controls</summary>
-          <div class="atlas-menu-body">
+
             <button type="button" class="atlas-btn" data-open="quick-jump-dialog">Quick jump</button>
             <button type="button" class="atlas-btn" data-open="flood-dialog">Rivers &amp; flood desk</button>
             <button type="button" class="atlas-btn" data-open="air-dialog">Air quality &amp; smoke</button>
@@ -77,27 +79,14 @@
       </nav>
     </header>
 
-    <nav class="atlas-lenses" id="atlas-lenses" aria-label="Explore city conditions">
-      <button data-lens="city" aria-pressed="true">City in 3D</button>
-      <button data-lens="rivers" aria-pressed="false">Rivers &amp; flood risk</button>
-      <button data-lens="economy" aria-pressed="false">Economic engine</button>
-      <button data-lens="transit" aria-pressed="false">Transit &amp; Metro</button>
-      <button data-lens="air" aria-pressed="false">Air &amp; 72h timeline</button>
-      <button data-lens="haze" aria-pressed="false">Brick kilns &amp; smoke</button>
-      <button data-lens="heritage" aria-pressed="false">Architectural heritage</button>
-      <button data-lens="rain" aria-pressed="false">Rain · next 24 h</button>
-      <button data-lens="radar" aria-pressed="false">Rain radar</button>
-      <button data-lens="cloud" aria-pressed="false">Satellite clouds</button>
-      <button data-lens="night" aria-pressed="false">Night lights</button>
-      <button data-lens="water" aria-pressed="false">Flood inundation</button>
-    </nav>
-
-    <section class="atlas-lens-story" aria-live="polite">
+    <div class="atlas-map-wrap">
+      <aside class="atlas-map-key"><div id="building-key"></div>    <details class="atlas-lens-story"><summary>Map evidence</summary>
       <strong id="atlas-lens-title">Read the city, from skyline to street</strong>
       <span id="atlas-lens-description">Choose a map lens. Sources and valid times stay with the evidence.</span>
-    </section>
+    </details>
 
-    <div class="atlas-map-wrap">
+</aside>
+      <section id="forecast-player" class="forecast-player" hidden aria-label="Forecast playback"></section>
       <div id="atlas-map" class="atlas-map" aria-label="3D Map of Dhaka"></div>
 
       <div id="atlas-map-loading" class="atlas-loading-screen">
@@ -168,7 +157,7 @@
       <div id="weather-detail-container"></div>
       <div id="air-timeline-container">Loading air quality timeline…</div>
       <p style="font-size:11px;color:var(--dim);margin-top:12px;">
-        Data from European Centre for Medium-Range Weather Forecasts (ECMWF) Copernicus Atmosphere Monitoring Service (CAMS) via Open-Meteo API. Model updates every 6 hours.
+        Data from European Centre for Medium-Range Weather Forecasts (ECMWF) Copernicus Atmosphere Monitoring Service (CAMS) via Open-Meteo API. CAMS global: approximately 45 km; native 3-hour steps, updated every 12 hours.
       </p>
     </div>
   </dialog>
@@ -234,8 +223,10 @@
     </div>
   </dialog>
 
-  <script type="module" src="/loader.js?v=dhaka-atlas-20261027-1793125055-52b7d9c"></script>
-  <script src="/app.js?v=dhaka-atlas-20261027-1793125055-52b7d9c" defer></script>
-  <script src="/dashboard.js?v=dhaka-atlas-20261027-1793125055-52b7d9c" defer></script>
+  <script type="module" src="/loader.js?v=dhaka-atlas-20261027-1793127265-45664f3"></script>
+  <script src="/design.js?v=dhaka-atlas-20261027-1793127265-45664f3" defer></script>
+  <script src="/forecast.js?v=dhaka-atlas-20261027-1793127265-45664f3" defer></script>
+  <script src="/app.js?v=dhaka-atlas-20261027-1793127265-45664f3" defer></script>
+  <script src="/dashboard.js?v=dhaka-atlas-20261027-1793127265-45664f3" defer></script>
 </body>
 </html>
