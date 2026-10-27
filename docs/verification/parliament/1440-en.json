@@ -1,0 +1,185 @@
+{
+  "width": 1440,
+  "height": 900,
+  "regions": [
+    {
+      "selector": ".atlas-header",
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 39,
+      "scrollWidth": 1440
+    },
+    {
+      "selector": ".atlas-lenses",
+      "x": 0,
+      "y": 39,
+      "width": 1440,
+      "height": 28,
+      "scrollWidth": 1440
+    },
+    {
+      "selector": ".atlas-lens-story",
+      "x": 0,
+      "y": 67,
+      "width": 1440,
+      "height": 24.9453125,
+      "scrollWidth": 1440
+    },
+    {
+      "selector": ".atlas-map-wrap",
+      "x": 0,
+      "y": 91.9453125,
+      "width": 1440,
+      "height": 808.0546875,
+      "scrollWidth": 1440
+    },
+    {
+      "selector": ".atlas-watch",
+      "x": 270,
+      "y": 799.1015625,
+      "width": 900,
+      "height": 70.8984375,
+      "scrollWidth": 900
+    }
+  ],
+  "buildingCaption": "Zoom in for building footprints; select a feature for source details. 3D: dated OSM detail; heights mapped or estimated.",
+  "controls": [
+    {
+      "id": "language-toggle",
+      "left": 928.5546875,
+      "right": 975.109375,
+      "top": 6,
+      "bottom": 32,
+      "scrollWidth": 45,
+      "width": 46.5546875
+    },
+    {
+      "id": "atlas-view",
+      "left": 1048.4921875,
+      "right": 1120.9921875,
+      "top": 6,
+      "bottom": 32,
+      "scrollWidth": 71,
+      "width": 72.5
+    },
+    {
+      "id": "atlas-basemap",
+      "left": 1187.203125,
+      "right": 1336.203125,
+      "top": 6,
+      "bottom": 32,
+      "scrollWidth": 147,
+      "width": 149
+    },
+    {
+      "id": "atlas-menu-summary",
+      "left": 1346.203125,
+      "right": 1426,
+      "top": 6,
+      "bottom": 32,
+      "scrollWidth": 78,
+      "width": 79.796875
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1165,
+      "right": 1399,
+      "top": 81,
+      "bottom": 107,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1165,
+      "right": 1399,
+      "top": 117,
+      "bottom": 143,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1165,
+      "right": 1399,
+      "top": 153,
+      "bottom": 179,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1165,
+      "right": 1399,
+      "top": 189,
+      "bottom": 215,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 1165,
+      "right": 1399,
+      "top": 225,
+      "bottom": 251,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "download-geojson-btn",
+      "left": 1165,
+      "right": 1399,
+      "top": 328.6875,
+      "bottom": 354.6875,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-theme",
+      "left": 1242.7265625,
+      "right": 1371.7265625,
+      "top": 372.6875,
+      "bottom": 398.6875,
+      "scrollWidth": 127,
+      "width": 129
+    },
+    {
+      "id": "atlas-watch-flood",
+      "left": 271,
+      "right": 494.75,
+      "top": 826.5,
+      "bottom": 869,
+      "scrollWidth": 224,
+      "width": 223.75
+    },
+    {
+      "id": "atlas-watch-air",
+      "left": 495.75,
+      "right": 719.5,
+      "top": 826.5,
+      "bottom": 869,
+      "scrollWidth": 224,
+      "width": 223.75
+    },
+    {
+      "id": "atlas-watch-wind",
+      "left": 720.5,
+      "right": 944.25,
+      "top": 826.5,
+      "bottom": 869,
+      "scrollWidth": 224,
+      "width": 223.75
+    },
+    {
+      "id": "atlas-watch-traffic",
+      "left": 945.25,
+      "right": 1169,
+      "top": 826.5,
+      "bottom": 869,
+      "scrollWidth": 224,
+      "width": 223.75
+    }
+  ],
+  "pass": true
+}

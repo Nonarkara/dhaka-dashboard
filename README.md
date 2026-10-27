@@ -12,7 +12,7 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
-| **City in 3D** | OSM building extrusions at zoom 14+ (mapped or inferred heights), satellite imagery and authored landmark references | OpenStreetMap, Esri Satellite, RAJUK |
+| **City in 3D** | OSM building extrusions at zoom 14+ in every 3D lens; local Parliament-area footprints preserve courtyards (mapped or estimated heights), plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
 | **Rivers & flood risk** | The five peripheral rivers (Buriganga, Turag, Balu, Shitalakshya, Dhaleshwari) and Tongi Khal with 6 BWDB gauge stations and surveyed danger levels (m MSL) | Bangladesh Water Development Board (BWDB) / FFWC |
 | **Economic engine** | Ready-Made Garment (RMG) export corridors, Savar DEPZ, Adamjee EPZ, Motijheel financial district, and wholesale hubs (Kawran Bazar, Islampur, Chawkbazar) | Export Promotion Bureau (EPB), Bangladesh Bank, DSE |
 | **Transit & Metro** | Dhaka Metro Rail (MRT Line 6) stations, Dhaka Elevated Expressway, Kamalapur central rail terminal, and Sadarghat launch terminal | DMTCL, DTCA, Bangladesh Railway, BIWTA |

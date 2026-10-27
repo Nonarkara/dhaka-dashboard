@@ -1,0 +1,185 @@
+{
+  "width": 390,
+  "height": 844,
+  "regions": [
+    {
+      "selector": ".atlas-header",
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 85,
+      "scrollWidth": 390
+    },
+    {
+      "selector": ".atlas-lenses",
+      "x": 0,
+      "y": 85,
+      "width": 390,
+      "height": 37,
+      "scrollWidth": 1501
+    },
+    {
+      "selector": ".atlas-lens-story",
+      "x": 0,
+      "y": 122,
+      "width": 390,
+      "height": 58.8359375,
+      "scrollWidth": 390
+    },
+    {
+      "selector": ".atlas-map-wrap",
+      "x": 0,
+      "y": 180.8359375,
+      "width": 390,
+      "height": 663.1640625,
+      "scrollWidth": 390
+    },
+    {
+      "selector": ".atlas-watch",
+      "x": 8,
+      "y": 692.6015625,
+      "width": 374,
+      "height": 121.3984375,
+      "scrollWidth": 374
+    }
+  ],
+  "buildingCaption": "ভবনের রূপ দেখতে জুম করুন; উৎসের তথ্য পেতে স্থাপনা নির্বাচন করুন। ৩ডি: তারিখযুক্ত OSM বিস্তারিত; উচ্চতা নথিভুক্ত বা আনুমানিক।",
+  "controls": [
+    {
+      "id": "language-toggle",
+      "left": 256.5,
+      "right": 314.421875,
+      "top": 4,
+      "bottom": 40,
+      "scrollWidth": 56,
+      "width": 57.921875
+    },
+    {
+      "id": "atlas-view",
+      "left": 8,
+      "right": 248.5,
+      "top": 44,
+      "bottom": 80,
+      "scrollWidth": 239,
+      "width": 240.5
+    },
+    {
+      "id": "atlas-basemap",
+      "left": 256.5,
+      "right": 382,
+      "top": 44,
+      "bottom": 80,
+      "scrollWidth": 124,
+      "width": 125.5
+    },
+    {
+      "id": "atlas-menu-summary",
+      "left": 322.421875,
+      "right": 379.7421875,
+      "top": 4,
+      "bottom": 40,
+      "scrollWidth": 55,
+      "width": 57.3203125
+    },
+    {
+      "id": "atlas-btn",
+      "left": 127,
+      "right": 361,
+      "top": 95,
+      "bottom": 131,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 127,
+      "right": 361,
+      "top": 141,
+      "bottom": 177,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 127,
+      "right": 361,
+      "top": 187,
+      "bottom": 223,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 127,
+      "right": 361,
+      "top": 233,
+      "bottom": 269,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-btn",
+      "left": 127,
+      "right": 361,
+      "top": 279,
+      "bottom": 315,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "download-geojson-btn",
+      "left": 127,
+      "right": 361,
+      "top": 392.6875,
+      "bottom": 428.6875,
+      "scrollWidth": 232,
+      "width": 234
+    },
+    {
+      "id": "atlas-theme",
+      "left": 127,
+      "right": 250.5,
+      "top": 446.6875,
+      "bottom": 482.6875,
+      "scrollWidth": 122,
+      "width": 123.5
+    },
+    {
+      "id": "atlas-watch-flood",
+      "left": 9,
+      "right": 194.5,
+      "top": 720,
+      "bottom": 766,
+      "scrollWidth": 186,
+      "width": 185.5
+    },
+    {
+      "id": "atlas-watch-air",
+      "left": 195.5,
+      "right": 381,
+      "top": 720,
+      "bottom": 766,
+      "scrollWidth": 186,
+      "width": 185.5
+    },
+    {
+      "id": "atlas-watch-wind",
+      "left": 9,
+      "right": 194.5,
+      "top": 767,
+      "bottom": 813,
+      "scrollWidth": 186,
+      "width": 185.5
+    },
+    {
+      "id": "atlas-watch-traffic",
+      "left": 195.5,
+      "right": 381,
+      "top": 767,
+      "bottom": 813,
+      "scrollWidth": 186,
+      "width": 185.5
+    }
+  ],
+  "pass": true
+}

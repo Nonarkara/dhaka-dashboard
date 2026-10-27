@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793123003-a00ea3c";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261027-1793125055-52b7d9c";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -21,6 +21,8 @@
   let loadingHidden = false;
   let bootAttempts = 0;
   let watchData = null;
+  let parliamentSnapshot = null;
+  let parliamentSourceReady = false;
   const tr = (en, bn) => document.documentElement.lang === "bn" ? bn : en;
 
   const $ = sel => document.querySelector(sel);
@@ -37,8 +39,8 @@
     city: {
       title: "Read the city, from skyline to street",
       title_bn: "আকাশরেখা থেকে অলিগলি: ঢাকার প্রতিটি স্তরের পাঠ",
-      desc: "Zoom in for OSM building extrusions (mapped or inferred heights). Select a feature for reference details.",
-      desc_bn: "জুম করে OSM ভবনের ত্রিমাত্রিক রূপ দেখুন (নথিভুক্ত বা আনুমানিক উচ্চতা)। তথ্যের জন্য স্থাপনা নির্বাচন করুন।"
+      desc: "Zoom in for building footprints; select a feature for source details.",
+      desc_bn: "ভবনের রূপ দেখতে জুম করুন; উৎসের তথ্য পেতে স্থাপনা নির্বাচন করুন।"
     },
     rivers: {
       title: "Five Rivers Ring & Flood Risk",
@@ -118,7 +120,7 @@
 
     const styleSpec = {
       version: 8,
-      glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+      glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
       sources: {
         "buildings": { type: "vector", url: "https://tiles.openfreemap.org/planet", attribution: "© OpenStreetMap · OpenFreeMap / OpenMapTiles" },
         "esri-satellite": {
@@ -156,7 +158,8 @@
 
     styleSpec.layers.push({
       id: "city-buildings", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 14,
-      paint: { "fill-extrusion-color": "#f5f0dc", "fill-extrusion-height": ["coalesce", ["get", "render_height"], 0], "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0], "fill-extrusion-opacity": 0.8 }
+      filter: ["!", ["has", "hide_3d"]],
+      paint: buildingPaint("render_height", "render_min_height")
     });
 
     try {
@@ -168,15 +171,20 @@
         pitch: 50,
         bearing: 15,
         maxPitch: 75,
+        minZoom: 9,
+        renderWorldCopies: false,
         attributionControl: true
       });
 
+      map.on("move", syncBuildingVisibility);
+      map.on("moveend", syncBuildingVisibility);
+      map.on("zoomend", syncBuildingVisibility);
       map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
 
       // Dismiss overlay when map renders or on error
       map.on("load", async () => {
         hideLoading();
-        await loadDataLayers();
+        await Promise.all([loadDataLayers(), loadParliamentBuildings()]);
       });
 
       map.on("idle", hideLoading);
@@ -184,6 +192,7 @@
         if (map.loaded()) hideLoading();
       });
       map.on("error", (e) => {
+        if (e.sourceId === "parliament-detail") { parliamentSourceReady = false; syncBuildingVisibility(); }
         console.warn("[atlas] map notice:", e);
         const status = $("#atlas-layer-status");
         if (status) { status.hidden = false; status.textContent = tr("A map source is unavailable. Visible reference layers remain usable.", "মানচিত্রের একটি উৎস অনুপলব্ধ। দৃশ্যমান তথ্যসূত্র স্তর ব্যবহারযোগ্য।"); }
@@ -202,6 +211,77 @@
   function showMapFailure() {
     const el = $("#atlas-map-loading");
     if (el) { el.classList.remove("loaded"); el.innerHTML = `<strong>${tr("Map unavailable", "মানচিত্র অনুপলব্ধ")}</strong><p>${tr("Map initialization failed. Reload to retry; civic data remains available from City watch.", "মানচিত্র চালু হয়নি। আবার চেষ্টা করতে রিলোড করুন; নগর পর্যবেক্ষণে তথ্য পাওয়া যাবে।")}</p><button class="atlas-btn" onclick="location.reload()">${tr("Retry", "আবার চেষ্টা")}</button>`; }
+  }
+
+  function buildingPaint(heightKey, baseKey) {
+    const base = ["max", 0, ["to-number", ["get", baseKey], 0]];
+    return {
+      "fill-extrusion-color": "#f5f0dc",
+      "fill-extrusion-height": ["case", [">", ["to-number", ["get", heightKey], 0], base], ["to-number", ["get", heightKey], 0], ["+", base, 6]],
+      "fill-extrusion-base": base,
+      "fill-extrusion-opacity": 0.9
+    };
+  }
+
+  function syncBuildingVisibility() {
+    if (!map) return;
+    const is3D = $("#atlas-view")?.value !== "2d";
+    // Never mask batched polygon tiles by ID or unsupported polygon `within`.
+    // Switch the whole layer only when the whole viewport fits inside detail coverage.
+    let useSnapshot = false;
+    if (parliamentSourceReady && parliamentSnapshot && map.getZoom() >= 16) {
+      const bounds = map.getBounds();
+      const [west, south, east, north] = parliamentSnapshot.bbox;
+      const guard = 0.0005; // ~50 m skyline margin beyond the ground viewport.
+      useSnapshot = bounds.getWest() > west + guard && bounds.getSouth() > south + guard
+        && bounds.getEast() < east - guard && bounds.getNorth() < north - guard;
+    }
+    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["parliament-buildings", is3D && useSnapshot]]) {
+      const visibility = visible ? "visible" : "none";
+      if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
+    }
+    const desc = $("#atlas-lens-description");
+    if (desc) {
+      const story = LENS_STORIES[currentLens] || LENS_STORIES.city;
+      const base = tr(story.desc, story.desc_bn);
+      const note = is3D ? useSnapshot
+        ? tr("3D: dated OSM detail; heights mapped or estimated.", "৩ডি: তারিখযুক্ত OSM বিস্তারিত; উচ্চতা নথিভুক্ত বা আনুমানিক।")
+        : tr("3D: OSM blocks; heights mapped or estimated.", "৩ডি: OSM ভবন; উচ্চতা নথিভুক্ত বা আনুমানিক।") : "";
+      const text = base + (note ? " " + note : "");
+      if (desc.textContent !== text) desc.textContent = text;
+    }
+  }
+
+  async function loadParliamentBuildings() {
+    try {
+      const res = await fetch("/data/parliament-buildings.geojson", { signal: AbortSignal.timeout(15000) });
+      if (!res.ok) throw new Error("detail-footprints-unavailable");
+      const data = await res.json();
+      if (data.type !== "FeatureCollection" || !data.features?.length || data.bbox?.length !== 4
+        || !data.features.some(f => f.id === "relation/18085267")) throw new Error("invalid-detail-footprints");
+      parliamentSnapshot = data;
+      const onData = event => {
+        if (event.sourceId === "parliament-detail" && event.isSourceLoaded) {
+          parliamentSourceReady = true;
+          map.off("sourcedata", onData);
+          syncBuildingVisibility();
+        }
+      };
+      map.on("sourcedata", onData);
+      map.addSource("parliament-detail", { type: "geojson", data,
+        attribution: `© OpenStreetMap · detail ${data.metadata.retrieved_at.slice(0, 10)} · ODbL` });
+      map.addLayer({ id: "parliament-buildings", type: "fill-extrusion", source: "parliament-detail", minzoom: 14,
+        layout: { visibility: "none" }, paint: buildingPaint("height_m", "min_height_m") }, "city-buildings");
+      // The source can finish before the layer is attached.
+      if (map.isSourceLoaded("parliament-detail")) { parliamentSourceReady = true; syncBuildingVisibility(); }
+      map.on("click", "parliament-buildings", event => {
+        if (event.features?.[0]) showInspectionHUD("building", event.features[0].properties);
+      });
+    } catch (error) {
+      parliamentSourceReady = false;
+      syncBuildingVisibility();
+      console.warn("Parliament detail unavailable; retaining streamed buildings", error);
+    }
   }
 
   async function loadDataLayers() {
@@ -232,6 +312,7 @@
             minzoom: 12,
             layout: {
               "text-field": ["get", "name"],
+              "text-font": ["Noto Sans Regular"],
               "text-size": 11,
               "text-offset": [0, 1.2],
               "text-anchor": "top"
@@ -367,6 +448,9 @@
       if (resAreas.ok) {
         areasData = await resAreas.json();
         populateQuickJump(areasData);
+        const areaId = new URLSearchParams(window.location.search).get("area");
+        const initialArea = areasData.find(area => area.id === areaId);
+        if (initialArea) flyToArea(initialArea, 0);
       }
     } catch (e) {
       console.warn("Could not load areas json:", e);
@@ -422,6 +506,14 @@
         <div class="hud-row"><span class="hud-label">Current Reading:</span><span class="hud-value" style="color:var(--dim)">${tr("Unavailable · no connected gauge feed", "অনুপলব্ধ · পর্যবেক্ষণ সংযুক্ত নেই")}</span></div>
         <div class="hud-row"><span class="hud-label">Status:</span><span class="hud-value">${tr("Reference station · not a live reading", "তথ্যসূত্র স্টেশন · সরাসরি পর্যবেক্ষণ নয়")}</span></div>
       `;
+    } else if (type === "building") {
+      rowsHtml = `
+        <div class="hud-row"><span class="hud-label">${tr("Block height", "ভবনের উচ্চতা")}</span><span class="hud-value">${props.height_m} m</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${props.height_method === "levels-times-3m" ? tr("OSM levels × 3 m (estimate)", "OSM তলা × ৩ মিটার (আনুমানিক)") : props.height_method === "osm-height-tag" ? tr("OSM height tag", "OSM উচ্চতার তথ্য") : tr("6 m estimate; no mapped height", "৬ মিটার আনুমানিক; উচ্চতার তথ্য নেই")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Snapshot", "উপাত্ত সংগ্রহ")}</span><span class="hud-value">${parliamentSnapshot.metadata.retrieved_at.slice(0, 10)}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Source", "উৎস")}</span><span class="hud-value">${props.osm_id} · ODbL</span></div>
+        <p>${tr("Mapped footprint massing; not a surveyed architectural model.", "মানচিত্রভিত্তিক ভবনের রূপ; জরিপকৃত স্থাপত্য মডেল নয়।")}</p>
+      `;
     } else if (type === "landmark") {
       rowsHtml = `
         <div class="hud-row"><span class="hud-label">Year / Era:</span><span class="hud-value">${props.year || "Historic"}</span></div>
@@ -446,7 +538,7 @@
       <div class="hud-header">
         <div>
           <h4 class="hud-title">${name}</h4>
-          <span class="hud-badge">${type}</span>
+          <span class="hud-badge">${type === "building" ? tr("building", "ভবন") : type}</span>
         </div>
         <button class="modal-close-btn" onclick="document.getElementById('atlas-observation-hud').hidden = true;">✕</button>
       </div>
@@ -498,8 +590,11 @@
     if (map.getLayer("economy-hubs")) {
       map.setLayoutProperty("economy-hubs", "visibility", (lensId === "economy" || lensId === "city") ? "visible" : "none");
     }
-    if (map.getLayer("city-buildings")) map.setLayoutProperty("city-buildings", "visibility", lensId === "city" && $("#atlas-view")?.value !== "2d" ? "visible" : "none");
-    if (map.getLayer("landmarks-labels")) map.setLayoutProperty("landmarks-labels", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
+    syncBuildingVisibility();
+    if (map.getLayer("landmarks-labels")) {
+      map.setLayoutProperty("landmarks-labels", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
+      map.setLayoutProperty("landmarks-labels", "text-field", ["coalesce", ["get", isBn ? "name_bn" : "name"], ["get", "name"]]);
+    }
     if (map.getLayer("landmarks-points")) {
       map.setLayoutProperty("landmarks-points", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
     }
@@ -568,7 +663,7 @@
         type: "raster",
         source: id,
         paint: { "raster-opacity": 0.75 }
-      });
+      }, map.getLayer("parliament-buildings") ? "parliament-buildings" : "city-buildings");
       activeOverlayLayer = id;
     } catch (e) {
       console.warn("Could not add raster overlay:", id, e);
@@ -591,7 +686,7 @@
     $("#atlas-view")?.addEventListener("change", e => {
       const is3D = e.target.value === "3d";
       if (map) {
-        if (map.getLayer("city-buildings")) map.setLayoutProperty("city-buildings", "visibility", is3D && currentLens === "city" ? "visible" : "none");
+        syncBuildingVisibility();
         map.easeTo({
           pitch: is3D ? 50 : 0,
           bearing: is3D ? 15 : 0,
@@ -636,12 +731,20 @@
     }
   }
 
+  function flyToArea(area, duration = 1500) {
+    if (!map) return;
+    const is3D = $("#atlas-view")?.value !== "2d";
+    const zoom = (area.zoom || 15) + (area.id === "parliament" ? Math.max(0, Math.log2(map.getContainer().clientWidth / 768)) : 0);
+    map.flyTo({ center: [area.lng, area.lat], zoom,
+      pitch: is3D ? (area.pitch ?? 45) : 0, bearing: is3D ? (area.bearing ?? 0) : 0, duration });
+  }
+
   function populateQuickJump(areas) {
     const container = $("#quick-jump-grid");
     if (!container) return;
     const isBn = document.documentElement.lang === "bn";
     container.innerHTML = areas.map(a => `
-      <button class="jump-btn" data-lat="${a.lat}" data-lng="${a.lng}" data-zoom="${a.zoom}">
+      <button class="jump-btn" data-area="${a.id}">
         <span class="jump-btn-cat">${a.category}</span>
         <div class="jump-btn-name">${(isBn && a.name_bn) ? a.name_bn : a.name}</div>
       </button>
@@ -649,10 +752,8 @@
 
     $$("#quick-jump-grid .jump-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        const lat = Number(btn.dataset.lat);
-        const lng = Number(btn.dataset.lng);
-        const zoom = Number(btn.dataset.zoom) || 15;
-        if (map) map.flyTo({ center: [lng, lat], zoom, pitch: 45, duration: 1500 });
+        const area = areas.find(item => item.id === btn.dataset.area);
+        if (area) flyToArea(area);
         $("#quick-jump-dialog")?.close();
       });
     });
