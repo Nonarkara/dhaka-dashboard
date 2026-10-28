@@ -35,7 +35,7 @@
           </div>
           <div class="metric-provenance">
             <span class="provenance-dot ${ind.provenance}"></span>
-            <span>${ind.source} · ${tr("No dated bulletin connected", "তারিখযুক্ত বুলেটিন সংযুক্ত নেই")}</span>
+            <span>${ind.source}${ind.period ? ` · ${tr("Period","তথ্যকাল")}: ${ind.period}` : ` · ${tr("No dated bulletin connected","তারিখযুক্ত বুলেটিন সংযুক্ত নেই")}`}</span>
           </div>
           <p style="margin:4px 0 0;font-size:11px;color:var(--dim);">${(isBn && ind.note_bn) ? ind.note_bn : ind.note}</p>
         </div>
@@ -54,19 +54,59 @@
       const data = await res.json();
       const isBn = document.documentElement.lang === "bn";
 
+      const tierLabel = (t) => ({ normal: tr("Normal","সাধারণ"), watch: tr("Watch","সতর্ক"), alert: tr("Alert","সতর্ক"), danger: tr("Danger","বিপদ") })[t] || t;
+      const tierClass = (t) => `river-tier river-tier-${t}`;
+
       container.innerHTML = `
-        <p>${tr("Reference stations only. Current levels and trends are unavailable; no observation feed is connected. Thresholds below are unverified registry values, not a flood warning service.", "শুধু স্টেশনের তথ্যসূত্র। পর্যবেক্ষণ সংযুক্ত না থাকায় বর্তমান পানির স্তর ও প্রবণতা অনুপলব্ধ। নিচের সীমা যাচাইহীন নিবন্ধিত মান; এটি বন্যা সতর্কীকরণ সেবা নয়।")}</p>
-        <div class="river-reference-list">${data.stations.map(st => `
+        <p>${tr("Modeled flood risk from 24-hour rainfall accumulation plus BWDB danger levels. Live gauge readings are not connected — tiers are a risk proxy, not an official FFWC flood warning.", "২৪ ঘণ্টার বৃষ্টিপাত ও বিউডব্লিউডি বিপদসীমার ওপর ভিত্তি করে মডেলভিত্তিক বন্যা ঝুঁকির স্তর। সরাসরি গেজ পাঠন সংযুক্ত নয় — স্তরগুলি একটি ঝুঁকি প্রক্সি, সরকারি એফএফডাব্লুসি বন্যা সতর্কবার্তা নয়।")}</p>
+        <div style="display:flex;gap:8px;margin-bottom:8px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;">
+          <span style="color:var(--ok)">● ${tr("Normal","সাধারণ")}: ${data.summary?.normal ?? 0}</span>
+          <span style="color:var(--amber)">● ${tr("Watch","সতর্ক")}: ${data.summary?.watch ?? 0}</span>
+          <span style="color:var(--warn)">● ${tr("Alert","সতর্কব군요")}: ${data.summary?.alert ?? 0}</span>
+          <span style="color:#dd4027">● ${tr("Danger","বিপদ")}: ${data.summary?.danger ?? 0}</span>
+        </div>
+        <div class="river-reference-list">${data.stations.map(st => {
+          const fr = st.floodRisk || { tier: "normal", reasonCode: null, rain_24h_mm: null, rain_current_mm: null, rainfallStatus: "unavailable", danger_level_m: st.danger_level_m, warning_level_m: st.warning_level_m, note: "" };
+          const rainText = fr.rain_24h_mm !== null ? `${fr.rain_24h_mm.toFixed(1)} mm` : tr("Unavailable","অনুপলব্ধ");
+          const tierColor = { normal: "var(--ok)", watch: "var(--amber)", alert: "var(--warn)", danger: "#dd4027" }[fr.tier];
+          return `
           <div class="river-reference-row">
-            <strong>${isBn ? st.name_bn : st.name}</strong>
-            <span>${tr("Current", "বর্তমান")}: ${tr("Unavailable", "অনুপলব্ধ")}</span>
-            <small>${st.station_code} · ${st.agency} · ${tr("Danger", "বিপদসীমা")} ${st.danger_level_m} m · ${tr("Warning", "সতর্কসীমা")} ${st.warning_level_m} m · ${tr("Peak", "সর্বোচ্চ")} ${st.highest_flood_level_m} m (${st.highest_flood_year})</small>
-          </div>`).join("")}</div>
+            <div>
+              <strong>${isBn ? st.name_bn : st.name}</strong>
+              <span class="river-tier-badge" style="background:${tierColor};color:#000;border-radius:0;padding:1px 6px;font-size:9px;margin-left:6px;">${tierLabel(fr.tier)}</span>
+              <span>${tr("Current", "বর্তমান")}: ${tr("Unavailable", "অনুপলব্ধ")}</span>
+              <small>${st.station_code} · ${st.agency} · ${tr("Danger", "বিপদসীমা")} ${st.danger_level_m} m · ${tr("24h Rain", "২৪ ঘণ্টা বৃষ্টি")} ${rainText} · ${tr("Rainfall", "বৃষ্টিপাত")} ${fr.rainfallStatus === "ok" ? tr("received","পাওয়া গেছে") : tr("unavailable","অনুপলব্ধ")}</small>
+              ${fr.reasonCode ? `<div style="font-size:10px;color:var(--dim);margin-top:2px;">${fr.reasonCode} · ${fr.note || ""}</div>` : ""}
+            </div>
+          </div>`;
+        }).join("")}</div>
         <p><a href="https://ffwc.gov.bd" target="_blank" rel="noopener">BWDB / FFWC ↗</a> · ${tr("Reference datum: m MSL. Observed time: unavailable.", "তথ্যসূত্র একক: m MSL। পর্যবেক্ষণের সময়: অনুপলব্ধ।")}</p>
       `;
     } catch (err) {
       container.innerHTML = `<p style="color:var(--warn);padding:8px;">River water level feed unavailable.</p>`;
     }
+  }
+
+  function aqiGuidance(aqi, isBn) {
+    if (typeof aqi !== "number" || !Number.isFinite(aqi)) {
+      return `<span style="color:var(--dim)">${tr("No AQI data — cannot determine action.","একিউআই তথ্য নেই — পদক্ষেপ নির্ধারিত করা যায় না।")}</span>`;
+    }
+    if (aqi <= 50) {
+      return `<span style="color:var(--ok)">${tr("Good — no action needed.","ভালো — কোনো পদক্ষেপের প্রয়োজন নেই।")}</span>`;
+    }
+    if (aqi <= 100) {
+      return `<span style="color:var(--amber)">${tr("Moderate — sensitive people reduce prolonged outdoor exertion.","মধ্যম — সংবেদনশীল ব্যক্তিরা দীর্ঘ বাহ্য পরিশ্রম হ্রাস করুন।")}</span>`;
+    }
+    if (aqi <= 150) {
+      return `<span style="color:#f97316">${tr("Unhealthy for Sensitive Groups — sensitive groups reduce outdoor exertion; schools consider limiting outdoor activity.","সंবেদনশীল গোষ্ঠীর জন্য Assalunhealthy — সংবেদনশীল গোষ্ঠী বাহ্য પરিশ্রম হ্রাস করুন; স্কুল বাহ্য কার্যক্রম সীমিত করার কথা চিন্তা করুন।")}</span>`;
+    }
+    if (aqi <= 200) {
+      return `<span style="color:var(--warn)">${tr("Unhealthy — everyone reduce prolonged outdoor exertion; consider mask use; restrict construction and brick kiln operations.","অস্বাস্থ্যকর — সবাই দীর্ঘ বাহ্য পরিশ্রম হ্রাস করুন; মাস্ক ব্যবহার বিবেচনা করুন; নির্মাণ ও ইটভাটা কার্যক্রম সীমিত করুন।")}</span>`;
+    }
+    if (aqi <= 300) {
+      return `<span style="color:#8b5cf6">${tr("Very Unhealthy — avoid prolonged outdoor exertion; use masks; schools consider closing; restrict traffic and industrial emissions.","খুব অস্বাস্থ্যকর — দীর্ঘ বাহ্য পরিশ্রম এড়িয়ে চলুন; মাস্ক ব্যবহার করুন; স্কুল বন্ধ করার কথা চিন্তা করুন; যানবাহন ও শিল্প নিঃসরণ সীমিত করুন।")}</span>`;
+    }
+    return `<span style="color:#7e22ce">${tr("Hazardous — avoid all outdoor exertion; emergency alerts; suspend non-essential outdoor work and traffic.","বিপজ্জনক — সব বাহ্য পরিশ্রম এড়িয়ে চলুন; জরুরি সতর্কবার্তা; অপরিহার্য নয় এমন বাহ্য কাজ ও যানবাহন বন্ধ করুন।")}</span>`;
   }
 
   async function loadAirQuality() {
@@ -103,6 +143,10 @@
           <span>+24 HOURS</span>
           <span>+48 HOURS</span>
           <span>+72 HOURS</span>
+        </div>
+        <div class="aqi-action-card" style="margin-top:8px;padding:6px 8px;background:var(--bg-raised);border:1px solid var(--line);font-size:11px;">
+          <strong style="text-transform:uppercase;letter-spacing:0.05em;font-family:var(--font-mono);font-size:10px;color:var(--dim);">${tr("Admin action guidance","প্রশাসনিক পদক্ষেপের দিকনির্দেশনা")}</strong>
+          <div style="margin-top:4px;">${aqiGuidance(data.data.current?.us_aqi, isBn)}</div>
         </div>
       `;
     } catch (err) {

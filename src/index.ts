@@ -748,45 +748,197 @@ const worker = {
     }
 
     // ── /api/dhaka/rivers ────────────────────────────────────────────────────
+    // Flood risk tiers are computed from Open-Meteo 24-hour rainfall
+    // accumulation (catchment level) combined with BWDB danger levels. Live
+    // river-gauge readings are not connected; this is a modeled risk proxy,
+    // not an official flood warning.
     if (url.pathname === "/api/dhaka/rivers") {
-      return jsonResponse({
-        status: "ok",
-        city: "Dhaka",
-        agency: "Bangladesh Water Development Board (BWDB) / Flood Forecasting & Warning Centre (FFWC)",
-        agency_url: "https://ffwc.gov.bd",
-        provenance: "reference",
-        reasonCode: "river-observations-not-connected",
-        observedAt: null,
-        readingsStatus: "unavailable",
-        stations: RIVER_STATIONS,
-        timestamp: new Date().toISOString(),
-        note: "Danger levels are officially surveyed benchmarks in metres Above Mean Sea Level (m MSL).",
-      });
+      const cacheKey = "rivers:flood-risk";
+      const { data, error } = await fetchWithCache(
+        cacheKey,
+        20 * 60 * 1000,
+        async () => {
+          // Fetch 24h rainfall for the 5 catchments
+          const points = [
+            { id: "buriganga", name: "Buriganga Catchment", lat: 23.7001, lng: 90.4150 },
+            { id: "turag", name: "Turag Basin", lat: 23.7980, lng: 90.3420 },
+            { id: "balu", name: "Balu Corridor", lat: 23.7140, lng: 90.5050 },
+            { id: "tongi", name: "Tongi North", lat: 23.8890, lng: 90.4010 },
+            { id: "savar", name: "Savar West", lat: 23.8583, lng: 90.2667 },
+          ];
+          const rainfall = await Promise.all(
+            points.map(async (p) => {
+              try {
+                const r = await fetch(
+                  `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&current=precipitation,rain&hourly=precipitation,rain&forecast_hours=24&timezone=Asia%2FDhaka`,
+                  { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
+                );
+                if (!r.ok) throw new Error(`upstream-http-${r.status}`);
+                const j = (await r.json()) as { current?: { precipitation?: number }; hourly?: { precipitation?: number[] } };
+                if (!Number.isFinite(j.current?.precipitation) || !j.hourly?.precipitation?.length) throw new Error("invalid-rainfall-payload");
+                return { ...p, status: "ok" as const, current_mm: j.current!.precipitation, rain_24h_sum_mm: j.hourly!.precipitation!.reduce((a: number, b: number) => a + b, 0) };
+              } catch {
+                return { ...p, status: "unavailable" as const, reasonCode: "upstream-or-invalid-rainfall" as const, current_mm: null, rain_24h_sum_mm: null };
+              }
+            }),
+          );
+          const rainById = new Map(rainfall.map(p => [p.id, p]));
+
+          // Map catchment ids to river station ids
+          const catchmentToStation: Record<string, string> = {
+            buriganga: "buriganga-mill-barrage",
+            turag: "turag-mirpur",
+            balu: "balu-demra",
+            tongi: "tongi-khal-tongi",
+            savar: "dhaleshwari-rekabi-bazar",
+          };
+
+          const stations = RIVER_STATIONS.map(st => {
+            const rain = rainById.get(Object.keys(catchmentToStation).find(k => catchmentToStation[k] === st.id) || "");
+            const rain24h = rain?.rain_24h_sum_mm ?? null;
+            const rainCurrent = rain?.current_mm ?? null;
+            const rainStatus = rain?.status ?? "unavailable";
+
+            // Flood risk tier from 24h rainfall accumulation relative to danger level.
+            // No live river readings exist, so this is a modeled proxy only.
+            let riskTier: "normal" | "watch" | "alert" | "danger" = "normal";
+            let riskReason = null;
+            if (rainStatus === "unavailable") {
+              riskTier = "normal"; // can't assess without rainfall data
+              riskReason = "rainfall-data-unavailable";
+            } else if (rain24h !== null) {
+              const danger = st.danger_level_m;
+              // Heuristic: 24h rainfall > 50mm suggests catchment saturation;
+              // > 100mm suggests elevated river levels approaching danger.
+              const saturation = rain24h / 100; // 0-1+ scale
+              if (saturation >= 1.0) {
+                riskTier = "danger";
+                riskReason = "heavy-24h-rainfall-catchment-saturated";
+              } else if (saturation >= 0.6) {
+                riskTier = "alert";
+                riskReason = "significant-24h-rainfall";
+              } else if (saturation >= 0.3) {
+                riskTier = "watch";
+                riskReason = "moderate-24h-rainfall";
+              }
+            }
+
+            return {
+              ...st,
+              current_level_m: null, // no live gauge feed
+              trend: "unavailable",
+              status: "unavailable",
+              readingsStatus: "unavailable",
+              reasonCode: "river-observations-not-connected",
+              floodRisk: {
+                tier: riskTier,
+                reasonCode: riskReason,
+                rain_24h_mm: rain24h,
+                rain_current_mm: rainCurrent,
+                rainfallStatus: rainStatus,
+                danger_level_m: st.danger_level_m,
+                warning_level_m: st.warning_level_m,
+                note: "Modeled flood risk proxy from 24h rainfall accumulation. Not an official FFWC flood warning.",
+              },
+            };
+          });
+
+          const anyRain = rainfall.some(r => r.status === "ok");
+          const anyDanger = stations.some(s => s.floodRisk.tier === "danger");
+          const anyAlert = stations.some(s => s.floodRisk.tier === "alert");
+
+          return {
+            status: anyRain ? "ok" : "unavailable",
+            provenance: "modeled",
+            readingsStatus: "unavailable",
+            reasonCode: anyRain ? null : "river-observations-not-connected",
+            observedAt: null,
+            timestamp: new Date().toISOString(),
+            stations,
+            summary: {
+              normal: stations.filter(s => s.floodRisk.tier === "normal").length,
+              watch: stations.filter(s => s.floodRisk.tier === "watch").length,
+              alert: stations.filter(s => s.floodRisk.tier === "alert").length,
+              danger: stations.filter(s => s.floodRisk.tier === "danger").length,
+              unavailable: stations.filter(s => s.floodRisk.tier === "normal" && rainfall.some(r => r.id === Object.keys(catchmentToStation).find(k => catchmentToStation[k] === s.id)) && rainfall.find(r => r.id === Object.keys(catchmentToStation).find(k => catchmentToStation[k] === s.id))?.status === "unavailable").length,
+            },
+            note: "Danger levels are officially surveyed benchmarks in metres Above Mean Sea Level (m MSL). Flood risk tiers are modeled from 24h rainfall accumulation — not live gauge readings or an official FFWC warning.",
+          };
+        },
+        null,
+      );
+
+      if (!data) {
+        return jsonResponse({
+          status: "unavailable",
+          reasonCode: "upstream-unreachable",
+          provenance: "unavailable",
+          observedAt: null,
+          readingsStatus: "unavailable",
+          stations: RIVER_STATIONS.map(s => ({ ...s, floodRisk: { tier: "normal" as const, reasonCode: "upstream-unreachable", rain_24h_mm: null, rain_current_mm: null, rainfallStatus: "unavailable", danger_level_m: s.danger_level_m, warning_level_m: s.warning_level_m, note: "Modeled flood risk proxy unavailable — upstream unreachable." } })),
+          timestamp: new Date().toISOString(),
+          error: error || null,
+        }, { status: 503 });
+      }
+
+      return jsonResponse(data, { status: data.status === "ok" ? 200 : 503 });
     }
 
     // ── /api/dhaka/economy ───────────────────────────────────────────────────
+    // Combines Bangladesh-specific reference indicators (RMG, DSEX, EPZs) with
+    // dated World Bank WDI observations where they overlap (CPI, remittance,
+    // exports, FX rate). Corridor workforce/export figures are unsourced
+    // constants and remain labeled reference-only.
     if (url.pathname === "/api/dhaka/economy") {
+      const instruments = await getInstruments();
+      const wbById = new Map(instruments.macro.map((m: any) => [m.id, m]));
+
+      const indicators = MACRO_INDICATORS.map(ind => {
+        const wb = (wbById.get({
+          "worker-remittance": "remittance",
+          "cpi-inflation-general": "inflation",
+          "usd-bdt-rate": "fx-period",
+        }[ind.id] || "") as any);
+        if (wb && wb.status === "ok" && wb.value !== null) {
+          return {
+            ...ind,
+            value: wb.value,
+            period: wb.period,
+            provenance: "reference" as const,
+            source: "World Bank WDI · " + ind.source,
+            source_url: wb.sourceUrl || ind.source_url,
+            note: ind.note + ` (World Bank ${wb.period})`,
+            note_bn: ind.note_bn,
+          };
+        }
+        return ind;
+      });
+
+      const corridors = [
+        { name: "Savar & Ashulia RMG Belt", workforce: 450000, annual_export: "$7.5B", sector: "Apparel" },
+        { name: "Dhaka EPZ (DEPZ)", workforce: 95000, annual_export: "$2.2B", sector: "RMG & Electronics" },
+        { name: "Adamjee EPZ Narayanganj", workforce: 62000, annual_export: "$1.1B", sector: "Diversified Export" },
+        { name: "Hemayetpur Leather City", workforce: 35000, annual_export: "$850M", sector: "Leather & CETP" },
+        { name: "Tejgaon Commercial Estate", workforce: 80000, sector: "Light Engineering & Media" },
+        { name: "Motijheel Financial Core", sector: "Central Banking & Capital Markets" },
+        { name: "Kawran Bazar Wholesale Hub", daily_turnover: "400M BDT", sector: "Agri-commodities" },
+        { name: "Islampur Textile Market", daily_turnover: "600M BDT", sector: "Wholesale Fabric" },
+      ].map(c => ({ ...c, provenance: "reference" as const, note: "Workforce and export figures are registry references; no dated bulletin connected." }));
+
+      const anyOk = instruments.status !== "unavailable";
       return jsonResponse({
-        status: "ok",
+        status: anyOk ? "ok" : "unavailable",
         city: "Dhaka",
         country: "Bangladesh",
-        provenance: "unavailable",
-        statusReason: "Indicator registry only; no dated bulletin has been ingested.",
-        reasonCode: "dated-bulletin-not-connected",
-        observedAt: null,
-        indicators: MACRO_INDICATORS,
-        corridors: [
-          { name: "Savar & Ashulia RMG Belt", workforce: 450000, annual_export: "$7.5B", sector: "Apparel" },
-          { name: "Dhaka EPZ (DEPZ)", workforce: 95000, annual_export: "$2.2B", sector: "RMG & Electronics" },
-          { name: "Adamjee EPZ Narayanganj", workforce: 62000, annual_export: "$1.1B", sector: "Diversified Export" },
-          { name: "Hemayetpur Leather City", workforce: 35000, annual_export: "$850M", sector: "Leather & CETP" },
-          { name: "Tejgaon Commercial Estate", workforce: 80000, sector: "Light Engineering & Media" },
-          { name: "Motijheel Financial Core", sector: "Central Banking & Capital Markets" },
-          { name: "Kawran Bazar Wholesale Hub", daily_turnover: "400M BDT", sector: "Agri-commodities" },
-          { name: "Islampur Textile Market", daily_turnover: "600M BDT", sector: "Wholesale Fabric" },
-        ].map(({ name, sector }) => ({ name, sector, provenance: "reference" })),
+        provenance: instruments.status === "ok" ? "reference" : "unavailable",
+        statusReason: anyOk ? "World Bank WDI annual series connected; Bangladesh-specific indicators remain reference registry." : "No dated bulletin connected.",
+        reasonCode: anyOk ? null : "dated-bulletin-not-connected",
+        observedAt: instruments.timestamp,
+        indicators,
+        corridors,
         timestamp: new Date().toISOString(),
-      });
+        fx: instruments.currency,
+      }, { status: anyOk ? 200 : 503 });
     }
 
     // ── /api/dhaka/transit ───────────────────────────────────────────────────
