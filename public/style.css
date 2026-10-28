@@ -46,12 +46,10 @@
   --water: #257da4;
   --metro: #008751;
   --expressway: #e65100;
-  --bus: #f59e0b;
-  --rail: #6366f1;
   --heritage: #d9583b;
   --economy: #10b981;
   --font-mono: "Barlow Semi Condensed", "Hind Siliguri", sans-serif;
-  --font-sans: "Barlow Semi Condensed", "Hind Siliguri", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Bengali", sans-serif;
+  --font-sans: "Barlow Semi Condensed", "Hind Siliguri", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Bengali", sans-serif;
   --font-display: "Barlow Semi Condensed", "Hind Siliguri", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 

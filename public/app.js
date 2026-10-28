@@ -976,59 +976,12 @@
         } else {
           if (status) status.textContent = tr("Reference kiln regions; wind data unavailable","ইটভাটার আঞ্চলিক তথ্যসূত্র; বাতাসের উপাত্ত অনুপলব্ধ");
         }
-        const kilnsGeo = {
-          type: "FeatureCollection",
-          features: [
-            { type: "Feature", geometry: { type: "Point", coordinates: [90.260, 23.830] }, properties: { name: isBn ? "সাভার ইটভাটা অঞ্চল" : "Savar Brick Kiln Belt", count: "Unverified reference region", tech: "Unverified", color: "#d96629" } },
-            { type: "Feature", geometry: { type: "Point", coordinates: [90.395, 23.930] }, properties: { name: isBn ? "গাজীপুর-টঙ্গী ইটভাটা অঞ্চল" : "Gazipur-Tongi Brick Belt", count: "Unverified reference region", tech: "Unverified", color: "#dd4027" } },
-            { type: "Feature", geometry: { type: "Point", coordinates: [90.370, 23.680] }, properties: { name: isBn ? "কেরানীগঞ্জ-বুড়িগঙ্গা ইটভাটা বলয়" : "Keraniganj-Buriganga Arc", count: "Unverified reference region", tech: "Unverified", color: "#e2953b" } },
-            { type: "Feature", geometry: { type: "Point", coordinates: [90.520, 23.630] }, properties: { name: isBn ? "নারায়ণগঞ্জ-শীতলক্ষ্যা ইটভাটা ক্লাস্টার" : "Narayanganj-Shitalakshya Cluster", count: "Unverified reference region", tech: "Unverified", color: "#e2953b" } }
-          ]
-        };
-        map.addSource("haze-kilns", { type: "geojson", data: kilnsGeo });
-        map.addLayer({
-          id: "haze-kilns-circles",
-          type: "circle",
-          source: "haze-kilns",
-          paint: {
-            "circle-radius": 20,
-            "circle-color": ["get", "color"],
-            "circle-opacity": 0.7,
-            "circle-stroke-width": 2,
-            "circle-stroke-color": "#f5f0dc"
-          }
-        }, map.getLayer("parliament-buildings") ? "parliament-buildings" : "city-buildings");
-        map.addLayer({
-          id: "haze-kilns-labels",
-          type: "symbol",
-          source: "haze-kilns",
-          layout: {
-            "text-field": ["get", "name"],
-            "text-font": ["Noto Sans Regular"],
-            "text-size": 11,
-            "text-offset": [0, 1.5]
-          },
-          paint: {
-            "text-color": "#ffffff",
-            "text-halo-color": "#0d171d",
-            "text-halo-width": 2
-          }
-        });
-        dynamicLayers.push("haze-kilns-circles", "haze-kilns-labels", "haze-kilns");
-        if (map.on) {
-          onDynamicClick("haze-kilns-circles", e => {
-            if (!e.features?.[0]) return;
-            const p = e.features[0].properties;
-            const hud = $("#atlas-observation-hud");
-            if (!hud) return;
-            hud.hidden = false;
-            hud.innerHTML = `<h3>${p.name}</h3>
-              <div style="margin:4px 0;"><strong>${tr("Registry status:","তথ্যসূত্রের অবস্থা:")}</strong> ${tr(p.count,"অযাচাইকৃত আঞ্চলিক তথ্যসূত্র")}</div>
-              <div style="margin:4px 0;"><strong>${tr("Kiln technology:","ভাটা প্রযুক্তি:")}</strong> ${p.tech}</div>
-              <div style="font-size:13px;color:var(--dim);">${tr("Regional context only; counts, active emissions and source attribution are unverified.","কেবল আঞ্চলিক প্রেক্ষাপট; সংখ্যা, সক্রিয় নির্গমন ও দূষণের উৎস যাচাই হয়নি।")}</div>
-              <button type="button" class="atlas-btn" style="margin-top:8px;width:100%;" onclick="document.getElementById('atlas-observation-hud').hidden=true">${tr("Close","বন্ধ করুন")}</button>`;
-          });
-        }
+        // GSH law (27 Oct 2026): Prefer no pin over a wrong pin. Brick kiln
+        // locations are unverified reference regions with no verified
+        // coordinates — no pins are drawn until a source (OSM hit, GPS,
+        // official station id, or recorded hand pin) exists with a source URL
+        // and timestamp. Surface wind status above remains the only haze-layer
+        // output.
       }
     } catch {
       if (currentLens === lens && status) status.textContent = tr("Evidence unavailable for this lens. No current observation is shown.", "এই স্তরের উপাত্ত অনুপলব্ধ। বর্তমান পর্যবেক্ষণ দেখানো হচ্ছে না।");
