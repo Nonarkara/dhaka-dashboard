@@ -591,7 +591,11 @@
       layer: "VIIRS_SNPP_DayNightBand",
       level: 7, ext: "png", maxzoom: 7,
       probe: { z: 7, y: 55, x: 96 },
-      label: ["NASA VIIRS Day/Night Band · night-time radiance", "নাসা ভিআইআইআরএস ডে/নাইট ব্যান্ড · রাতের দীপ্তি"]
+      label: ["NASA VIIRS Day/Night Band · night-time radiance", "নাসা ভিআইআইআরএস ডে/নাইট ব্যান্ড · রাতের দীপ্তি"],
+      // Night radiance over a daylight basemap reads as fog. The raster is
+      // opaque enough to carry the image on its own, and the basemap is dimmed
+      // for this lens so the lit city stands against a dark ground.
+      opacity: 0.95
     },
     water: {
       layer: "VIIRS_Combined_Flood_1-Day",
@@ -786,6 +790,13 @@
     if (map.getLayer("economy-hubs")) {
       map.setLayoutProperty("economy-hubs", "visibility", (lensId === "economy" || lensId === "city") ? "visible" : "none");
     }
+    // Night-time radiance only reads as night over a dark ground. Dim the
+    // daylight basemap for that lens and restore it for every other one.
+    for (const basemapId of ["basemap-esri", "basemap-osm"]) {
+      if (map.getLayer(basemapId)) {
+        map.setPaintProperty(basemapId, "raster-opacity", lensId === "night" ? 0.18 : 1);
+      }
+    }
     syncBuildingVisibility();
     if (map.getLayer("landmarks-labels")) {
       map.setLayoutProperty("landmarks-labels", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
@@ -828,7 +839,7 @@
     }
     // Pin every tile to one observation date so a mid-session GIBS rollover
     // cannot mix two dates across the raster.
-    addRasterOverlay(overlayId, gibsTileUrl(spec, obs.date), spec.maxzoom);
+    addRasterOverlay(overlayId, gibsTileUrl(spec, obs.date), spec.maxzoom, spec.opacity ?? 0.75);
     if (layerStatus) {
       layerStatus.hidden = false;
       const when = obs.dated
@@ -1014,7 +1025,7 @@
     }
   }
 
-  function addRasterOverlay(id, tileUrl, maxzoom = 9) {
+  function addRasterOverlay(id, tileUrl, maxzoom = 9, opacity = 0.75) {
     if (!map || map.getSource(id)) return;
     try {
       map.addSource(id, {
@@ -1027,7 +1038,7 @@
         id: id,
         type: "raster",
         source: id,
-        paint: { "raster-opacity": 0.75 }
+        paint: { "raster-opacity": opacity }
       }, map.getLayer("parliament-buildings") ? "parliament-buildings" : "city-buildings");
       activeOverlayLayer = id;
     } catch (e) {

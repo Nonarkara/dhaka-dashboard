@@ -33,6 +33,8 @@ function app({offline=false}={}) {
     getLayer(id){return this.layers.get(id);}
     getLayoutProperty(id,key){return this.getLayer(id)?.layout?.[key];}
     setLayoutProperty(id,key,value){const l=this.getLayer(id);l.layout??={};l.layout[key]=value;}
+    setPaintProperty(id,key,value){const l=this.getLayer(id);l.paint??={};l.paint[key]=value;}
+    getPaintProperty(id,key){return this.getLayer(id)?.paint?.[key];}
     addLayer(l,before){this.layers.set(l.id,l);if(l.type==='raster')this.lastRasterBefore=before;}
     addSource(id,data){this.sources.set(id,data);}
     getSource(id){return this.sources.get(id);}
@@ -111,6 +113,12 @@ for(const [lens,layer,level] of [
   assert.notEqual(dated[1],new Date().toISOString().split('T')[0],`${lens} rejected the blank placeholder date`);
   assert.ok(dated[1]===new Date(Date.now()-86400000).toISOString().split('T')[0],`${lens} fell back to the newest date carrying data`);
 }
+// Night-time radiance only reads as night over a dark ground, so the daylight
+// basemap is dimmed for that lens and restored for every other one.
+api.applyLens('night');await new Promise(r=>setTimeout(r,0));
+assert.equal(map.getPaintProperty('basemap-esri','raster-opacity'),0.18,'night dims the daylight basemap');
+api.applyLens('city');await new Promise(r=>setTimeout(r,0));
+assert.equal(map.getPaintProperty('basemap-esri','raster-opacity'),1,'other lenses restore the basemap');
 await api.loadParliamentBuildings();
 assert.equal(map.getLayoutProperty('parliament-buildings','visibility'),'none','no early switch');
 map.ready=true;
