@@ -23,6 +23,8 @@
   let watchData = null;
   let parliamentSnapshot = null;
   let parliamentSourceReady = false;
+  let parliamentModel = null;        // Three.js scene with loaded GLB, or null
+  let parliamentModelCredits = null; // { creator, creatorUrl, sourceUrl, license, ... }
   const tr = (en, bn) => document.documentElement.lang === "bn" ? bn : en;
 
   const $ = sel => document.querySelector(sel);
@@ -249,7 +251,10 @@
       useSnapshot = bounds.getWest() > west + guard && bounds.getSouth() > south + guard
         && bounds.getEast() < east - guard && bounds.getNorth() < north - guard;
     }
-    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["parliament-buildings", is3D && useSnapshot]]) {
+    // When a Parliament 3D model is loaded, it replaces the OSM footprint
+    // extrusion entirely — parliament-buildings stays hidden.
+    const parliamentVisible = parliamentModel ? false : is3D && useSnapshot;
+    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["parliament-buildings", parliamentVisible]]) {
       const visibility = visible ? "visible" : "none";
       if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
     }
@@ -257,7 +262,9 @@
     if (desc) {
       const story = LENS_STORIES[currentLens] || LENS_STORIES.city;
       const base = tr(story.desc, story.desc_bn);
-      const note = is3D ? useSnapshot
+      const note = is3D ? parliamentModel
+        ? tr("3D: Jatiya Sangsad Bhaban 3D model; OSM blocks elsewhere.", "৩ডি: জাতীয় সংসদ ভবনের ৩ডি মডেল; বাকি জায়গায় OSM ভবন।")
+        : useSnapshot
         ? tr("3D: dated OSM detail; heights mapped or estimated.", "৩ডি: তারিখযুক্ত OSM বিস্তারিত; উচ্চতা নথিভুক্ত বা আনুমানিক।")
         : tr("3D: OSM blocks; heights mapped or estimated.", "৩ডি: OSM ভবন; উচ্চতা নথিভুক্ত বা আনুমানিক।") : "";
       const text = base + (note ? " " + note : "");
@@ -274,11 +281,12 @@
         || !data.features.some(f => f.id === "relation/18085267")) throw new Error("invalid-detail-footprints");
       data.features.forEach(f => { f.properties.use_class = window.DhakaDesign?.classify(f.properties) || "unknown"; });
       parliamentSnapshot = data;
-      const onData = event => {
+      const onData = async event => {
         if (event.sourceId === "parliament-detail" && event.isSourceLoaded) {
           parliamentSourceReady = true;
           map.off("sourcedata", onData);
           syncBuildingVisibility();
+          await tryLoadParliamentModel();
         }
       };
       map.on("sourcedata", onData);
@@ -287,7 +295,11 @@
       map.addLayer({ id: "parliament-buildings", type: "fill-extrusion", source: "parliament-detail", minzoom: 14,
         layout: { visibility: "none" }, paint: buildingPaint("height_m", "min_height_m") }, "city-buildings");
       // The source can finish before the layer is attached.
-      if (map.isSourceLoaded("parliament-detail")) { parliamentSourceReady = true; syncBuildingVisibility(); }
+      if (map.isSourceLoaded("parliament-detail")) {
+        parliamentSourceReady = true;
+        syncBuildingVisibility();
+        await tryLoadParliamentModel();
+      }
       map.on("click", "parliament-buildings", event => {
         if (event.features?.[0]) showInspectionHUD("building", event.features[0].properties);
       });
@@ -295,6 +307,284 @@
       parliamentSourceReady = false;
       syncBuildingVisibility();
       console.warn("Parliament detail unavailable; retaining streamed buildings", error);
+    }
+  }
+
+  // ── Parliament 3D model (Louis Kahn's Jatiya Sangsad Bhaban) ───────────────
+  // Procedural Kahn-style Parliament built with Three.js primitives — no
+  // external model file, no third-party license, self-attributed to Dr Non /
+  // DEPA. Kahn's architecture is geometric (circular chamber, surrounding
+  // blocks, terraced roofs) and maps cleanly to cylinders, boxes, and planes.
+  // When present it replaces the OSM footprint extrusion inside the Parliament
+  // coverage area. Otherwise the OSM extrusion (heights mapped or estimated)
+  // remains in use.
+
+  async function loadThreeJS() {
+    if (!window.__threeImportMap) {
+      const map = document.createElement("script");
+      map.type = "importmap";
+      map.textContent = JSON.stringify({
+        imports: {
+          three: "https://unpkg.com/three@0.168.0/build/three.module.js",
+          "three/addons/":
+            "https://unpkg.com/three@0.168.0/examples/jsm/",
+        },
+      });
+      document.head.appendChild(map);
+      window.__threeImportMap = true;
+    }
+    return await import("three");
+  }
+
+  // Kahn concrete palette (Wada Sanzo-influenced, matches DHKx house rules).
+  const PARLIAMENT_COLORS = {
+    concrete: 0xbfb9a9,    // pale parchment-concrete
+    concreteDark: 0x9a9282,
+    roof: 0x8c8272,
+    shadow: 0x5d574e,
+    water: 0x257da4,
+  };
+
+  // Build a geometric Parliament complex: central circular assembly hall
+  // surrounded by perimeter office blocks, terraced roofs, and a reflecting
+  // pool. Returns a Three.js Group positioned at the Parliament centroid.
+  function buildParliamentModel(THREE) {
+    const group = new THREE.Group();
+
+    // Materials
+    const matConcrete = new THREE.MeshStandardMaterial({
+      color: PARLIAMENT_COLORS.concrete,
+      roughness: 0.85,
+      metalness: 0.05,
+    });
+    const matConcreteDark = new THREE.MeshStandardMaterial({
+      color: PARLIAMENT_COLORS.concreteDark,
+      roughness: 0.85,
+      metalness: 0.05,
+    });
+    const matRoof = new THREE.MeshStandardMaterial({
+      color: PARLIAMENT_COLORS.roof,
+      roughness: 0.9,
+      metalness: 0.02,
+    });
+    const matWater = new THREE.MeshStandardMaterial({
+      color: PARLIAMENT_COLORS.water,
+      roughness: 0.3,
+      metalness: 0.1,
+      transparent: true,
+      opacity: 0.85,
+    });
+
+    // ── Central circular assembly hall (Kahn's core form) ──
+    const hallRadius = 42;
+    const hallHeight = 38;
+    const hall = new THREE.Mesh(
+      new THREE.CylinderGeometry(hallRadius, hallRadius, hallHeight, 32),
+      matConcrete
+    );
+    hall.position.y = hallHeight / 2;
+    group.add(hall);
+
+    // Hall roof overhang (Kahn's deep canopies)
+    const roof = new THREE.Mesh(
+      new THREE.CylinderGeometry(hallRadius + 14, hallRadius + 14, 6, 32),
+      matRoof
+    );
+    roof.position.y = hallHeight + 3;
+    group.add(roof);
+
+    // ── Surrounding perimeter blocks (octagonal offices/chambers) ──
+    const blockCount = 12;
+    const blockRadius = hallRadius + 28;
+    const blockDepth = 26;
+    const blockHeight = 22;
+    for (let i = 0; i < blockCount; i++) {
+      const angle = (i / blockCount) * Math.PI * 2;
+      const x = Math.cos(angle) * blockRadius;
+      const z = Math.sin(angle) * blockRadius;
+      const block = new THREE.Mesh(
+        new THREE.BoxGeometry(blockDepth, blockHeight, blockDepth),
+        matConcreteDark
+      );
+      block.position.set(x, blockHeight / 2, z);
+      block.rotation.y = angle + Math.PI / 4;
+      group.add(block);
+
+      // Block roof
+      const blockRoof = new THREE.Mesh(
+        new THREE.BoxGeometry(blockDepth + 4, 4, blockDepth + 4),
+        matRoof
+      );
+      blockRoof.position.set(x, blockHeight + 2, z);
+      blockRoof.rotation.y = angle + Math.PI / 4;
+      group.add(blockRoof);
+    }
+
+    // ── Reflecting pool around the complex ──
+    const poolRadius = blockRadius + 40;
+    const pool = new THREE.Mesh(
+      new THREE.CylinderGeometry(poolRadius, poolRadius, 1, 64),
+      matWater
+    );
+    pool.position.set(0, 0.05, 0);
+    group.add(pool);
+
+    // ── Connecting bridges / walkways ──
+    const walkwayRad = blockRadius + 8;
+    for (let i = 0; i < blockCount; i += 3) {
+      const angle = (i / blockCount) * Math.PI * 2;
+      const x = Math.cos(angle) * walkwayRad;
+      const z = Math.sin(angle) * walkwayRad;
+      const w = new THREE.Mesh(
+        new THREE.BoxGeometry(6, 1, 34),
+        matConcreteDark
+      );
+      w.position.set(x, 3, z);
+      w.rotation.y = angle;
+      group.add(w);
+    }
+
+    // ── Light steps up to hall ──
+    const steps = new THREE.Group();
+    for (let s = 0; s < 6; s++) {
+      const step = new THREE.Mesh(
+        new THREE.BoxGeometry(hallRadius * 2 - s * 10, 2, hallRadius * 2 - s * 10),
+        matConcreteDark
+      );
+      step.position.set(0, s * 2 + 1, 0);
+      steps.add(step);
+    }
+    group.add(steps);
+
+    return group;
+  }
+
+  // MapLibre custom layer rendering the procedural Parliament model at a fixed
+  // geographic position using Three.js and the map's WebGL context.
+  class ParliamentModelLayer {
+    constructor(lng, lat, THREE, model) {
+      this.id = "parliament-model";
+      this.type = "custom";
+      this.lng = lng;
+      this.lat = lat;
+      this.THREE = THREE;
+      this.model = model;
+      this.renderer = null;
+      this.camera = null;
+      this.ready = false;
+    }
+
+    onAdd(map, gl) {
+      this.map = map;
+      this.gl = gl;
+      const size = map.getCanvas().getBoundingClientRect();
+
+      this.renderer = new this.THREE.WebGLRenderer({
+        context: gl,
+        canvas: map.getCanvas(),
+        antialias: true,
+        premultipliedAlpha: false,
+      });
+      this.renderer.autoClear = false;
+      this.renderer.setSize(size.width, size.height);
+      this.renderer.setPixelRatio(window.devicePixelRatio);
+
+      // Lighting matches map sun: intensity 0.55, position [1.3, 110, 45]
+      const scene = new this.THREE.Scene();
+      const ambient = new this.THREE.AmbientLight(0xffffff, 0.45);
+      scene.add(ambient);
+      const dir = new this.THREE.DirectionalLight(0xffffff, 0.75);
+      dir.position.set(1.3, 110, 45);
+      scene.add(dir);
+
+      this.scene = scene;
+      this.camera = new this.THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+      this.scene.add(this.model);
+      this.ready = true;
+      map.triggerRepaint();
+    }
+
+    render(gl, matrix) {
+      if (!this.ready || !this.renderer) return;
+      const size = this.map.getCanvas().getBoundingClientRect();
+      this.renderer.setSize(size.width, size.height);
+      this.renderer.setPixelRatio(window.devicePixelRatio);
+
+      const camera = this.camera;
+      camera.aspect = size.width / size.height;
+      camera.projectionMatrix.elements.set(matrix);
+
+      const center = this.map.transform.center;
+      const zoom = this.map.transform.zoom;
+      const alt = 260 * Math.pow(2, 15 - zoom);
+
+      const toMercator = (lng, lat) => {
+        const r = lng * (Math.PI / 180);
+        const y =
+          Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 180)) * 6378137;
+        return { x: r * 6378137, y };
+      };
+      const centerM = toMercator(center.lng, center.lat);
+      const targetM = toMercator(this.lng, this.lat);
+      const dx = targetM.x - centerM.x;
+      const dy = targetM.y - centerM.y;
+
+      camera.position.set(dx, alt, dy);
+      camera.lookAt(dx, 0, dy);
+      this.model.position.set(dx, 0, dy);
+
+      this.renderer.state.reset();
+      this.renderer.render(this.scene, camera);
+      this.map.triggerRepaint();
+    }
+  }
+
+  // Find Parliament centroid from footprint geometry
+  function parliamentCentroid(features) {
+    const parliament = features.find((f) => f.id === "relation/18085267");
+    if (!parliament) return null;
+    const rings =
+      parliament.geometry.type === "MultiPolygon"
+        ? parliament.geometry.coordinates[0]
+        : parliament.geometry.coordinates[0];
+    let sumX = 0,
+      sumY = 0,
+      count = 0;
+    for (const ring of rings) {
+      for (const [lon, lat] of ring) {
+        sumX += lon;
+        sumY += lat;
+        count++;
+      }
+    }
+    return { lng: sumX / count, lat: sumY / count };
+  }
+
+  async function tryLoadParliamentModel() {
+    if (!parliamentSourceReady || !parliamentSnapshot) return;
+
+    const THREE = await loadThreeJS().catch((err) => {
+      console.warn("Three.js unavailable; Parliament model skipped:", err);
+      return null;
+    });
+    if (!THREE) return;
+
+    const centroid = parliamentCentroid(parliamentSnapshot.features);
+    if (!centroid) return;
+
+    const model = buildParliamentModel(THREE);
+    parliamentModel = new ParliamentModelLayer(
+      centroid.lng,
+      centroid.lat,
+      THREE,
+      model
+    );
+
+    // Hide OSM Parliament extrusion; model layer draws instead
+    const layer = map.getLayer("parliament-buildings");
+    if (layer) {
+      map.addLayer(parliamentModel, "parliament-buildings");
+      map.setLayoutProperty("parliament-buildings", "visibility", "none");
     }
   }
 
@@ -531,6 +821,7 @@
         <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${props.height_method === "levels-times-3m" ? tr("OSM levels × 3 m (estimate)", "OSM তলা × ৩ মিটার (আনুমানিক)") : props.height_method === "osm-height-tag" ? tr("OSM height tag", "OSM উচ্চতার তথ্য") : tr("6 m estimate; no mapped height", "৬ মিটার আনুমানিক; উচ্চতার তথ্য নেই")}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Snapshot", "উপাত্ত সংগ্রহ")}</span><span class="hud-value">${parliamentSnapshot.metadata.retrieved_at.slice(0, 10)}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Source", "উৎস")}</span><span class="hud-value">${props.osm_id} · ODbL</span></div>
+        ${parliamentModel ? `<div class="hud-row"><span class="hud-label">${tr("3D model", "৩ডি মডেল")}</span><span class="hud-value">${tr("Procedural Kahn model · Dr Non Arkaraprasertkul / DEPA", "প্রক্রিয়াজাত কাহ্ন মডেল · ডক্টর নন আরকপ্রসাদকুল / ডিইপিএ")}</span></div>` : ""}
         <p>${tr("Mapped footprint massing; not a surveyed architectural model.", "মানচিত্রভিত্তিক ভবনের রূপ; জরিপকৃত স্থাপত্য মডেল নয়।")}</p>
       `;
     } else if (type === "landmark") {
