@@ -164,6 +164,31 @@ if (clientIds.join(",") !== serverIds.join(",")) {
   );
 }
 
+// ── The Worker's catalogue summary must not drift from the fixture ─────────
+// src/gibs-catalogue.ts is generated from the capabilities document; if it
+// and the vendored fixture disagree, one of them was edited by hand.
+const catalogueModule = readFileSync(join(root, "src", "gibs-catalogue.ts"), "utf8");
+const summaryEntries = {};
+for (const m of catalogueModule.matchAll(/"([A-Za-z0-9_-]+)":\s*"(\d{4}-\d{2}-\d{2})"/g)) {
+  summaryEntries[m[1]] = m[2];
+}
+if (!Object.keys(summaryEntries).length) {
+  fail("src/gibs-catalogue.ts: no layer dates found — regenerate with npm run catalogue:gibs");
+}
+for (const [id, date] of Object.entries(summaryEntries)) {
+  const layer = catalogue.layers[id];
+  if (!layer) {
+    fail(`src/gibs-catalogue.ts: layer "${id}" is not in the GIBS capabilities catalogue`);
+    continue;
+  }
+  if (layer.latest !== date) {
+    fail(
+      `src/gibs-catalogue.ts: layer "${id}" records ${date} but the catalogue says ${layer.latest} — ` +
+        `regenerate with npm run catalogue:gibs`,
+    );
+  }
+}
+
 // ── Retired layer ids must not reappear ────────────────────────────────────
 // These are layer ids that were once written into this codebase. One never
 // existed in GIBS; the other was retired by NASA in 2023. Both return 404/400

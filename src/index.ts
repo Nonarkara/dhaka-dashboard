@@ -2,6 +2,8 @@ import { getOutlook } from "./outlook.js";
 import { BUILD_ID, ATLAS_VERSION } from "./build-id.js";
 import { checkRateLimit } from "./rate-limit.js";
 import type { RateLimitEnv } from "./rate-limit.js";
+import { inspectGibsTile, workerInflate } from "./gibs-png.js";
+import { GIBS_CATALOGUE_CAPTURED, GIBS_CATALOGUE_LATEST } from "./gibs-catalogue.js";
 import { MACRO_INDICATORS, RIVER_STATIONS, AIR_STATIONS } from "./dhaka-data.js";
 
 export interface Env extends RateLimitEnv {
@@ -156,8 +158,18 @@ async function gibsTileAvailable(spec: GibsLayerSpec, date: string | null): Prom
   const t = date ? `${date}/` : "";
   const url = `${GIBS_BASE}/${spec.id}/default/${t}GoogleMapsCompatible_Level${spec.tileLevel}/${p.z}/${p.y}/${p.x}.${spec.format}`;
   try {
-    const res = await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(8000) });
-    return res.ok && Number(res.headers.get("content-length") || 0) > 0;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return false;
+    if (spec.format === "jpg") {
+      // JPEG carries no alpha and the Worker has no JPEG decoder. GIBS serves
+      // JPEG layers as 404 rather than as placeholder tiles, so a delivered
+      // JPEG means the observation exists.
+      return Number(res.headers.get("content-length") || 0) > 0;
+    }
+    const buf = await res.arrayBuffer();
+    if (!buf.byteLength) return false;
+    const verdict = await inspectGibsTile(buf, workerInflate);
+    return verdict.hasData;
   } catch {
     return false;
   }
@@ -168,10 +180,17 @@ async function gibsTileAvailable(spec: GibsLayerSpec, date: string | null): Prom
 // observation reports unavailable with a reason code — never a blank raster
 // presented as data.
 async function resolveGibsLayer(spec: GibsLayerSpec): Promise<GibsLayerReport> {
+  // Candidates newest-first: the last four days, plus the date the GIBS
+  // capabilities catalogue recorded for this layer, in case publication is
+  // slower than the four-day window. Every candidate is decoded before it is
+  // accepted — GIBS serves a blank placeholder for a date whose observation
+  // has not been ingested yet, and that placeholder is HTTP 200 and
+  // non-empty, so a status or byte check would accept it as data.
   const candidates = Array.from({ length: 4 }, (_, back) =>
     new Date(Date.now() - back * 86400000).toISOString().split("T")[0],
   );
-  // Concurrent probes: one round trip instead of four sequential ones.
+  const catalogueDate = GIBS_CATALOGUE_LATEST[spec.id];
+  if (catalogueDate && !candidates.includes(catalogueDate)) candidates.push(catalogueDate);
   const results = await Promise.all(
     candidates.map(async (date) => ({ date, ok: await gibsTileAvailable(spec, date) })),
   );
@@ -596,7 +615,8 @@ const worker = {
           city: "Dhaka",
           provenance: "measured",
           date: new Date().toISOString().split("T")[0],
-          source: "NASA GIBS WMTS · epsg3857/best · observation date resolved per layer by tile probe",
+          source: "NASA GIBS WMTS · epsg3857/best · observation date resolved per layer by decoding the tile",
+          catalogue_captured: GIBS_CATALOGUE_CAPTURED,
           layers: data,
         },
         { status: anyOk ? 200 : 503 },

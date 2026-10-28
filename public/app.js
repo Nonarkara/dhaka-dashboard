@@ -614,21 +614,68 @@
     return `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${spec.layer}/default/${d}GoogleMapsCompatible_Level${spec.level}/${p.z}/${p.y}/${p.x}.${spec.ext}`;
   }
 
-  async function gibsTileResolves(url) {
+  function gibsContext2d(width, height) {
+    if (typeof OffscreenCanvas === "function") {
+      const canvas = new OffscreenCanvas(width, height);
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (ctx) return ctx;
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    return canvas.getContext("2d", { willReadFrequently: true });
+  }
+
+  // GIBS publishes a date directory before the observation behind it is
+  // ingested, and serves that date as a fully blank placeholder tile: HTTP 200,
+  // non-empty, and — for the Suomi NPP Day/Night Band at 2026-10-28 — exactly
+  // what its own "latest" path returns. Neither the status code nor the byte
+  // count can tell that placeholder from a real raster, so decode the tile and
+  // look for actual content. A placeholder is a single uniform colour.
+  async function gibsTileHasData(url) {
+    let res;
     try {
-      const res = await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(9000) });
-      if (!res.ok) return false;
-      const len = res.headers?.get ? Number(res.headers.get("content-length") || 0) : null;
-      return len === null || len > 0;
+      res = await fetch(url, { signal: AbortSignal.timeout(15000) });
     } catch {
       return false;
     }
+    if (!res.ok) return false;
+    let blob;
+    try {
+      blob = await res.blob();
+    } catch {
+      return true;
+    }
+    if (!blob.size) return false;
+    try {
+      const bitmap = await createImageBitmap(blob);
+      const ctx = gibsContext2d(bitmap.width, bitmap.height);
+      if (!ctx) return true;
+      ctx.drawImage(bitmap, 0, 0);
+      const { data } = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+      bitmap.close?.();
+      let min = 255;
+      let max = 0;
+      let seen = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] < 8) continue;
+        const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        if (lum < min) min = lum;
+        if (lum > max) max = lum;
+        seen++;
+      }
+      if (!seen) return false;
+      return max - min > 2;
+    } catch {
+      // Cannot decode: the bytes are the only evidence available.
+      return true;
+    }
   }
 
-  // GIBS publishes each product on its own latency (0-3 days). Probe candidate
-  // dates newest-first and take the first that actually carries a tile over
-  // Dhaka: a 404 means no observation exists, not an empty raster to display.
-  // The candidates are probed concurrently so the lens resolves in one round trip.
+  // GIBS publishes each product on its own latency (0-3 days), and a date can
+  // exist as a blank placeholder before its observation is ingested. Probe
+  // candidate dates newest-first and take the first that actually carries an
+  // observation over Dhaka.
   async function resolveGibsObservation(spec) {
     const candidates = Array.from({ length: 4 }, (_, back) =>
       new Date(Date.now() - back * 86400000).toISOString().split("T")[0],
@@ -638,7 +685,7 @@
         const key = `${spec.layer}|${date}`;
         const cached = gibsObservationCache.get(key);
         if (cached !== undefined) return { date, ok: cached };
-        const ok = await gibsTileResolves(gibsProbeUrl(spec, date));
+        const ok = await gibsTileHasData(gibsProbeUrl(spec, date));
         gibsObservationCache.set(key, ok);
         return { date, ok };
       }),
@@ -646,9 +693,9 @@
     for (const r of results) {
       if (r.ok) return { date: r.date, dated: true };
     }
-    // GIBS also serves the latest available observation without a date. Prefer
-    // it over showing nothing, but report that the exact date is unresolved.
-    if (await gibsTileResolves(gibsProbeUrl(spec, null))) return { date: null, dated: false };
+    // The undated path serves GIBS's latest observation, which may itself be a
+    // placeholder. Prefer it over showing nothing, but say the date is unknown.
+    if (await gibsTileHasData(gibsProbeUrl(spec, null))) return { date: null, dated: false };
     return null;
   }
 
@@ -758,11 +805,11 @@
     if (!spec) return;
     const layerStatus = $("#atlas-layer-status");
     const overlayId = `nasa-${lensId}`;
-    // GIBS serves an undated path for the latest available observation, and it
-    // is byte-identical to that observation's dated tiles. Render it straight
-    // away so the lens never shows an empty waiting screen; the dated template
-    // is pinned in below once the exact observation date is known.
-    addRasterOverlay(overlayId, gibsTileUrl(spec, null), spec.maxzoom);
+    // Resolve the observation before painting. GIBS can serve a blank
+    // placeholder for a date whose observation has not been ingested yet, and
+    // that placeholder is an opaque white tile — painting it would cover the
+    // map with white and look like a broken layer. The status strip says
+    // "locating" while the probe runs, so nothing is claimed that is not shown.
     if (layerStatus) {
       layerStatus.hidden = false;
       layerStatus.textContent = tr("Locating latest NASA observation…", "নাসার সর্বশেষ পর্যবেক্ষণ খোঁজা হচ্ছে…");
@@ -779,15 +826,9 @@
       }
       return;
     }
-    if (obs.dated) {
-      // Pin every tile to one observation date so a mid-session GIBS rollover
-      // cannot mix two dates across the raster.
-      if (map?.getSource(overlayId)) {
-        map.removeLayer(overlayId);
-        map.removeSource(overlayId);
-      }
-      addRasterOverlay(overlayId, gibsTileUrl(spec, obs.date), spec.maxzoom);
-    }
+    // Pin every tile to one observation date so a mid-session GIBS rollover
+    // cannot mix two dates across the raster.
+    addRasterOverlay(overlayId, gibsTileUrl(spec, obs.date), spec.maxzoom);
     if (layerStatus) {
       layerStatus.hidden = false;
       const when = obs.dated

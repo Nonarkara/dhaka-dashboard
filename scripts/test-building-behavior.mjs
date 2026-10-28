@@ -45,7 +45,33 @@ function app({offline=false}={}) {
     flyTo(options){this.camera=options;}
   }
   const window={maplibregl:{Map:MapStub,NavigationControl:class{}},location:{search:''},addEventListener(){}};
-  const context={window,document:{documentElement:{lang:'en'},querySelector:s=>elements.get(s.slice(1))||null,querySelectorAll:()=>[]},URLSearchParams,AbortSignal,console:{warn(){}},setTimeout(){},setInterval(){},fetch:async url=>{if(offline)throw new Error('offline');return {ok:true,json:async()=>url.includes('parliament-buildings')?detail:{status:'unavailable'}};}};
+  // GIBS serves a blank placeholder tile for a date whose observation has not
+  // been ingested: HTTP 200, non-empty, opaque, one uniform colour. The stub
+  // below reproduces that so the client is forced to decode the tile rather
+  // than trust the status code or the byte count.
+  const today=()=>new Date().toISOString().split('T')[0];
+  const UNIFORM=new Uint8ClampedArray(4*4*4).fill(255);
+  const VARIED=new Uint8ClampedArray(4*4*4);
+  for(let i=0;i<VARIED.length;i+=4){VARIED[i]=i%255;VARIED[i+1]=120;VARIED[i+2]=200;VARIED[i+3]=255;}
+  const isBlank=(url)=>url.includes('gibs.earthdata')&&url.includes(`/${today()}/`);
+  class FakeCanvas{constructor(w,h){this.width=w;this.height=h;}getContext(){return{
+    drawImage(bitmap){this._bitmap=bitmap;},
+    getImageData(){return {data:this._bitmap&&this._bitmap.blank?UNIFORM:VARIED};},
+  };}}
+  const context={
+    window,
+    document:{documentElement:{lang:'en'},querySelector:s=>elements.get(s.slice(1))||null,querySelectorAll:()=>[]},
+    URLSearchParams,AbortSignal,console:{warn(){}},setTimeout(){},setInterval(){},
+    OffscreenCanvas:FakeCanvas,
+    createImageBitmap:async blob=>({width:4,height:4,blank:!!blob.blank,close(){}}),
+    fetch:async url=>{
+      if(offline)throw new Error('offline');
+      const blank=isBlank(url);
+      return {ok:true,status:200,headers:{get:()=>blank?'1611':'59778'},
+        blob:async()=>({size:blank?1611:59778,blank}),
+        json:async()=>url.includes('parliament-buildings')?detail:{status:'unavailable'}};
+    },
+  };
   let source=read('public/app.js');
   source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadParliamentBuildings,flyToArea,buildingPaint};})();';
   vm.runInNewContext(source,context);
@@ -57,6 +83,9 @@ for(const lens of ['city','heritage','rivers','transit','economy','air','haze','
   api.applyLens(lens);
   assert.equal(map.getLayoutProperty('city-buildings','visibility'),'visible',lens);
 }
+// The satellite raster is added once its observation has been resolved and
+// decoded, so it lands after the synchronous lens switch.
+await new Promise(r=>setTimeout(r,0));
 assert.equal(map.lastRasterBefore,'city-buildings','raster under blocks');
 // The satellite lenses must reach the map as a real GIBS raster source. A
 // source pointing at a layer id GIBS does not publish still counts as "a raster
@@ -75,6 +104,12 @@ for(const [lens,layer,level] of [
   assert.ok(source.tiles[0].includes(`/best/${layer}/default/`),`${lens} tile uses ${layer}`);
   assert.ok(source.tiles[0].includes(level),`${lens} tile uses ${level}`);
   assert.ok(source.tiles[0].startsWith('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/'),`${lens} tile host`);
+  // GIBS can serve a blank placeholder for a date whose observation has not
+  // been ingested yet. The lens must not settle on that date.
+  const dated=source.tiles[0].match(/default\/(\d{4}-\d{2}-\d{2})\//);
+  assert.ok(dated,`${lens} tile is pinned to an observation date`);
+  assert.notEqual(dated[1],new Date().toISOString().split('T')[0],`${lens} rejected the blank placeholder date`);
+  assert.ok(dated[1]===new Date(Date.now()-86400000).toISOString().split('T')[0],`${lens} fell back to the newest date carrying data`);
 }
 await api.loadParliamentBuildings();
 assert.equal(map.getLayoutProperty('parliament-buildings','visibility'),'none','no early switch');
@@ -82,7 +117,7 @@ map.ready=true;
 map.events.get('sourcedata')({sourceId:'parliament-detail',isSourceLoaded:true});
 assert.equal(map.getLayoutProperty('city-buildings','visibility'),'none');
 assert.equal(map.getLayoutProperty('parliament-buildings','visibility'),'visible');
-api.applyLens('cloud');assert.equal(map.lastRasterBefore,'parliament-buildings','raster under local blocks');
+api.applyLens('cloud');await new Promise(r=>setTimeout(r,0));assert.equal(map.lastRasterBefore,'parliament-buildings','raster under local blocks');
 api.applyLens('heritage');
 assert.equal(map.getLayoutProperty('parliament-buildings','visibility'),'visible','heritage keeps blocks');
 map.inside=false;api.syncBuildingVisibility();
