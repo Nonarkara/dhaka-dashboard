@@ -58,6 +58,24 @@ for(const lens of ['city','heritage','rivers','transit','economy','air','haze','
   assert.equal(map.getLayoutProperty('city-buildings','visibility'),'visible',lens);
 }
 assert.equal(map.lastRasterBefore,'city-buildings','raster under blocks');
+// The satellite lenses must reach the map as a real GIBS raster source. A
+// source pointing at a layer id GIBS does not publish still counts as "a raster
+// was added", so assert the layer id and tile matrix set that the map received.
+for(const [lens,layer,level] of [
+  ['cloud','VIIRS_NOAA20_CorrectedReflectance_TrueColor','GoogleMapsCompatible_Level9'],
+  ['aerosol','MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth','GoogleMapsCompatible_Level7'],
+  ['night','VIIRS_SNPP_DayNightBand','GoogleMapsCompatible_Level7'],
+  ['water','VIIRS_Combined_Flood_1-Day','GoogleMapsCompatible_Level9'],
+]) {
+  api.applyLens(lens);
+  await new Promise(r=>setTimeout(r,0));
+  const source=map.getSource(`nasa-${lens}`);
+  assert.ok(source,`${lens} raster source added`);
+  assert.equal(source.type,'raster',`${lens} source is a raster`);
+  assert.ok(source.tiles[0].includes(`/best/${layer}/default/`),`${lens} tile uses ${layer}`);
+  assert.ok(source.tiles[0].includes(level),`${lens} tile uses ${level}`);
+  assert.ok(source.tiles[0].startsWith('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/'),`${lens} tile host`);
+}
 await api.loadParliamentBuildings();
 assert.equal(map.getLayoutProperty('parliament-buildings','visibility'),'none','no early switch');
 map.ready=true;
