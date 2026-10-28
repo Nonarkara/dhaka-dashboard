@@ -15,152 +15,99 @@
 
   function clear() {
     pause();
+    hideOutlookHUD();
     for (const id of ['outlook-labels','outlook-cells']) if (map?.getLayer(id)) map.removeLayer(id);
     if (map?.getSource('outlook')) map.removeSource('outlook');
   }
 
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const numeric = value => typeof value === 'number' && Number.isFinite(value);
+  const valueText = value => numeric(value) ? value.toFixed(1) : tr('Unavailable','অনুপলব্ধ');
+  const dateText = time => time ? new Date(time).toLocaleDateString(document.documentElement.lang === 'bn' ? 'bn-BD' : 'en-GB', {timeZone:'UTC',month:'short',day:'numeric'}) : tr('Unavailable','অনুপলব্ধ');
+
+  function hideOutlookHUD() {
+    const hud = document.getElementById('atlas-observation-hud');
+    if (hud?.dataset?.owner === 'outlook') hud.hidden = true;
+  }
+
+  function inspectReach(e) {
+    if (lens !== 'rivers' || !data || !e.features?.[0]) return;
+    const id = e.features[0].properties.id;
+    const c = data.frames[index].cells.find(c => c.id === id);
+    const hud = document.getElementById('atlas-observation-hud');
+    if (!c || !hud) return;
+    const place = tr(c.place || '',c.place_bn || c.place || '');
+    hud.dataset.owner = 'outlook';
+    hud.hidden = false;
+    hud.innerHTML = `<h3>${escape(place ? tr('Model reach near ','কাছাকাছি মডেল নদীখণ্ড: ') + place : tr('Model reach','মডেল নদীখণ্ড'))}</h3>
+      <p>${escape(c.latitude.toFixed(3))}, ${escape(c.longitude.toFixed(3))}</p>
+      <p>${tr('Modeled discharge','মডেল নদীপ্রবাহ')}: <strong>${valueText(c.value)} ${escape(data.unit)}</strong></p>
+      <p>${tr('Valid model day (UTC)','কার্যকর মডেল দিন (UTC)')}: ${dateText(data.frames[index].validAt)}</p>
+      <p>${tr('Ensemble middle 50%','এনসেম্বলের মধ্যবর্তী ৫০%')}: ${numeric(c.p25) && numeric(c.p75) ? `${c.p25.toFixed(1)}–${c.p75.toFixed(1)} ${escape(data.unit)}` : tr('Unavailable','অনুপলব্ধ')}</p>
+      <p>${tr('Maximum in available daily series','উপলব্ধ দৈনিক সিরিজে সর্বোচ্চ')}: ${valueText(c.seriesMaximum)} ${escape(data.unit)} · ${dateText(c.seriesMaximumValidAt)}</p>
+      <p>${tr('Station match, flood arrival and harvest guidance are unvalidated or unavailable.','স্টেশনের মিল যাচাই হয়নি; বন্যা আসার সময় ও কর্তন পরামর্শ অনুপলব্ধ।')}</p>
+      <p>${escape(data.source)} · ${tr('Retrieved','সংগৃহীত')}: ${escape(data.fetchedAt)}</p>
+      <button id="forecast-inspection-close" class="atlas-btn" type="button">${tr('Close','বন্ধ করুন')}</button>`;
+    document.getElementById('forecast-inspection-close').onclick = () => {hud.hidden = true;};
+  }
+
   function frame() {
     if (!data || !map) return;
+    hideOutlookHUD();
     const f = data.frames[index], flood = lens === 'rivers';
     const isBn = document.documentElement.lang === 'bn';
-
-    const features = f.cells.filter(c => c.value !== null).map(c => {
-      const risk = c.riskLevel || (c.value < 15 ? 'normal' : c.value < 35 ? 'watch' : 'alert');
-      const pointColor = flood ? (risk === 'alert' ? '#dd4027' : (risk === 'watch' ? '#c5a56e' : '#547076')) : color(c.value);
-      const stName = isBn ? (c.station_bn || c.station || '') : (c.station || '');
-      const lbl = flood ? (stName ? `${stName.split('/')[0].trim()}: ${c.value.toFixed(1)}` : `${c.value.toFixed(1)}`) : `${c.value.toFixed(1)}`;
+    const features = f.cells.filter(c => numeric(c.value)).map(c => {
+      const place = isBn ? c.place_bn || c.place : c.place;
       return {
-        type: 'Feature',
-        properties: {
-          value: c.value,
-          color: pointColor,
-          label: lbl,
-          station: stName,
-          river: isBn ? (c.river_bn || c.river || '') : (c.river || ''),
-          haor: isBn ? (c.haor_bn || c.haor || '') : (c.haor || ''),
-          riskLevel: risk,
-          p25: c.p25,
-          p75: c.p75,
-          peakValue: c.peakValue,
-          peakTime: c.peakTime,
-          peakLeadDays: c.peakLeadDays,
-          peakLeadHours: c.peakLeadHours,
-          advisory: isBn ? (c.harvestAdvisory_bn || c.harvestAdvisory || '') : (c.harvestAdvisory || ''),
-        },
-        geometry: flood
-          ? { type: 'Point', coordinates: [c.longitude, c.latitude] }
-          : { type: 'Polygon', coordinates: [[[c.longitude-.2,c.latitude-.2],[c.longitude+.2,c.latitude-.2],[c.longitude+.2,c.latitude+.2],[c.longitude-.2,c.latitude+.2],[c.longitude-.2,c.latitude-.2]]] }
+        type:'Feature',
+        properties:{id:c.id,value:c.value,color:flood ? '#547076' : color(c.value),label:flood && place ? `${tr('Near ','কাছে: ')}${place}: ${c.value.toFixed(1)}` : c.value.toFixed(1)},
+        geometry:flood ? {type:'Point',coordinates:[c.longitude,c.latitude]} : {type:'Polygon',coordinates:[[[c.longitude-.2,c.latitude-.2],[c.longitude+.2,c.latitude-.2],[c.longitude+.2,c.latitude+.2],[c.longitude-.2,c.latitude+.2],[c.longitude-.2,c.latitude-.2]]]}
       };
     });
-
-    const geo = { type: 'FeatureCollection', features };
-    if (map.getSource('outlook')) {
-      map.getSource('outlook').setData(geo);
-    } else {
-      map.addSource('outlook', { type: 'geojson', data: geo, attribution: data.source });
-      map.addLayer(
-        flood
-          ? { id: 'outlook-cells', type: 'circle', source: 'outlook', paint: { 'circle-radius': 10, 'circle-color': ['get', 'color'], 'circle-stroke-width': 2, 'circle-stroke-color': '#f5f0dc' } }
-          : { id: 'outlook-cells', type: 'fill', source: 'outlook', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': .6, 'fill-outline-color': '#f5f0dc' } },
-        map.getLayer('parliament-buildings') ? 'parliament-buildings' : 'city-buildings'
-      );
-      map.addLayer({
-        id: 'outlook-labels',
-        type: 'symbol',
-        source: 'outlook',
-        layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Regular'], 'text-size': 13, 'text-offset': [0, 1.3] },
-        paint: { 'text-color': '#ffffff', 'text-halo-color': '#0d171d', 'text-halo-width': 2 }
-      });
-
-      if (map.on) {
-        map.on('click', 'outlook-cells', (e) => {
-          if (lens !== 'rivers' || !e.features?.[0]) return;
-          const props = e.features[0].properties;
-          const hud = document.getElementById('atlas-observation-hud');
-          if (hud) {
-            hud.hidden = false;
-            hud.innerHTML = `<h3>${props.station || 'Reach'} · ${props.river || ''}</h3>
-              <p style="margin:2px 0;font-size:12px;color:var(--dim);">${props.haor || ''}</p>
-              <div style="margin:6px 0;"><strong>${tr('Current flow:','বর্তমান প্রবাহ:')}</strong> ${props.value} ${data.unit}</div>
-              ${props.p25 && props.p75 ? `<div style="font-size:12px;color:var(--dim);">${tr('Ensemble middle 50%:','এনসেম্বল ৫০%:')} ${props.p25}–${props.p75} ${data.unit}</div>` : ''}
-              ${props.peakTime ? `<div style="margin:6px 0;padding:6px;background:var(--bg-strong);border-left:2px solid ${props.color}"><strong>${tr('Peak surge:','সর্বোচ্চ ঢল:')}</strong> ${props.peakValue} ${data.unit} (+${props.peakLeadHours}${tr('h lead time',' ঘণ্টা পূর্বে')})</div>` : ''}
-              <div style="margin-top:6px;font-size:12px;"><strong>${tr('Harvest guidance:','ধান কর্তন পরামর্শ:')}</strong> ${props.advisory || ''}</div>
-              <button type="button" class="atlas-btn" style="margin-top:8px;width:100%;" onclick="document.getElementById('atlas-observation-hud').hidden=true">${tr('Close','বন্ধ করুন')}</button>`;
-          }
-        });
-      }
+    const geo={type:'FeatureCollection',features};
+    if (map.getSource('outlook')) map.getSource('outlook').setData(geo);
+    else {
+      map.addSource('outlook',{type:'geojson',data:geo,attribution:data.source});
+      map.addLayer(flood ? {id:'outlook-cells',type:'circle',source:'outlook',paint:{'circle-radius':10,'circle-color':'#547076','circle-stroke-width':2,'circle-stroke-color':'#f5f0dc'}} : {id:'outlook-cells',type:'fill',source:'outlook',paint:{'fill-color':['get','color'],'fill-opacity':.6,'fill-outline-color':'#f5f0dc'}},map.getLayer('parliament-buildings') ? 'parliament-buildings' : 'city-buildings');
+      map.addLayer({id:'outlook-labels',type:'symbol',source:'outlook',layout:{'text-field':['get','label'],'text-font':['Noto Sans Regular'],'text-size':13,'text-offset':[0,1.3]},paint:{'text-color':'#ffffff','text-halo-color':'#0d171d','text-halo-width':2}});
     }
+    document.getElementById('forecast-time').textContent = flood
+      ? `${dateText(f.validAt)} · ${tr('valid model day, UTC','কার্যকর মডেল দিন, UTC')}`
+      : new Date(f.validAt).toLocaleString(isBn?'bn-BD':'en-GB',{timeZone:'Asia/Dhaka',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) + tr(' · valid time, Bangladesh',' · কার্যকর সময়, বাংলাদেশ');
+    document.getElementById('forecast-range').value=index;
+    const vals=f.cells.filter(c=>numeric(c.value)).map(c=>c.value);
+    document.getElementById('forecast-values').textContent=vals.length ? `${Math.min(...vals).toFixed(1)}–${Math.max(...vals).toFixed(1)} ${data.unit} · ${vals.length}/${f.cells.length} ${flood?tr('model reaches','মডেল নদীখণ্ড'):tr('model cells','মডেল সেল')}` : tr('No data for this frame','এই ধাপে তথ্য নেই');
 
-    const validDate = new Date(f.validAt);
-    document.getElementById('forecast-time').textContent = validDate.toLocaleString(
-      isBn ? 'bn-BD' : 'en-GB',
-      { timeZone: 'Asia/Dhaka', month: 'short', day: 'numeric', hour: flood ? undefined : '2-digit', minute: flood ? undefined : '2-digit' }
-    ) + tr(' · valid time, Bangladesh',' · কার্যকর সময়, বাংলাদেশ');
-    document.getElementById('forecast-range').value = index;
-
-    const vals = f.cells.filter(c => c.value !== null).map(c => c.value);
-    document.getElementById('forecast-values').textContent = vals.length
-      ? `${Math.min(...vals).toFixed(1)}–${Math.max(...vals).toFixed(1)} ${data.unit} · ${vals.length}/${f.cells.length} ${tr('model reaches','মডেল নদীখণ্ড')}`
-      : tr('No data for this frame','এই ধাপে তথ্য নেই');
-
-    // Agricultural Harvest Advisory Card
-    const harvestCard = document.getElementById('forecast-harvest-card');
-    if (harvestCard && flood) {
-      const activeCells = f.cells.filter(c => c.value !== null);
-      const hasAlert = activeCells.some(c => c.riskLevel === 'alert');
-      const hasWatch = activeCells.some(c => c.riskLevel === 'watch');
-      const overallRisk = hasAlert ? 'alert' : (hasWatch ? 'watch' : 'normal');
-
-      const riskBadge = overallRisk === 'alert'
-        ? tr('SURGE ALERT · EMERGENCY HARVEST','ঢল সতর্কতা · দ্রুত কর্তন')
-        : (overallRisk === 'watch' ? tr('FLOOD WATCH · PREPARE HARVESTERS','বন্যা সতর্কতা · হারভেস্টার প্রস্তুতি') : tr('NORMAL FLOW · DEFER HARVEST','স্বাভাবিক প্রবাহ · অকাল কর্তন পরিহার'));
-
-      const advice = overallRisk === 'alert'
-        ? tr('Peak surge approaching in <72h. Department of Agricultural Extension (DAE) advises harvesting all Boro paddy ≥80% ripe immediately to avert total crop loss from overtopping dykes.', '৭২ ঘণ্টার মধ্যে পাহাড়ি ঢল আসার সম্ভাবনা। বাঁধ উপচে ফসলহানি রোধে কৃষি সম্প্রসারণ অধিদপ্তর (DAE) ৮০% পাকা বোরো ধান অবিলম্বে কেটে ফেলার পরামর্শ দিচ্ছে।')
-        : (overallRisk === 'watch'
-          ? tr('Discharge rising towards bankfull. Mobilize combine harvesters and labor. Track upstream Cherrapunji rainfall.', 'নদীপ্রবাহ ডুবন্ত বাঁধের ধারণক্ষমতার দিকে বাড়ছে। কম্বাইন হারভেস্টার ও কৃষি শ্রমিক প্রস্তুত রাখুন। চেরাপুঞ্জির বৃষ্টিপাত পর্যবেক্ষণ করুন।')
-          : tr('River discharge is within safe seasonal limits. Defer harvesting to allow 100% full ripening and optimal grain yield.', 'নদীপ্রবাহ নিরাপদ মৌসুমি সীমার মধ্যে রয়েছে। পূর্ণ ফলনের জন্য অপরিপক্ব ধান না কেটে ১০০% পাকার সুযোগ দিন।'));
-
-      harvestCard.className = `forecast-harvest-card harvest-${overallRisk}`;
-      harvestCard.innerHTML = `<div class="harvest-badge">${riskBadge}</div><div class="harvest-advisory">${advice}</div>`;
+    // Keep the decision qualification beside the play/scrub controls.
+    // No value or absence of a value establishes safe farming conditions.
+    const decision = document.getElementById('forecast-harvest-card');
+    if (decision && flood) {
+      decision.className='forecast-harvest-card';
+      decision.textContent=tr('Warning thresholds, flood arrival and harvest guidance: unavailable.','বিপৎসীমা, বন্যা আসার সময় ও কর্তন পরামর্শ: অনুপলব্ধ।');
     }
-
-    // Detailed reaches list
-    const list = document.getElementById('forecast-reaches');
-    if (list) {
-      if (flood) {
-        list.innerHTML = f.cells.map(c => {
-          const stName = isBn ? (c.station_bn || c.station || `${c.latitude.toFixed(3)}, ${c.longitude.toFixed(3)}`) : (c.station || `${c.latitude.toFixed(3)}, ${c.longitude.toFixed(3)}`);
-          const riverName = isBn ? (c.river_bn || c.river || '') : (c.river || '');
-          const haorName = isBn ? (c.haor_bn || c.haor || '') : (c.haor || '');
-          const valText = c.value !== null ? `${c.value.toFixed(1)} ${data.unit}` : tr('unavailable','অনুপলব্ধ');
-          const ensText = c.p25 !== null && c.p75 !== null ? `${c.p25.toFixed(1)}–${c.p75.toFixed(1)} ${data.unit}` : tr('unavailable','অনুপলব্ধ');
-          const riskText = c.riskLevel === 'alert' ? tr('Alert','সতর্কতা') : (c.riskLevel === 'watch' ? tr('Watch','নজরদারি') : tr('Normal','স্বাভাবিক'));
-          const peakText = c.peakTime
-            ? (isBn ? `সর্বোচ্চ ঢল: ${c.peakValue?.toFixed(1)} ${data.unit} (${new Date(c.peakTime).toLocaleDateString('bn-BD', {month:'short', day:'numeric'})}, +${c.peakLeadHours}ঘণ্টা)`
-                    : `Peak flow: ${c.peakValue?.toFixed(1)} ${data.unit} (${new Date(c.peakTime).toLocaleDateString('en-GB', {month:'short', day:'numeric'})}, +${c.peakLeadHours}h)`)
-            : '';
-          return `<div class="reach-row">
-            <div class="reach-header"><strong>${stName}</strong> <span class="reach-river">· ${riverName}</span> <span class="reach-badge reach-${c.riskLevel || 'normal'}">${riskText}</span></div>
-            ${haorName ? `<div class="reach-haor">${haorName}</div>` : ''}
-            <div class="reach-metrics">
-              <span>${tr('Current flow','বর্তমান প্রবাহ')}: <strong>${valText}</strong></span>
-              <span>${tr('Ensemble 50%','এনসেম্বল ৫০%')}: ${ensText}</span>
-            </div>
-            ${peakText ? `<div class="reach-peak">${peakText}</div>` : ''}
-          </div>`;
-        }).join('');
-      } else {
-        list.textContent = f.cells.map(c => `${c.latitude.toFixed(3)}, ${c.longitude.toFixed(3)}: ${c.value === null ? tr('unavailable','অনুপলব্ধ') : c.value.toFixed(1)} ${data.unit} · ${tr('ensemble middle 50%','এনসেম্বলের মধ্যবর্তী ৫০%')}: ${c.p25 === null || c.p75 === null ? tr('unavailable','অনুপলব্ধ') : `${c.p25.toFixed(1)}–${c.p75.toFixed(1)}`}`).join('\n');
-      }
+    const list=document.getElementById('forecast-reaches');
+    if (list && flood) {
+      list.innerHTML=f.cells.map(c=>{
+        const place=isBn ? c.place_bn || c.place : c.place;
+        const context=place ? tr('Model reach near ','কাছাকাছি মডেল নদীখণ্ড: ')+place : tr('Model reach','মডেল নদীখণ্ড');
+        const ensemble=numeric(c.p25)&&numeric(c.p75) ? `${c.p25.toFixed(1)}–${c.p75.toFixed(1)} ${escape(data.unit)}` : tr('Unavailable','অনুপলব্ধ');
+        return `<div class="reach-row">
+          <strong>${escape(context)}</strong>
+          <span>${c.latitude.toFixed(3)}, ${c.longitude.toFixed(3)}</span>
+          <span>${tr('Selected day','নির্বাচিত দিন')}: ${valueText(c.value)} ${escape(data.unit)}</span>
+          <span>${tr('Ensemble middle 50%','এনসেম্বলের মধ্যবর্তী ৫০%')}: ${ensemble}</span>
+          <span>${tr('Available-series maximum','উপলব্ধ সিরিজে সর্বোচ্চ')}: ${valueText(c.seriesMaximum)} ${escape(data.unit)} · ${dateText(c.seriesMaximumValidAt)}</span>
+          <small>${tr('Available days','উপলব্ধ দিন')}: ${c.usableDays ?? 0}/${c.totalDays ?? data.frames.length} · ${tr('station match unvalidated','স্টেশনের মিল যাচাই হয়নি')}</small>
+        </div>`;
+      }).join('');
     }
   }
 
   function render() {
     if (!data) return;
     const flood = lens === 'rivers', el = panel();
-    el.innerHTML = `<h2>${flood ? tr('Northeast · river discharge & harvest advisory','উত্তর-পূর্ব · নদীপ্রবাহ ও ধান কর্তন পরামর্শ') : tr('Central Bangladesh · PM2.5','মধ্য বাংলাদেশ · পিএম২.৫')}</h2>
-      <p>${flood ? tr('Modeled reaches with arrival time and Boro crop harvest guidance.','নদীখণ্ডের আগমন সময় ও হাওর বোরো ধান কর্তনের সিদ্ধান্ত সহায়তা।') : tr('CAMS global · ~45 km cells · modeled, not street measurements.','CAMS বৈশ্বিক · প্রায় ৪৫ কিমি সেল · মডেল, রাস্তার পরিমাপ নয়।')}</p>
+    el.innerHTML = `<h2>${flood ? tr('Northeast · river discharge','উত্তর-পূর্ব · নদীপ্রবাহ') : tr('Central Bangladesh · PM2.5','মধ্য বাংলাদেশ · পিএম২.৫')}</h2>
+      <p>${flood ? tr('Daily modeled flow; not a flood-arrival or inundation forecast.','দৈনিক মডেলপ্রবাহ; বন্যা আসার সময় বা প্লাবনের পূর্বাভাস নয়।') : tr('CAMS global · ~45 km cells · modeled, not street measurements.','CAMS বৈশ্বিক · প্রায় ৪৫ কিমি সেল · মডেল, রাস্তার পরিমাপ নয়।')}</p>
       <output id="forecast-time"></output>
       <div class="forecast-controls">
         <button id="forecast-play" type="button">${tr('Play','চালান')}</button>
@@ -174,7 +121,7 @@
         <p><a href="${data.sourceUrl}" target="_blank" rel="noopener">${data.source}</a> · ${flood ? tr('~5 km, daily steps','প্রায় ৫ কিমি, দৈনিক ধাপ') : tr('native 3-hour steps; updates every 12 hours','মূল ধাপ ৩ ঘণ্টা; প্রতি ১২ ঘণ্টায় হালনাগাদ')}</p>
         <p>${tr('Retrieved','সংগৃহীত')}: ${data.fetchedAt}</p>
         <p>${tr('Model issue time not exposed. Local accuracy unvalidated. Missing cells are omitted.','মডেল প্রকাশের সময় দেওয়া হয়নি। স্থানীয় নির্ভুলতা যাচাই হয়নি। তথ্যহীন সেল বাদ দেওয়া হয়েছে।')}</p>
-        ${flood ? `<p><strong>${tr('Why river discharge does not equal field inundation:','কেন নদীপ্রবাহ প্লাবনসীমার সমান নয়:')}</strong> ${tr('Discharge (m³/s) models upstream surge volume and peak arrival time. Farmland inundation depends on BWDB submersible dykes (ডুবন্ত বাঁধ) and field elevation. When flow exceeds bankfull, dykes risk overtopping.','নদীপ্রবাহ (মি³/সেকেন্ড) উজানের পানির পরিমাণ ও ঢল আসার সময় নির্দেশ করে। নির্দিষ্ট ফসলি জমি প্লাবিত হবে কিনা তা নির্ভর করে স্থানীয় ডুবন্ত বাঁধের উচ্চতা ও জমির উচ্চতার ওপর। প্রবাহ ধারণক্ষমতা ছাড়িয়ে গেলে বাঁধ উপচে হাওরে পানি প্রবেশ করে।')}</p>
+        ${flood ? `<p><strong>${tr('Why river discharge does not equal field inundation:','কেন নদীপ্রবাহ প্লাবনসীমার সমান নয়:')}</strong> ${tr('The largest modeled river within 5 km may be a different channel. Place names describe query context only. Local warning thresholds, crop stage, terrain and embankment conditions have not been validated. A daily series maximum does not establish flash-flood arrival.','৫ কিমির মধ্যে বৃহত্তম মডেল নদীটি ভিন্ন খালও হতে পারে। স্থানের নাম কেবল অনুসন্ধানের প্রেক্ষাপট। স্থানীয় বিপৎসীমা, ফসলের পরিপক্বতা, ভূমি ও বাঁধের অবস্থা যাচাই হয়নি। দৈনিক সিরিজের সর্বোচ্চ মান আকস্মিক বন্যার আগমন সময় প্রমাণ করে না।')}</p>
         <div id="forecast-reaches" class="forecast-reaches"></div>
         <a href="https://ffwc.gov.bd" target="_blank" rel="noopener">${tr('Official FFWC water level & warning bulletins ↗','সরকারি FFWC পানি সমতল ও সতর্কবার্তা ↗')}</a>` : ''}
       </details>`;
@@ -253,7 +200,7 @@
       }
     } catch {
       if (token !== generation) return;
-      panel().innerHTML = `<p role="status">${tr('Outlook unavailable. No forecast is drawn.','পূর্বাভাস অনুপলব্ধ। কোনো পূর্বাভাস আঁকা হয়নি।')}</p><p>${new Date().toISOString()} · model-provider-or-valid-horizon-unavailable</p><button id="forecast-retry">${tr('Retry','আবার চেষ্টা')}</button>`;
+      panel().innerHTML = `<p role="status">${tr('Outlook unavailable. No forecast is drawn.','পূর্বাভাস অনুপলব্ধ। কোনো পূর্বাভাস আঁকা হয়নি।')}</p><p data-language-fixed>${new Date().toISOString()} · model-provider-or-valid-horizon-unavailable</p><button id="forecast-retry">${tr('Retry','আবার চেষ্টা')}</button>`;
       document.getElementById('forecast-retry').onclick = () => activate(lens);
     }
   }
@@ -263,6 +210,7 @@
   window.AtlasForecast = {
     attach(m) {
       map = m;
+      map.on?.('click', 'outlook-cells', inspectReach);
       const watch = document.getElementById("atlas-watch");
       if (watch) {
         new ResizeObserver(() => {

@@ -504,8 +504,11 @@
   }
 
   function showInspectionHUD(type, props) {
+    // Map tags are public external data, not trusted HTML.
+    props = Object.fromEntries(Object.entries(props).map(([key,value]) => [key, typeof value === 'string' ? value.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) : value]));
     const hud = $("#atlas-observation-hud");
     if (!hud) return;
+    if (hud.dataset) hud.dataset.owner = "feature";
 
     const isBn = document.documentElement.lang === "bn";
     const name = (isBn && props.name_bn) ? props.name_bn : props.name;
@@ -521,7 +524,7 @@
         <div class="hud-row"><span class="hud-label">Status:</span><span class="hud-value">${tr("Reference station · not a live reading", "তথ্যসূত্র স্টেশন · সরাসরি পর্যবেক্ষণ নয়")}</span></div>
       `;
     } else if (type === "building") {
-      const use = ({civic:tr("Civic / community","নাগরিক / সামাজিক"), commerce:tr("Commerce","বাণিজ্য"), homes:tr("Homes","আবাসন"), industry:tr("Industry / utilities","শিল্প / পরিষেবা"), unknown:tr("Use unknown","ব্যবহার অজানা")})[props.use_class] || tr("Use unknown","ব্যবহার অজানা");
+      const use = ({apartments:tr("Apartments","অ্যাপার্টমেন্ট"), retail:tr("Retail / markets","খুচরা / বাজার"), mosque:tr("Religious use","ধর্মীয় ব্যবহার"), education:tr("Education","শিক্ষা"), healthcare:tr("Healthcare","স্বাস্থ্যসেবা"), civic:tr("Civic / community","নাগরিক / সামাজিক"), commerce:tr("Commerce","বাণিজ্য"), homes:tr("Homes","আবাসন"), industry:tr("Industry / utilities","শিল্প / পরিষেবা"), unknown:tr("Use unknown","ব্যবহার অজানা")})[props.use_class] || tr("Use unknown","ব্যবহার অজানা");
       rowsHtml = `
         <div class="hud-row"><span class="hud-label">${tr("Mapped use", "নথিভুক্ত ব্যবহার")}</span><span class="hud-value">${use}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Block height", "ভবনের উচ্চতা")}</span><span class="hud-value">${props.height_m} m</span></div>
@@ -566,6 +569,11 @@
 
   let radarTimer = null;
   let dynamicLayers = [];
+  let dynamicClickHandlers = [];
+  function onDynamicClick(id, handler) {
+    map.on("click", id, handler);
+    dynamicClickHandlers.push({id, handler});
+  }
   let lensToken = 0;
 
   // NASA GIBS layer registry.
@@ -720,6 +728,8 @@
   };
 
   function clearDynamicLayers() {
+    for (const {id, handler} of dynamicClickHandlers) map?.off("click", id, handler);
+    dynamicClickHandlers = [];
     if (radarTimer) {
       clearInterval(radarTimer);
       radarTimer = null;
@@ -736,7 +746,7 @@
     dynamicLayers = [];
   }
 
-  function applyLens(lensId) {
+  function applyLens(lensId, { moveCamera = lensId !== currentLens } = {}) {
     currentLens = lensId;
     const token = ++lensToken;
     if ($("#atlas-lens")) $("#atlas-lens").value = lensId;
@@ -758,7 +768,7 @@
 
     const is3D = $("#atlas-view")?.value !== "2d";
     const vp = LENS_VIEWPORTS[lensId];
-    if (vp && typeof map.flyTo === "function") {
+    if (moveCamera && !["air", "rivers"].includes(lensId) && vp && typeof map.flyTo === "function") {
       map.flyTo({
         center: vp.center,
         zoom: vp.zoom,
@@ -940,7 +950,7 @@
         });
         dynamicLayers.push("catchment-rain-circles", "catchment-rain-labels", "catchment-rain");
         if (map.on) {
-          map.on("click", "catchment-rain-circles", e => {
+          onDynamicClick("catchment-rain-circles", e => {
             if (!e.features?.[0]) return;
             const p = e.features[0].properties;
             const hud = $("#atlas-observation-hud");
@@ -957,22 +967,22 @@
         const data = await res.json();
         if (currentLens !== lens) return;
         const wind = data?.data?.current;
-        const windSpeed = wind?.wind_speed_10m ? Number(wind.wind_speed_10m).toFixed(1) : null;
-        const windDir = wind?.wind_direction_10m !== undefined ? Math.round(Number(wind.wind_direction_10m)) : null;
+        const windSpeed = Number.isFinite(wind?.wind_speed_10m) ? Number(wind.wind_speed_10m).toFixed(1) : null;
+        const windDir = Number.isFinite(wind?.wind_direction_10m) ? Math.round(wind.wind_direction_10m) : null;
         const cardinals = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
         const cardinal = windDir !== null ? cardinals[Math.round(windDir / 22.5) % 16] : "";
         if (windSpeed && windDir !== null) {
-          if (status) status.textContent = `${tr("Surface wind: ","ভূপৃষ্ঠের বাতাস: ")}${windSpeed} km/h ${tr("from ","দিক: ")}${windDir}° (${cardinal}) · ${tr("Winter plume transport towards central Dhaka","ধোঁয়া কেন্দ্রীয় ঢাকার দিকে প্রবাহিত")}`;
+          if (status) status.textContent = `${tr("Surface wind: ","ভূপৃষ্ঠের বাতাস: ")}${windSpeed} km/h ${tr("from ","দিক: ")}${windDir}° (${cardinal}) · ${tr("Modeled surface wind only; smoke transport is not established","কেবল মডেলভিত্তিক ভূপৃষ্ঠের বাতাস; ধোঁয়া পরিবহন নির্ধারিত নয়")}`;
         } else {
-          if (status) status.textContent = tr("Brick kiln clusters in Savar, Gazipur & Narayanganj arcs · prevailing winter smoke transport","সাভার, গাজীপুর ও নারায়ণগঞ্জ ইটভাটা অঞ্চল · শীতকালীন ধোঁয়া প্রবাহ");
+          if (status) status.textContent = tr("Reference kiln regions; wind data unavailable","ইটভাটার আঞ্চলিক তথ্যসূত্র; বাতাসের উপাত্ত অনুপলব্ধ");
         }
         const kilnsGeo = {
           type: "FeatureCollection",
           features: [
-            { type: "Feature", geometry: { type: "Point", coordinates: [90.260, 23.830] }, properties: { name: isBn ? "সাভার ইটভাটা অঞ্চল" : "Savar Brick Kiln Belt", count: "~180 kilns", tech: "FCBTK / Zigzag", color: "#d96629" } },
-            { type: "Feature", geometry: { type: "Point", coordinates: [90.395, 23.930] }, properties: { name: isBn ? "গাজীপুর-টঙ্গী ইটভাটা অঞ্চল" : "Gazipur-Tongi Brick Belt", count: "~240 kilns", tech: "FCBTK / Zigzag", color: "#dd4027" } },
-            { type: "Feature", geometry: { type: "Point", coordinates: [90.370, 23.680] }, properties: { name: isBn ? "কেরানীগঞ্জ-বুড়িগঙ্গা ইটভাটা বলয়" : "Keraniganj-Buriganga Arc", count: "~120 kilns", tech: "Zigzag / Traditional", color: "#e2953b" } },
-            { type: "Feature", geometry: { type: "Point", coordinates: [90.520, 23.630] }, properties: { name: isBn ? "নারায়ণগঞ্জ-শীতলক্ষ্যা ইটভাটা ক্লাস্টার" : "Narayanganj-Shitalakshya Cluster", count: "~150 kilns", tech: "FCBTK / Zigzag", color: "#e2953b" } }
+            { type: "Feature", geometry: { type: "Point", coordinates: [90.260, 23.830] }, properties: { name: isBn ? "সাভার ইটভাটা অঞ্চল" : "Savar Brick Kiln Belt", count: "Unverified reference region", tech: "Unverified", color: "#d96629" } },
+            { type: "Feature", geometry: { type: "Point", coordinates: [90.395, 23.930] }, properties: { name: isBn ? "গাজীপুর-টঙ্গী ইটভাটা অঞ্চল" : "Gazipur-Tongi Brick Belt", count: "Unverified reference region", tech: "Unverified", color: "#dd4027" } },
+            { type: "Feature", geometry: { type: "Point", coordinates: [90.370, 23.680] }, properties: { name: isBn ? "কেরানীগঞ্জ-বুড়িগঙ্গা ইটভাটা বলয়" : "Keraniganj-Buriganga Arc", count: "Unverified reference region", tech: "Unverified", color: "#e2953b" } },
+            { type: "Feature", geometry: { type: "Point", coordinates: [90.520, 23.630] }, properties: { name: isBn ? "নারায়ণগঞ্জ-শীতলক্ষ্যা ইটভাটা ক্লাস্টার" : "Narayanganj-Shitalakshya Cluster", count: "Unverified reference region", tech: "Unverified", color: "#e2953b" } }
           ]
         };
         map.addSource("haze-kilns", { type: "geojson", data: kilnsGeo });
@@ -1006,16 +1016,16 @@
         });
         dynamicLayers.push("haze-kilns-circles", "haze-kilns-labels", "haze-kilns");
         if (map.on) {
-          map.on("click", "haze-kilns-circles", e => {
+          onDynamicClick("haze-kilns-circles", e => {
             if (!e.features?.[0]) return;
             const p = e.features[0].properties;
             const hud = $("#atlas-observation-hud");
             if (!hud) return;
             hud.hidden = false;
             hud.innerHTML = `<h3>${p.name}</h3>
-              <div style="margin:4px 0;"><strong>${tr("Operating density:","ভাটার সংখ্যা:")}</strong> ${p.count}</div>
+              <div style="margin:4px 0;"><strong>${tr("Registry status:","তথ্যসূত্রের অবস্থা:")}</strong> ${tr(p.count,"অযাচাইকৃত আঞ্চলিক তথ্যসূত্র")}</div>
               <div style="margin:4px 0;"><strong>${tr("Kiln technology:","ভাটা প্রযুক্তি:")}</strong> ${p.tech}</div>
-              <div style="font-size:11.5px;color:var(--dim);">${tr("Major winter particulate and black carbon emission zone affecting Dhaka urban basin.","শীতকালে ঢাকা মহানগরীর বাতাসের মান অবনমনকারী প্রধান ধোঁয়া নির্গমন বলয়।")}</div>
+              <div style="font-size:13px;color:var(--dim);">${tr("Regional context only; counts, active emissions and source attribution are unverified.","কেবল আঞ্চলিক প্রেক্ষাপট; সংখ্যা, সক্রিয় নির্গমন ও দূষণের উৎস যাচাই হয়নি।")}</div>
               <button type="button" class="atlas-btn" style="margin-top:8px;width:100%;" onclick="document.getElementById('atlas-observation-hud').hidden=true">${tr("Close","বন্ধ করুন")}</button>`;
           });
         }
@@ -1172,6 +1182,7 @@
     wireUIEvents();
     pollCityWatch();
     setInterval(pollCityWatch, 5 * 60 * 1000);
+    window.AtlasInstruments?.start();
     initMap();
   }
 

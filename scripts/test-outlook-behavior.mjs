@@ -13,28 +13,40 @@ assert.throws(()=>normalizeOutlook({...air,hourly_units:{pm2_5:'ppm'}},'air',now
 assert.throws(()=>normalizeOutlook(air,'air',now+10*86400000));
 const flood={latitude:25.075,longitude:91.375,daily_units:{river_discharge:'m³/s',river_discharge_p25:'m³/s',river_discharge_p75:'m³/s'},daily:{time:['2026-10-28','2026-10-29'],river_discharge:[450,430],river_discharge_p25:[440,null],river_discharge_p75:[470,450]}};
 const f=normalizeOutlook(flood,'flood',now);assert.equal(f.frames[0].cells[0].p25,440);assert.equal(f.frames[1].cells[0].p25,null);
-assert.equal(f.frames[0].cells[0].station,'Sunamganj Sadar');
-assert.equal(f.frames[0].cells[0].river,'Surma River');
-assert.equal(f.frames[0].cells[0].peakValue,450);
-assert.ok(f.frames[0].cells[0].harvestAdvisory);
-assert.ok(f.reaches?.length === 1 && f.reaches[0].station === 'Sunamganj Sadar');
+assert.equal(f.frames[0].cells[0].place,'Sunamganj Sadar');
+assert.equal(f.frames[0].cells[0].stationMatchStatus,'unvalidated');
+assert.equal(f.frames[0].cells[0].seriesMaximum,450);
+assert.equal(f.frames[0].cells[0].bankfull_q,null);
+assert.equal(f.frames[0].cells[0].harvestGuidanceStatus,'unavailable');
+assert.equal(f.reaches[0].warningStatus,'unavailable');
+for(const reading of [...f.frames.flatMap(x=>x.cells),...f.reaches]) {
+  for(const unsafe of ['riskLevel','peakLeadHours','arrivalLeadHours','harvestAdvisory'])assert.equal(reading[unsafe],undefined,unsafe);
+}
+const late={...flood,daily:{...flood.daily,time:['2026-10-28','2026-11-04'],river_discharge:[100,1000]}};
+const delayed=normalizeOutlook(late,'flood',now);
+assert.equal(delayed.reaches[0].seriesMaximumValidAt,'2026-11-04T00:00:00Z');
+assert.equal(delayed.reaches[0].warningStatus,'unavailable','a seven-day maximum is not a72h warning');
+const empty=normalizeOutlook([flood,{...flood,latitude:24.925,longitude:91.875,daily:{...flood.daily,river_discharge:[null,null]}}],'flood',now);
+assert.equal(empty.reaches[1].seriesMaximum,null);assert.equal(empty.reaches[1].warningStatus,'unavailable','missing data is never safe');
+const zero=normalizeOutlook({...flood,daily:{...flood.daily,river_discharge:[0,0]}},'flood',now);
+assert.equal(zero.reaches[0].seriesMaximum,0,'a real zero is retained');
 const original=globalThis.fetch;globalThis.fetch=async()=>{throw Error('offline')};
 const missing=await getOutlook('flood'); assert.equal(missing.status,'unavailable');assert.ok(missing.reasonCode&&missing.timestamp);assert.deepEqual(missing.frames,[]);globalThis.fetch=original;
 const context={document:{addEventListener(){}}};
 // Exercise the actual classifier, including Parliament government tags and unknown native tiles.
 const win={addEventListener(){}};vm.runInNewContext(readFileSync('public/design.js','utf8'),{window:win,document:context.document});
-for(const [tags,kind] of [[{building:'yes'},'unknown'],[{office:'government',building:'yes'},'civic'],[{building:'apartments'},'homes'],[{building:'warehouse'},'industry'],[{building:'office'},'commerce']])assert.equal(win.DhakaDesign.classify(tags),kind);
+for(const [tags,kind] of [[{building:'yes'},'unknown'],[{office:'government',building:'yes'},'civic'],[{building:'apartments'},'apartments'],[{amenity:'school',building:'yes'},'education'],[{building:'hospital'},'healthcare'],[{building:'mosque'},'mosque'],[{building:'warehouse'},'industry'],[{building:'office'},'commerce']])assert.equal(win.DhakaDesign.classify(tags),kind);
 console.log('✓ Outlook behavior: native steps, valid horizon, duplicate cells, real zero vs missing, units, ensemble quartiles, offline envelope and mapped-use classification');
 const nodes=new Map();
-function element(id) { if(!nodes.has(id))nodes.set(id,{id,hidden:true,open:true,style:{},value:0,textContent:'',innerHTML:'',getBoundingClientRect:()=>({height:26})}); return nodes.get(id); }
+function element(id) { if(!nodes.has(id))nodes.set(id,{id,hidden:true,open:true,dataset:{},style:{},value:0,textContent:'',innerHTML:'',getBoundingClientRect:()=>({height:26})}); return nodes.get(id); }
 const requests=[],ticks=new Map(),events={},framesDrawn=[],focuses=[];
 let tickId=0;
 const doc={documentElement:{lang:'en'},hidden:false,getElementById:element,addEventListener:(name,fn)=>events[name]=fn};
 const playerWin={addEventListener:(name,fn)=>events[name]=fn};
 const model={status:'ok',source:'CAMS',sourceUrl:'https://open-meteo.com/en/docs/air-quality-api',fetchedAt:'2026-10-28T00:00Z',unit:'μg/m³',frames:[0,3,6].map((h,i)=>({validAt:`2026-10-28T0${h}:00:00Z`,cells:[{latitude:24,longitude:90.4,value:[22,43,null][i],p25:null,p75:null}]}))};
 vm.runInNewContext(readFileSync('public/forecast.js','utf8'),{window:playerWin,document:doc,Date,AbortSignal,ResizeObserver:class{observe(){}},setInterval:fn=>{ticks.set(++tickId,fn);return tickId},clearInterval:id=>ticks.delete(id),fetch:()=>new Promise(resolve=>requests.push(resolve))});
-const layers=new Map(),sources=new Map();
-const m={getLayer:id=>layers.get(id),getSource:id=>sources.get(id),addLayer:l=>layers.set(l.id,l),removeLayer:id=>layers.delete(id),removeSource:id=>sources.delete(id),addSource:(id,s)=>{framesDrawn.push(s.data);sources.set(id,{setData:d=>framesDrawn.push(d)})},getMinZoom:()=>9,setMinZoom(){},fitBounds:(...args)=>focuses.push(args)};
+const layers=new Map(),sources=new Map(),handlers=[];
+const m={on:(event,layer,fn)=>handlers.push({event,layer,fn}),getLayer:id=>layers.get(id),getSource:id=>sources.get(id),addLayer:l=>layers.set(l.id,l),removeLayer:id=>layers.delete(id),removeSource:id=>sources.delete(id),addSource:(id,s)=>{framesDrawn.push(s.data);sources.set(id,{setData:d=>framesDrawn.push(d)})},getMinZoom:()=>9,setMinZoom(){},fitBounds:(...args)=>focuses.push(args)};
 const flush=async()=>{await new Promise(r=>setImmediate(r));};
 await playerWin.AtlasForecast.activate('air');playerWin.AtlasForecast.attach(m);assert.equal(requests.length,1);
 requests.shift()({ok:false,json:async()=>({status:'unavailable'})});await flush();assert.equal(focuses.length,0);
@@ -46,3 +58,13 @@ const oldRequest=playerWin.AtlasForecast.activate('rivers');const newRequest=pla
 await playerWin.AtlasForecast.activate('city');assert.equal(layers.size,0);assert.equal(element('atlas-watch-shell').open,true);
 const badQuartiles=normalizeOutlook({...flood,daily:{...flood.daily,river_discharge_p25:[500,500],river_discharge_p75:[400,400]}},'flood',now);assert.equal(badQuartiles.frames[0].cells[0].p25,null);
 console.log('✓ Actual player: early selection, failed-first-load retry focus, paused start, play/pause, scrub missing frame, response race and watch restoration');
+
+assert.equal(handlers.filter(h=>h.layer==='outlook-cells').length,1,'click handler is attached once across lens switches');
+const floodModel={...model,unit:'m³/s',frames:[0,1].map(i=>({validAt:`2026-10-${28+i}T00:00:00Z`,cells:[{id:'reach1',place:'Sunamganj',latitude:25.075,longitude:91.375,value:0,p25:0,p75:0,seriesMaximum:0,seriesMaximumValidAt:'2026-10-28T00:00:00Z',usableDays:2,totalDays:2}]}))};
+const active=playerWin.AtlasForecast.activate('rivers');requests.shift()({ok:true,json:async()=>floodModel});await active;
+handlers[0].fn({features:[{properties:{id:'reach1'}}]});
+assert.equal(element('atlas-observation-hud').hidden,false);
+assert.match(element('atlas-observation-hud').innerHTML,/0.0–0.0/);
+assert.doesNotMatch(element('forecast-harvest-card').textContent,/safe|defer|Emergency/);
+element('forecast-range').oninput({target:{value:'1'}});assert.equal(element('atlas-observation-hud').hidden,true,'scrub closes stale inspection');
+console.log('✓ Warning regression: seven-day maxima, zero, missing reaches, neutral warning status, one click handler and stale inspection closure');

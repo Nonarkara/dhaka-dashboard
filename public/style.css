@@ -192,6 +192,20 @@ body {
   gap: 10px;
 }
 
+/* National data stays in the Map disclosure on narrow screens. */
+.atlas-instruments { display:none; min-width:0; font-size:13px; gap:10px; align-items:baseline; font-variant-numeric:tabular-nums; }
+.atlas-instrument { white-space:nowrap; }
+#atlas-national-data { font-size:14px; line-height:1.45; }
+#atlas-national-data p { margin:6px 0; }
+#atlas-national-data dl { margin:0; }
+#atlas-national-data dt { margin-top:12px; font-weight:600; }
+#atlas-national-data dd { margin:0; padding-bottom:8px; border-bottom:1px solid var(--line); }
+#atlas-national-data dd strong,#atlas-national-data dd small { display:block; overflow-wrap:anywhere; }
+#atlas-national-data dd small { font-size:12px; color:var(--dim); }
+#atlas-national-data dd a { font-size:12px; }
+@media(min-width:1200px) { .atlas-instruments { display:flex; margin-left:auto; } }
+@media(max-width:1439px) { .atlas-instruments .atlas-instrument { display:none; } }
+
 .atlas-control-label {
   display: inline-flex;
   align-items: center;

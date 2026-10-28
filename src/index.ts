@@ -1,3 +1,4 @@
+import { getInstruments } from "./instruments.js";
 import { getOutlook } from "./outlook.js";
 import { BUILD_ID, ATLAS_VERSION } from "./build-id.js";
 import { checkRateLimit } from "./rate-limit.js";
@@ -592,6 +593,12 @@ const worker = {
         source: "Open-Meteo · surface wind at 10 m (no 925 hPa field)",
         data,
       }, { status: data ? 200 : 503 });
+    }
+
+    // National statistics: values retain their reporting periods and source age.
+    if (url.pathname === "/api/atlas/instruments") {
+      const data=await getInstruments();
+      return jsonResponse(data,{status:data.status==='unavailable'?503:200,headers:{'cache-control':'no-store'}});
     }
 
     // ── /api/atlas/environment ───────────────────────────────────────────────

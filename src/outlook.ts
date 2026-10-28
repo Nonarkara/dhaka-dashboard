@@ -7,14 +7,6 @@ const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFi
 export interface NortheastReachMeta {
   station: string;
   station_bn: string;
-  river: string;
-  river_bn: string;
-  haor: string;
-  haor_bn: string;
-  vulnerability: string;
-  vulnerability_bn: string;
-  bankfull_q: number;
-  alert_q: number;
 }
 
 const NORTHEAST_REACHES: { lat: number; lon: number; meta: NortheastReachMeta }[] = [
@@ -24,14 +16,6 @@ const NORTHEAST_REACHES: { lat: number; lon: number; meta: NortheastReachMeta }[
     meta: {
       station: "Tahirpur / Lorergorh",
       station_bn: "তাহিরপুর / লরেড়গড়",
-      river: "Jadukata River",
-      river_bn: "যাদুকাটা নদী",
-      haor: "Tanguar & Shanir Haor",
-      haor_bn: "টাঙ্গুয়ার ও শনির হাওর",
-      vulnerability: "Submersible dykes protecting Boro paddy crops",
-      vulnerability_bn: "বোরো ধান সুরক্ষার ডুবন্ত বাঁধ",
-      bankfull_q: 350,
-      alert_q: 600,
     },
   },
   {
@@ -40,14 +24,6 @@ const NORTHEAST_REACHES: { lat: number; lon: number; meta: NortheastReachMeta }[
     meta: {
       station: "Sunamganj Sadar",
       station_bn: "সুনামগঞ্জ সদর",
-      river: "Surma River",
-      river_bn: "সুরমা নদী",
-      haor: "Dekhar & Karchar Haor",
-      haor_bn: "দেখার ও খরচার হাওর",
-      vulnerability: "Low-lying Boro paddy depressions and municipal dykes",
-      vulnerability_bn: "নিচু বোরো ধানের জমি ও শহর রক্ষা বাঁধ",
-      bankfull_q: 550,
-      alert_q: 900,
     },
   },
   {
@@ -56,14 +32,6 @@ const NORTHEAST_REACHES: { lat: number; lon: number; meta: NortheastReachMeta }[
     meta: {
       station: "Amalshid / Zakiganj",
       station_bn: "অমলশীদ / জকিগঞ্জ",
-      river: "Kushiyara River (Barak Bifurcation)",
-      river_bn: "কুশিয়ারা নদী (বরাক মোহনা)",
-      haor: "Hakaluki Haor & Fenchuganj Corridor",
-      haor_bn: "হাকালুকি হাওর ও ফেঞ্চুগঞ্জ করিডোর",
-      vulnerability: "Primary transboundary inflow into Hakaluki Haor basin",
-      vulnerability_bn: "হাকালুকি হাওরে প্রধান আন্তঃসীমান্ত পাহাড়ি ঢল",
-      bankfull_q: 1200,
-      alert_q: 1800,
     },
   },
   {
@@ -72,14 +40,6 @@ const NORTHEAST_REACHES: { lat: number; lon: number; meta: NortheastReachMeta }[
     meta: {
       station: "Sylhet Sadar",
       station_bn: "সিলেট সদর",
-      river: "Surma River (Upper Reach)",
-      river_bn: "সুরমা নদী (উজান প্রবাহ)",
-      haor: "Upper Surma Valley",
-      haor_bn: "উজান সুরমা উপত্যকা",
-      vulnerability: "Urban lowlands and riverbank agricultural plots",
-      vulnerability_bn: "শহরের নিচু এলাকা ও নদী তীরবর্তী কৃষি জমি",
-      bankfull_q: 400,
-      alert_q: 700,
     },
   },
 ];
@@ -88,8 +48,13 @@ function findNearestReach(lat: number, lon: number): NortheastReachMeta | undefi
   let bestDist = Infinity;
   let bestMeta: NortheastReachMeta | undefined;
   for (const r of NORTHEAST_REACHES) {
-    const d = Math.hypot(lat - r.lat, lon - r.lon);
-    if (d < 0.25 && d < bestDist) {
+    // Context names are only attached within the provider's 5 km search radius.
+    // Distance does not validate a channel or an official warning station.
+    const rad = Math.PI / 180;
+    const a = Math.sin((lat-r.lat)*rad/2)**2
+      + Math.cos(lat*rad)*Math.cos(r.lat*rad)*Math.sin((lon-r.lon)*rad/2)**2;
+    const d = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    if (d <= 5 && d < bestDist) {
       bestDist = d;
       bestMeta = r.meta;
     }
@@ -118,7 +83,8 @@ export function normalizeOutlook(raw: unknown, kind: 'air' | 'flood', now = Date
       const time = t.length === 10 ? `${t}T00:00:00Z` : `${t}:00Z`;
       const ms = Date.parse(time);
       const start = kind === 'air' ? now : Math.floor(now / 86400000) * 86400000;
-      if (!Number.isFinite(ms) || ms < start || ms > now + (kind === 'air' ? 48 * 3600000 : 10 * 86400000)) return;
+      if (!Number.isFinite(ms) || new Date(ms).toISOString().slice(0,10) !== t.slice(0,10)) throw new Error('invalid-valid-time');
+      if (ms < start || ms > now + (kind === 'air' ? 48 * 3600000 : 10 * 86400000)) return;
       if (kind === 'air' && new Date(ms).getUTCHours() % 3 !== 0) return;
       const v = series[key][i], lo = series.river_discharge_p25?.[i], hi = series.river_discharge_p75?.[i];
       const quartilesValid = units.river_discharge_p25 === unit && units.river_discharge_p75 === unit && finite(lo) && finite(hi) && lo <= hi;
@@ -128,70 +94,41 @@ export function normalizeOutlook(raw: unknown, kind: 'air' | 'flood', now = Date
     cells.push({ id, latitude: row.latitude, longitude: row.longitude, values });
   }
 
-  // Pre-calculate reach peak arrivals, lead times and harvest decision advisories for flood reaches
+  // A maximum in a daily series is a model statistic, not a flood arrival.
+  // Place labels are geographic query context; no station identity is inferred.
+  // The provider can choose a different river within its search radius.
   const reachMetaMap = new Map<string, {
     meta?: NortheastReachMeta;
-    peakValue: number | null;
-    peakTime: string | null;
-    peakLeadHours: number | null;
-    peakLeadDays: number | null;
-    arrivalLeadHours: number | null;
-    riskLevel: 'normal' | 'watch' | 'alert';
-    harvestAdvisory: string;
-    harvestAdvisory_bn: string;
+    seriesMaximum: number | null;
+    seriesMaximumValidAt: string | null;
+    usableDays: number;
+    totalDays: number;
+    warningStatus: 'unavailable';
+    warningReasonCode: string;
   }>();
 
   if (kind === 'flood') {
     for (const c of cells) {
       const meta = findNearestReach(c.latitude, c.longitude);
-      let peakVal: number | null = null;
-      let peakT: string | null = null;
-      let maxV = -Infinity;
-      let arrivalH: number | null = null;
-      const bankfull = meta?.bankfull_q ?? 500;
-      const alert = meta?.alert_q ?? 800;
-
-      for (const [timeStr, valObj] of c.values.entries()) {
-        if (valObj.value !== null) {
-          if (valObj.value > maxV) {
-            maxV = valObj.value;
-            peakT = timeStr;
-          }
-          if (valObj.value >= bankfull && arrivalH === null) {
-            arrivalH = Math.max(0, Math.round((Date.parse(timeStr) - now) / 3600000));
-          }
+      let maximum: number | null = null;
+      let maximumAt: string | null = null;
+      let usableDays = 0;
+      for (const [validAt, sample] of [...c.values.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+        if (sample.value === null) continue;
+        usableDays++;
+        if (maximum === null || sample.value > maximum) {
+          maximum = sample.value;
+          maximumAt = validAt;
         }
       }
-      if (Number.isFinite(maxV)) peakVal = maxV;
-      const peakHours = peakT ? Math.max(0, Math.round((Date.parse(peakT) - now) / 3600000)) : null;
-      const peakDays = peakHours !== null ? Math.round(peakHours / 24) : null;
-
-      const riskLevel: 'normal' | 'watch' | 'alert' =
-        peakVal !== null && peakVal >= alert
-          ? 'alert'
-          : (peakVal !== null && peakVal >= bankfull ? 'watch' : 'normal');
-
-      let advisory = "Defer harvest: seasonal river flow is within safe limits. Allow crops to reach 100% full ripening for maximum grain yield.";
-      let advisory_bn = "অকাল কর্তন পরিহার: নদীপ্রবাহ নিরাপদ মৌসুমি সীমার মধ্যে রয়েছে। পূর্ণ ফলনের জন্য ধান সম্পূর্ণ পরিপক্ব হতে দিন।";
-
-      if (riskLevel === 'alert') {
-        advisory = "Emergency early harvest: peak flood surge arrives within <72h. Reap Boro paddy >=80% ripe immediately to prevent submersion loss.";
-        advisory_bn = "জরুরি আগাম কর্তন: ৭২ ঘণ্টার মধ্যে পাহাড়ি ঢল আসার সম্ভাবনা। বাঁধ উপচে ফসলহানি রোধে ৮০% পাকা বোরো ধান দ্রুত কাটুন।";
-      } else if (riskLevel === 'watch') {
-        advisory = "Harvest preparation: river flow rising towards bankfull. Mobilize combine harvesters and labor. Track upstream Cherrapunji rain.";
-        advisory_bn = "কর্তন প্রস্তুতি: নদীপ্রবাহ ডুবন্ত বাঁধের উচ্চতার দিকে বাড়ছে। কম্বাইন হারভেস্টার ও কৃষি শ্রমিক প্রস্তুত রাখুন। চেরাপুঞ্জির বৃষ্টি পর্যবেক্ষণ করুন।";
-      }
-
       reachMetaMap.set(c.id, {
         meta,
-        peakValue: peakVal,
-        peakTime: peakT,
-        peakLeadHours: peakHours,
-        peakLeadDays: peakDays,
-        arrivalLeadHours: arrivalH,
-        riskLevel,
-        harvestAdvisory: advisory,
-        harvestAdvisory_bn: advisory_bn,
+        seriesMaximum: maximum,
+        seriesMaximumValidAt: maximumAt,
+        usableDays,
+        totalDays: times.size,
+        warningStatus: 'unavailable',
+        warningReasonCode: 'no-validated-station-threshold-or-arrival-model',
       });
     }
   }
@@ -201,11 +138,6 @@ export function normalizeOutlook(raw: unknown, kind: 'air' | 'flood', now = Date
     cells: cells.map(c => {
       const v = c.values.get(validAt) || { value: null, p25: null, p75: null };
       const reachInfo = reachMetaMap.get(c.id);
-      const cellRisk: 'normal' | 'watch' | 'alert' =
-        v.value !== null && reachInfo?.meta
-          ? (v.value >= reachInfo.meta.alert_q ? 'alert' : (v.value >= reachInfo.meta.bankfull_q ? 'watch' : 'normal'))
-          : (reachInfo?.riskLevel || 'normal');
-
       return {
         id: c.id,
         latitude: c.latitude,
@@ -213,25 +145,22 @@ export function normalizeOutlook(raw: unknown, kind: 'air' | 'flood', now = Date
         value: v.value,
         p25: v.p25,
         p75: v.p75,
-        ...(kind === 'flood' && reachInfo?.meta ? {
-          station: reachInfo.meta.station,
-          station_bn: reachInfo.meta.station_bn,
-          river: reachInfo.meta.river,
-          river_bn: reachInfo.meta.river_bn,
-          haor: reachInfo.meta.haor,
-          haor_bn: reachInfo.meta.haor_bn,
-          vulnerability: reachInfo.meta.vulnerability,
-          vulnerability_bn: reachInfo.meta.vulnerability_bn,
-          bankfull_q: reachInfo.meta.bankfull_q,
-          alert_q: reachInfo.meta.alert_q,
-          peakValue: reachInfo.peakValue,
-          peakTime: reachInfo.peakTime,
-          peakLeadHours: reachInfo.peakLeadHours,
-          peakLeadDays: reachInfo.peakLeadDays,
-          arrivalLeadHours: reachInfo.arrivalLeadHours,
-          riskLevel: cellRisk,
-          harvestAdvisory: reachInfo.harvestAdvisory,
-          harvestAdvisory_bn: reachInfo.harvestAdvisory_bn,
+        ...(kind === 'flood' && reachInfo ? {
+          place: reachInfo.meta?.station || null,
+          place_bn: reachInfo.meta?.station_bn || null,
+          contextStatus: 'geographic-query-context-only',
+          stationMatchStatus: 'unvalidated',
+          riverMatchStatus: 'unvalidated',
+          seriesMaximum: reachInfo.seriesMaximum,
+          seriesMaximumValidAt: reachInfo.seriesMaximumValidAt,
+          usableDays: reachInfo.usableDays,
+          totalDays: reachInfo.totalDays,
+          warningStatus: reachInfo.warningStatus,
+          warningReasonCode: reachInfo.warningReasonCode,
+          harvestGuidanceStatus: 'unavailable',
+          harvestGuidanceReasonCode: 'no-local-crop-stage-or-official-advisory-feed',
+          bankfull_q: null,
+          alert_q: null,
         } : {})
       };
     })
@@ -245,22 +174,21 @@ export function normalizeOutlook(raw: unknown, kind: 'air' | 'flood', now = Date
       id: c.id,
       latitude: c.latitude,
       longitude: c.longitude,
-      station: info?.meta?.station || c.id,
-      station_bn: info?.meta?.station_bn || c.id,
-      river: info?.meta?.river || 'Northeast River',
-      river_bn: info?.meta?.river_bn || 'উত্তর-পূর্ব নদী',
-      haor: info?.meta?.haor || 'Haor Basin',
-      haor_bn: info?.meta?.haor_bn || 'হাওর অঞ্চল',
-      bankfull_q: info?.meta?.bankfull_q || null,
-      alert_q: info?.meta?.alert_q || null,
-      peakValue: info?.peakValue || null,
-      peakTime: info?.peakTime || null,
-      peakLeadHours: info?.peakLeadHours || null,
-      peakLeadDays: info?.peakLeadDays || null,
-      arrivalLeadHours: info?.arrivalLeadHours || null,
-      riskLevel: info?.riskLevel || 'normal',
-      harvestAdvisory: info?.harvestAdvisory || null,
-      harvestAdvisory_bn: info?.harvestAdvisory_bn || null,
+      place: info?.meta?.station || null,
+      place_bn: info?.meta?.station_bn || null,
+      contextStatus: 'geographic-query-context-only',
+      stationMatchStatus: 'unvalidated',
+      riverMatchStatus: 'unvalidated',
+      seriesMaximum: info?.seriesMaximum ?? null,
+      seriesMaximumValidAt: info?.seriesMaximumValidAt ?? null,
+      usableDays: info?.usableDays ?? 0,
+      totalDays: times.size,
+      warningStatus: 'unavailable',
+      warningReasonCode: 'no-validated-station-threshold-or-arrival-model',
+      harvestGuidanceStatus: 'unavailable',
+      harvestGuidanceReasonCode: 'no-local-crop-stage-or-official-advisory-feed',
+      bankfull_q: null,
+      alert_q: null,
     };
   }) : undefined;
 
@@ -299,8 +227,12 @@ export async function getOutlook(kind: 'air' | 'flood') {
         source: kind === 'air' ? 'CAMS global / Open-Meteo' : 'GloFAS v4 forecast / Open-Meteo',
         sourceUrl: kind === 'air' ? 'https://open-meteo.com/en/docs/air-quality-api' : 'https://open-meteo.com/en/docs/flood-api',
         resolution: kind === 'air' ? '0.4° (~45 km), native 3-hour steps' : '0.05° (~5 km), daily steps',
-        extentStatus: kind === 'flood' ? 'modeled-reaches-with-arrival-and-submersible-embankment-risk' : 'unavailable',
-        extentReasonCode: kind === 'flood' ? 'field-level-inundation-requires-bwdb-submersible-dyke-dem' : 'no-calibrated-inundation-model',
+        extentStatus: 'unavailable',
+        warningStatus: 'unavailable',
+        warningReasonCode: 'no-validated-station-threshold-or-arrival-model',
+        harvestGuidanceStatus: 'unavailable',
+        harvestGuidanceReasonCode: 'no-local-crop-stage-or-official-advisory-feed',
+        extentReasonCode: 'no-calibrated-inundation-model',
         reachSelection: kind === 'flood' ? 'largest modeled river within 5 km of query; not validated against warning stations' : null,
         requestedCoordinates: coords,
         observationsStatus: 'unavailable',

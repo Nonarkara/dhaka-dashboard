@@ -16,10 +16,15 @@
 
   function classify(p) {
     const use = p['building:use'] || p.building;
-    if (p.office === 'government' || ['school','college','university','hospital','place_of_worship','community_centre','townhall','courthouse','library','police','fire_station'].includes(p.amenity) || ['public','civic','government','hospital','school','college','university','mosque','church','temple'].includes(use)) return 'civic';
+    if (p.amenity === 'place_of_worship' || ['mosque','church','temple','shrine'].includes(use)) return 'mosque';
+    if (['school','college','university','kindergarten'].includes(p.amenity) || ['school','college','university','kindergarten'].includes(use)) return 'education';
+    if (['hospital','clinic','pharmacy'].includes(p.amenity) || ['hospital','clinic'].includes(use)) return 'healthcare';
+    if (p.office === 'government' || ['community_centre','townhall','courthouse','library','police','fire_station'].includes(p.amenity) || ['public','civic','government'].includes(use)) return 'civic';
     if (['industrial','warehouse','factory','service','utility','power'].includes(use)) return 'industry';
-    if (['residential','apartments','house','detached','dormitory','terrace','semidetached_house'].includes(use)) return 'homes';
-    if ((p.shop && p.shop !== 'no') || (p.office && p.office !== 'no') || ['commercial','retail','office','restaurant','hotel'].includes(use)) return 'commerce';
+    if (['apartments','dormitory'].includes(use)) return 'apartments';
+    if (['residential','house','detached','terrace','semidetached_house'].includes(use)) return 'homes';
+    if ((p.shop && p.shop !== 'no') || ['marketplace','restaurant'].includes(p.amenity) || ['retail','restaurant'].includes(use)) return 'retail';
+    if ((p.office && p.office !== 'no') || ['commercial','office','hotel'].includes(use)) return 'commerce';
     return 'unknown';
   }
 
@@ -78,10 +83,12 @@
     'university', '#2563a8',
     'college', '#2563a8',
     'kindergarten', '#2563a8',
+    'education', '#2563a8',
     // Healthcare -> Medical Celadon
     'hospital', '#10b981',
     'clinic', '#10b981',
     'pharmacy', '#10b981',
+    'healthcare', '#10b981',
     // Default neutral ground
     '#b4b0a3'
   ];
@@ -102,9 +109,9 @@
       { key: 'education', color: colors.education, en: 'Education / Campus', bn: 'শিক্ষা ও বিশ্ববিদ্যালয়' },
       { key: 'healthcare', color: colors.healthcare, en: 'Healthcare / Hospitals', bn: 'হাসপাতাল ও স্বাস্থ্য' },
       { key: 'industry', color: colors.industry, en: 'Industry / RMG / EPZ', bn: 'শিল্প ও তৈরি পোশাক' },
-      { key: 'unknown', color: colors.unknown, en: 'Neutral Ground', bn: 'সাধারণ ভবন' },
+      { key: 'unknown', color: colors.unknown, en: 'Use unknown', bn: 'ব্যবহার অজানা' },
     ];
-    node.innerHTML = `<details><summary>${bn ? 'ভবনের ধরন (প্যালেট ১)' : 'Building types (Palette 1)'}</summary><div class="building-swatches">${items.map(it => `<span><i style="background:${it.color}"></i>${bn ? it.bn : it.en}</span>`).join('')}</div><p>${bn ? 'সানজো ওয়াদা প্যালেট ১ (ইংরেজি লাল ও নীল) অনুসারে ভবনের ধরন চিহ্নিত। অন্যান্য ভবন প্রাকৃতিক ধূসর।' : 'Sanzo Wada Palette 1 tone (English Red & Cerulian Blue). Streamed buildings use mapped OSM types.'}</p></details>`;
+    node.innerHTML = `<details><summary>${bn ? 'ভবনের ধরন (প্যালেট ১)' : 'Building types (Palette 1)'}</summary><div class="building-swatches">${items.map(it => `<span><i style="background:${it.color}"></i>${bn ? it.bn : it.en}</span>`).join('')}</div><p>${bn ? 'সানজো ওয়াদা প্যালেট ১-এর রং। OSM-এর নথিভুক্ত ব্যবহার অনুযায়ী রং; ট্যাগহীন স্ট্রিম করা ভবনের ব্যবহার অজানা। উচ্চতা নথিভুক্ত বা আনুমানিক।' : 'Sanzo Wada Palette 1 tone (English Red & Cerulian Blue). Colors follow mapped OSM use tags. Untagged streamed buildings remain unknown; heights mapped or estimated.'}</p></details>`;
   }
 
   document.addEventListener('DOMContentLoaded', render);

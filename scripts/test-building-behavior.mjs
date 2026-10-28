@@ -23,7 +23,7 @@ for(const f of detail.features) {
   }
 }
 function app({offline=false}={}) {
-  const elements=new Map(['atlas-view','atlas-lens-title','atlas-lens-description','atlas-layer-status'].map(id=>[id,{value:'3d',textContent:'',hidden:true,addEventListener(){}}]));
+  const elements=new Map(['atlas-view','atlas-lens-title','atlas-lens-description','atlas-layer-status','atlas-observation-hud'].map(id=>[id,{value:'3d',textContent:'',hidden:true,addEventListener(){}}]));
   let map;
   class MapStub {
     constructor(options){this.layers=new Map(options.style.layers.map(l=>[l.id,l]));this.sources=new Map();this.options=options;this.events=new Map();this.inside=true;this.zoom=16.7;this.ready=false;map=this;}
@@ -75,7 +75,7 @@ function app({offline=false}={}) {
     },
   };
   let source=read('public/app.js');
-  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadParliamentBuildings,flyToArea,buildingPaint};})();';
+  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadParliamentBuildings,flyToArea,buildingPaint,showInspectionHUD};})();';
   vm.runInNewContext(source,context);
   window.test.initMap();
   return {api:window.test,map,elements};
@@ -158,3 +158,16 @@ for(const height of [undefined,null,0,-1])assert.equal(evaluate(paint['fill-extr
 assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:35.7}),35.7);
 assert.equal(evaluate(paint['fill-extrusion-height'],{render_min_height:10}),16);
 console.log(`✓ Building behavior: ${detail.features.length} real footprints, Parliament courtyards, all lenses, exclusive detail switch, pan/offline/2D fallback and authored camera`);
+
+({api,map}=app());
+const authored=JSON.parse(read('public/dhaka-areas.json')).find(a=>a.id==='parliament');
+api.flyToArea(authored,0);const authoredCamera=map.camera;
+api.applyLens('city');assert.equal(map.camera,authoredCamera,'same-lens refresh must not overwrite authored Parliament view');
+api.applyLens('heritage');const heritageCamera=map.camera;
+api.applyLens('heritage');assert.equal(map.camera,heritageCamera,'language refresh must preserve camera');
+console.log('✓ Camera lifecycle: authored Parliament and manual same-lens views survive evidence/language refresh');
+
+({api,map,elements}=app());api.showInspectionHUD('landmark',{name:'<img src=x onerror=alert(1)>',description:'<script>bad()</script>'});
+assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('<img'));
+assert.ok(elements.get('atlas-observation-hud').innerHTML.includes('&lt;img'));
+console.log('✓ Inspection security: untrusted map labels render as text');

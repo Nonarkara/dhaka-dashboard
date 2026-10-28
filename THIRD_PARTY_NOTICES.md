@@ -38,3 +38,5 @@ authors. It does not reproduce scans, cover art, or publisher text.
 Plate 241 digital conversions are not measurements of printed inks.
 
 Barlow Semi Condensed and Hind Siliguri: SIL OFL, license texts in public/fonts.
+
+Daily currency reference: Fawaz Ahmed Currency API, CC0-1.0, https://github.com/fawazahmed0/exchange-api . World Bank WDI series are attributed with individual indicator links and reporting years in the national-data dialog.

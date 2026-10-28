@@ -8,22 +8,23 @@ A 3D civic atlas and operational dashboard for Greater Metropolitan Dhaka where 
 
 ## 1. Capabilities & Lenses
 
-DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and environmental monitoring across 12 interactive lenses:
+DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and environmental monitoring across 13 interactive lenses:
 
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
 | **City in 3D** | OSM building extrusions at zoom 14+ in every 3D lens; local Parliament-area footprints preserve courtyards (mapped or estimated heights), plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
-| **Rivers & flood risk** | The five peripheral rivers (Buriganga, Turag, Balu, Shitalakshya, Dhaleshwari) and Tongi Khal with 6 BWDB gauge stations and surveyed danger levels (m MSL) | Bangladesh Water Development Board (BWDB) / FFWC |
+| **River outlook** | Northeast GloFAS daily model reaches with ensemble quartiles and available-series maxima; Dhaka reference station registry has no connected observations or calibrated warnings | Bangladesh Water Development Board (BWDB) / FFWC |
 | **Economic engine** | Ready-Made Garment (RMG) export corridors, Savar DEPZ, Adamjee EPZ, Motijheel financial district, and wholesale hubs (Kawran Bazar, Islampur, Chawkbazar) | Export Promotion Bureau (EPB), Bangladesh Bank, DSE |
 | **Transit & Metro** | Dhaka Metro Rail (MRT Line 6) stations, Dhaka Elevated Expressway, Kamalapur central rail terminal, and Sadarghat launch terminal | DMTCL, DTCA, Bangladesh Railway, BIWTA |
-| **Air & 72h timeline** | City-center modeled air quality (the seven locations are a reference registry, not seven sensor readings); (Uttara, Mirpur, Gulshan, Farmgate, Motijheel, Sadarghat, Savar) with 72-hour PM2.5 & US AQI forecast curves | Copernicus CAMS / Open-Meteo |
+| **Air forecast** | Regional CAMS PM2.5 playback at approximately 45 km in native three-hour steps for the next 48 hours; city-center 72-hour timeline remains in the air desk | Copernicus CAMS / Open-Meteo |
 | **Brick kilns & smoke** | Explicit unavailable state until FIRMS retrieval is configured; surface wind only, no 925 hPa field | NASA FIRMS (VIIRS NOAA-20 375m), ECMWF |
 | **Architectural heritage** | Mughal, colonial, and modern masterworks: Lalbagh Fort (1678), Ahsan Manzil (1872), Louis Kahn's Jatiya Sangsad Bhaban (1982), Curzon Hall (1904) | Directorate of Archaeology, Survey of Bangladesh |
 | **Rain · next 24 h** | Catchment-level precipitation accumulation forecasts across the Greater Dhaka river basin | Open-Meteo High-Resolution Precipitation Models |
 | **Rain radar** | Live Doppler radar precipitation loop over the Bengal Delta | RainViewer Doppler Radar Mosaic |
 | **Satellite clouds** | Daily true-color atmospheric cloud reflectance | NASA GIBS / NOAA-20 VIIRS True Color |
 | **Night lights** | Nighttime radiance and urban electrification patterns | NASA GIBS / Suomi NPP VIIRS Black Marble (VNP46A2) |
-| **Flood inundation** | Global near-real-time surface water and flood inundation | NASA GIBS / Terra & Aqua MODIS 250m Flood Water |
+| **Satellite flood detection** | Dated VIIRS combined one-day flood-detection imagery; not a forecast of local arrival or field impacts | NASA GIBS |
+| **Satellite aerosol (AOD)** | Dated MODIS MAIAC atmospheric aerosol column; not ground-level PM2.5 | NASA GIBS |
 
 ---
 
@@ -37,7 +38,7 @@ Rivers likewise retain station geography and threshold references, but current l
 
 ## 3. Hydrology & River Ring
 
-Dhaka is an island city encircled by rivers. DHKx monitors 6 critical hydrological gauge stations:
+Dhaka is an island city encircled by rivers. DHKx retains six reference station locations. The benchmarks below are unverified registry entries; current observations are not connected:
 - **Buriganga River at Dhaka (Mill Barrage)**: Danger Level 5.55 m MSL
 - **Turag River at Mirpur**: Danger Level 5.50 m MSL
 - **Balu River at Demra**: Danger Level 5.75 m MSL
@@ -58,16 +59,18 @@ The dashboard runs on a Cloudflare Worker serving a zero-bundle-overhead static 
 | `/api/atlas/districts` | GET | DNCC & DSCC municipal divisions and administrative thanas |
 | `/api/atlas/at-this-point?lat=&lng=` | GET | Nearest weather station, river gauge, and geographic bbox containment |
 | `/api/atlas/weather` | GET | Current weather, humidity, apparent temp, and 3-day forecast |
-| `/api/atlas/air-quality` | GET | 7-station PM2.5, PM10, AQI and 72-hour CAMS forecast timeline |
+| `/api/atlas/air-quality` | GET | City-center CAMS model timeline; seven locations are a reference registry |
 | `/api/atlas/rainfall` | GET | 24-hour rainfall accumulation across 5 catchment basins |
 | `/api/atlas/fires` | GET | NASA FIRMS active fire hotspots in Savar/Gazipur kiln arcs |
-| `/api/atlas/wind` | GET | Surface and 925 hPa wind vectors showing smoke drift trajectories |
+| `/api/atlas/wind` | GET | Modeled surface wind; pressure-level transport and pollution attribution unavailable |
+| `/api/atlas/outlook?kind=air` or `kind=flood` | GET | Regional CAMS PM2.5 / GloFAS daily discharge playback; warning/arrival/harvest guidance unavailable |
+| `/api/atlas/instruments` | GET | Dated national World Bank annual series and daily CC0 FX references; partial failure metadata |
 | `/api/atlas/environment` | GET | Dated NASA GIBS WMTS endpoints and RainViewer radar metadata |
 | `/api/atlas/earthquake` | GET | USGS seismic events in the Bengal Basin and Dauki Fault zone |
 | `/api/atlas/search?q=` | GET | Address geocoder bounded to Greater Dhaka |
 | `/api/atlas/export` | GET | GeoJSON export of landmarks, rivers, and transit features |
 | `/api/atlas/watch` | GET | Real-time status indicators for flood, air, weather, and economy |
-| `/api/dhaka/rivers` | GET | BWDB gauge readings, danger levels, historical peaks, and flood status |
+| `/api/dhaka/rivers` | GET | Reference station registry; current readings unavailable |
 | `/api/dhaka/economy` | GET | Sourced macroeconomic indicators and EPZ industrial clusters |
 | `/api/dhaka/transit` | GET | MRT Line 6 stations, elevated expressway, and transit hubs |
 

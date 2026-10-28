@@ -32,13 +32,12 @@ The two-row header is superseded by a 48px operating row. Barlow Semi Condensed/
 
 `/api/atlas/outlook?kind=air|flood` supplies validated CAMS global PM2.5 (native three-hour steps, ~45km cells) or GloFAS v4 daily discharge at northeast reference queries. Playback starts paused, supports scrub/retry, labels valid/retrieval times, suppresses missing cells and invalid quartile pairs, deduplicates returned coordinates and rejects expired horizons. Run issue time/local accuracy are unavailable. These are not ground observations, calibrated inundation extents or flash-flood arrival predictions. Daily northeast model reaches are not yet validated against FFWC stations. Private delegate material is not distributed. See docs/DESIGN-OUTLOOK.md and docs/evidence/2026-10-28.
 
-## Northeast Farmer Early Warning & Harvest Decision Support · 28 October 2026
+## Audit correction: northeast warning inference · 28 October 2026
 
-The model playback is upgraded to directly address the core agricultural need of the Haor Basin: early warning that helps northeast farmers make Boro rice harvest decisions.
+The earlier harvest-warning implementation was not scientifically validated. Tests reproduced a seven-day maximum described as arriving within 72 hours, and missing discharge classified as safe with advice to defer harvest. The hardcoded bankfull/alert values had no cited calibration. A passing byte check proved deployment, not the validity of these recommendations.
 
-- Reaches identify authoritative hydrological gateways: Jadukata at Tahirpur/Lorergorh (Tanguar Haor entrance), Surma at Sunamganj Sadar (Dekhar/Shanir Haor), Kushiyara at Amalshid/Zakiganj (Hakaluki Haor corridor), and Upper Surma at Sylhet Sadar.
-- Hydrographs model peak surge arrival time ($T_{peak}$), lead hours, and bankfull/surge alert thresholds.
-- Actionable DAE/BRRI agricultural harvest guidance is rendered directly in the player and reach cards: Emergency early harvest of ≥80% ripe paddy when surge arrives in <72h vs deferring harvest for full ripening when flow is calm.
-- Map points are interactive, color-coded by Palette plate 241 risk levels (#547076 normal, #c5a56e watch, #dd4027 surge alert), and clickable to open the HUD reach card.
-- Explicit scientific demarcation: 1D river discharge ($m^3/s$) establishes arrival time and surge volume, while 2D field-level inundation boundaries require local DEM and BWDB submersible dyke (ডুবন্ত বাঁধ) crest heights.
-
+- Geographic labels now identify query context near places, never an authoritative warning-station match.
+- The available daily series maximum and its UTC model date are descriptive statistics, not surge arrival or warning lead time.
+- Warning thresholds, field inundation, local crop-stage guidance and arrival predictions remain explicitly unavailable until validated official inputs are connected.
+- Reach playback, ensemble ranges, clickable inspection, valid/retrieval times and missing-data behavior are preserved. Inspection closes on frame/lens/language changes to avoid stale values.
+- National instruments retain a device clock, dated World Bank WDI annual series and CC0 daily FX reference data. Full labels, periods, source links and unavailable states are accessible from Map → Bangladesh data on phones. No population billion/million conversion or live-FX claim is inferred.

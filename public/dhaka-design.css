@@ -311,3 +311,25 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
   font-size: 11px;
   color: var(--accent);
 }
+
+/* Audit: density must retain complete labels, readable type and usable targets. */
+.atlas-menu-body { width:260px; min-width:0; max-width:calc(100vw - 16px); padding:10px; }
+.atlas-menu-body .atlas-control-label > span { font-size:13px; text-transform:none; letter-spacing:0; }
+.atlas-menu-body select,.atlas-menu-body .atlas-btn { min-height:36px; height:auto; font-size:14px; white-space:normal; overflow:visible; text-overflow:clip; }
+.atlas-menu-body select { padding:4px 6px; }
+.atlas-menu-body a { white-space:normal; overflow:visible; font-size:13px; padding:5px 0; }
+.atlas-map-key { width:fit-content; max-width:min(290px,calc(100% - 70px)); }
+.atlas-map-key summary { min-height:32px; font-size:13px; padding:5px 8px; }
+.atlas-map-key p { font-size:13px; line-height:1.4; margin:6px 8px; }
+.building-swatches { font-size:13px; line-height:1.35; }
+.forecast-player { width:min(320px,calc(100% - 16px)); font-size:13px; line-height:1.4; }
+.forecast-player h2 { font-size:17px; }
+.forecast-player p,.forecast-player output { font-size:13px; }
+.forecast-player button { min-height:36px; height:auto; font-size:14px; }
+.forecast-player details[open] { max-height:180px; }
+.forecast-harvest-card { padding:6px 0; border:0; font-size:13px; background:transparent; }
+.reach-row { display:grid; gap:3px; font-size:13px; }
+.atlas-map-key summary { white-space:normal; overflow:visible; text-overflow:clip; }
+.building-swatches span { white-space:normal; overflow:visible; font-size:13px; }
+.atlas-lens-story strong,.atlas-lens-story > span { font-size:13px; line-height:1.4; padding:4px 8px; }
+.modal-close-btn { min-width:36px; min-height:36px; }

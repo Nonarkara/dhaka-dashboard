@@ -14,9 +14,9 @@ Building categories use actual OSM tags, never height, proximity or random color
 - **Education & Campuses**: Academic Lapis `#2563a8`
 - **Healthcare & Hospitals**: Medical Celadon `#10b981`
 - **Industry & RMG Factories**: Industrial Slate `#5a6772`
-- **General / Unknown**: Neutral Ground `#b4b0a3` marks unclassified footprints. Streamed OpenFreeMap vector tiles map available class/use tags.
+- **General / Unknown**: Neutral Ground `#b4b0a3` marks unclassified footprints. Streamed tiles without mapped use tags remain unknown.
 
-Spatial Hallucination (SH) Elimination: Overlays are budgeted strictly to prevent map obstruction. The atlas menu bar is halved from 300 px to 150 px with single-column vertical micro-controls; the map key is budgeted to 150 px; the forecast playback panel is halved from 560 px to 280 px; and the observation HUD is tightened from 310 px to 220 px. This preserves the maximum possible operating viewport for the hero 3D map. Height provenance and Parliament courtyards remain intact.
+Spatial Hallucination (SH) Elimination: Overlays are budgeted strictly to prevent map obstruction. The atlas menu groups its controls without clipping or shrinking readable labels; the map key fits its labels; the forecast playback panel groups model values with playback controls; and the observation HUD is tightened from 310 px to 220 px. This preserves the maximum possible operating viewport for the hero 3D map. Height provenance and Parliament courtyards remain intact.
 
 ### Satellite Observation, Atmospheric Modeling & 3D Spatial Geometry
 Satellite rasters come from NASA GIBS (WMTS, `epsg3857/best`). Every layer id, tile matrix set and file format is validated against the GIBS capabilities catalogue by `scripts/test-environment-contract.mjs`, and `scripts/verify-gibs-live.mjs` confirms at release time that the tiles still return imagery over Dhaka. GIBS publishes each product on its own latency, so the observation date is resolved by probing candidate dates rather than assumed, and the resolved date is printed in the lens status strip. A layer with no observation reports `unavailable` with a `reasonCode` — it never renders an empty raster as if it were data.
@@ -36,19 +36,22 @@ Operational requirements distilled from a private delegate discussion: policy de
 
 The outlook is a model playback, paused by default. CAMS global PM2.5 uses native-scale cells, three-hour frames and a fixed concentration scale. GloFAS discharge uses daily model reaches and ensemble quartiles. Model issue time is not exposed by the provider and remains null; retrieval and valid times are separate. Missing values stay missing.
 
-### Northeast Agricultural Early Warning & Harvest Decision Advisory
-In the Northeast Haor Basin (Sunamganj, Sylhet, Netrokona, Kishoreganj), Boro rice is the sole annual crop. Pre-monsoon flash floods originate from heavy rainfall over the Meghalaya/Assam hills (Cherrapunji) and enter through 4 gateway reaches:
-- **Jadukata River · Tahirpur / Lorergorh**: Tanguar & Shanir Haor entry (Bankfull 350 m³/s, Alert 600 m³/s).
-- **Surma River · Sunamganj Sadar**: Dekhar & Karchar Haor depression (Bankfull 550 m³/s, Alert 900 m³/s).
-- **Kushiyara River · Amalshid / Zakiganj**: Hakaluki Haor corridor (Bankfull 1,200 m³/s, Alert 1,800 m³/s).
-- **Upper Surma · Sylhet Sadar**: Upper Surma Valley (Bankfull 400 m³/s, Alert 700 m³/s).
+### Northeast river outlook and decision limits
 
-From the 10-day GloFAS v4 hydrograph, the system calculates peak surge magnitude, peak arrival timestamp ($T_{peak}$), and lead hours. This drives an agricultural decision advisory matching Department of Agricultural Extension (DAE) and Bangladesh Rice Research Institute (BRRI) protocols:
-- **Surge Alert (<72h lead time, discharge > alert/bankfull)**: Emergency early harvest of Boro paddy ≥80% ripe immediately to prevent 100% submersion loss from overtopping submersible dykes (ডুবন্ত বাঁধ).
-- **Flood Watch (3–5 days lead time)**: Mobilize combine harvesters and community labor; track Cherrapunji upstream rainfall.
-- **Normal Flow**: Defer harvesting; allow grain filling to reach 100% full ripening for maximum agricultural yield.
+The delegates' need for agricultural warning lead time is retained as a product requirement. It is not satisfied by attaching uncited channel-capacity numbers to a daily global model. The audit reproduced seven-day peaks reported as arriving within 72 hours, and absent values reported as safe. The earlier DAE/BRRI-attributed harvest/defer advice was not backed by a connected official advisory or local crop observations.
 
-### Scientific Demarcation: Channel Discharge vs Field Inundation
-River discharge ($m^3/s$) establishes upstream volume, rate of rise, and arrival lead time ($T_{arrival}$). However, whether individual agricultural plots or roads flood depends on local Digital Elevation Models (DEM) and the crest elevation and condition of BWDB submersible dykes (ডুবন্ত বাঁধ). When river flow exceeds bankfull capacity, submersible dykes face overtopping. Official surveyed water levels and warning stages are maintained by BWDB / FFWC at https://ffwc.gov.bd .
+Four geographic queries remain near Sunamganj, Sylhet, Zakiganj and Tahirpur. The API can select a different river within its search radius; place names describe query context, not verified river or warning-station identity. Actual returned coordinates stay visible. All cells use a neutral categorical color, with no safe/watch/alert classification.
 
-Sources: https://open-meteo.com/en/docs/air-quality-api ; https://open-meteo.com/en/docs/flood-api ; https://global-flood.emergency.copernicus.eu/general-information/about-glofas/ . Official warnings: https://ffwc.gov.bd .
+Each reach retains its selected daily modeled discharge and ensemble quartiles. A maximum across available daily samples is labeled as an available-series maximum with its UTC model date and usable-day count. It supplies neither flash-flood arrival time nor a local warning threshold. A declining series, a zero value and absent values all leave warning and harvest status unavailable.
+
+Field inundation requires a calibrated terrain/hydraulic model and local validation. Operational agricultural advice also requires official warning inputs, crop maturity, embankment condition and an established advisory workflow. The interface links to FFWC for official bulletins. No generic harvest or defer recommendation is inferred.
+
+### National instruments
+
+The unfinished clock/economy band is integrated through a bounded national-data disclosure. Bangladesh time uses the device clock with an explicit label, independent of cached server responses. World Bank WDI values retain annual periods and source links; they do not become live economic measurements. A CC0 daily FX reference retains its data date and is never labeled a live tradable rate. Latest valid dated observations are selected after country, indicator, number and period checks. Missing feeds show reason codes and timestamps; full evidence remains available at phone widths.
+
+### Geometry audit
+
+A compact map toolbar remains 48px. Density cannot be achieved with 24px targets, clipped labels or unreadable microtype. Map settings use complete wrapping labels and at least 36px controls. The building key expands to its content, and the player keeps readable qualifications beside play and scrub. Populated phone, tablet, desktop, Bengali and error states are measured and independently reviewed before release.
+
+Sources: https://open-meteo.com/en/docs/air-quality-api ; https://open-meteo.com/en/docs/flood-api ; https://github.com/fawazahmed0/exchange-api ; https://datahelpdesk.worldbank.org/knowledgebase/articles/898599-indicator-api-queries . Official warnings: https://ffwc.gov.bd .
