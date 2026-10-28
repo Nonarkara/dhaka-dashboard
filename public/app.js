@@ -99,20 +99,20 @@
     aerosol: {
       title: "NASA Satellite Aerosol Optical Depth (AOD)",
       title_bn: "নাসা উপগ্রহ এরোসল অপটিক্যাল ডেপথ (AOD)",
-      desc: "NASA MODIS MAIAC & VIIRS daily atmospheric aerosol optical depth and smoke column density over Bengal Basin.",
-      desc_bn: "নাসার মডিস ও ভিআইআইআরএস উপগ্রহভিত্তিক বায়ুমণ্ডলীয় এরোসল ও ধোঁয়ার ঘনত্ব।"
+      desc: "Daily NASA MODIS MAIAC aerosol optical depth — atmospheric particulate loading and smoke density over the Bengal Basin.",
+      desc_bn: "দৈনিক নাসা মডিস মায়াক এরোসল অপটিক্যাল ডেপথ — বাংলাদেশ অববাহিকার বায়ুমণ্ডলীয় কণা ও ধোঁয়ার ঘনত্ব।"
     },
     night: {
-      title: "NASA Black Marble Night Lights",
-      title_bn: "নাসার ব্ল্যাক মার্বেল রাতের আলো",
-      desc: "Daily nighttime radiance from Suomi NPP VIIRS Day/Night band.",
-      desc_bn: "সুওমি এনপিপির উপগ্রহ চিত্র থেকে রাতের আলোর দীপ্তি ও বিদ্যুতায়ন।"
+      title: "NASA VIIRS Night Lights",
+      title_bn: "নাসার ভিআইআইআরএস রাতের আলো",
+      desc: "Daily night-time radiance from the Suomi NPP VIIRS Day/Night Band over Greater Dhaka.",
+      desc_bn: "সুওমি এনপিপি ভিআইআইআরএস ডে/নাইট ব্যান্ড থেকে বৃহত্তর ঢাকার দৈনিক রাতের দীপ্তি।"
     },
     water: {
       title: "Satellite Observed Flood Inundation",
       title_bn: "উপগ্রহ পর্যবেক্ষিত বন্যা প্লাবন",
-      desc: "MODIS NRT 250m global surface water and flood inundation detection.",
-      desc_bn: "মডিস (MODIS) উপগ্রহ উপাত্তভিত্তিক ভূপৃষ্ঠের পানি ও প্লাবন বিস্তার।"
+      desc: "Daily NASA VIIRS combined flood detection, 1-day window, for the Bengal Delta.",
+      desc_bn: "দৈনিক নাসা ভিআইআইআরএস যৌথ বন্যা শনাক্তকরণ, ১ দিনের জানালা — বাংলাদেশ বদ্বীপ।"
     }
   };
 
@@ -566,6 +566,91 @@
 
   let radarTimer = null;
   let dynamicLayers = [];
+  let lensToken = 0;
+
+  // NASA GIBS layer registry.
+  // Every entry is validated against the GIBS WMTS capabilities catalogue by
+  // scripts/test-environment-contract.mjs: the layer id must exist, the tile
+  // matrix set must be one the layer publishes, and the file format must
+  // match. GIBS observation latency differs per product, so the observation
+  // date is resolved by probing rather than assumed — see resolveGibsObservation.
+  const GIBS_LAYERS = {
+    cloud: {
+      layer: "VIIRS_NOAA20_CorrectedReflectance_TrueColor",
+      level: 9, ext: "jpg", maxzoom: 9,
+      probe: { z: 9, y: 221, x: 384 },
+      label: ["NASA VIIRS True Color · surface reflectance", "নাসা ভিআইআইআরএস ট্রু কালার · ভূপৃষ্ঠের পরিবর্তনশীলতা"]
+    },
+    aerosol: {
+      layer: "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth",
+      level: 7, ext: "png", maxzoom: 7,
+      probe: { z: 7, y: 55, x: 96 },
+      label: ["NASA MODIS MAIAC · aerosol optical depth (AOD)", "নাসা মডিস মায়াক · এরোসল অপটিক্যাল ডেপথ (AOD)"]
+    },
+    night: {
+      layer: "VIIRS_SNPP_DayNightBand",
+      level: 7, ext: "png", maxzoom: 7,
+      probe: { z: 7, y: 55, x: 96 },
+      label: ["NASA VIIRS Day/Night Band · night-time radiance", "নাসা ভিআইআইআরএস ডে/নাইট ব্যান্ড · রাতের দীপ্তি"]
+    },
+    water: {
+      layer: "VIIRS_Combined_Flood_1-Day",
+      level: 9, ext: "png", maxzoom: 9,
+      probe: { z: 9, y: 221, x: 384 },
+      label: ["NASA VIIRS combined flood · 1-day window", "নাসা ভিআইআইআরএস যৌথ বন্যা · ১ দিনের জানালা"]
+    }
+  };
+
+  const gibsObservationCache = new Map();
+
+  function gibsTileUrl(spec, date) {
+    const d = date ? `${date}/` : "";
+    return `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${spec.layer}/default/${d}GoogleMapsCompatible_Level${spec.level}/{z}/{y}/{x}.${spec.ext}`;
+  }
+
+  function gibsProbeUrl(spec, date) {
+    const d = date ? `${date}/` : "";
+    const p = spec.probe;
+    return `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${spec.layer}/default/${d}GoogleMapsCompatible_Level${spec.level}/${p.z}/${p.y}/${p.x}.${spec.ext}`;
+  }
+
+  async function gibsTileResolves(url) {
+    try {
+      const res = await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(9000) });
+      if (!res.ok) return false;
+      const len = res.headers?.get ? Number(res.headers.get("content-length") || 0) : null;
+      return len === null || len > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  // GIBS publishes each product on its own latency (0-3 days). Probe candidate
+  // dates newest-first and take the first that actually carries a tile over
+  // Dhaka: a 404 means no observation exists, not an empty raster to display.
+  // The candidates are probed concurrently so the lens resolves in one round trip.
+  async function resolveGibsObservation(spec) {
+    const candidates = Array.from({ length: 4 }, (_, back) =>
+      new Date(Date.now() - back * 86400000).toISOString().split("T")[0],
+    );
+    const results = await Promise.all(
+      candidates.map(async (date) => {
+        const key = `${spec.layer}|${date}`;
+        const cached = gibsObservationCache.get(key);
+        if (cached !== undefined) return { date, ok: cached };
+        const ok = await gibsTileResolves(gibsProbeUrl(spec, date));
+        gibsObservationCache.set(key, ok);
+        return { date, ok };
+      }),
+    );
+    for (const r of results) {
+      if (r.ok) return { date: r.date, dated: true };
+    }
+    // GIBS also serves the latest available observation without a date. Prefer
+    // it over showing nothing, but report that the exact date is unresolved.
+    if (await gibsTileResolves(gibsProbeUrl(spec, null))) return { date: null, dated: false };
+    return null;
+  }
 
   const LENS_VIEWPORTS = {
     city: { center: [90.4125, 23.8103], zoom: 13, pitch: 50, bearing: 15 },
@@ -602,6 +687,7 @@
 
   function applyLens(lensId) {
     currentLens = lensId;
+    const token = ++lensToken;
     if ($("#atlas-lens")) $("#atlas-lens").value = lensId;
     window.AtlasForecast?.activate(lensId);
     $$(".atlas-lenses button").forEach(btn => {
@@ -662,35 +748,52 @@
       map.setLayoutProperty("landmarks-points", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
     }
 
-    const today = new Date().toISOString().split("T")[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+    if (GIBS_LAYERS[lensId]) {
+      applyGibsOverlay(lensId, token);
+    }
+  }
 
-    if (lensId === "cloud") {
-      addRasterOverlay(
-        "nasa-cloud",
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/${today}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`
-      );
-    } else if (lensId === "aerosol") {
-      addRasterOverlay(
-        "nasa-aerosol",
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth/default/${yesterday}/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png`,
-        7
-      );
+  async function applyGibsOverlay(lensId, token) {
+    const spec = GIBS_LAYERS[lensId];
+    if (!spec) return;
+    const layerStatus = $("#atlas-layer-status");
+    const overlayId = `nasa-${lensId}`;
+    // GIBS serves an undated path for the latest available observation, and it
+    // is byte-identical to that observation's dated tiles. Render it straight
+    // away so the lens never shows an empty waiting screen; the dated template
+    // is pinned in below once the exact observation date is known.
+    addRasterOverlay(overlayId, gibsTileUrl(spec, null), spec.maxzoom);
+    if (layerStatus) {
+      layerStatus.hidden = false;
+      layerStatus.textContent = tr("Locating latest NASA observation…", "নাসার সর্বশেষ পর্যবেক্ষণ খোঁজা হচ্ছে…");
+    }
+    const obs = await resolveGibsObservation(spec);
+    if (token !== lensToken || currentLens !== lensId) return;
+    if (!obs) {
       if (layerStatus) {
         layerStatus.hidden = false;
-        layerStatus.textContent = tr("NASA MODIS MAIAC · Aerosol Optical Depth (AOD) · Daily satellite column density", "নাসা মডিস মায়াক · এরোসল অপটিক্যাল ডেপথ (AOD) · দৈনিক উপগ্রহ বায়ুমণ্ডলীয় ঘনত্ব");
+        layerStatus.textContent = tr(
+          `Satellite layer unavailable · reasonCode gibs-no-observation · ${spec.layer}`,
+          `উপগ্রহ স্তর উপলব্ধ নয় · reasonCode gibs-no-observation · ${spec.layer}`
+        );
       }
-    } else if (lensId === "night") {
-      addRasterOverlay(
-        "nasa-night",
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_DayNightBand_ENCC/default/${yesterday}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`,
-        8
-      );
-    } else if (lensId === "water") {
-      addRasterOverlay(
-        "nasa-water",
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_Flood_Water_250m/default/${yesterday}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`
-      );
+      return;
+    }
+    if (obs.dated) {
+      // Pin every tile to one observation date so a mid-session GIBS rollover
+      // cannot mix two dates across the raster.
+      if (map?.getSource(overlayId)) {
+        map.removeLayer(overlayId);
+        map.removeSource(overlayId);
+      }
+      addRasterOverlay(overlayId, gibsTileUrl(spec, obs.date), spec.maxzoom);
+    }
+    if (layerStatus) {
+      layerStatus.hidden = false;
+      const when = obs.dated
+        ? tr(`observation ${obs.date}`, `পর্যবেক্ষণ ${obs.date}`)
+        : tr("latest available observation (exact date unresolved)", "সর্বশেষ উপলব্ধ পর্যবেক্ষণ (সঠিক তারিখ নিশ্চিত নয়)");
+      layerStatus.textContent = `${tr(spec.label[0], spec.label[1])} · ${when}`;
     }
   }
 

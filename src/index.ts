@@ -81,6 +81,168 @@ async function fetchWithCache<T>(
   }
 }
 
+// ── NASA GIBS layer registry ───────────────────────────────────────────────
+// Layer id, tile matrix set and file format are validated against the GIBS
+// WMTS capabilities catalogue by scripts/test-environment-contract.mjs.
+// Never add a layer here without confirming it exists in that catalogue, and
+// never claim an observation date that was not actually fetched.
+interface GibsLayerSpec {
+  id: string;
+  name: string;
+  provider: string;
+  tileLevel: number;
+  format: "png" | "jpg";
+  probe: { z: number; y: number; x: number };
+}
+
+interface GibsLayerReport {
+  id: string;
+  name: string;
+  provider: string;
+  kind: "gibs-raster" | "json-endpoint";
+  template: string | null;
+  endpoint: string | null;
+  tile_level: number | null;
+  format: string | null;
+  status: "ok" | "unavailable";
+  latest_date: string | null;
+  reasonCode: string | null;
+}
+
+const GIBS_BASE = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best";
+
+const GIBS_LAYERS: GibsLayerSpec[] = [
+  {
+    id: "VIIRS_NOAA20_CorrectedReflectance_TrueColor",
+    name: "VIIRS True Color Surface Reflectance",
+    provider: "NASA GIBS / NOAA-20",
+    tileLevel: 9,
+    format: "jpg",
+    probe: { z: 9, y: 221, x: 384 },
+  },
+  {
+    id: "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth",
+    name: "MAIAC Aerosol Optical Depth",
+    provider: "NASA GIBS / MODIS Terra + Aqua",
+    tileLevel: 7,
+    format: "png",
+    probe: { z: 7, y: 55, x: 96 },
+  },
+  {
+    id: "VIIRS_SNPP_DayNightBand",
+    name: "VIIRS Day/Night Band Night-Time Radiance",
+    provider: "NASA GIBS / Suomi NPP",
+    tileLevel: 7,
+    format: "png",
+    probe: { z: 7, y: 55, x: 96 },
+  },
+  {
+    id: "VIIRS_Combined_Flood_1-Day",
+    name: "Combined Flood Detection (1-day window)",
+    provider: "NASA GIBS / VIIRS NOAA-20 + NOAA-21",
+    tileLevel: 9,
+    format: "png",
+    probe: { z: 9, y: 221, x: 384 },
+  },
+];
+
+function gibsTemplate(spec: GibsLayerSpec, date: string | null): string {
+  const t = date ? `${date}/` : "";
+  return `${GIBS_BASE}/${spec.id}/default/${t}GoogleMapsCompatible_Level${spec.tileLevel}/{z}/{y}/{x}.${spec.format}`;
+}
+
+async function gibsTileAvailable(spec: GibsLayerSpec, date: string | null): Promise<boolean> {
+  const p = spec.probe;
+  const t = date ? `${date}/` : "";
+  const url = `${GIBS_BASE}/${spec.id}/default/${t}GoogleMapsCompatible_Level${spec.tileLevel}/${p.z}/${p.y}/${p.x}.${spec.format}`;
+  try {
+    const res = await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(8000) });
+    return res.ok && Number(res.headers.get("content-length") || 0) > 0;
+  } catch {
+    return false;
+  }
+}
+
+// GIBS publishes each product on its own latency, so the newest observation is
+// discovered by probing candidate dates rather than assumed. A layer with no
+// observation reports unavailable with a reason code — never a blank raster
+// presented as data.
+async function resolveGibsLayer(spec: GibsLayerSpec): Promise<GibsLayerReport> {
+  const candidates = Array.from({ length: 4 }, (_, back) =>
+    new Date(Date.now() - back * 86400000).toISOString().split("T")[0],
+  );
+  // Concurrent probes: one round trip instead of four sequential ones.
+  const results = await Promise.all(
+    candidates.map(async (date) => ({ date, ok: await gibsTileAvailable(spec, date) })),
+  );
+  for (const r of results) {
+    if (r.ok) {
+      return {
+        id: spec.id,
+        name: spec.name,
+        provider: spec.provider,
+        kind: "gibs-raster",
+        template: gibsTemplate(spec, r.date),
+        endpoint: null,
+        tile_level: spec.tileLevel,
+        format: spec.format,
+        status: "ok",
+        latest_date: r.date,
+        reasonCode: null,
+      };
+    }
+  }
+  const undated = await gibsTileAvailable(spec, null);
+  return {
+    id: spec.id,
+    name: spec.name,
+    provider: spec.provider,
+    kind: "gibs-raster",
+    template: gibsTemplate(spec, null),
+    endpoint: null,
+    tile_level: spec.tileLevel,
+    format: spec.format,
+    status: undated ? "ok" : "unavailable",
+    latest_date: null,
+    reasonCode: undated ? "gibs-date-unresolved" : "gibs-no-observation",
+  };
+}
+
+// RainViewer serves a live composite; the newest observation is the last
+// published frame, so the date is read from the payload rather than assumed.
+async function resolveRadarLayer(): Promise<GibsLayerReport> {
+  const endpoint = "https://api.rainviewer.com/public/weather-maps.json";
+  const base: GibsLayerReport = {
+    id: "rainviewer-radar",
+    name: "Doppler Weather Radar Composite",
+    provider: "RainViewer",
+    kind: "json-endpoint",
+    template: null,
+    endpoint,
+    tile_level: null,
+    format: null,
+    status: "unavailable",
+    latest_date: null,
+    reasonCode: "upstream-unreachable",
+  };
+  try {
+    const res = await fetch(endpoint, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) return { ...base, reasonCode: `upstream-status-${res.status}` };
+    const payload = (await res.json()) as { radar?: { past?: { time?: number }[] } };
+    const frames = payload.radar?.past ?? [];
+    const newest = frames.length ? frames[frames.length - 1].time : undefined;
+    if (!newest) return { ...base, reasonCode: "radar-no-frame" };
+    return {
+      ...base,
+      status: "ok",
+      latest_date: new Date(newest * 1000).toISOString().split("T")[0],
+      reasonCode: null,
+    };
+  } catch {
+    return base;
+  }
+}
+
 const worker = {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -415,50 +577,30 @@ const worker = {
 
     // ── /api/atlas/environment ───────────────────────────────────────────────
     if (url.pathname === "/api/atlas/environment") {
-      const today = new Date().toISOString().split("T")[0];
-      return jsonResponse({
-        status: "ok",
-        city: "Dhaka",
-        provenance: "reference",
-        date: today,
-        layers: [
-          {
-            id: "viirs-truecolor",
-            name: "VIIRS True Color Surface Reflectance",
-            provider: "NASA GIBS / NOAA-20",
-            template: `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/{Time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`,
-            format: "jpg",
-          },
-          {
-            id: "viirs-aerosol",
-            name: "VIIRS Aerosol Optical Depth (Deep Blue)",
-            provider: "NASA GIBS / Suomi NPP",
-            template: `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_Aerosol_Optical_Depth_Deep_Blue_Daily/default/{Time}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`,
-            format: "png",
-          },
-          {
-            id: "black-marble-night",
-            name: "Black Marble Nighttime Lights (VIIRS DNB)",
-            provider: "NASA GIBS / VNP46A2",
-            template: `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_DayNightBand_ENCC/default/{Time}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`,
-            format: "png",
-          },
-          {
-            id: "modis-flood-water",
-            name: "MODIS NRT Global Flood Water (250m)",
-            provider: "NASA GIBS / Terra & Aqua",
-            template: `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_Flood_Water_250m/default/{Time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`,
-            format: "png",
-          },
-          {
-            id: "rainviewer-radar",
-            name: "Doppler Weather Radar Composite",
-            provider: "RainViewer",
-            endpoint: "https://api.rainviewer.com/public/weather-maps.json",
-            format: "tiles",
-          },
-        ],
-      });
+      const { data, error } = await fetchWithCache<GibsLayerReport[]>(
+        "gibs:environment",
+        30 * 60 * 1000,
+        async () => {
+          const gibs = await Promise.all(GIBS_LAYERS.map((spec) => resolveGibsLayer(spec)));
+          const radar = await resolveRadarLayer();
+          return [...gibs, radar];
+        },
+        [],
+      );
+
+      const anyOk = data.some((l) => l.status === "ok");
+      return jsonResponse(
+        {
+          status: anyOk ? "ok" : "unavailable",
+          reasonCode: anyOk ? null : error ? "upstream-unreachable" : "gibs-no-observation",
+          city: "Dhaka",
+          provenance: "measured",
+          date: new Date().toISOString().split("T")[0],
+          source: "NASA GIBS WMTS · epsg3857/best · observation date resolved per layer by tile probe",
+          layers: data,
+        },
+        { status: anyOk ? 200 : 503 },
+      );
     }
 
     // ── /api/atlas/earthquake ────────────────────────────────────────────────

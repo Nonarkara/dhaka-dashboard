@@ -19,7 +19,12 @@ Building categories use actual OSM tags, never height, proximity or random color
 Spatial Hallucination (SH) Elimination: Overlays are budgeted strictly to prevent map obstruction. The atlas menu bar is halved from 300 px to 150 px with single-column vertical micro-controls; the map key is budgeted to 150 px; the forecast playback panel is halved from 560 px to 280 px; and the observation HUD is tightened from 310 px to 220 px. This preserves the maximum possible operating viewport for the hero 3D map. Height provenance and Parliament courtyards remain intact.
 
 ### Satellite Observation, Atmospheric Modeling & 3D Spatial Geometry
-- **NASA Aerosol Optical Depth (AOD)**: NASA MODIS MAIAC (1 km high-resolution Level 7) & VIIRS daily atmospheric aerosol column density measuring transboundary particulate loading and winter smoke over Bengal Basin.
+Satellite rasters come from NASA GIBS (WMTS, `epsg3857/best`). Every layer id, tile matrix set and file format is validated against the GIBS capabilities catalogue by `scripts/test-environment-contract.mjs`, and `scripts/verify-gibs-live.mjs` confirms at release time that the tiles still return imagery over Dhaka. GIBS publishes each product on its own latency, so the observation date is resolved by probing candidate dates rather than assumed, and the resolved date is printed in the lens status strip. A layer with no observation reports `unavailable` with a `reasonCode` — it never renders an empty raster as if it were data.
+
+- **NASA Aerosol Optical Depth (AOD)**: NASA MODIS MAIAC L2G (1 km product, served on GIBS `GoogleMapsCompatible_Level7` tiles) daily atmospheric aerosol column density, measuring transboundary particulate loading and winter smoke over the Bengal Basin.
+- **Satellite Cloud Reflectance**: NASA VIIRS NOAA-20 corrected true-colour surface reflectance (`Level9`, JPEG), daily.
+- **Night-Time Radiance**: NASA VIIRS Suomi NPP Day/Night Band radiance (`Level7`), the Black Marble family product, daily.
+- **Flood Inundation**: NASA VIIRS combined flood detection, 1-day window (`Level9`), daily.
 - **Doppler Rain Radar Playback**: Dynamic RainViewer Doppler radar loop cycling past observation frames with BST timestamps, displaying precipitation movement across the delta.
 - **Catchment Rainfall Modeling**: Modeled 24-hour precipitation accumulation across 5 Greater Dhaka drainage basins (Buriganga, Turag, Balu, Tongi North, Savar West) with intensity-coded badges and interactive hydrologic observation cards.
 - **Winter Smoke Transport & Brick Kiln Arcs**: Live 10m surface wind vectors from Open-Meteo coupled with spatial kiln clusters in Savar, Gazipur, Keraniganj, and Narayanganj, illustrating seasonal particulate drift into central Dhaka.

@@ -1,0 +1,94 @@
+#!/usr/bin/env node
+/**
+ * Refresh scripts/fixtures/gibs-catalogue.json from the NASA GIBS WMTS
+ * capabilities document.
+ *
+ * The fixture is the offline ground truth used by
+ * scripts/test-environment-contract.mjs. It answers the only question that
+ * matters when a satellite overlay is wired up: does this layer id exist in
+ * GIBS, at which tile matrix set and file format, and is it still publishing
+ * observations? A layer id that is absent, or that stopped publishing years
+ * ago, yields tiles that 404 on every date — a blank raster presented as data.
+ *
+ * Run manually when adding or changing a GIBS layer:
+ *   node scripts/refresh-gibs-catalogue.mjs
+ */
+import { readFileSync, writeFileSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname, "..");
+
+const CAPABILITIES_URL =
+  "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml";
+const OUT = join(root, "scripts/fixtures/gibs-catalogue.json");
+
+// The client and the Worker both probe this many candidate dates when looking
+// for the newest observation. A layer whose latest observation is older than
+// this window cannot be shown today without guessing.
+const OBSERVATION_WINDOW_DAYS = 4;
+
+console.log(`==> Fetching GIBS capabilities from ${CAPABILITIES_URL}...`);
+const res = await fetch(CAPABILITIES_URL, { signal: AbortSignal.timeout(120000) });
+if (!res.ok) {
+  console.error(`FAIL: GIBS capabilities responded ${res.status}`);
+  process.exit(1);
+}
+const xml = await res.text();
+console.log(`    received ${(xml.length / 1024 / 1024).toFixed(2)} MB`);
+
+function tag(block, name) {
+  const m = block.match(new RegExp(`<${name}[^>]*>([^<]*)</${name}>`));
+  return m ? m[1].trim() : null;
+}
+
+const layers = {};
+const blockRe = /<Layer>([\s\S]*?)<\/Layer>/g;
+let match;
+let count = 0;
+while ((match = blockRe.exec(xml)) !== null) {
+  const block = match[1];
+  const id = tag(block, "ows:Identifier");
+  if (!id) continue;
+  const formats = [...block.matchAll(/<Format>([^<]*)<\/Format>/g)].map((m) => m[1]);
+  const tileMatrixSets = [
+    ...new Set(
+      [...block.matchAll(/<TileMatrixSet>([^<]*)<\/TileMatrixSet>/g)].map((m) => m[1]),
+    ),
+  ];
+  const values = [...block.matchAll(/<Value>([^<]*)<\/Value>/g)].map((m) => m[1]);
+  // Time dimension values are ISO ranges like "2018-01-05/2026-10-27/P1D".
+  const starts = [];
+  const ends = [];
+  for (const v of values) {
+    const [start, end] = v.split("/");
+    if (/^\d{4}-\d{2}-\d{2}$/.test(start)) starts.push(start);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(end)) ends.push(end);
+  }
+  layers[id] = {
+    title: tag(block, "ows:Title"),
+    tileMatrixSets,
+    formats,
+    earliest: starts.length ? starts.sort()[0] : null,
+    latest: ends.length ? ends.sort()[ends.length - 1] : null,
+  };
+  count++;
+}
+
+if (count < 100) {
+  console.error(`FAIL: parsed only ${count} layers — the capabilities document changed shape`);
+  process.exit(1);
+}
+
+const captured = new Date().toISOString().split("T")[0];
+const catalogue = {
+  source: CAPABILITIES_URL,
+  captured,
+  observationWindowDays: OBSERVATION_WINDOW_DAYS,
+  layerCount: count,
+  layers,
+};
+
+writeFileSync(OUT, `${JSON.stringify(catalogue, null, 2)}\n`, "utf8");
+console.log(`✓ Captured ${count} layers to scripts/fixtures/gibs-catalogue.json (captured ${captured})`);

@@ -32,7 +32,10 @@ const REQUIRED_FILES = [
   "public/data/parliament-buildings.geojson",
   "public/dhaka-economy.geojson",
   "public/vendor/maplibre-6.4.1/maplibre-gl.mjs",
-  "public/vendor/maplibre-6.4.1/maplibre-gl.css"
+  "public/vendor/maplibre-6.4.1/maplibre-gl.css",
+  "scripts/fixtures/gibs-catalogue.json",
+  "scripts/verify-gibs-live.mjs",
+  "scripts/refresh-gibs-catalogue.mjs"
 ];
 
 for (const f of REQUIRED_FILES) {

@@ -12,6 +12,8 @@
     "release": "bash scripts/deploy-live.sh",
     "typecheck": "tsc --noEmit",
     "verify": "node scripts/verify-local.mjs",
+    "verify:gibs": "node scripts/verify-gibs-live.mjs",
+    "catalogue:gibs": "node scripts/refresh-gibs-catalogue.mjs",
     "smoke": "node scripts/smoke-atlas.mjs",
     "smoke:api": "node scripts/smoke-atlas-api.mjs",
     "test": "node scripts/test-release-contract.mjs && node scripts/test-client-contract.mjs && node scripts/test-theme-contract.mjs && node scripts/test-environment-contract.mjs && node scripts/test-i18n-contract.mjs && node scripts/test-dhaka-contract.mjs && node scripts/test-anti-slop-design.mjs && node scripts/test-data-behavior.mjs && node scripts/test-building-behavior.mjs && node scripts/test-outlook-behavior.mjs"
