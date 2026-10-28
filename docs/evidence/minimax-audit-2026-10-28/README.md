@@ -26,3 +26,11 @@ New regression tests execute the actual model normalizer, forecast player, natio
 Primary source contracts: [Open-Meteo Flood API](https://open-meteo.com/en/docs/flood-api), [World Bank Indicators API](https://datahelpdesk.worldbank.org/knowledgebase/articles/898599-indicator-api-queries), [CC0 daily currency reference](https://github.com/fawazahmed0/exchange-api). Model reach selection and daily output do not validate local flood arrival, warning stages or crop decisions.
 
 Independent review closed after source, all 11 suites, typecheck and populated English/Bengali captures. The final national-data dialog resolves the rejected nested-disclosure layout. Final 390px menu controls end near y=601, inside the first screen. Twenty recorded cases include the original failure, restored-CSS failure and rejected intermediate disclosure; final cases pass. The isolated outage displays unavailable with a retry control and no inferred safe state. Public temporary fixtures were removed before release.
+
+## Release and MSH closeout
+
+Canonical deployment succeeded with Worker version `452b41da-d8ff-4015-a7ee-71033915ee52`, build `dhaka-atlas-20261028-1793175241-aedab64`. All 11 test suites, typecheck, datasets, seven existing live API checks, exact SHA-256 asset matching and four decoded NASA GIBS products passed. Production's new river response contains ten daily frames and explicit unavailable warning/harvest/extent status, without risk classification or harvest directives. National data returned eight dated annual series and a dated daily FX reference; population was 175,686,899, not an inflated billion-scale value. The live browser verified day scrubbing, changed discharge values, the explicit unknown warning status, and full labels/units/periods/source links in the national-data dialog.
+
+The browser connection became stale when work resumed and recovered after resetting the computer-use session. This does not establish the cause of the user's earlier interruption. Saved commits and release files remained available.
+
+MSH: captured the verified lesson “Daily river maxima and green tests do not validate flood or harvest warnings.” Two earlier entries were marked superseded, with correction links and historical claims retained as audit evidence. Recall self-test returns the verified correction and labels the older entry superseded.
