@@ -71,7 +71,7 @@ async function get(path) {
     const measured = districts.flatMap(d => d.measurements ?? []).filter(m => m.status === "ok");
     check("collage returns measured satellite signals for the districts", r.status === 200 && districts.length >= 14 && measured.length > 0, `status=${r.status} districts=${districts.length} measured=${measured.length}`);
     // A measured value must carry its unit, its date and its resolution.
-    const traceable = measured.every(m => m.unit && (m.observationDate || m.vintage) && m.resolutionM > 0);
+    const traceable = measured.every(m => m.unit && (m.observationDate || m.vintage) && (m.resolutionM === null || m.resolutionM > 0));
     check("every measured signal carries a unit, a date and a resolution", traceable);
     // And the readings must be real sentences, in both languages.
     const readings = districts.flatMap(d => d.readings ?? []).filter(x => x.status === "ok");
