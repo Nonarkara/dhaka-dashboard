@@ -1,0 +1,154 @@
+Canonical deploy: bash scripts/deploy-live.sh
+Code commit: 688a24e
+Build: dhaka-atlas-20261029-1793302943-688a24e
+Worker version: abf40126-2a6c-4024-b88d-7d566252e01f
+==> 6. Verifying live deployment...
+
+> dhaka-dashboard@1.0.0 smoke
+> node scripts/smoke-atlas.mjs
+
+==> Running smoke-atlas.mjs static page checks...
+✓ smoke-atlas.mjs passed: Static app entry points verified.
+
+> dhaka-dashboard@1.0.0 smoke:api
+> node scripts/smoke-atlas-api.mjs
+
+==> DHKx 3D Atlas API smoke · https://dhaka.nonarkara.org
+  ✓ health check answers with build ID and status ok (status=200 buildId=dhaka-atlas-20261029-1793302943-688a24e)
+  ✓ areas returns 14 curated districts (status=200 count=14)
+  ✓ districts returns city corporations (DNCC and DSCC) (status=200)
+  ✓ at-this-point resolves Motijheel (status=200)
+  ✓ rivers returns 6 BWDB gauge stations (status=200 stations=6)
+  ✓ economy returns macroeconomic indicators (status=200 count=8)
+  ✓ city watch strip answers with flood and air indicators (status=200)
+  ✓ instruments answer with a live rate and dated national series (status=200 macro=17 fx=124.03669145)
+  ✓ every national reading carries its reporting period 
+  ✓ collage returns measured satellite signals for the districts (status=200 districts=14 measured=86)
+  ✓ every measured signal carries a unit, a date and a resolution 
+  ✓ the collage reads its domains in English and Bengali (readings=86)
+  ✓ economy corridors carry measured radiance, not registry figures (measured=10 corridors=10)
+
+✓ All 13 API smoke checks passed successfully.
+✓ Live SHA-256 matches for HTML, client scripts, styles, translations and reference layers
+==> 7. Verifying live NASA GIBS satellite tiles...
+==> Running verify-gibs-live.mjs...
+  ✓ VIIRS_NOAA20_CorrectedReflectance_TrueColor: 8178 bytes, image/jpeg, observation 2026-10-29
+  ✓ MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: 34078 bytes, image/png, observation 2026-10-28
+    note: VIIRS_SNPP_DayNightBand undated "latest" path is a blank placeholder (GIBS has not ingested the newest observation)
+  ✓ VIIRS_SNPP_DayNightBand: 1611 bytes, image/png, observation 2026-10-28 (placeholder dates rejected: 2026-10-29)
+  ✓ VIIRS_Combined_Flood_1-Day: 3896 bytes, image/png, observation 2026-10-29
+  ✓ deployed API VIIRS_NOAA20_CorrectedReflectance_TrueColor: ok, latest 2026-10-29
+  ✓ deployed API MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: ok, latest 2026-10-28
+  ✓ deployed API VIIRS_SNPP_DayNightBand: ok, latest 2026-10-28
+  ✓ deployed API VIIRS_Combined_Flood_1-Day: ok, latest 2026-10-29
+  ✓ deployed API rainviewer-radar: ok, latest 2026-10-29
+✓ verify-gibs-live.mjs passed: 4 GIBS layers serve live imagery over Dhaka and the deployed API reports every layer ok.
+==> 8. Verifying the live satellite collage...
+
+> dhaka-dashboard@1.0.0 verify:satellite
+> node --import ./scripts/lib/ts-resolver.mjs scripts/verify-satellite-live.mjs
+
+Measuring 14 districts over 6 satellite signals…
+status partial · 86/98 measurements · 0.5s
+  old-dhaka        Night radiance           28.31 nW/(cm² sr) · 2026-10-28 · 560 m
+  old-dhaka        Daytime surface heat     306.26 K · 2026-10-29 · 1120 m
+  old-dhaka        Night-time surface heat  297.476 K · 2026-10-25 · 1120 m
+  old-dhaka        Aerosol optical depth    0.47 1 · 2026-10-28 · 1120 m
+  old-dhaka        Vegetation index         0.231 1 · 2026-09-30 · 280 m
+  old-dhaka        Built-up ground          100 % of ground · static 2010 · 35 m
+  old-dhaka        Solar resource           4.5031 kWh/m²/day · static null · null m
+  motijheel        Night radiance           35.584 nW/(cm² sr) · 2026-10-28 · 560 m
+  motijheel        Daytime surface heat     unavailable · cloud-or-no-observation
+  motijheel        Night-time surface heat  296.804 K · 2026-10-25 · 1120 m
+  motijheel        Aerosol optical depth    0.497 1 · 2026-10-28 · 1120 m
+  motijheel        Vegetation index         0.276 1 · 2026-09-30 · 280 m
+  motijheel        Built-up ground          100 % of ground · static 2010 · 35 m
+  motijheel        Solar resource           4.5031 kWh/m²/day · static null · null m
+  parliament       Night radiance           36.238 nW/(cm² sr) · 2026-10-28 · 560 m
+  parliament       Daytime surface heat     unavailable · cloud-or-no-observation
+  parliament       Night-time surface heat  296.396 K · 2026-10-25 · 1119 m
+  parliament       Aerosol optical depth    0.549 1 · 2026-10-28 · 1119 m
+  parliament       Vegetation index         0.474 1 · 2026-09-30 · 280 m
+  parliament       Built-up ground          100 % of ground · static 2010 · 35 m
+  parliament       Solar resource           4.5031 kWh/m²/day · static null · null m
+  hatirjheel       Night radiance           34.358 nW/(cm² sr) · 2026-10-28 · 560 m
+  hatirjheel       Daytime surface heat     unavailable · cloud-or-no-observation
+  hatirjheel       Night-time surface heat  295.35 K · 2026-10-25 · 1119 m
+  hatirjheel       Aerosol optical depth    0.569 1 · 2026-10-28 · 1119 m
+  hatirjheel       Vegetation index         0.317 1 · 2026-09-30 · 280 m
+  hatirjheel       Built-up ground          98.22 % of ground · static 2010 · 35 m
+  hatirjheel       Solar resource           4.5031 kWh/m²/day · static null · null m
+  gulshan          Night radiance           31.39 nW/(cm² sr) · 2026-10-28 · 560 m
+  gulshan          Daytime surface heat     unavailable · cloud-or-no-observation
+  gulshan          Night-time surface heat  295.033 K · 2026-10-25 · 1119 m
+  gulshan          Aerosol optical depth    0.574 1 · 2026-10-28 · 1119 m
+  gulshan          Vegetation index         0.408 1 · 2026-09-30 · 280 m
+  gulshan          Built-up ground          100 % of ground · static 2010 · 35 m
+  gulshan          Solar resource           4.5031 kWh/m²/day · static null · null m
+  kawran-bazar     Night radiance           35.658 nW/(cm² sr) · 2026-10-28 · 560 m
+  kawran-bazar     Daytime surface heat     unavailable · cloud-or-no-observation
+  kawran-bazar     Night-time surface heat  296.588 K · 2026-10-25 · 1119 m
+  kawran-bazar     Aerosol optical depth    0.536 1 · 2026-10-28 · 1119 m
+  kawran-bazar     Vegetation index         0.286 1 · 2026-09-30 · 280 m
+  kawran-bazar     Built-up ground          100 % of ground · static 2010 · 35 m
+  kawran-bazar     Solar resource           4.5031 kWh/m²/day · static null · null m
+  sadarghat        Night radiance           23.898 nW/(cm² sr) · 2026-10-28 · 560 m
+  sadarghat        Daytime surface heat     306.546 K · 2026-10-29 · 1120 m
+  sadarghat        Night-time surface heat  297.524 K · 2026-10-25 · 1120 m
+  sadarghat        Aerosol optical depth    0.473 1 · 2026-10-28 · 1120 m
+  sadarghat        Vegetation index         0.225 1 · 2026-09-30 · 280 m
+  sadarghat        Built-up ground          76.44 % of ground · static 2010 · 35 m
+  sadarghat        Solar resource           4.5031 kWh/m²/day · static null · null m
+  savar-ashulia    Night radiance           13.634 nW/(cm² sr) · 2026-10-28 · 559 m
+  savar-ashulia    Daytime surface heat     unavailable · cloud-or-no-observation
+  savar-ashulia    Night-time surface heat  293.762 K · 2026-10-25 · 1118 m
+  savar-ashulia    Aerosol optical depth    unavailable · cloud-or-no-observation
+  savar-ashulia    Vegetation index         0.63 1 · 2026-09-30 · 280 m
+  savar-ashulia    Built-up ground          45.78 % of ground · static 2010 · 35 m
+  savar-ashulia    Solar resource           4.5031 kWh/m²/day · static null · null m
+  uttara           Night radiance           21.208 nW/(cm² sr) · 2026-10-28 · 559 m
+  uttara           Daytime surface heat     unavailable · cloud-or-no-observation
+  uttara           Night-time surface heat  291 K · 2026-10-25 · 1118 m
+  uttara           Aerosol optical depth    0.578 1 · 2026-10-28 · 1118 m
+  uttara           Vegetation index         0.31 1 · 2026-09-30 · 280 m
+  uttara           Built-up ground          71.11 % of ground · static 2010 · 35 m
+  uttara           Solar resource           4.5031 kWh/m²/day · static null · null m
+  mirpur           Night radiance           28.03 nW/(cm² sr) · 2026-10-28 · 559 m
+  mirpur           Daytime surface heat     unavailable · cloud-or-no-observation
+  mirpur           Night-time surface heat  295.19 K · 2026-10-25 · 1119 m
+  mirpur           Aerosol optical depth    0.535 1 · 2026-10-28 · 1119 m
+  mirpur           Vegetation index         0.274 1 · 2026-09-30 · 280 m
+  mirpur           Built-up ground          100 % of ground · static 2010 · 35 m
+  mirpur           Solar resource           4.5031 kWh/m²/day · static null · null m
+  dhanmondi        Night radiance           34.56 nW/(cm² sr) · 2026-10-28 · 560 m
+  dhanmondi        Daytime surface heat     unavailable · cloud-or-no-observation
+  dhanmondi        Night-time surface heat  296.9 K · 2026-10-25 · 1119 m
+  dhanmondi        Aerosol optical depth    0.532 1 · 2026-10-28 · 1119 m
+  dhanmondi        Vegetation index         0.27 1 · 2026-09-30 · 280 m
+  dhanmondi        Built-up ground          100 % of ground · static 2010 · 35 m
+  dhanmondi        Solar resource           4.5031 kWh/m²/day · static null · null m
+  tejgaon          Night radiance           36.52 nW/(cm² sr) · 2026-10-28 · 560 m
+  tejgaon          Daytime surface heat     unavailable · cloud-or-no-observation
+  tejgaon          Night-time surface heat  295.772 K · 2026-10-25 · 1119 m
+  tejgaon          Aerosol optical depth    0.558 1 · 2026-10-28 · 1119 m
+  tejgaon          Vegetation index         0.338 1 · 2026-09-30 · 280 m
+  tejgaon          Built-up ground          100 % of ground · static 2010 · 35 m
+  tejgaon          Solar resource           4.5031 kWh/m²/day · static null · null m
+  chawkbazar       Night radiance           26.226 nW/(cm² sr) · 2026-10-28 · 560 m
+  chawkbazar       Daytime surface heat     unavailable · cloud-or-no-observation
+  chawkbazar       Night-time surface heat  297.716 K · 2026-10-25 · 1120 m
+  chawkbazar       Aerosol optical depth    0.47 1 · 2026-10-28 · 1120 m
+  chawkbazar       Vegetation index         0.275 1 · 2026-09-30 · 280 m
+  chawkbazar       Built-up ground          100 % of ground · static 2010 · 35 m
+  chawkbazar       Solar resource           4.5031 kWh/m²/day · static null · null m
+  narayanganj      Night radiance           16.002 nW/(cm² sr) · 2026-10-28 · 560 m
+  narayanganj      Daytime surface heat     309.188 K · 2026-10-29 · 1121 m
+  narayanganj      Night-time surface heat  295.916 K · 2026-10-25 · 1121 m
+  narayanganj      Aerosol optical depth    0.267 1 · 2026-10-28 · 1121 m
+  narayanganj      Vegetation index         0.295 1 · 2026-09-30 · 280 m
+  narayanganj      Built-up ground          100 % of ground · static 2010 · 35 m
+  narayanganj      Solar resource           4.5031 kWh/m²/day · static null · null m
+✓ Live satellite verification: 86/98 measurements, 86 domain readings
+✓ Persistent snapshot a157e167-91c9-43b6-90e7-663fab259288: 86/98 readings; original solar period, sampling, history and source health; no visitor acquisition. Read 1114ms including history checks.
+✓ Live population reference: 1280 cells and 2181 dated OSM objects; hashes, category counts, unknown cells, source provenance and corrected questions.
+==> Deploy complete: dhaka.nonarkara.org is live!
