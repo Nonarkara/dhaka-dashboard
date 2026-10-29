@@ -14,4 +14,8 @@ export const GIBS_CATALOGUE_LATEST: Record<string, string> = {
   "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth": "2026-10-26",
   "VIIRS_SNPP_DayNightBand": "2026-10-28",
   "VIIRS_Combined_Flood_1-Day": "2026-10-27",
+  "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance": "2026-10-27",
+  "MODIS_Terra_Land_Surface_Temp_Day_TES": "2026-10-28",
+  "MODIS_Terra_Land_Surface_Temp_Night_TES": "2026-10-27",
+  "MODIS_Terra_L3_NDVI_16Day": "2026-09-30",
 };

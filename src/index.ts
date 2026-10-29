@@ -6,6 +6,7 @@ import type { RateLimitEnv } from "./rate-limit.js";
 import { inspectGibsTile, workerInflate } from "./gibs-png.js";
 import { GIBS_CATALOGUE_CAPTURED, GIBS_CATALOGUE_LATEST } from "./gibs-catalogue.js";
 import { MACRO_INDICATORS, RIVER_STATIONS, AIR_STATIONS } from "./dhaka-data.js";
+import { buildCollage, DOMAINS, type CollageResult, type CorridorPoint, type District } from "./collage.js";
 
 export interface Env extends RateLimitEnv {
   ASSETS: Fetcher;
@@ -82,6 +83,71 @@ async function fetchWithCache<T>(
     // Expired model output must not masquerade as a current reading.
     return { data: fallback, fromCache: false, error: String(err) };
   }
+}
+
+/**
+ * The collage, built once and shared.
+ *
+ * The districts and the industrial corridors come from the atlas's own
+ * assets, and both are measured in the same pass, so the corridors can be
+ * read against the districts. The result is cached, because measuring it
+ * costs a round of satellite tiles and the answer does not change by the
+ * minute.
+ */
+async function getCollage(env: Env, request: Request): Promise<CollageResult | null> {
+  const { data } = await fetchWithCache<CollageResult | null>(
+    "collage:dhaka",
+    2 * 60 * 60 * 1000,
+    async () => {
+      const areasRes = await env.ASSETS.fetch(new URL("/dhaka-areas.json", request.url).toString());
+      if (!areasRes.ok) throw new Error("areas-missing");
+      const areas = (await areasRes.json()) as Array<{
+        id: string; name: string; name_bn: string; category: string; lat: number; lng: number;
+      }>;
+      const districts: District[] = areas.map((a) => ({
+        id: a.id,
+        name: a.name,
+        name_bn: a.name_bn,
+        category: a.category ?? "",
+        lat: a.lat,
+        lng: a.lng,
+      }));
+
+      // The corridors are points from the atlas's own economy registry. They
+      // used to carry a workforce, an export value and a daily turnover that
+      // had no upstream and no date; those are gone, and what replaces them
+      // is a measured night radiance.
+      const corridorPoints: CorridorPoint[] = [];
+      const economyRes = await env.ASSETS.fetch(new URL("/dhaka-economy.geojson", request.url).toString());
+      if (economyRes.ok) {
+        const geo = (await economyRes.json()) as {
+          features?: Array<{
+            properties?: { name?: string; sector?: string; category?: string };
+            geometry?: { type?: string; coordinates?: unknown };
+          }>;
+        };
+        for (const feature of geo.features ?? []) {
+          const geometry = feature.geometry;
+          if (!geometry || geometry.type !== "Point") continue;
+          const coords = geometry.coordinates as [number, number] | undefined;
+          if (!Array.isArray(coords) || coords.length < 2) continue;
+          const [lng, lat] = coords;
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+          const name = feature.properties?.name ?? `${lat}, ${lng}`;
+          corridorPoints.push({
+            id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+            name,
+            sector: feature.properties?.sector ?? feature.properties?.category ?? "Industrial and commercial cluster",
+            lat,
+            lng,
+          });
+        }
+      }
+      return buildCollage(districts, corridorPoints);
+    },
+    null,
+  );
+  return data;
 }
 
 // ── NASA GIBS layer registry ───────────────────────────────────────────────
@@ -714,13 +780,29 @@ const worker = {
         const response = await worker.fetch(new Request(new URL(path, request.url), { headers: request.headers }), env);
         return await response.json() as { status: string; provenance: string; reasonCode?: string; source?: string; data?: { current?: { time?: string; us_aqi?: number; wind_speed_10m?: number; wind_direction_10m?: number } } };
       };
-      const [air, weather] = await Promise.all([read("/api/atlas/air-quality"), read("/api/atlas/weather")]);
+      const [air, weather, rivers] = await Promise.all([
+        read("/api/atlas/air-quality"),
+        read("/api/atlas/weather"),
+        read("/api/dhaka/rivers"),
+      ]);
       const aqi = air.data?.current?.us_aqi;
       const wind = weather.data?.current;
       const missing = (source: string, reasonCode: string) => ({
         status: "unavailable", provenance: "unavailable", reasonCode, source,
         timestamp: new Date().toISOString(), observedAt: null,
       });
+      // The modeled flood risk tier is the worst tier across the catchments.
+      // Live gauge readings are not connected — this is a rainfall proxy, not
+      // an official FFWC warning, and it is labelled as such downstream.
+      const riverBody = rivers as { status: string; provenance: string; reasonCode?: string; stations?: Array<{ floodRisk?: { tier: string } }>; summary?: { normal: number; watch: number; alert: number; danger: number } } | null;
+      const floodStations = riverBody?.stations ?? [];
+      const floodTiers = floodStations.map(s => s.floodRisk?.tier).filter(Boolean) as string[];
+      const worstTier = floodTiers.includes("danger") ? "danger"
+        : floodTiers.includes("alert") ? "alert"
+        : floodTiers.includes("watch") ? "watch"
+        : floodTiers.includes("normal") ? "normal"
+        : null;
+      const floodOk = riverBody?.status === "ok" && floodTiers.length > 0;
       return jsonResponse({
         status: "partial", city: "Dhaka", timestamp: new Date().toISOString(),
         indicators: {
@@ -734,7 +816,16 @@ const worker = {
             status: "ok", provenance: "modeled", wind_speed_10m: wind.wind_speed_10m,
             wind_direction_10m: wind.wind_direction_10m, observedAt: wind.time, source: weather.source,
           } : missing("Open-Meteo", weather.reasonCode || "invalid-current-wind"),
-          floodRisk: missing("BWDB / FFWC", "river-observations-not-connected"),
+          floodRisk: floodOk ? {
+            status: worstTier ?? "normal",
+            provenance: "modeled",
+            source: "BWDB / FFWC + Open-Meteo (24h rainfall)",
+            summary: riverBody.summary,
+            tier: worstTier,
+            reasonCode: null,
+            observedAt: null,
+            timestamp: new Date().toISOString(),
+          } : missing("BWDB / FFWC", riverBody?.reasonCode || "river-observations-not-connected"),
           economy: missing("Bangladesh Bank / DSE", "dated-bulletin-not-connected"),
         },
       });
@@ -914,16 +1005,17 @@ const worker = {
         return ind;
       });
 
-      const corridors = [
-        { name: "Savar & Ashulia RMG Belt", workforce: 450000, annual_export: "$7.5B", sector: "Apparel" },
-        { name: "Dhaka EPZ (DEPZ)", workforce: 95000, annual_export: "$2.2B", sector: "RMG & Electronics" },
-        { name: "Adamjee EPZ Narayanganj", workforce: 62000, annual_export: "$1.1B", sector: "Diversified Export" },
-        { name: "Hemayetpur Leather City", workforce: 35000, annual_export: "$850M", sector: "Leather & CETP" },
-        { name: "Tejgaon Commercial Estate", workforce: 80000, sector: "Light Engineering & Media" },
-        { name: "Motijheel Financial Core", sector: "Central Banking & Capital Markets" },
-        { name: "Kawran Bazar Wholesale Hub", daily_turnover: "400M BDT", sector: "Agri-commodities" },
-        { name: "Islampur Textile Market", daily_turnover: "600M BDT", sector: "Wholesale Fabric" },
-      ].map(c => ({ ...c, provenance: "reference" as const, note: "Workforce and export figures are registry references; no dated bulletin connected." }));
+      // The corridors carry measured night-time radiance, not registry
+      // figures. Workforce, export value and daily turnover were hardcoded
+      // constants with no upstream and no date — they looked like data and
+      // were invented. The satellite cannot count workers either, but it can
+      // measure how much light a corridor leaves on, on a stated night, at a
+      // stated resolution, and that is a fact with a source.
+      //
+      // The measurement is shared with the collage, which measures the
+      // corridors and the districts in the same pass and caches the result.
+      const collage = await getCollage(env, request);
+      const corridors = collage?.corridors ?? [];
 
       const anyOk = instruments.status !== "unavailable";
       return jsonResponse({
@@ -939,6 +1031,31 @@ const worker = {
         timestamp: new Date().toISOString(),
         fx: instruments.currency,
       }, { status: anyOk ? 200 : 503 });
+    }
+
+    // ── /api/atlas/collage ───────────────────────────────────────────────────
+    // The collage: one acquisition per satellite signal, measured over every
+    // district, then read against the rest of the city so a number becomes a
+    // finding. Cached for two hours, because the underlying acquisitions
+    // change on a daily-to-16-day cycle and re-measuring on every request
+    // would hammer GIBS for no new information.
+    if (url.pathname === "/api/atlas/collage") {
+      const data = await getCollage(env, request);
+      if (!data) {
+        return jsonResponse({
+          status: "unavailable",
+          reasonCode: "collage-unavailable",
+          provenance: "unavailable",
+          timestamp: new Date().toISOString(),
+          city: "Dhaka",
+          domains: DOMAINS,
+          districts: [],
+          corridors: [],
+          measured: 0,
+          total: 0,
+        }, { status: 503 });
+      }
+      return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200 });
     }
 
     // ── /api/dhaka/transit ───────────────────────────────────────────────────

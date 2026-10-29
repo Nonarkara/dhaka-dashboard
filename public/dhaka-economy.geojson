@@ -12,8 +12,8 @@
         "workforce": null,
         "type": "epz",
         "annual_export_usd": null,
-        "description": "Premier export processing zone in Savar hosting over 100 foreign and local manufacturing enterprises across apparel, electronics, and textiles.",
-        "description_bn": "সাভারে অবস্থিত শীর্ষস্থানীয় রপ্তানি প্রক্রিয়াকরণ এলাকা যেখানে তৈরি পোশাক, ইলেকট্রনিক্স ও টেক্সটাইলের শতাধিক আন্তর্জাতিক প্রতিষ্ঠান কর্মরত।",
+        "description": "Premier export processing zone in Savar hosting foreign and local manufacturing enterprises across apparel, electronics, and textiles.",
+        "description_bn": "সাভারে অবস্থিত শীর্ষস্থানীয় রপ্তানি প্রক্রিয়াকরণ এলাকা যেখানে তৈরি পোশাক, ইলেকট্রনিক্স ও টেক্সটাইলের আন্তর্জাতিক প্রতিষ্ঠান কর্মরত।",
         "provenance": "reference",
         "observedAt": null
       },
@@ -81,8 +81,8 @@
         "workforce": null,
         "type": "industrial_estate",
         "annual_export_usd": null,
-        "description": "Centralized 200-acre tannery park with Central Effluent Treatment Plant (CETP) relocated from historic Hazaribagh to protect the Buriganga River.",
-        "description_bn": "বুড়িগঙ্গা নদীকে দূষণমুক্ত করতে হাজারীবাগ থেকে স্থানান্তরিত ২০০ একরের কেন্দ্রীয় তরল বর্জ্য পরিশোধনাগার (সিইটিপি) সমৃদ্ধ আধুনিক চামড়া শিল্প নগরী।",
+        "description": "Centralized tannery park with Central Effluent Treatment Plant (CETP) relocated from historic Hazaribagh to protect the Buriganga River.",
+        "description_bn": "বুড়িগঙ্গা নদীকে দূষণমুক্ত করতে হাজারীবাগ থেকে স্থানান্তরিত কেন্দ্রীয় তরল বর্জ্য পরিশোধনাগার (সিইটিপি) সমৃদ্ধ আধুনিক চামড়া শিল্প নগরী।",
         "provenance": "reference",
         "observedAt": null
       },
@@ -103,8 +103,8 @@
         "sector": "Light Engineering, Media & Tech Hub",
         "workforce": null,
         "type": "urban_industrial",
-        "description": "Central Dhaka's 500-acre master-planned industrial zone currently evolving into a high-density hub of media studios, tech offices, and auto engineering.",
-        "description_bn": "ঢাকার কেন্দ্রস্থলে অবস্থিত ৫০০ একরের পরিকল্পিত শিল্প এলাকা যা দ্রুত মিডিয়া স্টুডিও, টেক অফিস ও অটোমোবাইল ইঞ্জিনিয়ারিং হাবে রূপ নিচ্ছে।",
+        "description": "Central Dhaka's master-planned industrial zone currently evolving into a high-density hub of media studios, tech offices, and auto engineering.",
+        "description_bn": "ঢাকার কেন্দ্রস্থলে অবস্থিত পরিকল্পিত শিল্প এলাকা যা দ্রুত মিডিয়া স্টুডিও, টেক অফিস ও অটোমোবাইল ইঞ্জিনিয়ারিং হাবে রূপ নিচ্ছে।",
         "provenance": "reference",
         "observedAt": null
       },
@@ -146,8 +146,8 @@
         "sector": "Agri-commodity Wholesale",
         "daily_turnover_bdt": null,
         "type": "wholesale_market",
-        "description": "The capital's primary wholesale terminal for perishables, receiving over 3,000 trucks nightly with agricultural produce from all national divisions.",
-        "description_bn": "রাজধানীর প্রধান পাইকারি খাদ্য আড়ত, যেখানে প্রতিদিন রাতে সারাদেশ থেকে ৩,০০০-এর বেশি ট্রাকে কাঁচামাল ও কৃষিপণ্য আসে।",
+        "description": "The capital's primary wholesale terminal for perishables, receiving agricultural produce by truck each night from across the country.",
+        "description_bn": "রাজধানীর প্রধান পাইকারি খাদ্য আড়ত, যেখানে প্রতিদিন রাতে সারাদেশ থেকে ট্রাকে কাঁচামাল ও কৃষিপণ্য আসে।",
         "provenance": "reference",
         "observedAt": null
       },

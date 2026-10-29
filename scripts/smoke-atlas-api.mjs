@@ -56,6 +56,35 @@ async function get(path) {
     const r = await get("/api/atlas/watch");
     check("city watch strip answers with flood and air indicators", r.status === 200 && !!r.body?.indicators?.floodRisk, `status=${r.status}`);
   }
+  {
+    const r = await get("/api/atlas/instruments");
+    const macro = r.body?.macro ?? [];
+    const fxOk = r.body?.currency?.status === "ok" && Number.isFinite(r.body?.currency?.rate);
+    check("instruments answer with a live rate and dated national series", r.status === 200 && fxOk && macro.length >= 8, `status=${r.status} macro=${macro.length} fx=${r.body?.currency?.rate}`);
+    // Every reading must carry its own period, or the number has no date.
+    const dated = macro.filter(m => m.status === "ok").every(m => typeof m.period === "string");
+    check("every national reading carries its reporting period", dated);
+  }
+  {
+    const r = await get("/api/atlas/collage");
+    const districts = r.body?.districts ?? [];
+    const measured = districts.flatMap(d => d.measurements ?? []).filter(m => m.status === "ok");
+    check("collage returns measured satellite signals for the districts", r.status === 200 && districts.length >= 14 && measured.length > 0, `status=${r.status} districts=${districts.length} measured=${measured.length}`);
+    // A measured value must carry its unit, its date and its resolution.
+    const traceable = measured.every(m => m.unit && (m.observationDate || m.vintage) && m.resolutionM > 0);
+    check("every measured signal carries a unit, a date and a resolution", traceable);
+    // And the readings must be real sentences, in both languages.
+    const readings = districts.flatMap(d => d.readings ?? []).filter(x => x.status === "ok");
+    check("the collage reads its domains in English and Bengali", readings.length > 0 && readings.every(x => x.reading && x.reading_bn), `readings=${readings.length}`);
+  }
+  {
+    const r = await get("/api/dhaka/economy");
+    const corridors = r.body?.corridors ?? [];
+    // The corridors must carry a measured radiance, not a typed-in figure.
+    const withRadiance = corridors.filter(c => c.status === "ok" && Number.isFinite(c.night_radiance_nw));
+    const withFabrication = corridors.filter(c => c.workforce != null || c.annual_export != null || c.daily_turnover != null);
+    check("economy corridors carry measured radiance, not registry figures", withRadiance.length > 0 && withFabrication.length === 0, `measured=${withRadiance.length} corridors=${corridors.length}`);
+  }
 
   const failures = CHECKS.filter(c => !c.ok);
   if (failures.length > 0) {

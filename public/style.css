@@ -190,9 +190,43 @@ body {
   gap: 10px;
 }
 
-/* National data stays in the Map disclosure on narrow screens. */
-.atlas-instruments { display:none; min-width:0; font-size:13px; gap:10px; align-items:baseline; font-variant-numeric:tabular-nums; }
-.atlas-instrument { white-space:nowrap; }
+/* The instrument band.
+   One row, one message: the country's clock, the live exchange rate and the
+   national readings, in that order of importance. The clock and the rate are
+   never dropped — they are the two a person checks without meaning to. The
+   rest arrive as the width allows, so the band stays a band instead of
+   becoming a shelf that overflows. */
+.atlas-instruments {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+  margin-left: auto;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+.atlas-instrument { white-space: nowrap; display: inline-flex; align-items: baseline; gap: 4px; }
+.atlas-instrument-value { font-weight: 600; }
+.atlas-instrument-unit { color: var(--dim); font-size: 11px; }
+.atlas-instrument[data-state="unavailable"] .atlas-instrument-value { color: var(--dim); }
+.instrument-clock {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+/* The unit after each reading needs no space from its number. */
+.atlas-instrument .atlas-instrument-value + .atlas-instrument-unit { margin-left: 0; }
+
+/* The band gives way before the header does: each reading is dropped at the
+   width where it stops fitting, in order of how much it matters. */
+@media(max-width:1439px) { .atlas-instrument[data-slot="industry"] { display:none; } }
+@media(max-width:1199px) { .atlas-instrument[data-slot="exports"] { display:none; } }
+@media(max-width:1023px) { .atlas-instrument[data-slot="inflation"] { display:none; } }
+@media(max-width:899px)  { .atlas-instrument[data-slot="population"] { display:none; } }
+@media(max-width:767px)  { .atlas-instrument[data-slot="gdp"] { display:none; } }
+
 #atlas-national-data { font-size:14px; line-height:1.45; }
 #atlas-national-data p { margin:6px 0; }
 #atlas-national-data dl { margin:0; }
@@ -201,8 +235,6 @@ body {
 #atlas-national-data dd strong,#atlas-national-data dd small { display:block; overflow-wrap:anywhere; }
 #atlas-national-data dd small { font-size:12px; color:var(--dim); }
 #atlas-national-data dd a { font-size:12px; }
-@media(min-width:1200px) { .atlas-instruments { display:flex; margin-left:auto; } }
-@media(max-width:1439px) { .atlas-instruments .atlas-instrument { display:none; } }
 
 .atlas-control-label {
   display: inline-flex;
@@ -634,11 +666,22 @@ body {
 }
 .atlas-layer-status { position: absolute; top: 8px; left: 8px; right: 52px; z-index: 21; margin: 0; padding: 6px 8px; max-width: 65ch; background: var(--bg); border: 1px solid var(--line); font-size: 12px; }
 @media (max-width: 768px) {
-  .atlas-header { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; }
+  /* One row on a phone: wordmark, lens, clock, Map menu. The language
+     control moves into the Map menu, because the header has no room for a
+     fifth thing and the menu is where the other controls already live. */
+  .atlas-header { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 8px; }
   .atlas-header-meta { grid-column: 1; gap: 6px; }
-  .atlas-header-nav > .atlas-btn { grid-column: 2; grid-row: 1; }
-  .atlas-header-nav > .atlas-menu { grid-column: 3; grid-row: 1; order: 0; }
+  .atlas-header-nav > .atlas-btn { display: none; }
+  .atlas-header-nav > .atlas-menu { grid-column: 4; grid-row: 1; order: 0; }
+  .atlas-header-nav { display: contents; }
+  .atlas-lens-choice { grid-column: 2; min-width: 0; }
+  .atlas-lens-choice select { width: 100%; min-width: 0; }
+  .atlas-instruments { grid-column: 3; margin-left: 0; gap: 8px; }
   .atlas-header-nav > .atlas-control-label { grid-row: 2; }
   .atlas-header-nav > .atlas-control-label:nth-of-type(1) { grid-column: 1; }
   .atlas-header-nav > .atlas-control-label:nth-of-type(2) { grid-column: 2 / 4; }
+}
+@media (min-width: 769px) {
+  /* The header carries the language control when there is room for it. */
+  #language-toggle-menu { display: none; }
 }

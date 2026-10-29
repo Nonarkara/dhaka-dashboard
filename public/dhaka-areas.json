@@ -48,8 +48,8 @@
     "zoom": 14.8,
     "pitch": 50,
     "bearing": 45,
-    "description": "300-acre master-planned stormwater retention and urban drainage basin regulating monsoon runoff between central Dhaka and the Balu River.",
-    "description_bn": "৩০০ একরের মাস্টার-প্ল্যানড জলনির্গমন ও ধারণ অববাহিকা যা কেন্দ্রীয় ঢাকা ও বালু নদীর মধ্যবর্তী বর্ষার পানি নিয়ন্ত্রণ করে।"
+    "description": "Master-planned stormwater retention and urban drainage basin regulating monsoon runoff between central Dhaka and the Balu River.",
+    "description_bn": "মাস্টার-প্ল্যানড জলনির্গমন ও ধারণ অববাহিকা যা কেন্দ্রীয় ঢাকা ও বালু নদীর মধ্যবর্তী বর্ষার পানি নিয়ন্ত্রণ করে।"
   },
   {
     "id": "gulshan",
@@ -87,8 +87,8 @@
     "zoom": 16.0,
     "pitch": 50,
     "bearing": -15,
-    "description": "South Asia's busiest river passenger terminal on the Buriganga, handling over 200 launches daily connecting southern coastal districts.",
-    "description_bn": "বুড়িগঙ্গার তীরে দক্ষিণ এশিয়ার ব্যস্ততম নদী যাত্রী টার্মিনাল, প্রতিদিন ২০০টির বেশি লঞ্চের মাধ্যমে দক্ষিণাঞ্চলের উপকূলীয় জেলাসমূহের সংযোগ।"
+    "description": "South Asia's busiest river passenger terminal on the Buriganga, connecting southern coastal districts.",
+    "description_bn": "বুড়িগঙ্গার তীরে দক্ষিণ এশিয়ার ব্যস্ততম নদী যাত্রী টার্মিনাল, দক্ষিণাঞ্চলের উপকূলীয় জেলাসমূহের সংযোগ।"
   },
   {
     "id": "savar-ashulia",
@@ -100,8 +100,8 @@
     "zoom": 13.8,
     "pitch": 35,
     "bearing": 20,
-    "description": "The manufacturing heart of Bangladesh's $47B+ Ready-Made Garment (RMG) export economy, Dhaka EPZ (DEPZ), and National Martyrs' Memorial.",
-    "description_bn": "বাংলাদেশের ৪৭ বিলিয়ন ডলারেরও বেশি তৈরি পোশাক (আরএমজি) রপ্তানি অর্থনীতির প্রাণকেন্দ্র, ঢাকা ইপিজেড এবং জাতীয় স্মৃতিসৌধ।"
+    "description": "The manufacturing heart of Bangladesh's Ready-Made Garment (RMG) export economy, Dhaka EPZ (DEPZ), and National Martyrs' Memorial.",
+    "description_bn": "বাংলাদেশের তৈরি পোশাক (আরএমজি) রপ্তানি অর্থনীতির প্রাণকেন্দ্র, ঢাকা ইপিজেড এবং জাতীয় স্মৃতিসৌধ।"
   },
   {
     "id": "uttara",

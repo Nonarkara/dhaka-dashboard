@@ -57,6 +57,13 @@
       toggle.textContent = language === 'bn' ? 'English' : 'বাংলা';
       toggle.setAttribute('aria-label', language === 'bn' ? 'Switch to English' : 'বাংলায় দেখুন');
     }
+    // The same control appears in the Map menu on narrow screens, where the
+    // header has no room for it. Both say the same thing at the same time.
+    const menuToggle = document.getElementById('language-toggle-menu');
+    if (menuToggle) {
+      menuToggle.textContent = language === 'bn' ? 'English' : 'বাংলা';
+      menuToggle.setAttribute('aria-label', language === 'bn' ? 'Switch to English' : 'বাংলায় দেখুন');
+    }
     visit(document.body);
     const title = document.querySelector('title');
     if (title) visit(title);
@@ -84,6 +91,7 @@
     apply();
     document.getElementById('atlas-language')?.addEventListener('change', event => set(event.target.value));
     document.getElementById('language-toggle')?.addEventListener('click', () => set(language === 'bn' ? 'en' : 'bn'));
+    document.getElementById('language-toggle-menu')?.addEventListener('click', () => set(language === 'bn' ? 'en' : 'bn'));
     const observer = new MutationObserver(records => {
       for (const record of records) {
         if (record.type === 'childList') for (const node of record.addedNodes) visit(node);

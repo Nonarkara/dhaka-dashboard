@@ -123,6 +123,94 @@
 .aqi-bar[data-aqi-class="very-unhealthy"] { background: #8b5cf6; }
 .aqi-bar[data-aqi-class="hazardous"] { background: #7e22ce; }
 
+/* The collage — satellite signals by district.
+   A rail of districts on the left, a board of domain readings on the right.
+   Every card carries its own measurement: value, unit, date, resolution. */
+.collage-layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.collage-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 58vh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+}
+.collage-district {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 7px 9px;
+  background: var(--bg);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-left: 3px solid transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+}
+.collage-district:last-child { border-bottom: 0; }
+.collage-district:hover { background: var(--bg-raised); }
+/* The selected district is marked with a rule, not a shadow: the project
+   enforces flat geometry, and a shadow would render as nothing at all. */
+.collage-district[aria-pressed="true"] { background: var(--bg-raised); border-left-color: var(--accent); }
+.collage-district strong { display: block; font-size: 12px; font-weight: 600; }
+.collage-district small {
+  display: block;
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+.collage-panel { min-width: 0; }
+.collage-district-head { margin-bottom: 10px; }
+.collage-district-head strong { display: block; font-size: 15px; }
+.collage-district-head span { display: block; font-size: 12px; color: var(--dim); line-height: 1.45; margin-top: 3px; }
+.collage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+}
+.collage-card {
+  border: 1px solid var(--line);
+  padding: 9px 10px;
+  background: var(--bg);
+  min-width: 0;
+}
+.collage-card h4 {
+  margin: 0 0 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+}
+.collage-reading { margin: 0 0 7px; font-size: 12px; line-height: 1.45; }
+.collage-basis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: 11px;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+.collage-basis span:first-child { color: var(--ink); }
+.collage-unavailable { margin: 0; font-size: 12px; color: var(--dim); }
+.collage-card[data-state="unavailable"] { border-style: dashed; }
+.collage-card[data-state="unavailable"] small { display: block; margin-top: 4px; font-size: 10px; color: var(--dim); }
+.collage-empty, .collage-foot { font-size: 12px; color: var(--dim); }
+.collage-foot { margin: 10px 0 0; }
+@media (max-width: 700px) {
+  .collage-layout { grid-template-columns: minmax(0, 1fr); }
+  .collage-rail { max-height: 30vh; }
+}
+
 /* Quick Jump Grid */
 .jump-grid {
   display: grid;
@@ -333,3 +421,14 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .building-swatches span { white-space:normal; overflow:visible; font-size:13px; }
 .atlas-lens-story strong,.atlas-lens-story > span { font-size:13px; line-height:1.4; padding:4px 8px; }
 .modal-close-btn { min-width:36px; min-height:36px; }
+
+/* A subhead inside a desk, separating two boards of readings. */
+.desk-subhead {
+  margin: 16px 0 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  font-weight: 600;
+}

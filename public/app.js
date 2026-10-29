@@ -1395,8 +1395,18 @@
     const unknown = tr("Unavailable", "অনুপলব্ধ");
     const modeled = tr("Model", "মডেল");
     const category = {Good:"ভালো", Moderate:"মাঝারি", "Unhealthy for Sensitive Groups":"সংবেদনশীলদের জন্য অস্বাস্থ্যকর", Unhealthy:"অস্বাস্থ্যকর", "Very Unhealthy":"অত্যন্ত অস্বাস্থ্যকর", Hazardous:"বিপজ্জনক"};
+    const tierLabel = { normal: tr("Normal","সাধারণ"), watch: tr("Watch","সতর্ক"), alert: tr("Alert","সতর্ক"), danger: tr("Danger","বিপদ") };
     const values = {
-      flood: unknown + tr(" · gauge feed", " · নদী পর্যবেক্ষণ"),
+      flood: (() => {
+        const f = ind?.floodRisk;
+        if (!f || f.status === "unavailable") return unknown + tr(" · gauge feed", " · নদী পর্যবেক্ষণ");
+        const s = f.summary ?? {};
+        const t = tierLabel[f.tier ?? "normal"] || f.tier;
+        const parts = [t];
+        if (s.danger > 0) parts.push(`${tr("Danger","বিপদ")}: ${s.danger}`);
+        if (s.alert > 0) parts.push(`${tr("Alert","সতর্ক")}: ${s.alert}`);
+        return parts.join(" · ");
+      })(),
       air: Number.isFinite(ind?.airQuality?.us_aqi) ? `${modeled} · AQI ${ind.airQuality.us_aqi} · ${tr(ind.airQuality.category, category[ind.airQuality.category])}` : unknown,
       wind: Number.isFinite(ind?.weather?.wind_speed_10m) ? `${modeled} · ${ind.weather.wind_speed_10m} km/h · ${ind.weather.wind_direction_10m}°` : unknown,
       traffic: unknown + tr(" · dated bulletin", " · তারিখযুক্ত বুলেটিন"),
@@ -1407,7 +1417,7 @@
       const item = $(`#atlas-watch-${key}`);
       if (item) {
         const feed = ind?.[({flood:"floodRisk",air:"airQuality",wind:"weather",traffic:"economy"})[key]];
-        item.dataset.tier = feed?.status || "unavailable";
+        item.dataset.tier = feed?.tier || feed?.status || "unavailable";
         item.title = `${feed?.source || ""} · ${feed?.observedAt || feed?.reasonCode || "unavailable"}`;
       }
     }
@@ -1427,6 +1437,7 @@
     pollCityWatch();
     setInterval(pollCityWatch, 5 * 60 * 1000);
     window.AtlasInstruments?.start();
+    window.AtlasCollage?.start();
     initMap();
   }
 

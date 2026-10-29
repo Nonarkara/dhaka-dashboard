@@ -42,7 +42,9 @@
         <button type="button" id="language-toggle" class="atlas-btn" aria-label="Switch language">English</button>
         <details class="atlas-menu" id="atlas-menu">
           <summary class="atlas-menu-summary">Map</summary>
-          <div class="atlas-menu-body"><button type="button" class="atlas-btn" data-open="national-data-dialog">Bangladesh data</button>        <label class="atlas-control-label">
+          <div class="atlas-menu-body"><button type="button" class="atlas-btn" data-open="national-data-dialog">Bangladesh data</button>
+            <button type="button" class="atlas-btn" data-open="collage-dialog">Satellite signals by district</button>
+            <button type="button" id="language-toggle-menu" class="atlas-btn" aria-label="Switch language">English</button>        <label class="atlas-control-label">
           <span>Map view</span>
           <select id="atlas-view" class="atlas-select" aria-label="Map view">
             <option value="3d" selected>3D city</option>
@@ -130,6 +132,22 @@
     <div class="modal-header"><h3 class="modal-title">Bangladesh data</h3><button class="modal-close-btn" type="button" aria-label="Close">✕</button></div>
     <div class="modal-body" id="atlas-national-data"></div>
   </dialog>
+  <dialog id="collage-dialog" class="dashboard-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Satellite signals by district</h3>
+      <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-top:0;font-size:12px;color:var(--dim);">
+        Seven city domains, each answered by a different satellite instrument and measured over the district itself. Every reading names the value, its unit, the observation date and the ground resolution it was taken at.
+      </p>
+      <div class="collage-layout">
+        <nav class="collage-rail" id="collage-districts" aria-label="Districts"></nav>
+        <div class="collage-panel" id="collage-domains"></div>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="quick-jump-dialog" class="dashboard-modal">
     <div class="modal-header">
       <h3 class="modal-title">Quick jump to Dhaka districts</h3>
@@ -178,6 +196,8 @@
         Indicator definitions only. No dated bulletin is connected; current numeric values are unavailable.
       </p>
       <div class="metric-grid" id="economy-indicators-grid">Loading economic indicators…</div>
+      <h4 class="desk-subhead" id="economy-corridors-head">Industrial corridors · measured night radiance</h4>
+      <div class="collage-grid" id="economy-corridors-grid">Loading corridor signals…</div>
     </div>
   </dialog>
 
@@ -233,6 +253,7 @@
   <script src="/design.js?v=dhaka-atlas-20261028-1793181354-93416f6" defer></script>
   <script src="/forecast.js?v=dhaka-atlas-20261028-1793181354-93416f6" defer></script>
   <script src="/instruments.js?v=dhaka-atlas-20261028-1793181354-93416f6" defer></script>
+  <script src="/collage.js?v=dhaka-atlas-20261028-1793181354-93416f6" defer></script>
   <script src="/app.js?v=dhaka-atlas-20261028-1793181354-93416f6" defer></script>
   <script src="/dashboard.js?v=dhaka-atlas-20261028-1793181354-93416f6" defer></script>
 </body>

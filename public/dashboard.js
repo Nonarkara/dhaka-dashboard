@@ -40,8 +40,36 @@
           <p style="margin:4px 0 0;font-size:11px;color:var(--dim);">${(isBn && ind.note_bn) ? ind.note_bn : ind.note}</p>
         </div>
       `).join("");
+
+      // The corridors. These carry a measured night-time radiance rather than
+      // the registry figures they used to carry, which had no source and no
+      // date: workforce, export value and daily turnover were typed in and
+      // read as data. The satellite cannot count workers, but it can say how
+      // much light a corridor leaves on, on a stated night.
+      const corridorBox = $("#economy-corridors-grid");
+      if (corridorBox) {
+        const corridors = Array.isArray(data.corridors) ? data.corridors : [];
+        corridorBox.innerHTML = corridors.length ? corridors.map(c => {
+          const measured = c.status === "ok" && c.night_radiance_nw !== null;
+          const rate = measured
+            ? new Intl.NumberFormat(isBn ? "bn-BD" : "en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c.night_radiance_nw)
+            : tr("Not measurable", "মাপা যায়নি");
+          return `
+            <article class="collage-card" data-state="${measured ? "ok" : "unavailable"}">
+              <h4>${c.name}</h4>
+              <p class="collage-reading">${measured ? `${rate} nW/(cm² sr)` : tr("Not measurable", "মাপা যায়নি")}</p>
+              <div class="collage-basis">
+                <span>${c.sector}</span>
+                ${measured ? `<span>${c.observation_date}</span>` : `<span>${c.reasonCode}</span>`}
+                ${c.city_rank ? `<span>${tr(`rank ${c.city_rank} of ${corridors.length}`, `${corridors.length}টির মধ্যে ${c.city_rank} নম্বর`)}</span>` : ''}
+              </div>
+            </article>`;
+        }).join("") : `<p class="collage-unavailable">${tr("No corridor could be measured.", "কোনো করিডোর মাপা যায়নি।")}</p>`;
+      }
     } catch (err) {
       container.innerHTML = `<p style="color:var(--warn);padding:8px;">Economic indicators feed unavailable.</p>`;
+      const corridorBox = $("#economy-corridors-grid");
+      if (corridorBox) corridorBox.innerHTML = `<p class="collage-unavailable">${tr("Corridor signals unavailable.", "করিডোরের সংকেত অনুপলব্ধ।")}</p>`;
     }
   }
 

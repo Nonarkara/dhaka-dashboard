@@ -27,6 +27,23 @@ export interface GibsTileVerdict {
   range?: number;
 }
 
+/**
+ * A decoded palette raster.
+ *
+ * GIBS serves every measured layer as a palette PNG: `indices` holds one
+ * palette index per pixel and `palette` holds the RGB the index paints as. The
+ * physical quantity lives in neither — it lives in the layer's colour map,
+ * keyed by that same index. So a measurement needs the index, not the colour.
+ */
+export interface GibsPaletteRaster {
+  width: number;
+  height: number;
+  /** Palette index per pixel, row-major. */
+  indices: Uint8Array;
+  /** RGB triples, index × 3. Empty when the image is not palette-based. */
+  palette: Uint8Array;
+}
+
 interface PngImage {
   width: number;
   height: number;
@@ -217,6 +234,41 @@ export async function inspectGibsTile(
   const range = max - min;
   if (range <= 2) return { hasData: false, reason: "uniform-colour", range };
   return { hasData: true, reason: "has-content", range };
+}
+
+/**
+ * Decode a GIBS palette PNG into its palette indices.
+ *
+ * This is the measurement half of the decoder: `inspectGibsTile` answers "is
+ * this tile real?", and this answers "what does each pixel say?". Both run on
+ * the same inflate so the two can never disagree about what was decoded.
+ *
+ * Throws when the image is not a palette PNG — a true-colour or RGB raster
+ * cannot be reduced to palette indices, and pretending otherwise would turn
+ * colour into a number that means nothing.
+ */
+export async function decodeGibsPalette(
+  bytes: ArrayBuffer | Uint8Array,
+  inflate: Inflate,
+): Promise<GibsPaletteRaster> {
+  const buf = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const img = await decodePng(buf, inflate);
+  if (img.colorType !== 3) {
+    throw new Error(`png: not a palette image (colour type ${img.colorType})`);
+  }
+  const indices = new Uint8Array(img.width * img.height);
+  for (let y = 0; y < img.height; y++) {
+    const row = y * img.stride;
+    for (let x = 0; x < img.width; x++) {
+      indices[y * img.width + x] = img.data[row + x * img.channels];
+    }
+  }
+  return {
+    width: img.width,
+    height: img.height,
+    indices,
+    palette: img.palette ?? new Uint8Array(0),
+  };
 }
 
 /** Inflate using the Workers runtime's DecompressionStream. */

@@ -34,4 +34,7 @@ node scripts/verify-live-bytes.mjs
 echo "==> 7. Verifying live NASA GIBS satellite tiles..."
 node scripts/verify-gibs-live.mjs --api "$ATLAS_URL"
 
+echo "==> 8. Verifying the live satellite collage..."
+npm run verify:satellite
+
 echo "==> Deploy complete: dhaka.nonarkara.org is live!"
