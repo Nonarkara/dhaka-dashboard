@@ -27,3 +27,11 @@ Task budget: at most one qualification paragraph before readings; first reading 
 A local isolated fixture restores481746b HTML, dashboard JavaScript and design CSS. Same budget fails: two intro paragraphs and first row y307px at390x844. Corrected first row y212px, a95px reduction before the first reading, with full qualifications preserved. The final JSON records dimensions, repeated-row size, header, map and page geometry; screenshots show preserved source reading paths.
 
 Reproduce fixtures with `node --import ./scripts/lib/ts-resolver.mjs scripts/fixtures/flood-correction/preview.mjs`, run a local worker, then open `/__river-values.html?lang=en&area=parliament` and `/__river-before.html?lang=en&area=parliament`. Generated public/__river-* files are temporary and must be removed before deployment. The positive/zero fixture numbers are synthetic test data, never production observations. Screenshots named *values* show fixtures; before screenshots show the old implementation. None are claims of observed flood conditions.
+
+## Deployed verification
+
+Canonical `bash scripts/deploy-live.sh` completed successfully. Build: `dhaka-atlas-20261029-1793283707-c3eee18`; Worker version: `c1e426c1-54a8-4c7a-9c0e-56a99c03df27`. All12 suites, typecheck, datasets,13 API smoke checks, exact live SHA-256 assets, four decoded GIBS products and live satellite verification (72/84 measurements) passed.
+
+Direct production checks assert six unavailable assessments, five available rainfall queries and one unmapped query with null value/retrieval time. Production browser shows the full rainfall period, source and unvalidated gauge match. `live-api.json` and `live-en.png` preserve that evidence. The initial browser request briefly retained the previous60-second cached API shape; reloading after cache expiry retrieved the new fields. No cache-busting keys were used.
+
+MSH captured the verified regression and correction in `Scars/Debug-Logs/2026-10-29-rainfall-proxies-must-not-turn-unmapped-river-queries-into-normal-flood-assessments.md`.

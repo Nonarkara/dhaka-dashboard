@@ -1,0 +1,342 @@
+{
+  "watch": {
+    "status": "partial",
+    "city": "Dhaka",
+    "timestamp": "2026-10-29T14:24:40.009Z",
+    "indicators": {
+      "airQuality": {
+        "status": "danger",
+        "provenance": "modeled",
+        "us_aqi": 155,
+        "observedAt": "2026-10-29T20:00",
+        "category": "Unhealthy",
+        "source": "Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo"
+      },
+      "weather": {
+        "status": "ok",
+        "provenance": "modeled",
+        "wind_speed_10m": 3.3,
+        "wind_direction_10m": 29,
+        "observedAt": "2026-10-29T20:15",
+        "source": "Open-Meteo Weather API"
+      },
+      "floodRisk": {
+        "status": "unavailable",
+        "provenance": "unavailable",
+        "reasonCode": "validated-flood-assessment-not-connected",
+        "source": "BWDB / FFWC",
+        "timestamp": "2026-10-29T14:24:40.009Z",
+        "observedAt": null
+      },
+      "economy": {
+        "status": "unavailable",
+        "provenance": "unavailable",
+        "reasonCode": "dated-bulletin-not-connected",
+        "source": "Bangladesh Bank / DSE",
+        "timestamp": "2026-10-29T14:24:40.009Z",
+        "observedAt": null
+      }
+    }
+  },
+  "rivers": {
+    "status": "partial",
+    "provenance": "modeled",
+    "readingsStatus": "unavailable",
+    "reasonCode": null,
+    "observedAt": null,
+    "timestamp": "2026-10-29T14:24:43.199Z",
+    "stations": [
+      {
+        "id": "buriganga-mill-barrage",
+        "name": "Buriganga at Dhaka (Mill Barrage)",
+        "name_bn": "\u09ac\u09c1\u09a1\u09bc\u09bf\u0997\u0999\u09cd\u0997\u09be (\u09a2\u09be\u0995\u09be \u09ae\u09bf\u09b2 \u09ac\u09cd\u09af\u09be\u09b0\u09be\u099c)",
+        "river": "Buriganga",
+        "river_bn": "\u09ac\u09c1\u09a1\u09bc\u09bf\u0997\u0999\u09cd\u0997\u09be",
+        "station_code": "SW42",
+        "danger_level_m": 5.55,
+        "warning_level_m": 5.05,
+        "highest_flood_level_m": 7.58,
+        "highest_flood_year": 1988,
+        "current_level_m": null,
+        "trend": "unavailable",
+        "status": "unavailable",
+        "lat": 23.7001,
+        "lng": 90.415,
+        "agency": "BWDB / FFWC",
+        "source_url": "https://ffwc.gov.bd",
+        "readingsStatus": "unavailable",
+        "reasonCode": "river-observations-not-connected",
+        "rainfall": {
+          "status": "ok",
+          "provenance": "modeled",
+          "reasonCode": null,
+          "value": 0.7999999999999999,
+          "unit": "mm",
+          "source": "Open-Meteo Weather API",
+          "sourceUrl": "https://open-meteo.com/en/docs",
+          "retrievedAt": "2026-10-29T14:24:42.183Z",
+          "validFrom": "2026-10-29T13:00:00.000Z",
+          "validTo": "2026-10-30T13:00:00.000Z",
+          "query": {
+            "latitude": 23.7001,
+            "longitude": 90.415,
+            "name": "Buriganga Catchment"
+          },
+          "spatialScope": "query-point-not-catchment",
+          "stationMatchStatus": "unvalidated"
+        },
+        "floodRisk": {
+          "status": "unavailable",
+          "provenance": "unavailable",
+          "tier": null,
+          "reasonCode": "validated-flood-assessment-not-connected",
+          "timestamp": "2026-10-29T14:24:43.199Z",
+          "note": "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected."
+        }
+      },
+      {
+        "id": "turag-mirpur",
+        "name": "Turag at Mirpur",
+        "name_bn": "\u09a4\u09c1\u09b0\u09be\u0997 (\u09ae\u09bf\u09b0\u09aa\u09c1\u09b0)",
+        "river": "Turag",
+        "river_bn": "\u09a4\u09c1\u09b0\u09be\u0997",
+        "station_code": "SW299",
+        "danger_level_m": 5.5,
+        "warning_level_m": 5,
+        "highest_flood_level_m": 8.35,
+        "highest_flood_year": 1998,
+        "current_level_m": null,
+        "trend": "unavailable",
+        "status": "unavailable",
+        "lat": 23.798,
+        "lng": 90.342,
+        "agency": "BWDB / FFWC",
+        "source_url": "https://ffwc.gov.bd",
+        "readingsStatus": "unavailable",
+        "reasonCode": "river-observations-not-connected",
+        "rainfall": {
+          "status": "ok",
+          "provenance": "modeled",
+          "reasonCode": null,
+          "value": 0.7,
+          "unit": "mm",
+          "source": "Open-Meteo Weather API",
+          "sourceUrl": "https://open-meteo.com/en/docs",
+          "retrievedAt": "2026-10-29T14:24:42.260Z",
+          "validFrom": "2026-10-29T13:00:00.000Z",
+          "validTo": "2026-10-30T13:00:00.000Z",
+          "query": {
+            "latitude": 23.798,
+            "longitude": 90.342,
+            "name": "Turag Basin"
+          },
+          "spatialScope": "query-point-not-catchment",
+          "stationMatchStatus": "unvalidated"
+        },
+        "floodRisk": {
+          "status": "unavailable",
+          "provenance": "unavailable",
+          "tier": null,
+          "reasonCode": "validated-flood-assessment-not-connected",
+          "timestamp": "2026-10-29T14:24:43.199Z",
+          "note": "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected."
+        }
+      },
+      {
+        "id": "balu-demra",
+        "name": "Balu at Demra",
+        "name_bn": "\u09ac\u09be\u09b2\u09c1 (\u09a1\u09c7\u09ae\u09b0\u09be)",
+        "river": "Balu",
+        "river_bn": "\u09ac\u09be\u09b2\u09c1",
+        "station_code": "SW08",
+        "danger_level_m": 5.75,
+        "warning_level_m": 5.25,
+        "highest_flood_level_m": 7.13,
+        "highest_flood_year": 1998,
+        "current_level_m": null,
+        "trend": "unavailable",
+        "status": "unavailable",
+        "lat": 23.714,
+        "lng": 90.505,
+        "agency": "BWDB / FFWC",
+        "source_url": "https://ffwc.gov.bd",
+        "readingsStatus": "unavailable",
+        "reasonCode": "river-observations-not-connected",
+        "rainfall": {
+          "status": "ok",
+          "provenance": "modeled",
+          "reasonCode": null,
+          "value": 0.8999999999999999,
+          "unit": "mm",
+          "source": "Open-Meteo Weather API",
+          "sourceUrl": "https://open-meteo.com/en/docs",
+          "retrievedAt": "2026-10-29T14:24:42.366Z",
+          "validFrom": "2026-10-29T13:00:00.000Z",
+          "validTo": "2026-10-30T13:00:00.000Z",
+          "query": {
+            "latitude": 23.714,
+            "longitude": 90.505,
+            "name": "Balu Corridor"
+          },
+          "spatialScope": "query-point-not-catchment",
+          "stationMatchStatus": "unvalidated"
+        },
+        "floodRisk": {
+          "status": "unavailable",
+          "provenance": "unavailable",
+          "tier": null,
+          "reasonCode": "validated-flood-assessment-not-connected",
+          "timestamp": "2026-10-29T14:24:43.199Z",
+          "note": "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected."
+        }
+      },
+      {
+        "id": "lakhya-narayanganj",
+        "name": "Shitalakshya at Narayanganj",
+        "name_bn": "\u09b6\u09c0\u09a4\u09b2\u0995\u09cd\u09b7\u09cd\u09af\u09be (\u09a8\u09be\u09b0\u09be\u09af\u09bc\u09a3\u0997\u099e\u09cd\u099c)",
+        "river": "Shitalakshya",
+        "river_bn": "\u09b6\u09c0\u09a4\u09b2\u0995\u09cd\u09b7\u09cd\u09af\u09be",
+        "station_code": "SW179",
+        "danger_level_m": 5.5,
+        "warning_level_m": 5,
+        "highest_flood_level_m": 6.93,
+        "highest_flood_year": 1998,
+        "current_level_m": null,
+        "trend": "unavailable",
+        "status": "unavailable",
+        "lat": 23.619,
+        "lng": 90.511,
+        "agency": "BWDB / FFWC",
+        "source_url": "https://ffwc.gov.bd",
+        "readingsStatus": "unavailable",
+        "reasonCode": "river-observations-not-connected",
+        "rainfall": {
+          "status": "unavailable",
+          "provenance": "unavailable",
+          "reasonCode": "rainfall-query-not-mapped",
+          "value": null,
+          "unit": "mm",
+          "source": "Open-Meteo Weather API",
+          "sourceUrl": "https://open-meteo.com/en/docs",
+          "retrievedAt": null,
+          "validFrom": null,
+          "validTo": null,
+          "query": null,
+          "spatialScope": "query-point-not-catchment",
+          "stationMatchStatus": "unvalidated"
+        },
+        "floodRisk": {
+          "status": "unavailable",
+          "provenance": "unavailable",
+          "tier": null,
+          "reasonCode": "validated-flood-assessment-not-connected",
+          "timestamp": "2026-10-29T14:24:43.199Z",
+          "note": "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected."
+        }
+      },
+      {
+        "id": "tongi-khal-tongi",
+        "name": "Tongi Khal at Tongi",
+        "name_bn": "\u099f\u0999\u09cd\u0997\u09c0 \u0996\u09be\u09b2 (\u099f\u0999\u09cd\u0997\u09c0)",
+        "river": "Tongi Khal",
+        "river_bn": "\u099f\u0999\u09cd\u0997\u09c0 \u0996\u09be\u09b2",
+        "station_code": "SW298",
+        "danger_level_m": 6.08,
+        "warning_level_m": 5.58,
+        "highest_flood_level_m": 7.84,
+        "highest_flood_year": 1998,
+        "current_level_m": null,
+        "trend": "unavailable",
+        "status": "unavailable",
+        "lat": 23.889,
+        "lng": 90.401,
+        "agency": "BWDB / FFWC",
+        "source_url": "https://ffwc.gov.bd",
+        "readingsStatus": "unavailable",
+        "reasonCode": "river-observations-not-connected",
+        "rainfall": {
+          "status": "ok",
+          "provenance": "modeled",
+          "reasonCode": null,
+          "value": 0.7,
+          "unit": "mm",
+          "source": "Open-Meteo Weather API",
+          "sourceUrl": "https://open-meteo.com/en/docs",
+          "retrievedAt": "2026-10-29T14:24:43.199Z",
+          "validFrom": "2026-10-29T13:00:00.000Z",
+          "validTo": "2026-10-30T13:00:00.000Z",
+          "query": {
+            "latitude": 23.889,
+            "longitude": 90.401,
+            "name": "Tongi North"
+          },
+          "spatialScope": "query-point-not-catchment",
+          "stationMatchStatus": "unvalidated"
+        },
+        "floodRisk": {
+          "status": "unavailable",
+          "provenance": "unavailable",
+          "tier": null,
+          "reasonCode": "validated-flood-assessment-not-connected",
+          "timestamp": "2026-10-29T14:24:43.199Z",
+          "note": "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected."
+        }
+      },
+      {
+        "id": "dhaleshwari-rekabi-bazar",
+        "name": "Dhaleshwari at Rekabi Bazar",
+        "name_bn": "\u09a7\u09b2\u09c7\u09b6\u09cd\u09ac\u09b0\u09c0 (\u09b0\u09c7\u0995\u09be\u09ac\u09bf \u09ac\u09be\u099c\u09be\u09b0)",
+        "river": "Dhaleshwari",
+        "river_bn": "\u09a7\u09b2\u09c7\u09b6\u09cd\u09ac\u09b0\u09c0",
+        "station_code": "SW68",
+        "danger_level_m": 5.18,
+        "warning_level_m": 4.68,
+        "highest_flood_level_m": 7.42,
+        "highest_flood_year": 1988,
+        "current_level_m": null,
+        "trend": "unavailable",
+        "status": "unavailable",
+        "lat": 23.563,
+        "lng": 90.495,
+        "agency": "BWDB / FFWC",
+        "source_url": "https://ffwc.gov.bd",
+        "readingsStatus": "unavailable",
+        "reasonCode": "river-observations-not-connected",
+        "rainfall": {
+          "status": "ok",
+          "provenance": "modeled",
+          "reasonCode": null,
+          "value": 1,
+          "unit": "mm",
+          "source": "Open-Meteo Weather API",
+          "sourceUrl": "https://open-meteo.com/en/docs",
+          "retrievedAt": "2026-10-29T14:24:42.135Z",
+          "validFrom": "2026-10-29T13:00:00.000Z",
+          "validTo": "2026-10-30T13:00:00.000Z",
+          "query": {
+            "latitude": 23.8583,
+            "longitude": 90.2667,
+            "name": "Savar West"
+          },
+          "spatialScope": "query-point-not-catchment",
+          "stationMatchStatus": "unvalidated"
+        },
+        "floodRisk": {
+          "status": "unavailable",
+          "provenance": "unavailable",
+          "tier": null,
+          "reasonCode": "validated-flood-assessment-not-connected",
+          "timestamp": "2026-10-29T14:24:43.199Z",
+          "note": "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected."
+        }
+      }
+    ],
+    "summary": {
+      "assessed": 0,
+      "unavailable": 6,
+      "rainfallAvailable": 5,
+      "rainfallUnavailable": 1
+    },
+    "note": "Registry danger levels are unverified reference values. Point rainfall forecasts do not establish river levels, catchment saturation or flood warnings."
+  }
+}
