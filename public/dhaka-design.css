@@ -433,3 +433,15 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
   color: var(--dim);
   font-weight: 600;
 }
+
+/* Sampling evidence stays beside the selected place, without a second reading rail. */
+#collage-dialog .collage-layout { display:block; }
+#collage-dialog .collage-rail { max-height:none; overflow:visible; border:0; padding:0; margin:0 0 8px; }
+#collage-dialog .collage-rail label { display:flex; align-items:center; gap:8px; font-size:13px; }
+#collage-dialog .collage-rail select { min-width:0; flex:1; height:36px; color:var(--ink); background:var(--bg); border:1px solid var(--line); font:inherit; padding:4px 8px; }
+#collage-dialog .collage-grid { display:block; }
+#collage-dialog .collage-card { border:0; border-top:1px solid var(--line); padding:8px 0; }
+#collage-dialog .collage-card h4 { font-size:12px; }
+#collage-dialog .collage-reading { font-size:14px; }
+#collage-dialog .collage-basis { border:0; padding:0; font-size:12px; overflow-wrap:anywhere; }
+.collage-sample { margin-top:6px; min-height:36px; font-size:13px; }

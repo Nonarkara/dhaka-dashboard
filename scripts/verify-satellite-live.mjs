@@ -27,7 +27,11 @@ const districts = areas.map(a => ({
 
 console.log(`Measuring ${districts.length} districts over ${MEASURED_LAYERS.length} satellite signals…`);
 const started = Date.now();
-const collage = await buildCollage(districts, 2);
+const response = await fetch('https://dhaka.nonarkara.org/api/atlas/collage');
+assert.ok(response.ok, 'published snapshot endpoint unavailable');
+const collage = await response.json();
+assert.equal(collage.delivery?.source,'persistent-snapshot');
+assert.ok(collage.delivery.ageSeconds>=0);
 const seconds = ((Date.now() - started) / 1000).toFixed(1);
 
 console.log(`status ${collage.status} · ${collage.measured}/${collage.total} measurements · ${seconds}s`);
@@ -50,7 +54,7 @@ assert.ok(collage.status !== "unavailable", "the collage is entirely unavailable
 const measured = collage.districts.flatMap(d => d.measurements).filter(m => m.status === "ok");
 for (const m of measured) {
   assert.ok(m.value !== null && Number.isFinite(m.value), `a measurement of ${m.layerId} has no value`);
-  assert.ok(m.observationDate || m.vintage, `a measurement of ${m.layerId} has neither a date nor a vintage`);
+  assert.ok(m.observationDate || m.vintage || m.period, `a measurement of ${m.layerId} has neither a date nor a vintage`);
   // Resolution may be null for non-raster, point-based measurements (e.g. a
   // climatology such as NASA POWER solar). When present it must be positive.
   assert.ok(m.resolutionM === null || m.resolutionM > 0, `a measurement of ${m.layerId} has no resolution`);

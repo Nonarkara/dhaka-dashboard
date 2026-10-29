@@ -129,11 +129,10 @@ ok("ground resolution halves with each level", () => {
   const equator = 156543.03392804097;
   assert.ok(Math.abs(groundResolutionM(7, 0) - equator / 128) < 0.01, "level 7 resolution is off the pyramid");
   assert.ok(Math.abs(groundResolutionM(12, 0) - equator / 4096) < 0.01, "level 12 resolution is off the pyramid");
-  // Over Dhaka the Mercator projection stretches the ground, so a pixel
-  // covers more metres than at the equator: 1.34 km at level 7, 42 m at
-  // level 12.
-  assert.ok(l7 > 1300 && l7 < 1370, `level 7 resolution is ${l7} m, expected about 1336`);
-  assert.ok(l12 > 40 && l12 < 43, `level 12 resolution is ${l12} m, expected about 41.8`);
+  // Ground pixel spacing decreases away from the equator.
+  assert.ok(Math.abs(groundResolutionM(7,60)/groundResolutionM(7,0)-0.5)<1e-9);
+  assert.ok(l7 > 1100 && l7 < 1130, `level 7 resolution is ${l7} m, expected about 1119`);
+  assert.ok(l12 > 34 && l12 < 36, `level 12 resolution is ${l12} m, expected about 35.0`);
 });
 
 // ── 6. The colour map turns an index into a physical quantity ─────────────
@@ -275,7 +274,7 @@ ok("the collage ranks districts against the whole city", () => {
     ["a", "b", "c"],
   );
   const partialReading = partial.get("a").find(r => r.domain === "people");
-  assert.ok(partialReading.reading.includes("tied with 1 other district"), `a tie was reported as a win: ${partialReading.reading}`);
+  assert.ok(partialReading.reading.includes("tied with 1 other sampled place"), `a tie was reported as a win: ${partialReading.reading}`);
 
   const unique = readingsFromMeasurements(
     new Map([
@@ -301,7 +300,7 @@ ok("the collage ranks districts against the whole city", () => {
   );
   const scopedTop = scoped.get("a").find(r => r.domain === "environment");
   assert.ok(!scopedTop.reading.includes("in the city"), `a partial reading claimed the city: ${scopedTop.reading}`);
-  assert.ok(scopedTop.reading.includes("2 districts measured"), `the reading did not state its scope: ${scopedTop.reading}`);
+  assert.ok(scopedTop.reading.includes("2 sampled places"), `the reading did not state its scope: ${scopedTop.reading}`);
 
   // No two domains may print the same number as their own finding.
   for (const [, list] of readings) {
@@ -356,9 +355,12 @@ ok("the domains are named in both languages", () => {
 ok("the solar resource rejects a payload it cannot read", async () => {
   const { selectSolar } = await import("../src/solar-resource.ts");
 
-  const good = { properties: { parameter: { ALLSKY_SFC_SW_DWN: { ANN: 4.5031, JAN: 3.6233, JUL: 4.3798 } } } };
+  const good = { header:{range:"January 2001 - December 2025",sources:["SYN1DEG"]}, parameters:{ALLSKY_SFC_SW_DWN:{units:"kW-hr/m^2/day"}},geometry:{coordinates:[90.412,23.81,10]}, properties: { parameter: { ALLSKY_SFC_SW_DWN: { ANN: 4.5031, JAN: 3.6233, JUL: 4.3798 } } } };
   const selected = selectSolar(good);
   assert.equal(selected.annual, 4.5031);
+  assert.equal(selected.period,"January 2001 - December 2025");
+  assert.deepEqual(selected.returnedCoordinates,[90.412,23.81,10]);
+  assert.equal(selected.nativeResolutionDegrees,1);
   assert.equal(selected.monthly.length, 2, "the monthly figures were dropped");
 
   // A payload with no parameter, a fill value, a zero, or a non-number must

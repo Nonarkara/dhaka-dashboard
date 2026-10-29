@@ -28,6 +28,7 @@ import {
   measureLayer,
   type MeasurePoint,
   type Measurement,
+  samplingWindow,
 } from "./satellite.js";
 import { getSolarResource } from "./solar-resource.js";
 
@@ -61,7 +62,10 @@ export interface DomainReading {
     /** How many districts share this value, when it is a tie. */
     tied: number;
     /** Share of the measurement window that carried an observation. */
-    coverage: number;
+    coverage: number | null;
+    source?: string; sourceUrl?: string; provenance?: string; period?: string | null;
+    resolutionM?: number | null; nativeResolutionM?: number | null; nativeResolutionDegrees?: number | null;
+    sampling?: Measurement["sampling"]; censored?: boolean;
   } | null;
   status: "ok" | "unavailable";
   reasonCode: string | null;
@@ -88,7 +92,7 @@ export interface CollageResult {
   reasonCode: string | null;
   timestamp: string;
   city: string;
-  provenance: "measured";
+  provenance: "mixed";
   domains: typeof DOMAINS;
   districts: DistrictCollage[];
   /** The industrial corridors, measured the same way as the districts. */
@@ -120,7 +124,7 @@ export interface CorridorReading {
   city_rank: number | null;
   status: "ok" | "unavailable";
   reasonCode: string | null;
-  provenance: "measured";
+  provenance: "mixed";
   note: string;
 }
 
@@ -188,8 +192,8 @@ const SIGNAL_READINGS: Record<string, SignalReading> = {
     higherIs: "more",
     highNote: "the surface that stays hottest after dark",
     highNote_bn: "রাতেও সবচেয়ে গরম থাকা ভূমি",
-    lowNote: "the surface that cools fastest after dark",
-    lowNote_bn: "রাতে সবচেয়ে দ্রুত ঠান্ডা হওয়া ভূমি",
+    lowNote: "the lowest sampled night-time surface temperature",
+    lowNote_bn: "নমুনায় রাতের সর্বনিম্ন ভূ-পৃষ্ঠের তাপমাত্রা",
     display: (v) => `${(v - 273.15).toFixed(1)} °C`,
   },
   MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: {
@@ -238,10 +242,10 @@ const DOMAIN_PHRASING: Record<string, Record<string, { high: string; high_bn: st
   },
   "smart-living": {
     MODIS_Terra_Land_Surface_Temp_Night_TES: {
-      high: "no night-time relief — the surface here stays hottest after dark",
-      high_bn: "রাতে কোনো স্বস্তি নেই — রাতেও সবচেয়ে গরম থাকা ভূমি",
-      low: "the fastest night-time cooling in the city",
-      low_bn: "শহরে রাতে সবচেয়ে দ্রুত ঠান্ডা হওয়া ভূমি",
+      high: "the highest sampled night-time surface temperature",
+      high_bn: "নমুনায় রাতের সর্বোচ্চ ভূ-পৃষ্ঠের তাপমাত্রা",
+      low: "the lowest sampled night-time surface temperature",
+      low_bn: "নমুনায় রাতের সর্বনিম্ন ভূ-পৃষ্ঠের তাপমাত্রা",
     },
   },
 };
@@ -296,10 +300,11 @@ function rankAcrossCity(
   const byLayer = new Map<string, Array<{ district: string; m: Measurement }>>();
   for (const [district, measurements] of perDistrict) {
     for (const m of measurements) {
-      if (m.status !== "ok" || m.value === null) continue;
-      const list = byLayer.get(m.layerId) ?? [];
+      if (m.status !== "ok" || m.value === null || m.censored) continue;
+      const acquisition = `${m.layerId}|${m.observationDate}|${m.vintage}|${m.period}`;
+      const list = byLayer.get(acquisition) ?? [];
       list.push({ district, m });
-      byLayer.set(m.layerId, list);
+      byLayer.set(acquisition, list);
     }
   }
   const ranks = new Map<string, { rank: number; of: number; tied: number }>();
@@ -391,37 +396,37 @@ function readDomain(
   const lowNote = phrase?.low ?? spec?.lowNote;
   const lowNoteBn = phrase?.low_bn ?? spec?.lowNote_bn;
   const of = bestPlaced?.of ?? relevant.length;
-  const rank = bestPlaced?.rank ?? of;
+  const rank = best.censored ? null : bestPlaced?.rank ?? of;
   const tied = bestPlaced?.tied ?? 0;
   // A rank is only "in the city" when every district was measured on this
   // acquisition. A cloudy day leaves three districts visible, and calling the
   // hottest of those "the hottest in Dhaka" would describe a city nobody saw.
-  const cityWide = of >= citySize;
-  const scopeEn = cityWide ? "the city" : `${of} districts measured`;
+  const cityWide = false;
+  const scopeEn = cityWide ? "the city" : `${of} sampled places`;
   const scopeBn = cityWide ? "শহরে" : `পরিমাপ করা ${of}টি এলাকার`;
   const isTop = rank === 1;
-  const isBottom = rank + tied === of;
+  const isBottom = rank !== null && rank + tied === of;
   const tiedTop = tied > 0 && tied === of - 1;
 
   // Every measured district holding the same value is a uniformity finding,
   // not a fourteen-way tie for first: "100% built-up everywhere" is a fact
   // about the city, and ranking it would be a sentence that says nothing.
-  const noteEn = tiedTop
-    ? `the same in all ${of} districts measured`
+  const noteEn = best.censored ? "lower bound; exact rank unavailable" : tiedTop
+    ? `the same in all ${of} sampled places`
     : isTop
       ? tied > 0
-        ? `tied with ${tied} other ${tied === 1 ? "district" : "districts"} at the top of ${scopeEn}`
+        ? `tied with ${tied} other ${tied === 1 ? "sampled place" : "sampled places"} at the top of ${scopeEn}`
         : cityWide
-          ? highNote ?? `the highest of ${of} districts measured`
-          : `the highest of ${of} districts measured`
+          ? highNote ?? `the highest of ${of} sampled places`
+          : `the highest of ${of} sampled places`
       : isBottom
         ? tied > 0
-          ? `tied with ${tied} other ${tied === 1 ? "district" : "districts"} at the bottom of ${scopeEn}`
+          ? `tied with ${tied} other ${tied === 1 ? "sampled place" : "sampled places"} at the bottom of ${scopeEn}`
           : cityWide
-            ? lowNote ?? `the lowest of ${of} districts measured`
-            : `the lowest of ${of} districts measured`
+            ? lowNote ?? `the lowest of ${of} sampled places`
+            : `the lowest of ${of} sampled places`
         : `ranked ${rank} of ${of} in ${scopeEn}`;
-  const noteBn = tiedTop
+  const noteBn = best.censored ? "নিম্নসীমা; সঠিক ক্রম অনুপলব্ধ" : tiedTop
     ? `পরিমাপ করা সব ${of}টি এলাকায় একই`
     : isTop
       ? tied > 0
@@ -446,8 +451,8 @@ function readDomain(
   return {
     domain,
     signals: relevant.map((m) => m.layerId),
-    reading: `${best.label}: ${shown} — ${noteEn}.`,
-    reading_bn: `${best.label_bn}: ${shownBn} — ${noteBn}।`,
+    reading: `${best.label}: ${best.censored ? "≥ " : ""}${shown} — ${noteEn}.`,
+    reading_bn: `${best.label_bn}: ${best.censored ? "≥ " : ""}${shownBn} — ${noteBn}।`,
     basis: {
       label: best.label,
       label_bn: best.label_bn,
@@ -462,6 +467,8 @@ function readDomain(
       // 40% of a window is a different claim from one over all of it, and the
       // reader is entitled to know which they are looking at.
       coverage: best.coverage,
+      source: best.source, sourceUrl: best.sourceUrl, provenance: best.provenance, period: best.period,
+      resolutionM: best.resolutionM, nativeResolutionM: best.nativeResolutionM, nativeResolutionDegrees: best.nativeResolutionDegrees, sampling: best.sampling, censored: best.censored,
     },
     status: "ok",
     reasonCode: null,
@@ -514,11 +521,13 @@ async function measureSolar(points: MeasurePoint[]): Promise<{ measurements: Mea
       min: r.value,
       max: r.value,
       mean: r.value,
-      // A climatology covers the whole period, so the window is fully
-      // observed — there is no partial coverage to report.
-      coverage: r.status === "ok" ? 1 : 0,
-      samples: r.status === "ok" ? 1 : 0,
-      observationDate: r.period,
+      // POWER does not supply observed spatial coverage for this model point.
+      coverage: null,
+      samples: 0,
+      observationDate: null,
+      period: r.period, source: r.source, sourceUrl: r.sourceUrl, provenance: "modeled",
+      retrievedAt: r.retrievedAt, returnedCoordinates: r.returnedCoordinates, nativeResolutionDegrees: r.nativeResolutionDegrees,
+      sampling: { type: "model-point", radiusPx: null, bbox: null, scope: "coarse-climatology-not-district-solar-potential" },
       vintage: null,
       static: false,
       censored: false,
@@ -536,7 +545,7 @@ async function measureSolar(points: MeasurePoint[]): Promise<{ measurements: Mea
 export async function buildCollage(
   districts: District[],
   corridorPoints: CorridorPoint[] = [],
-  radiusPx = 2,
+  radiusPx?: number,
 ): Promise<CollageResult> {
   const points: MeasurePoint[] = districts.map((d) => ({ id: d.id, lat: d.lat, lng: d.lng }));
   const perDistrict = new Map<string, Measurement[]>();
@@ -547,18 +556,23 @@ export async function buildCollage(
   // which is most of a Worker's request budget spent waiting on the network
   // instead of doing work.
   const layerResults = await Promise.all([
-    ...MEASURED_LAYERS.map((layer) => measureLayer(layer, points, radiusPx)),
+    ...MEASURED_LAYERS.map((layer) => measureLayer(layer, points, radiusPx ?? layer.radiusPx ?? 2)),
     // The solar resource is not a raster but it is a measurement, and it is
     // the only instrument that speaks to the energy domain: what the sun
     // does to a place, as opposed to what the place does at night.
     measureSolar(points),
   ]);
-  for (const { measurements } of layerResults) {
+  for (const [layerIndex, { measurements }] of layerResults.entries()) {
     // measureLayer returns one measurement per point, in the order it was
     // given, so they zip back onto the districts exactly.
     measurements.forEach((m, index) => {
       const district = districts[index];
-      if (district) perDistrict.get(district.id)?.push(m);
+      if (district) {
+        const layer = MEASURED_LAYERS[layerIndex];
+        if (layer) Object.assign(m, { source: "NASA GIBS", sourceUrl: "https://gibs.earthdata.nasa.gov/", provenance: layer.static ? "reference" : "measured", nativeResolutionM: null,
+          sampling: samplingWindow(district.lat,district.lng,layer.tileLevel,radiusPx ?? layer.radiusPx ?? 2) });
+        perDistrict.get(district.id)?.push(m);
+      }
     });
   }
 
@@ -612,7 +626,7 @@ export async function buildCollage(
       status === "ok" ? null : status === "partial" ? "some-signals-unavailable" : "no-signal-measured",
     timestamp: new Date().toISOString(),
     city: "Dhaka",
-    provenance: "measured",
+    provenance: "mixed",
     domains: DOMAINS,
     districts: results,
     corridors: await measureCorridors(corridorPoints),
@@ -653,7 +667,7 @@ async function measureCorridors(points: CorridorPoint[]): Promise<CorridorReadin
       city_rank: null,
       status: m?.status ?? "unavailable",
       reasonCode: m?.reasonCode ?? "corridor-not-measured",
-      provenance: "measured",
+      provenance: "mixed",
       note: "Night-time radiance measured by VIIRS Day/Night Band over the corridor centre.",
     };
   });

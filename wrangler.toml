@@ -21,3 +21,16 @@ run_worker_first = true
 name = "RATE_LIMITER"
 namespace_id = "4208"
 simple = { limit = 600, period = 60 }
+
+[[r2_buckets]]
+binding = "OBSERVATION_ARCHIVE"
+bucket_name = "dhaka-observations"
+
+[[d1_databases]]
+binding = "OBSERVATION_DB"
+database_name = "dhaka-observations"
+database_id = "61bdde6b-5afb-4dda-95ad-2971839f9416"
+migrations_dir = "migrations"
+
+[triggers]
+crons = ["*/15 * * * *"]

@@ -19,6 +19,7 @@
   let collage = null;
   let selected = null;
   let loading = false;
+  let readFailed = false;
 
   /** Escape untrusted text before it goes into the DOM. */
   const esc = text => String(text ?? '').replace(/[&<>"']/g, c => ({
@@ -44,29 +45,27 @@
   /** When the measurement was taken, stated honestly for a static layer too. */
   function when(m) {
     if (m.vintage) return tr(`static map · ${m.vintage}`, `স্থির মানচিত্র · ${m.vintage}`);
+    if (m.period) return m.period;
     if (m.observationDate) return m.observationDate;
     return tr('no observation', 'পর্যবেক্ষণ নেই');
   }
 
   function renderDistricts(list) {
     list.innerHTML = '';
+    const label = document.createElement('label');
+    label.textContent = tr('Sampled place', 'নমুনার স্থান');
+    const select = document.createElement('select');
+    select.setAttribute('aria-label', tr('Sampled place', 'নমুনার স্থান'));
     for (const d of collage.districts) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'collage-district';
-      button.dataset.id = d.id;
-      button.setAttribute('aria-pressed', String(d.id === selected));
-      const name = document.createElement('strong');
-      name.textContent = bn() ? d.name_bn : d.name;
-      const note = document.createElement('small');
-      note.textContent = d.headline_bn && bn() ? d.headline_bn : d.headline;
-      button.append(name, note);
-      button.addEventListener('click', () => {
-        selected = d.id;
-        render();
-      });
-      list.appendChild(button);
+      const option = document.createElement('option');
+      option.value = d.id;
+      option.textContent = bn() ? d.name_bn : d.name;
+      option.selected = d.id === selected;
+      select.appendChild(option);
     }
+    select.addEventListener('change', () => {selected = select.value; render();});
+    label.appendChild(select);
+    list.appendChild(label);
   }
 
   function renderDomains(panel, district) {
@@ -75,12 +74,6 @@
       panel.innerHTML = `<p class="collage-empty">${tr('Pick a district to read its signals.', 'সংকেত পড়তে একটি এলাকা বেছে নিন।')}</p>`;
       return;
     }
-    const heading = document.createElement('div');
-    heading.className = 'collage-district-head';
-    heading.innerHTML = `<strong>${esc(bn() ? district.name_bn : district.name)}</strong>
-      <span>${esc(bn() ? district.headline_bn : district.headline)}</span>`;
-    panel.appendChild(heading);
-
     const grid = document.createElement('div');
     grid.className = 'collage-grid';
 
@@ -93,7 +86,7 @@
         card.innerHTML = `
           <h4>${esc(bn() ? domain.label_bn : domain.label)}</h4>
           <p class="collage-unavailable">${tr('Not measurable here', 'এখানে মাপা যায়নি')}</p>
-          <small>${esc(reading?.reasonCode || 'no-measured-signal-in-domain')}</small>`;
+          <small data-language-fixed>${esc(reading?.reasonCode || 'no-measured-signal-in-domain')}</small>`;
         grid.appendChild(card);
         continue;
       }
@@ -104,22 +97,46 @@
         <p class="collage-reading">${esc(bn() ? reading.reading_bn : reading.reading)}</p>
         <div class="collage-basis">
           <span>${esc(bn() ? basis.label_bn : basis.label)}</span>
-          <span>${esc(display(basis))}</span>
+          <span>${basis.censored ? "≥ " : ""}${esc(display(basis))}</span>
           <span>${esc(when(basis))}</span>
+          <span>${esc(basis.source || tr('Source unavailable','উৎস অনুপলব্ধ'))} · ${esc(basis.provenance === 'modeled' ? tr('modeled','মডেলভিত্তিক') : basis.provenance === 'reference' ? tr('reference','তথ্যসূত্র') : tr('satellite-derived estimate','উপগ্রহভিত্তিক অনুমান'))}</span>
+          ${basis.resolutionM ? `<span>${tr('Tile pixel spacing','টাইলের পিক্সেলের দূরত্ব')}: ${number(basis.resolutionM)} m · ${tr('native resolution unverified','মূল রেজোলিউশন যাচাই করা হয়নি')}</span>` : `<span>${basis.nativeResolutionDegrees ? tr(`Source grid ${basis.nativeResolutionDegrees}°; not rooftop potential`, `উৎসের গ্রিড ${number(basis.nativeResolutionDegrees)}°; ছাদের সম্ভাবনা নয়`) : tr('Native resolution unavailable','মূল রেজোলিউশন অনুপলব্ধ')}</span>`}
+          <span>${basis.coverage === null ? tr('Model point; observed coverage not supplied','মডেলের স্থান; পর্যবেক্ষণের পরিমাণ সরবরাহ করা হয়নি') : tr('Observed sample coverage','নমুনায় তথ্যের পরিমাণ') + ': ' + number(basis.coverage * 100) + '%'}</span>
           ${basis.rank ? `<span>${basis.tied
             ? tr(`tied ${basis.rank} of ${basis.of}`, `${basis.of}টির মধ্যে যৌথ ${basis.rank} নম্বর`)
             : tr(`rank ${basis.rank} of ${basis.of}`, `${basis.of}টির মধ্যে ${basis.rank} নম্বর`)}</span>` : ''}
         </div>`;
+      if (basis.sampling?.bbox) {
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'atlas-btn collage-sample';
+        button.textContent = tr('Show sampled footprint','নমুনার সীমানা দেখুন');
+        button.addEventListener('click', () => {
+          window.dispatchEvent(new CustomEvent('atlas:sampling', {detail:{bbox:basis.sampling.bbox, label:bn()?district.name_bn:district.name}}));
+          document.getElementById('collage-dialog')?.close();
+        });
+        card.appendChild(button);
+      }
       grid.appendChild(card);
     }
     panel.appendChild(grid);
 
     const foot = document.createElement('p');
     foot.className = 'collage-foot';
-    foot.textContent = tr(
-      `${collage.measured} of ${collage.total} measurements available · measured ${new Date(collage.timestamp).toISOString().slice(0, 10)} · NASA GIBS`,
-      `${collage.total}টির মধ্যে ${collage.measured}টি পরিমাপ পাওয়া গেছে · ${new Date(collage.timestamp).toISOString().slice(0, 10)} · NASA GIBS`,
-    );
+    const delivery = collage.delivery ? {...collage.delivery} : null;
+    if (delivery) {
+      delivery.ageSeconds = Math.max(0, Math.floor((Date.now()-Date.parse(delivery.collectedAt))/1000));
+      delivery.status = readFailed || delivery.ageSeconds>4*3600 ? 'stale' : 'fresh';
+      delivery.reasonCode = readFailed ? 'snapshot-request-failed' : delivery.ageSeconds>4*3600 ? 'collector-overdue' : null;
+    }
+    foot.textContent = delivery ? tr(
+      `${collage.measured}/${collage.total} readings · ${delivery.status} snapshot · collected ${delivery.collectedAt} · age ${number(delivery.ageSeconds / 3600)} h. Observation dates differ by instrument.`,
+      `${number(collage.measured)}/${number(collage.total)}টি পাঠ · ${delivery.status === 'fresh' ? 'সাম্প্রতিক' : 'পুরোনো'} সংরক্ষিত তথ্য · সংগ্রহ ${delivery.collectedAt} · বয়স ${number(delivery.ageSeconds / 3600)} ঘণ্টা। যন্ত্রভেদে পর্যবেক্ষণের তারিখ আলাদা।`
+    ) : tr('Snapshot age unavailable','সংরক্ষিত তথ্যের বয়স অনুপলব্ধ');
+    if (delivery?.reasonCode) { const reason=document.createElement('span');reason.dataset.languageFixed='';reason.textContent=' · '+delivery.reasonCode;foot.appendChild(reason); }
+    const history = document.createElement('a');
+    history.href = `/api/atlas/history?place=${encodeURIComponent(district.id)}&signal=${encodeURIComponent(district.measurements[0]?.layerId || '')}`;
+    history.target = '_blank'; history.rel = 'noopener'; history.textContent = tr('Stored history (JSON)','সংরক্ষিত ইতিহাস (JSON)');
+    foot.append(' · ', history);
     panel.appendChild(foot);
   }
 
@@ -129,12 +146,15 @@
     if (!list || !panel) return;
     if (!collage) {
       list.innerHTML = '';
-      panel.innerHTML = `<p class="collage-empty">${tr('Satellite signals are being measured…', 'উপগ্রহ সংকেত পরিমাপ করা হচ্ছে…')}</p>`;
+      panel.innerHTML = `<p class="collage-empty">${tr('Snapshot unavailable or loading.', 'সংরক্ষিত তথ্য অনুপলব্ধ অথবা লোড হচ্ছে।')}</p>`;
       return;
     }
-    if (collage.status === 'unavailable') {
+    const expired=collage.delivery && Date.now()-Date.parse(collage.delivery.collectedAt)>7*86400000;
+    if (collage.status === 'unavailable' || expired) {
       list.innerHTML = '';
-      panel.innerHTML = `<p class="collage-unavailable">${tr('No signal could be measured.', 'কোনো সংকেত পরিমাপ করা যায়নি।')}</p>`;
+      panel.innerHTML = `<p class="collage-unavailable">${tr('Published snapshot unavailable.', 'প্রকাশিত সংরক্ষিত তথ্য অনুপলব্ধ।')} · ${esc(expired ? "snapshot-expired" : collage.reasonCode)}</p>`;
+      const retry=document.createElement('button');retry.type='button';retry.className='atlas-btn collage-retry';
+      retry.textContent=tr('Retry snapshot','সংরক্ষিত তথ্য আবার আনুন');retry.addEventListener('click',load);panel.appendChild(retry);
       return;
     }
     if (!selected && collage.districts.length) selected = collage.districts[0].id;
@@ -151,8 +171,10 @@
       const body = await res.json();
       if (!Array.isArray(body.districts)) throw Error('invalid-collage');
       collage = body;
+      readFailed = false;
     } catch {
-      collage = null;
+      readFailed = true;
+      if (!collage?.delivery) collage = {status:'unavailable', reasonCode:'snapshot-request-failed', districts:[]};
     } finally {
       loading = false;
       render();
@@ -166,6 +188,7 @@
         open.addEventListener('close', () => { });
         load();
       }
+      document.querySelector('[data-open="collage-dialog"]')?.addEventListener('click',load);
       window.addEventListener('atlas:language', render);
     },
     load,

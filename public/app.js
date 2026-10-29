@@ -251,9 +251,9 @@
       useSnapshot = bounds.getWest() > west + guard && bounds.getSouth() > south + guard
         && bounds.getEast() < east - guard && bounds.getNorth() < north - guard;
     }
-    // When a Parliament 3D model is loaded, it replaces the OSM footprint
-    // extrusion entirely — parliament-buildings stays hidden.
-    const parliamentVisible = parliamentModel ? false : is3D && useSnapshot;
+    // The model replaces only Parliament itself; nearby mapped blocks stay visible.
+    const parliamentVisible = is3D && useSnapshot;
+    if (parliamentModel) parliamentModel.visible = parliamentVisible;
     for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["parliament-buildings", parliamentVisible]]) {
       const visibility = visible ? "visible" : "none";
       if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
@@ -263,7 +263,7 @@
       const story = LENS_STORIES[currentLens] || LENS_STORIES.city;
       const base = tr(story.desc, story.desc_bn);
       const note = is3D ? parliamentModel
-        ? tr("3D: Jatiya Sangsad Bhaban 3D model; OSM blocks elsewhere.", "৩ডি: জাতীয় সংসদ ভবনের ৩ডি মডেল; বাকি জায়গায় OSM ভবন।")
+        ? tr("3D: schematic Parliament model; mapped OSM blocks around it.", "৩ডি: সংসদের ধারণামূলক মডেল; চারপাশে OSM ভবন।")
         : useSnapshot
         ? tr("3D: dated OSM detail; heights mapped or estimated.", "৩ডি: তারিখযুক্ত OSM বিস্তারিত; উচ্চতা নথিভুক্ত বা আনুমানিক।")
         : tr("3D: OSM blocks; heights mapped or estimated.", "৩ডি: OSM ভবন; উচ্চতা নথিভুক্ত বা আনুমানিক।") : "";
@@ -320,23 +320,9 @@
   // remains in use.
 
   async function loadThreeJS() {
-    if (!window.__threeImportMap) {
-      const map = document.createElement("script");
-      map.type = "importmap";
-      map.textContent = JSON.stringify({
-        imports: {
-          three: "https://unpkg.com/three@0.168.0/build/three.module.js",
-          "three/addons/":
-            "https://unpkg.com/three@0.168.0/examples/jsm/",
-        },
-      });
-      document.head.appendChild(map);
-      window.__threeImportMap = true;
-    }
-    return await import("three");
+    return import("/vendor/three-0.168.0/three.module.js");
   }
 
-  // Kahn concrete palette (Wada Sanzo-influenced, matches DHKx house rules).
   const PARLIAMENT_COLORS = {
     concrete: 0xbfb9a9,    // pale parchment-concrete
     concreteDark: 0x9a9282,
@@ -465,6 +451,8 @@
     constructor(lng, lat, THREE, model) {
       this.id = "parliament-model";
       this.type = "custom";
+      this.renderingMode = "3d";
+      this.visible = false;
       this.lng = lng;
       this.lat = lat;
       this.THREE = THREE;
@@ -486,8 +474,6 @@
         premultipliedAlpha: false,
       });
       this.renderer.autoClear = false;
-      this.renderer.setSize(size.width, size.height);
-      this.renderer.setPixelRatio(window.devicePixelRatio);
 
       // Lighting matches map sun: intensity 0.55, position [1.3, 110, 45]
       const scene = new this.THREE.Scene();
@@ -498,44 +484,25 @@
       scene.add(dir);
 
       this.scene = scene;
-      this.camera = new this.THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+      this.camera = new this.THREE.Camera();
       this.scene.add(this.model);
       this.ready = true;
       map.triggerRepaint();
     }
 
-    render(gl, matrix) {
-      if (!this.ready || !this.renderer) return;
-      const size = this.map.getCanvas().getBoundingClientRect();
-      this.renderer.setSize(size.width, size.height);
-      this.renderer.setPixelRatio(window.devicePixelRatio);
-
-      const camera = this.camera;
-      camera.aspect = size.width / size.height;
-      camera.projectionMatrix.elements.set(matrix);
-
-      const center = this.map.transform.center;
-      const zoom = this.map.transform.zoom;
-      const alt = 260 * Math.pow(2, 15 - zoom);
-
-      const toMercator = (lng, lat) => {
-        const r = lng * (Math.PI / 180);
-        const y =
-          Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 180)) * 6378137;
-        return { x: r * 6378137, y };
-      };
-      const centerM = toMercator(center.lng, center.lat);
-      const targetM = toMercator(this.lng, this.lat);
-      const dx = targetM.x - centerM.x;
-      const dy = targetM.y - centerM.y;
-
-      camera.position.set(dx, alt, dy);
-      camera.lookAt(dx, 0, dy);
-      this.model.position.set(dx, 0, dy);
-
-      this.renderer.state.reset();
-      this.renderer.render(this.scene, camera);
-      this.map.triggerRepaint();
+    render(gl, args) {
+      if (!this.ready || !this.renderer || !this.visible) return;
+      const matrix = args?.defaultProjectionData?.mainMatrix;
+      if (!matrix || matrix.length !== 16) return;
+      const origin = window.maplibregl.MercatorCoordinate.fromLngLat([this.lng,this.lat],0);
+      const scale = origin.meterInMercatorCoordinateUnits();
+      const local = new this.THREE.Matrix4()
+        .makeTranslation(origin.x,origin.y,origin.z)
+        .scale(new this.THREE.Vector3(scale,-scale,scale))
+        .multiply(new this.THREE.Matrix4().makeRotationX(Math.PI/2));
+      this.camera.projectionMatrix.fromArray(matrix).multiply(local);
+      this.renderer.resetState();
+      this.renderer.render(this.scene,this.camera);
     }
   }
 
@@ -561,13 +528,13 @@
   }
 
   async function tryLoadParliamentModel() {
-    if (!parliamentSourceReady || !parliamentSnapshot) return;
+    if (!parliamentSourceReady || !parliamentSnapshot || parliamentModel) return;
 
     const THREE = await loadThreeJS().catch((err) => {
       console.warn("Three.js unavailable; Parliament model skipped:", err);
       return null;
     });
-    if (!THREE) return;
+    if (!THREE || parliamentModel) return;
 
     const centroid = parliamentCentroid(parliamentSnapshot.features);
     if (!centroid) return;
@@ -584,7 +551,8 @@
     const layer = map.getLayer("parliament-buildings");
     if (layer) {
       map.addLayer(parliamentModel, "parliament-buildings");
-      map.setLayoutProperty("parliament-buildings", "visibility", "none");
+      map.setFilter("parliament-buildings", ["!=",["get","osm_id"],"relation/18085267"]);
+      syncBuildingVisibility();
     }
   }
 
@@ -1423,6 +1391,19 @@
   }
 
   function bootAtlas() {
+    window.addEventListener('atlas:sampling', event => {
+      const bbox = event.detail?.bbox;
+      if (!map || !Array.isArray(bbox) || bbox.length !== 4 || !bbox.every(Number.isFinite)) return;
+      const [west,south,east,north] = bbox;
+      const data = {type:'Feature', properties:{}, geometry:{type:'Polygon', coordinates:[[[west,south],[east,south],[east,north],[west,north],[west,south]]]}};
+      if (map.getSource('sample-footprint')) map.getSource('sample-footprint').setData(data);
+      else {
+        map.addSource('sample-footprint',{type:'geojson',data});
+        map.addLayer({id:'sample-footprint',type:'line',source:'sample-footprint',paint:{'line-color':'#d9583b','line-width':3,'line-dasharray':[2,1]}});
+      }
+      map.fitBounds([[west,south],[east,north]], {padding:60,maxZoom:16,duration:800});
+    });
+
     wireUIEvents();
     pollCityWatch();
     setInterval(pollCityWatch, 5 * 60 * 1000);

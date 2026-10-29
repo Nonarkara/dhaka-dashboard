@@ -18,6 +18,9 @@ npm run verify
 echo "==> 3. Running test contract suite..."
 npm test
 
+echo "==> Applying observation schema..."
+npx wrangler d1 migrations apply dhaka-observations --remote
+
 echo "==> 4. Stamping deterministic build ID..."
 node scripts/stamp-build-id.mjs
 
@@ -36,5 +39,7 @@ node scripts/verify-gibs-live.mjs --api "$ATLAS_URL"
 
 echo "==> 8. Verifying the live satellite collage..."
 npm run verify:satellite
+
+node scripts/verify-snapshots-live.mjs
 
 echo "==> Deploy complete: dhaka.nonarkara.org is live!"

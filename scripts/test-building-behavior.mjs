@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
+import * as Three from '../public/vendor/three-0.168.0/three.module.js';
 const read=path=>readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
 const detail=JSON.parse(read('public/data/parliament-buildings.geojson'));
 const parliament=detail.features.find(f=>f.id==='relation/18085267');
@@ -33,6 +34,7 @@ function app({offline=false}={}) {
     getLayer(id){return this.layers.get(id);}
     getLayoutProperty(id,key){return this.getLayer(id)?.layout?.[key];}
     setLayoutProperty(id,key,value){const l=this.getLayer(id);l.layout??={};l.layout[key]=value;}
+    setFilter(id,value){this.getLayer(id).filter=value;}
     setPaintProperty(id,key,value){const l=this.getLayer(id);l.paint??={};l.paint[key]=value;}
     getPaintProperty(id,key){return this.getLayer(id)?.paint?.[key];}
     addLayer(l,before){this.layers.set(l.id,l);if(l.type==='raster')this.lastRasterBefore=before;}
@@ -75,12 +77,12 @@ function app({offline=false}={}) {
     },
   };
   let source=read('public/app.js');
-  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadParliamentBuildings,flyToArea,buildingPaint,showInspectionHUD};})();';
+  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadParliamentBuildings,flyToArea,buildingPaint,showInspectionHUD,ParliamentModelLayer,attachModelForTest:model=>{parliamentModel=model;}};})();';
   vm.runInNewContext(source,context);
   window.test.initMap();
-  return {api:window.test,map,elements};
+  return {api:window.test,map,elements,maplibre:window.maplibregl};
 }
-let {api,map,elements}=app();
+let {api,map,elements,maplibre}=app();
 for(const lens of ['city','heritage','rivers','transit','economy','air','haze','rain','radar','cloud','night','water']) {
   api.applyLens(lens);
   assert.equal(map.getLayoutProperty('city-buildings','visibility'),'visible',lens);
@@ -171,3 +173,26 @@ console.log('✓ Camera lifecycle: authored Parliament and manual same-lens view
 assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('<img'));
 assert.ok(elements.get('atlas-observation-hud').innerHTML.includes('&lt;img'));
 console.log('✓ Inspection security: untrusted map labels render as text');
+
+// Actual Three.js matrices accept the MapLibre6 render input without .elements.set.
+let renders=0;
+const renderer=class {resetState(){} render(){renders++;}};
+const model=new Three.Group();
+const renderCase=app();
+const layer=new renderCase.api.ParliamentModelLayer(90.378,23.762,{...Three,WebGLRenderer:renderer},model);
+const identity=new Three.Matrix4().elements;
+const layerMap={getCanvas:()=>({getBoundingClientRect:()=>({width:390,height:844})}),triggerRepaint(){}};
+// The context's maplibregl object is shared with the actual closure.
+// Mercator conversion is injected as the map library API, not copied camera internals.
+// Expose the map library only inside this test harness.
+renderCase.maplibre.MercatorCoordinate={fromLngLat:()=>({x:0.75,y:0.5,z:0,meterInMercatorCoordinateUnits:()=>1e-8})};
+layer.onAdd(layerMap,{});layer.visible=true;layer.render({}, {defaultProjectionData:{mainMatrix:identity}});
+assert.equal(renders,1);assert.ok(layer.camera.projectionMatrix.elements.every(Number.isFinite));assert.equal(layer.renderingMode,'3d');
+layer.visible=false;layer.render({}, {defaultProjectionData:{mainMatrix:identity}});assert.equal(renders,1,'2D or out-of-coverage model rendered');
+console.log('✓ Parliament custom render: MapLibre6 matrix, actual Three.js array storage, shared canvas and visibility');
+
+renderCase.map.ready=true;
+await renderCase.api.loadParliamentBuildings();
+renderCase.api.attachModelForTest(layer);renderCase.api.syncBuildingVisibility();
+assert.equal(renderCase.map.getLayoutProperty('parliament-buildings','visibility'),'visible','model hid all nearby mapped buildings');
+renderCase.elements.get('atlas-view').value='2d';renderCase.api.syncBuildingVisibility();assert.equal(layer.visible,false);

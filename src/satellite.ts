@@ -1,3 +1,4 @@
+import { fetchSource } from "./source-fetch.js";
 /**
  * Satellite measurement over Dhaka.
  *
@@ -244,7 +245,7 @@ export interface Measurement {
   /** Mean of the observed values. */
   mean: number | null;
   /** Share of the window's pixels that carried an observation. */
-  coverage: number;
+  coverage: number | null;
   /** Pixels that carried an observation. */
   samples: number;
   /** The observation date the measurement was taken from. */
@@ -261,6 +262,10 @@ export interface Measurement {
   reasonCode: string | null;
   /** Ground resolution of one pixel, in metres, at the measured latitude. */
   resolutionM: number | null;
+  source?: string; sourceUrl?: string; provenance?: "measured" | "modeled" | "reference";
+  period?: string | null; retrievedAt?: string; nativeResolutionM?: number | null;
+  nativeResolutionDegrees?: number | null; returnedCoordinates?: number[] | null;
+  sampling?: { type: "point-window" | "model-point"; radiusPx: number | null; bbox: [number, number, number, number] | null; scope: string };
 }
 
 /* ── Tile geometry ───────────────────────────────────────────────────────── */
@@ -269,12 +274,12 @@ export interface Measurement {
  * Ground resolution of one GIBS pixel, in metres, at a given latitude.
  *
  * GIBS uses the standard GoogleMapsCompatible Web Mercator pyramid, so the
- * equator's 156543.03 m / 2^level is scaled by 1/cos(latitude).
+ * equator's 156543.03 m / 2^level is scaled by cos(latitude).
  */
 export function groundResolutionM(level: number, lat: number): number {
   const equator = 156543.03392804097 / Math.pow(2, level);
   const cos = Math.cos((lat * Math.PI) / 180);
-  return equator / Math.max(cos, 1e-6);
+  return equator * Math.max(cos, 1e-6);
 }
 
 /** The XY tile covering a point, and the pixel within that tile. */
@@ -372,7 +377,8 @@ interface DecodedTile {
  * districts share tiles, and the date search tries the same tile on several
  * days. Without this the Worker would fetch the same bytes dozens of times.
  */
-const tileCache = new Map<string, DecodedTile | null>();
+const tileCache = new Map<string, {value: DecodedTile | null; expires: number}>();
+const tilePending = new Map<string, Promise<DecodedTile | null>>();
 
 function tileCacheKey(layerId: string, date: string | null, level: number, x: number, y: number): string {
   return `${layerId}|${date ?? "latest"}|${level}|${x}|${y}`;
@@ -385,7 +391,7 @@ function tileCacheKey(layerId: string, date: string | null, level: number, x: nu
  * no observation at all. It never throws for an ordinary upstream problem:
  * an unreachable tile is a missing measurement, not a crashed request.
  */
-async function fetchTile(
+async function collectTile(
   layerId: string,
   date: string | null,
   level: number,
@@ -394,11 +400,11 @@ async function fetchTile(
 ): Promise<DecodedTile | null> {
   const key = tileCacheKey(layerId, date, level, x, y);
   const cached = tileCache.get(key);
-  if (cached !== undefined) return cached;
+  if (cached && cached.expires > Date.now()) return cached.value;
   const url = gibsTileUrl(layerId, date, level, x, y);
   let result: DecodedTile | null = null;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+    const res = await fetchSource(url, { signal: AbortSignal.timeout(12000) });
     if (res.ok) {
       const buf = await res.arrayBuffer();
       if (buf.byteLength) {
@@ -409,8 +415,27 @@ async function fetchTile(
   } catch {
     result = null;
   }
-  tileCache.set(key, result);
+  if (tileCache.size >= 256) tileCache.delete(tileCache.keys().next().value!);
+  tileCache.set(key, {value:result, expires:Date.now() + (result ? 30*60000 : 60000)});
   return result;
+}
+
+async function fetchTile(layerId: string, date: string | null, level: number, x: number, y: number) {
+  const key = tileCacheKey(layerId, date, level, x, y);
+  const existing = tilePending.get(key);
+  if (existing) return existing;
+  const task = collectTile(layerId, date, level, x, y);
+  tilePending.set(key, task);
+  try { return await task; } finally { tilePending.delete(key); }
+}
+
+/** Actual sampled pixel edges, not an administrative district boundary. */
+export function samplingWindow(lat: number, lng: number, level: number, radiusPx: number): Measurement["sampling"] {
+  const {gx, gy} = globalPixelForPoint(lat, lng, level);
+  const size = 256 * 2 ** level;
+  const lon = (x: number) => x / size * 360 - 180;
+  const latitude = (y: number) => Math.atan(Math.sinh(Math.PI * (1 - 2 * y / size))) * 180 / Math.PI;
+  return {type:"point-window", radiusPx, bbox:[lon(gx-radiusPx),latitude(gy+radiusPx+1),lon(gx+radiusPx+1),latitude(gy-radiusPx)], scope:"sampled-pixels-not-district-average"};
 }
 
 /* ── Measurement ─────────────────────────────────────────────────────────── */
@@ -460,7 +485,7 @@ async function sampleWindow(
   );
 
   const values: number[] = [];
-  let total = 0;
+  const total = (2 * radiusPx + 1) ** 2;
   let censored = false;
   const classCounts = new Map<number, number>();
   for (let dy = -radiusPx; dy <= radiusPx; dy++) {
@@ -475,7 +500,6 @@ async function sampleWindow(
       const localX = px - Math.floor(px / TILE_SIZE) * TILE_SIZE;
       const localY = py - Math.floor(py / TILE_SIZE) * TILE_SIZE;
       if (localX < 0 || localY < 0 || localX >= tile.width || localY >= tile.height) continue;
-      total++;
       const index = tile.indices[localY * tile.width + localX];
       classCounts.set(index, (classCounts.get(index) ?? 0) + 1);
       const resolved = resolveIndexValue(colormap, index);
@@ -635,7 +659,7 @@ export async function measureLayer(
       // that matters, not as a mid-point of a colour range.
       if (layer.classes && layer.classTarget !== undefined) {
         const hits = sample.classCounts.get(layer.classTarget) ?? 0;
-        const share = hits / sample.total;
+        const share = hits / sample.values.length;
         return {
           layerId: layer.id,
           label: layer.label,
@@ -649,7 +673,7 @@ export async function measureLayer(
           max: Number((share * 100).toFixed(2)),
           mean: Number((share * 100).toFixed(2)),
           coverage: Number((sample.values.length / sample.total).toFixed(3)),
-          samples: sample.total,
+          samples: sample.values.length,
           observationDate: chosen,
           vintage: layer.vintage ?? null,
           static: layer.static === true,

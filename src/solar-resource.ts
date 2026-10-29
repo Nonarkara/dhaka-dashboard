@@ -1,3 +1,4 @@
+import { fetchSource } from "./source-fetch.js";
 /**
  * The solar resource — NASA's POWER climatology.
  *
@@ -29,6 +30,10 @@ export interface SolarReading {
   provenance: "modeled";
   /** The climatological period the figure averages over. */
   period: string | null;
+  retrievedAt?: string;
+  returnedCoordinates?: number[] | null;
+  nativeResolutionDegrees?: number | null;
+  sources?: string[];
   source: string;
   sourceUrl: string;
   reasonCode: string | null;
@@ -61,10 +66,13 @@ export function selectSolar(raw: unknown): {
   annual: number;
   monthly: { month: string; value: number }[];
   period: string | null;
+  sources: string[]; returnedCoordinates: number[] | null; nativeResolutionDegrees: number | null;
 } {
   const payload = raw as {
     properties?: { parameter?: { ALLSKY_SFC_SW_DWN?: Record<string, number> } };
-    header?: { sources?: string[] };
+    header?: { sources?: string[]; range?: string };
+    parameters?: { ALLSKY_SFC_SW_DWN?: { units?: string } };
+    geometry?: { coordinates?: number[] };
   };
   const series = payload?.properties?.parameter?.ALLSKY_SFC_SW_DWN;
   if (!series || typeof series !== "object") {
@@ -81,12 +89,20 @@ export function selectSolar(raw: unknown): {
       monthly.push({ month, value });
     }
   }
-  // The climatology period is not in the payload, so it is stated as the
-  // model's climatological normal rather than guessed at.
-  return { annual, monthly, period: "climatological normal" };
+  if (payload.parameters?.ALLSKY_SFC_SW_DWN?.units !== "kW-hr/m^2/day") throw Error("power-invalid-units");
+  const period = payload.header?.range;
+  if (typeof period !== "string" || !/\b(19|20)\d{2}\b/.test(period)) throw Error("power-missing-period");
+  const sources = payload.header?.sources;
+  if (!Array.isArray(sources) || !sources.length || !sources.every(s=>typeof s === "string")) throw Error("power-missing-source");
+  const coordinates = payload.geometry?.coordinates;
+  if (!Array.isArray(coordinates) || coordinates.length < 2 || !coordinates.every(Number.isFinite)) throw Error("power-invalid-location");
+  return { annual, monthly, period, sources, returnedCoordinates: coordinates,
+    nativeResolutionDegrees: sources.includes("SYN1DEG") ? 1 : null };
+
 }
 
-const cache = new Map<string, SolarReading>();
+const cache = new Map<string, { reading: SolarReading; expires: number }>();
+const pending = new Map<string, Promise<SolarReading>>();
 
 /**
  * The solar resource at a point.
@@ -95,10 +111,10 @@ const cache = new Map<string, SolarReading>();
  * kept; a failure is not, because the next request should try again rather
  * than live with a stale failure.
  */
-export async function getSolarResource(lat: number, lng: number): Promise<SolarReading> {
+async function collectSolarResource(lat: number, lng: number): Promise<SolarReading> {
   const key = `${lat.toFixed(3)},${lng.toFixed(3)}`;
   const cached = cache.get(key);
-  if (cached && cached.status === "ok") return cached;
+  if (cached && cached.expires > Date.now()) return cached.reading;
 
   const base: Omit<SolarReading, "status" | "value" | "reasonCode" | "monthly"> = {
     unit: "kWh/m²/day",
@@ -111,7 +127,7 @@ export async function getSolarResource(lat: number, lng: number): Promise<SolarR
   };
 
   try {
-    const res = await fetch(powerUrl(lat, lng), {
+    const res = await fetchSource(powerUrl(lat, lng), {
       signal: AbortSignal.timeout(12000),
       headers: { "user-agent": "dhaka-3d-atlas/1.0" },
     });
@@ -122,10 +138,16 @@ export async function getSolarResource(lat: number, lng: number): Promise<SolarR
       status: "ok",
       value: Number(selected.annual.toFixed(4)),
       period: selected.period,
+      source: `NASA POWER Climatology API · ${selected.sources.join(", ")}`,
+      sourceUrl: powerUrl(lat, lng),
+      retrievedAt: new Date().toISOString(),
+      returnedCoordinates: selected.returnedCoordinates,
+      nativeResolutionDegrees: selected.nativeResolutionDegrees,
+      sources: selected.sources,
       monthly: selected.monthly,
       reasonCode: null,
     };
-    cache.set(key, reading);
+    cache.set(key, {reading, expires: Date.now() + 86400000});
     return reading;
   } catch (err) {
     const reasonCode =
@@ -140,7 +162,16 @@ export async function getSolarResource(lat: number, lng: number): Promise<SolarR
       monthly: null,
       reasonCode,
     };
-    cache.set(key, reading);
+    cache.set(key, {reading, expires: Date.now() + 5 * 60000});
     return reading;
   }
+}
+
+export async function getSolarResource(lat: number, lng: number): Promise<SolarReading> {
+  const key = `${lat.toFixed(3)},${lng.toFixed(3)}`;
+  const existing = pending.get(key);
+  if (existing) return existing;
+  const task = collectSolarResource(lat, lng);
+  pending.set(key, task);
+  try { return await task; } finally { pending.delete(key); }
 }

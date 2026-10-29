@@ -2,6 +2,10 @@
 // Keys are the canonical English source strings.
 
 window.ATLAS_BN = {
+  "Sampled places": "নমুনার স্থানসমূহ",
+  "Satellite samples by place": "স্থানভিত্তিক উপগ্রহের নমুনা",
+  "Seven instruments sampled near each place; these are not district averages or measures of domain performance. Dates and spatial scales differ.": "প্রতিটি স্থানের কাছে সাতটি যন্ত্রের নমুনা; এগুলো এলাকার গড় বা খাতের কর্মদক্ষতার পরিমাপ নয়। তারিখ ও স্থানিক মাপ আলাদা।",
+
   "Bangladesh data": "বাংলাদেশের উপাত্ত", "National reference data": "জাতীয় তথ্যসূত্র",
   "Explore city conditions": "নগরের অবস্থা দেখুন", "Forecast playback": "পূর্বাভাসের চলচিত্র", "Dhaka Civic Atlas": "ঢাকা নাগরিক অ্যাটলাস", "3D Map of Dhaka": "ঢাকার ত্রিমাত্রিক মানচিত্র",
   "Dhaka": "ঢাকা", "Map": "ম্যাপ", "River outlook": "নদী পূর্বাভাস", "Air forecast": "বায়ু পূর্বাভাস", "Map evidence": "মানচিত্রের তথ্য",

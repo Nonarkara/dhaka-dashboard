@@ -1,3 +1,4 @@
+import { readSnapshot, collectSnapshot, sourceHealth, observationHistory, historicalSnapshot, type SnapshotEnv } from "./snapshots.js";
 import { getInstruments } from "./instruments.js";
 import { getOutlook } from "./outlook.js";
 import { BUILD_ID, ATLAS_VERSION } from "./build-id.js";
@@ -8,7 +9,7 @@ import { GIBS_CATALOGUE_CAPTURED, GIBS_CATALOGUE_LATEST } from "./gibs-catalogue
 import { MACRO_INDICATORS, RIVER_STATIONS, AIR_STATIONS } from "./dhaka-data.js";
 import { buildCollage, DOMAINS, type CollageResult, type CorridorPoint, type District } from "./collage.js";
 
-export interface Env extends RateLimitEnv {
+export interface Env extends RateLimitEnv, SnapshotEnv {
   ASSETS: Fetcher;
 }
 
@@ -94,11 +95,8 @@ async function fetchWithCache<T>(
  * costs a round of satellite tiles and the answer does not change by the
  * minute.
  */
-async function getCollage(env: Env, request: Request): Promise<CollageResult | null> {
-  const { data } = await fetchWithCache<CollageResult | null>(
-    "collage:dhaka",
-    2 * 60 * 60 * 1000,
-    async () => {
+async function buildCollectedCollage(env: Env): Promise<CollageResult> {
+      const request = new Request("https://dhaka.nonarkara.org/");
       const areasRes = await env.ASSETS.fetch(new URL("/dhaka-areas.json", request.url).toString());
       if (!areasRes.ok) throw new Error("areas-missing");
       const areas = (await areasRes.json()) as Array<{
@@ -144,10 +142,10 @@ async function getCollage(env: Env, request: Request): Promise<CollageResult | n
         }
       }
       return buildCollage(districts, corridorPoints);
-    },
-    null,
-  );
-  return data;
+}
+
+async function getCollage(env: Env, _request: Request) {
+  return readSnapshot(env);
 }
 
 // ── NASA GIBS layer registry ───────────────────────────────────────────────
@@ -330,6 +328,10 @@ async function resolveRadarLayer(): Promise<GibsLayerReport> {
 }
 
 const worker = {
+  async scheduled(_controller: ScheduledController, env: Env, _ctx: ExecutionContext) {
+    const result = await collectSnapshot(env, () => buildCollectedCollage(env), Date.now(), _controller.cron === "manual");
+    console.log(`snapshot collector: ${result}`);
+  },
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
@@ -1004,12 +1006,27 @@ const worker = {
     // finding. Cached for two hours, because the underlying acquisitions
     // change on a daily-to-16-day cycle and re-measuring on every request
     // would hammer GIBS for no new information.
+    if (url.pathname === "/api/atlas/sources") {
+      return jsonResponse(await sourceHealth(env), {headers:{"cache-control":"no-store"}});
+    }
+    if (url.pathname === "/api/atlas/history") {
+      const snapshot = url.searchParams.get("snapshot");
+      if (snapshot) {
+        if (!/^[a-f0-9-]{36}$/.test(snapshot)) return jsonResponse({status:"unavailable",reasonCode:"invalid-snapshot-id",timestamp:new Date().toISOString()},{status:400});
+        return jsonResponse(await historicalSnapshot(env,snapshot), {headers:{"cache-control":"no-store"}});
+      }
+      const place = url.searchParams.get("place"), signal = url.searchParams.get("signal");
+      if ((place && !/^[a-z0-9-]{1,80}$/.test(place)) || (signal && !/^[A-Za-z0-9_-]{1,120}$/.test(signal)) || !!place !== !!signal) {
+        return jsonResponse({status:"unavailable",reasonCode:"invalid-history-query",timestamp:new Date().toISOString()}, {status:400});
+      }
+      return jsonResponse(await observationHistory(env,place,signal), {headers:{"cache-control":"no-store"}});
+    }
     if (url.pathname === "/api/atlas/collage") {
       const data = await getCollage(env, request);
       if (!data) {
         return jsonResponse({
           status: "unavailable",
-          reasonCode: "collage-unavailable",
+          reasonCode: "published-snapshot-unavailable",
           provenance: "unavailable",
           timestamp: new Date().toISOString(),
           city: "Dhaka",
@@ -1020,7 +1037,7 @@ const worker = {
           total: 0,
         }, { status: 503 });
       }
-      return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200 });
+      return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200, headers:{"cache-control":"no-store"} });
     }
 
     // ── /api/dhaka/transit ───────────────────────────────────────────────────

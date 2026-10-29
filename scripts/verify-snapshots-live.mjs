@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+const base=process.env.ATLAS_URL||'https://dhaka.nonarkara.org';
+const get=async path=>{const r=await fetch(base+path);assert.ok(r.ok,`${path}: HTTP${r.status}`);return r.json();};
+const state=await get('/api/atlas/sources');assert.ok(state.collector.last_success_at&&state.delivery.snapshotId);assert.notEqual(state.status,'unavailable');
+const start=performance.now(),snapshot=await get('/api/atlas/collage');
+assert.equal(snapshot.delivery.source,'persistent-snapshot');assert.ok(snapshot.delivery.ageSeconds>=0);
+const solar=snapshot.districts.flatMap(d=>d.measurements).filter(m=>m.layerId.startsWith('NASA_POWER')&&m.status==='ok');
+assert.ok(solar.length);assert.ok(solar.every(m=>m.coverage===null&&m.provenance==='modeled'&&m.period.includes('2001')&&m.returnedCoordinates));
+const raster=snapshot.districts.flatMap(d=>d.measurements).filter(m=>m.status==='ok'&&!m.layerId.startsWith('NASA_POWER'));
+assert.ok(raster.every(m=>m.sampling?.bbox?.length===4&&m.resolutionM>0&&m.nativeResolutionM===null));
+const history=await get('/api/atlas/history');assert.ok(history.records.length);
+const historic=await get(history.records[0].snapshotUrl);assert.equal(historic.status,'historical');assert.ok(historic.data.districts[0].measurements[0].sampling);
+const rows=await get('/api/atlas/history?place=parliament&signal=VIIRS_SNPP_DayNightBand_At_Sensor_Radiance');assert.ok(rows.records.length&&rows.records[0].snapshotUrl);
+const after=await get('/api/atlas/sources');assert.equal(after.collector.last_attempt_at,state.collector.last_attempt_at,'GET requests started acquisition');
+const watch=await get('/api/atlas/watch');assert.equal(watch.indicators.floodRisk.status,'unavailable');
+console.log(`✓ Persistent snapshot ${snapshot.delivery.snapshotId}: ${snapshot.measured}/${snapshot.total} readings; original solar period, sampling, history and source health; no visitor acquisition. Read ${(performance.now()-start).toFixed(0)}ms including history checks.`);

@@ -69,6 +69,9 @@ The dashboard runs on a Cloudflare Worker serving a zero-bundle-overhead static 
 | `/api/atlas/earthquake` | GET | USGS seismic events in the Bengal Basin and Dauki Fault zone |
 | `/api/atlas/search?q=` | GET | Address geocoder bounded to Greater Dhaka |
 | `/api/atlas/export` | GET | GeoJSON export of landmarks, rivers, and transit features |
+| `/api/atlas/sources` | GET | Persistent collector status, source coverage and last successful collection |
+| `/api/atlas/history` | GET | Stored snapshots or per-place/per-instrument history; links to original metadata |
+| `/api/atlas/collage` | GET | Seven instruments near sampled places; stored snapshot with age and sampling footprint |
 | `/api/atlas/watch` | GET | Real-time status indicators for flood, air, weather, and economy |
 | `/api/dhaka/rivers` | GET | Reference station registry; current readings unavailable |
 | `/api/dhaka/economy` | GET | Sourced macroeconomic indicators and EPZ industrial clusters |

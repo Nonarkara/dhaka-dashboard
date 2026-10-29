@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
+import {createRequire} from 'node:module';
+const nativeRequire=createRequire(import.meta.url);
 const realFetch = globalThis.fetch;
 function loadWorker(fetcher) {
   globalThis.fetch = fetcher;
@@ -11,7 +13,7 @@ function loadWorker(fetcher) {
     const js = ts.transpileModule(source, {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
     const module = {exports:{}};
     modules.set(name,module.exports);
-    new Function('require','module','exports',js)(path=>load(path.replace('./','').replace('.js','')),module,module.exports);
+    new Function('require','module','exports',js)(path=>path.startsWith('.')?load(path.replace('./','').replace('.js','')):nativeRequire(path),module,module.exports);
     return module.exports;
   }
   return load('index').default;

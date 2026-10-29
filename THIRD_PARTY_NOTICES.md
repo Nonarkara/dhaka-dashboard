@@ -40,3 +40,7 @@ Plate 241 digital conversions are not measurements of printed inks.
 Barlow Semi Condensed and Hind Siliguri: SIL OFL, license texts in public/fonts.
 
 Daily currency reference: Fawaz Ahmed Currency API, CC0-1.0, https://github.com/fawazahmed0/exchange-api . World Bank WDI series are attributed with individual indicator links and reporting years in the national-data dialog.
+
+## Three.js r168
+
+Self-hosted `public/vendor/three-0.168.0/three.module.js`, from https://unpkg.com/three@0.168.0/build/three.module.js, MIT license retained alongside it in LICENSE. Used for the schematic Parliament model. No third-party architectural model or texture is included.

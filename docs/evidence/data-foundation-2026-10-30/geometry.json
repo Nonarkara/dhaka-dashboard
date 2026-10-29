@@ -1,0 +1,392 @@
+{
+  "old": {
+    "width": 390,
+    "height": 844,
+    "firstCardY": 530.234375,
+    "selectorHeight": 253.1953125,
+    "pass": false
+  },
+  "after": [
+    {
+      "firstCard": {
+        "height": 210.5859375,
+        "scrollWidth": 325,
+        "width": 325,
+        "x": 32.5,
+        "y": 237.4921875
+      },
+      "intro": {
+        "height": 52.1953125,
+        "scrollWidth": 325,
+        "width": 325,
+        "x": 32.5,
+        "y": 129.296875
+      },
+      "map": {
+        "height": 796,
+        "scrollWidth": 390,
+        "width": 390,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 844,
+        "width": 390
+      },
+      "sampleButton": {
+        "height": 36,
+        "scrollWidth": 135,
+        "width": 137.2109375,
+        "x": 32.5,
+        "y": 404.078125
+      },
+      "selector": {
+        "height": 36,
+        "scrollWidth": 325,
+        "width": 325,
+        "x": 32.5,
+        "y": 193.4921875
+      },
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "lang": "en",
+      "pass": true
+    },
+    {
+      "firstCard": {
+        "height": 147.4921875,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 149,
+        "y": 210.8984375
+      },
+      "intro": {
+        "height": 17.3984375,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 149,
+        "y": 137.5
+      },
+      "map": {
+        "height": 852,
+        "scrollWidth": 1024,
+        "width": 1024,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 900,
+        "width": 1024
+      },
+      "sampleButton": {
+        "height": 36,
+        "scrollWidth": 135,
+        "width": 137.2109375,
+        "x": 149,
+        "y": 314.390625
+      },
+      "selector": {
+        "height": 36,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 149,
+        "y": 166.8984375
+      },
+      "viewport": {
+        "height": 900,
+        "width": 1024
+      },
+      "lang": "en",
+      "pass": true
+    },
+    {
+      "firstCard": {
+        "height": 147.4921875,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 357,
+        "y": 210.8984375
+      },
+      "intro": {
+        "height": 17.3984375,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 357,
+        "y": 137.5
+      },
+      "map": {
+        "height": 852,
+        "scrollWidth": 1440,
+        "width": 1440,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 900,
+        "width": 1440
+      },
+      "sampleButton": {
+        "height": 36,
+        "scrollWidth": 135,
+        "width": 137.2109375,
+        "x": 357,
+        "y": 314.390625
+      },
+      "selector": {
+        "height": 36,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 357,
+        "y": 166.8984375
+      },
+      "viewport": {
+        "height": 900,
+        "width": 1440
+      },
+      "lang": "en",
+      "pass": true
+    },
+    {
+      "firstCard": {
+        "height": 147.4921875,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 277,
+        "y": 197.3984375
+      },
+      "intro": {
+        "height": 17.3984375,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 277,
+        "y": 124
+      },
+      "map": {
+        "height": 672,
+        "scrollWidth": 1280,
+        "width": 1280,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 720,
+        "width": 1280
+      },
+      "sampleButton": {
+        "height": 36,
+        "scrollWidth": 135,
+        "width": 137.2109375,
+        "x": 277,
+        "y": 300.890625
+      },
+      "selector": {
+        "height": 36,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 277,
+        "y": 153.3984375
+      },
+      "viewport": {
+        "height": 720,
+        "width": 1280
+      },
+      "lang": "en",
+      "pass": true
+    },
+    {
+      "firstCard": {
+        "height": 210.5859375,
+        "scrollWidth": 325,
+        "width": 325,
+        "x": 32.5,
+        "y": 220.09375
+      },
+      "intro": {
+        "height": 34.796875,
+        "scrollWidth": 325,
+        "width": 325,
+        "x": 32.5,
+        "y": 129.296875
+      },
+      "map": {
+        "height": 796,
+        "scrollWidth": 390,
+        "width": 390,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 844,
+        "width": 390
+      },
+      "sampleButton": {
+        "height": 36,
+        "scrollWidth": 114,
+        "width": 115.7109375,
+        "x": 32.5,
+        "y": 386.6796875
+      },
+      "selector": {
+        "height": 36,
+        "scrollWidth": 325,
+        "width": 325,
+        "x": 32.5,
+        "y": 176.09375
+      },
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "lang": "bn",
+      "pass": true
+    },
+    {
+      "firstCard": {
+        "height": 147.4921875,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 149,
+        "y": 210.8984375
+      },
+      "intro": {
+        "height": 17.3984375,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 149,
+        "y": 137.5
+      },
+      "map": {
+        "height": 852,
+        "scrollWidth": 1024,
+        "width": 1024,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 900,
+        "width": 1024
+      },
+      "sampleButton": {
+        "height": 36,
+        "scrollWidth": 114,
+        "width": 115.7109375,
+        "x": 149,
+        "y": 314.390625
+      },
+      "selector": {
+        "height": 36,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 149,
+        "y": 166.8984375
+      },
+      "viewport": {
+        "height": 900,
+        "width": 1024
+      },
+      "lang": "bn",
+      "pass": true
+    },
+    {
+      "firstCard": {
+        "height": 147.4921875,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 357,
+        "y": 210.8984375
+      },
+      "intro": {
+        "height": 17.3984375,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 357,
+        "y": 137.5
+      },
+      "map": {
+        "height": 852,
+        "scrollWidth": 1440,
+        "width": 1440,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 900,
+        "width": 1440
+      },
+      "sampleButton": {
+        "height": 36,
+        "scrollWidth": 114,
+        "width": 115.7109375,
+        "x": 357,
+        "y": 314.390625
+      },
+      "selector": {
+        "height": 36,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 357,
+        "y": 166.8984375
+      },
+      "viewport": {
+        "height": 900,
+        "width": 1440
+      },
+      "lang": "bn",
+      "pass": true
+    },
+    {
+      "firstCard": {
+        "height": 147.4921875,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 277,
+        "y": 197.3984375
+      },
+      "intro": {
+        "height": 17.3984375,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 277,
+        "y": 124
+      },
+      "map": {
+        "height": 672,
+        "scrollWidth": 1280,
+        "width": 1280,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 720,
+        "width": 1280
+      },
+      "sampleButton": {
+        "height": 36,
+        "scrollWidth": 114,
+        "width": 115.7109375,
+        "x": 277,
+        "y": 300.890625
+      },
+      "selector": {
+        "height": 36,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 277,
+        "y": 153.3984375
+      },
+      "viewport": {
+        "height": 720,
+        "width": 1280
+      },
+      "lang": "bn",
+      "pass": true
+    }
+  ],
+  "restored": {
+    "firstCardY": 530.234375,
+    "selectorHeight": 253.1953125,
+    "pass": false
+  }
+}
