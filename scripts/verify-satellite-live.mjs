@@ -80,7 +80,11 @@ for (const d of collage.districts) {
     withReading++;
     assert.ok(r.reading && r.reading.length > 10, "a reading is empty");
     assert.ok(r.reading_bn && r.reading_bn.length > 10, "a reading has no Bengali text");
-    assert.ok(r.basis && r.basis.rank, "a reading has no rank");
+    assert.ok(r.basis, "a reading has no basis");
+    if (r.basis.censored) {
+      assert.equal(r.basis.rank,null,"a lower bound received an exact rank");
+      assert.ok(r.reading.includes("≥"),"a lower-bound qualification was lost");
+    } else assert.ok(r.basis.rank>=1,"an exact reading has no rank");
   }
 }
 assert.ok(withReading > 0, "no domain reading could be composed");
