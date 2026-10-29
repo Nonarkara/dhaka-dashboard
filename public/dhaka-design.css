@@ -427,6 +427,31 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-map-key summary { white-space:normal; overflow:visible; text-overflow:clip; }
 .building-swatches span { white-space:normal; overflow:visible; font-size:13px; }
 .atlas-lens-story strong,.atlas-lens-story > span { font-size:13px; line-height:1.4; padding:4px 8px; }
+
+/* Reference evidence stays folded until requested; the map keeps its height. */
+.people-key[hidden] { display:none; }
+.atlas-map-key .people-key summary { min-height:36px; }
+.people-key-body { display:grid; gap:1px; padding:3px 8px; max-width:290px; max-height:30dvh; overflow:auto; font-size:13px; line-height:1.35; }
+.people-key-body [hidden] { display:none; }
+.people-key-body label { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.people-key-body select { min-width:0; max-width:160px; min-height:36px; font:inherit; background:var(--bg); color:var(--ink); border:1px solid var(--line); }
+.people-scale { display:flex; color:#101c21; font-size:12px; }
+.people-scale small { align-self:center; padding-right:4px; font-size:12px; color:var(--ink); }
+.people-scale span { flex:1; text-align:center; padding:3px; background:#b9c9bd; }
+.people-scale span:nth-of-type(2) { background:#c5a56e; }
+.people-scale span:nth-of-type(3) { background:#b77855; }
+.people-scale span:nth-of-type(4) { background:#a34830; color:#fff; }
+.people-symbols i { display:inline-block; width:10px; height:10px; border:1px solid #f3eedf; }
+.people-school { background:#2563a8; }
+.people-health { background:#10b981; }
+.atlas-observation-hud.people-inspection { font-size:13px; line-height:1.4; width:min(285px,calc(100% - 24px)); }
+.people-inspection button { min-height:36px; }
+.people-inspection #people-close { float:right; margin-left:6px; }
+.people-inspection > a,.people-inspection > label { display:block; margin-top:6px; }
+.people-inspection select { width:100%; min-height:36px; font:inherit; background:var(--bg); color:var(--ink); border:1px solid var(--line); }
+@media (max-width:600px) {
+  .atlas-observation-hud.people-inspection { top:120px; bottom:auto; left:8px; right:auto; max-height:42%; }
+}
 .modal-close-btn { min-width:36px; min-height:36px; }
 
 /* A subhead inside a desk, separating two boards of readings. */

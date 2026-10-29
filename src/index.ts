@@ -145,7 +145,8 @@ async function buildCollectedCollage(env: Env): Promise<CollageResult> {
 }
 
 async function getCollage(env: Env, _request: Request) {
-  return readSnapshot(env);
+  const snapshot = await readSnapshot(env);
+  return snapshot ? {...snapshot, domains: DOMAINS} : null;
 }
 
 // ── NASA GIBS layer registry ───────────────────────────────────────────────
@@ -329,7 +330,13 @@ async function resolveRadarLayer(): Promise<GibsLayerReport> {
 
 const worker = {
   async scheduled(_controller: ScheduledController, env: Env, _ctx: ExecutionContext) {
-    const result = await collectSnapshot(env, () => buildCollectedCollage(env), Date.now(), _controller.cron === "manual");
+    const manual = _controller.cron === "manual";
+    if (!manual && env.OBSERVATION_DB) {
+      await env.OBSERVATION_DB.prepare("UPDATE collector_state SET last_scheduled_at=? WHERE name='collage'")
+        .bind(new Date(_controller.scheduledTime).toISOString()).run();
+    }
+    const result = await collectSnapshot(env, () => buildCollectedCollage(env), Date.now(), manual);
+    if (result === "failed") throw Error("scheduled-collection-failed");
     console.log(`snapshot collector: ${result}`);
   },
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -1006,6 +1013,17 @@ const worker = {
     // finding. Cached for two hours, because the underlying acquisitions
     // change on a daily-to-16-day cycle and re-measuring on every request
     // would hammer GIBS for no new information.
+    if (url.pathname === "/api/atlas/people") {
+      try {
+        const response = await env.ASSETS.fetch(new URL('/data/people-manifest.json', request.url));
+        if (!response.ok) throw Error('manifest-unavailable');
+        const manifest = await response.json() as {status?: string};
+        if (manifest.status !== 'reference') throw Error('invalid-manifest');
+        return jsonResponse(manifest, {headers:{'cache-control':'no-store'}});
+      } catch {
+        return jsonResponse({status: 'unavailable', reasonCode: 'reference-manifest-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
+      }
+    }
     if (url.pathname === "/api/atlas/sources") {
       return jsonResponse(await sourceHealth(env), {headers:{"cache-control":"no-store"}});
     }

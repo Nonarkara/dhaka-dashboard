@@ -1,0 +1,490 @@
+[
+  {
+    "body": {
+      "bottom": 351.9296875,
+      "clientWidth": 227,
+      "height": 194.9296875,
+      "scrollWidth": 227,
+      "width": 226.5625,
+      "x": 10,
+      "y": 157
+    },
+    "controls": [
+      {
+        "height": 36,
+        "id": "summary"
+      },
+      {
+        "height": 36,
+        "id": "people-filter"
+      },
+      {
+        "height": 36,
+        "id": "people-cell"
+      }
+    ],
+    "header": {
+      "bottom": 48,
+      "clientWidth": 390,
+      "height": 48,
+      "scrollWidth": 390,
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    "height": 844,
+    "key": {
+      "bottom": 352.9296875,
+      "clientWidth": 227,
+      "height": 296.9296875,
+      "scrollWidth": 227,
+      "width": 229.5625,
+      "x": 8,
+      "y": 56
+    },
+    "lang": "en",
+    "map": {
+      "bottom": 844,
+      "clientWidth": 390,
+      "height": 796,
+      "scrollWidth": 390,
+      "width": 390,
+      "x": 0,
+      "y": 48
+    },
+    "overflow": false,
+    "pass": true,
+    "width": 390,
+    "bodyFit": {
+      "content": 195,
+      "visible": 195
+    }
+  },
+  {
+    "body": {
+      "bottom": 369.4765625,
+      "clientWidth": 287,
+      "height": 212.4765625,
+      "scrollWidth": 287,
+      "width": 287,
+      "x": 10,
+      "y": 157
+    },
+    "controls": [
+      {
+        "height": 36,
+        "id": "summary"
+      },
+      {
+        "height": 36,
+        "id": "people-filter"
+      },
+      {
+        "height": 36,
+        "id": "people-cell"
+      }
+    ],
+    "header": {
+      "bottom": 48,
+      "clientWidth": 390,
+      "height": 48,
+      "scrollWidth": 390,
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    "height": 844,
+    "key": {
+      "bottom": 370.4765625,
+      "clientWidth": 287,
+      "height": 314.4765625,
+      "scrollWidth": 287,
+      "width": 290,
+      "x": 8,
+      "y": 56
+    },
+    "lang": "bn",
+    "map": {
+      "bottom": 844,
+      "clientWidth": 390,
+      "height": 796,
+      "scrollWidth": 390,
+      "width": 390,
+      "x": 0,
+      "y": 48
+    },
+    "overflow": false,
+    "pass": true,
+    "width": 390,
+    "bodyFit": {
+      "content": 212,
+      "visible": 212
+    }
+  },
+  {
+    "body": {
+      "bottom": 351.9296875,
+      "clientWidth": 227,
+      "height": 194.9296875,
+      "scrollWidth": 227,
+      "width": 226.5625,
+      "x": 10,
+      "y": 157
+    },
+    "controls": [
+      {
+        "height": 36,
+        "id": "summary"
+      },
+      {
+        "height": 36,
+        "id": "people-filter"
+      },
+      {
+        "height": 36,
+        "id": "people-cell"
+      }
+    ],
+    "header": {
+      "bottom": 48,
+      "clientWidth": 1024,
+      "height": 48,
+      "scrollWidth": 1024,
+      "width": 1024,
+      "x": 0,
+      "y": 0
+    },
+    "height": 900,
+    "key": {
+      "bottom": 352.9296875,
+      "clientWidth": 227,
+      "height": 296.9296875,
+      "scrollWidth": 227,
+      "width": 229.5625,
+      "x": 8,
+      "y": 56
+    },
+    "lang": "en",
+    "map": {
+      "bottom": 900,
+      "clientWidth": 1024,
+      "height": 852,
+      "scrollWidth": 1024,
+      "width": 1024,
+      "x": 0,
+      "y": 48
+    },
+    "overflow": false,
+    "pass": true,
+    "width": 1024,
+    "bodyFit": {
+      "content": 195,
+      "visible": 195
+    }
+  },
+  {
+    "body": {
+      "bottom": 369.4765625,
+      "clientWidth": 287,
+      "height": 212.4765625,
+      "scrollWidth": 287,
+      "width": 287,
+      "x": 10,
+      "y": 157
+    },
+    "controls": [
+      {
+        "height": 36,
+        "id": "summary"
+      },
+      {
+        "height": 36,
+        "id": "people-filter"
+      },
+      {
+        "height": 36,
+        "id": "people-cell"
+      }
+    ],
+    "header": {
+      "bottom": 48,
+      "clientWidth": 1024,
+      "height": 48,
+      "scrollWidth": 1024,
+      "width": 1024,
+      "x": 0,
+      "y": 0
+    },
+    "height": 900,
+    "key": {
+      "bottom": 370.4765625,
+      "clientWidth": 287,
+      "height": 314.4765625,
+      "scrollWidth": 287,
+      "width": 290,
+      "x": 8,
+      "y": 56
+    },
+    "lang": "bn",
+    "map": {
+      "bottom": 900,
+      "clientWidth": 1024,
+      "height": 852,
+      "scrollWidth": 1024,
+      "width": 1024,
+      "x": 0,
+      "y": 48
+    },
+    "overflow": false,
+    "pass": true,
+    "width": 1024,
+    "bodyFit": {
+      "content": 212,
+      "visible": 212
+    }
+  },
+  {
+    "body": {
+      "bottom": 351.9296875,
+      "clientWidth": 227,
+      "height": 194.9296875,
+      "scrollWidth": 227,
+      "width": 226.5625,
+      "x": 10,
+      "y": 157
+    },
+    "controls": [
+      {
+        "height": 36,
+        "id": "summary"
+      },
+      {
+        "height": 36,
+        "id": "people-filter"
+      },
+      {
+        "height": 36,
+        "id": "people-cell"
+      }
+    ],
+    "header": {
+      "bottom": 48,
+      "clientWidth": 1440,
+      "height": 48,
+      "scrollWidth": 1440,
+      "width": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "height": 900,
+    "key": {
+      "bottom": 352.9296875,
+      "clientWidth": 227,
+      "height": 296.9296875,
+      "scrollWidth": 227,
+      "width": 229.5625,
+      "x": 8,
+      "y": 56
+    },
+    "lang": "en",
+    "map": {
+      "bottom": 900,
+      "clientWidth": 1440,
+      "height": 852,
+      "scrollWidth": 1440,
+      "width": 1440,
+      "x": 0,
+      "y": 48
+    },
+    "overflow": false,
+    "pass": true,
+    "width": 1440,
+    "bodyFit": {
+      "content": 195,
+      "visible": 195
+    }
+  },
+  {
+    "body": {
+      "bottom": 369.4765625,
+      "clientWidth": 287,
+      "height": 212.4765625,
+      "scrollWidth": 287,
+      "width": 287,
+      "x": 10,
+      "y": 157
+    },
+    "controls": [
+      {
+        "height": 36,
+        "id": "summary"
+      },
+      {
+        "height": 36,
+        "id": "people-filter"
+      },
+      {
+        "height": 36,
+        "id": "people-cell"
+      }
+    ],
+    "header": {
+      "bottom": 48,
+      "clientWidth": 1440,
+      "height": 48,
+      "scrollWidth": 1440,
+      "width": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "height": 900,
+    "key": {
+      "bottom": 370.4765625,
+      "clientWidth": 287,
+      "height": 314.4765625,
+      "scrollWidth": 287,
+      "width": 290,
+      "x": 8,
+      "y": 56
+    },
+    "lang": "bn",
+    "map": {
+      "bottom": 900,
+      "clientWidth": 1440,
+      "height": 852,
+      "scrollWidth": 1440,
+      "width": 1440,
+      "x": 0,
+      "y": 48
+    },
+    "overflow": false,
+    "pass": true,
+    "width": 1440,
+    "bodyFit": {
+      "content": 212,
+      "visible": 212
+    }
+  },
+  {
+    "body": {
+      "bottom": 351.9296875,
+      "clientWidth": 227,
+      "height": 194.9296875,
+      "scrollWidth": 227,
+      "width": 226.5625,
+      "x": 10,
+      "y": 157
+    },
+    "controls": [
+      {
+        "height": 36,
+        "id": "summary"
+      },
+      {
+        "height": 36,
+        "id": "people-filter"
+      },
+      {
+        "height": 36,
+        "id": "people-cell"
+      }
+    ],
+    "header": {
+      "bottom": 48,
+      "clientWidth": 1280,
+      "height": 48,
+      "scrollWidth": 1280,
+      "width": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "height": 720,
+    "key": {
+      "bottom": 352.9296875,
+      "clientWidth": 227,
+      "height": 296.9296875,
+      "scrollWidth": 227,
+      "width": 229.5625,
+      "x": 8,
+      "y": 56
+    },
+    "lang": "en",
+    "map": {
+      "bottom": 720,
+      "clientWidth": 1280,
+      "height": 672,
+      "scrollWidth": 1280,
+      "width": 1280,
+      "x": 0,
+      "y": 48
+    },
+    "overflow": false,
+    "pass": true,
+    "width": 1280,
+    "bodyFit": {
+      "content": 195,
+      "visible": 195
+    }
+  },
+  {
+    "body": {
+      "bottom": 369.4765625,
+      "clientWidth": 287,
+      "height": 212.4765625,
+      "scrollWidth": 287,
+      "width": 287,
+      "x": 10,
+      "y": 157
+    },
+    "controls": [
+      {
+        "height": 36,
+        "id": "summary"
+      },
+      {
+        "height": 36,
+        "id": "people-filter"
+      },
+      {
+        "height": 36,
+        "id": "people-cell"
+      }
+    ],
+    "header": {
+      "bottom": 48,
+      "clientWidth": 1280,
+      "height": 48,
+      "scrollWidth": 1280,
+      "width": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "height": 720,
+    "key": {
+      "bottom": 370.4765625,
+      "clientWidth": 287,
+      "height": 314.4765625,
+      "scrollWidth": 287,
+      "width": 290,
+      "x": 8,
+      "y": 56
+    },
+    "lang": "bn",
+    "map": {
+      "bottom": 720,
+      "clientWidth": 1280,
+      "height": 672,
+      "scrollWidth": 1280,
+      "width": 1280,
+      "x": 0,
+      "y": 48
+    },
+    "overflow": false,
+    "pass": true,
+    "width": 1280,
+    "bodyFit": {
+      "content": 212,
+      "visible": 212
+    }
+  }
+]

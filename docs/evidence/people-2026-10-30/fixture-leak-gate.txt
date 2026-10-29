@@ -1,0 +1,12 @@
+==> Running verify-local.mjs preflight checks...
+file:///Users/nonarkara/.codex/worktrees/flood-correction/Dhaka/scripts/verify-local.mjs:11
+if (fixtures.length) throw Error(`Local preview fixtures must not ship: ${fixtures.join(', ')}`);
+                           ^
+
+Error: Local preview fixtures must not ship: __people-before.css, __people-before.html, __people-outage.html
+    at file:///Users/nonarkara/.codex/worktrees/flood-correction/Dhaka/scripts/verify-local.mjs:11:28
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:642:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v26.0.0

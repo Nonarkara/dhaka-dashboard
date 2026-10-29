@@ -41,6 +41,8 @@ window.ATLAS_BN = {
   // Lenses
   "Explore evidence": "উপাত্তের প্রমাণ",
   "City in 3D": "ত্রিমাত্রিক নগরী",
+  "People & facilities": "মানুষ ও সেবা প্রতিষ্ঠান",
+  "Population": "জনসংখ্যা",
   "Rivers & flood risk": "পাঁচ নদী ও বন্যা ঝুঁকি",
   "Economic engine": "অর্থনৈতিক ইঞ্জিন ও শিল্প",
   "Transit & Metro": "মেট্রোরেল ও পরিবহন",

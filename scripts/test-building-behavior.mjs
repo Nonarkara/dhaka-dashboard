@@ -23,8 +23,8 @@ for(const f of detail.features) {
     assert.ok(ring.every(p=>p.length===2 && p.every(Number.isFinite)));
   }
 }
-function app({offline=false}={}) {
-  const elements=new Map(['atlas-view','atlas-lens-title','atlas-lens-description','atlas-layer-status','atlas-observation-hud'].map(id=>[id,{value:'3d',textContent:'',hidden:true,addEventListener(){}}]));
+function app({offline=false,search=''}={}) {
+  const elements=new Map(['atlas-view','atlas-lens-title','atlas-lens-description','atlas-layer-status','atlas-observation-hud'].map(id=>[id,{value:'3d',textContent:'',hidden:true,classList:{remove(){}},addEventListener(){}}]));
   let map;
   class MapStub {
     constructor(options){this.layers=new Map(options.style.layers.map(l=>[l.id,l]));this.sources=new Map();this.options=options;this.events=new Map();this.inside=true;this.zoom=16.7;this.ready=false;map=this;}
@@ -48,7 +48,7 @@ function app({offline=false}={}) {
     getBounds(){const [w,s,e,n]=detail.bbox;return {getWest:()=>this.inside?w+.002:w-.1,getSouth:()=>s+.002,getEast:()=>e-.002,getNorth:()=>n-.002};}
     flyTo(options){this.camera=options;}
   }
-  const window={maplibregl:{Map:MapStub,NavigationControl:class{}},location:{search:''},addEventListener(){}};
+  const window={maplibregl:{Map:MapStub,NavigationControl:class{}},location:{search},addEventListener(){}};
   // GIBS serves a blank placeholder tile for a date whose observation has not
   // been ingested: HTTP 200, non-empty, opaque, one uniform colour. The stub
   // below reproduces that so the client is forced to decode the tile rather
@@ -73,11 +73,11 @@ function app({offline=false}={}) {
       const blank=isBlank(url);
       return {ok:true,status:200,headers:{get:()=>blank?'1611':'59778'},
         blob:async()=>({size:blank?1611:59778,blank}),
-        json:async()=>url.includes('parliament-buildings')?detail:{status:'unavailable'}};
+        json:async()=>url.includes('parliament-buildings')?detail:url.includes('dhaka-areas')?JSON.parse(read('public/dhaka-areas.json')):{status:'unavailable'}};
     },
   };
   let source=read('public/app.js');
-  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadParliamentBuildings,flyToArea,buildingPaint,showInspectionHUD,ParliamentModelLayer,attachModelForTest:model=>{parliamentModel=model;}};})();';
+  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadDataLayers,loadParliamentBuildings,flyToArea,buildingPaint,showInspectionHUD,ParliamentModelLayer,attachModelForTest:model=>{parliamentModel=model;}};})();';
   vm.runInNewContext(source,context);
   window.test.initMap();
   return {api:window.test,map,elements,maplibre:window.maplibregl};
@@ -168,6 +168,11 @@ api.applyLens('city');assert.equal(map.camera,authoredCamera,'same-lens refresh 
 api.applyLens('heritage');const heritageCamera=map.camera;
 api.applyLens('heritage');assert.equal(map.camera,heritageCamera,'language refresh must preserve camera');
 console.log('✓ Camera lifecycle: authored Parliament and manual same-lens views survive evidence/language refresh');
+({api,map}=app({search:'?area=parliament'}));api.applyLens('people');const earlyPeopleCamera=map.camera;await api.loadDataLayers();assert.equal(map.camera,earlyPeopleCamera,'late URL-area load must not overwrite an early people selection');
+api.applyLens('rivers'); api.applyLens('people');
+assert.equal(map.camera.center[0],90.4,'people lens must return from northeast rivers to Dhaka');
+const peopleCamera=map.camera;api.applyLens('people');
+assert.equal(map.camera,peopleCamera,'same-lens people refresh must preserve the camera');
 
 ({api,map,elements}=app());api.showInspectionHUD('landmark',{name:'<img src=x onerror=alert(1)>',description:'<script>bad()</script>'});
 assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('<img'));

@@ -6,6 +6,10 @@ D1 migrations run before canonical deployment. R2 archives upstream response bod
 
 For a deliberate bootstrap/recollection, run `npx wrangler dev --remote --test-scheduled --port 8792`, wait for Ready, then `curl 'http://localhost:8792/__scheduled?cron=manual'`. This invokes the preview's scheduled handler with remote bindings; it is not a production HTTP write endpoint. Manual collection ignores the2hour due guard but cannot override another lease. Stop the preview after verification. Ordinary deployed cron uses the configured schedule and cannot be forced by a public query parameter.
 
+Scheduler provenance is recorded separately from successful publication. `collector.last_scheduled_at` is the platform scheduled time for the last automatic wake, including no-op wakes when a snapshot is not due. `runs[].trigger_source` distinguishes `scheduled`, `manual`, and `legacy-unknown`; old bootstrap rows are not retrospectively called automatic. A wake is not proof of a new acquisition or publication. A failed collector rejects the scheduled handler so the platform records failure, while source health retains the run reason and previous publication.
+
+The population/facilities lens is a separately dated static reference, not part of this automatic satellite collector. See [PEOPLE-DATA.md](PEOPLE-DATA.md) for its source licences, metric aggregation, explicit rebuild and private raw-input restore path.
+
 Read APIs:
 - /api/atlas/collage: published data plus collection age/fresh-or-stale envelope.
 - /api/atlas/sources: collection and source health, including unavailable failures.

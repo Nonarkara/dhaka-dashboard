@@ -1,0 +1,62 @@
+{
+  "status": "reference",
+  "generatedAt": "2026-10-29T19:38:35.711952+00:00",
+  "bbox": [
+    90.23895227009733,
+    23.594164517100097,
+    90.55988906432036,
+    23.960378575820744
+  ],
+  "grid": {
+    "crs": "EPSG:32646",
+    "cellSizeM": 1000,
+    "coordinateDecimals": 5,
+    "fieldLicenses": {
+      "population": "CC BY 4.0 (WorldPop)",
+      "OSMCountColumns": "ODbL 1.0 (OpenStreetMap contributors)"
+    },
+    "method": "sum of native pixel counts assigned by pixel centre; no interpolation",
+    "cells": 1280
+  },
+  "population": {
+    "year": 2025,
+    "release": "bgd_pop_2025_CN_100m_R2025A_v1",
+    "source": "https://api.stac.worldpop.org/collections/BGD/items/bgd_pop_2025_CN_100m_R2025A_v1",
+    "asset": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2025/BGD/v1/100m/constrained/bgd_pop_2025_CN_100m_R2025A_v1.tif",
+    "doi": "10.5258/SOTON/WP00839",
+    "license": "CC BY 4.0",
+    "citation": "Bondarenko M. et al. (2025). WorldPop Global Demographic Data R2025A v1. DOI:10.5258/SOTON/WP00839",
+    "tier": "modeled",
+    "nativeResolution": "3 arcseconds; approximately 100m at equator",
+    "unit": "estimated people per valid pixel",
+    "sha256": "fc915f7d0753e586c23fb15ac27967c971fe71955ea209311711d69b7eace09b",
+    "limits": "Model estimate for 2025, not census or current residents. Nodata remains unknown; valid-pixel share is not accuracy or confidence. No uncertainty interval supplied."
+  },
+  "facilities": {
+    "source": "https://download.geofabrik.de/asia/bangladesh-261028.osm.pbf",
+    "extract": {
+      "source": "https://download.geofabrik.de/asia/bangladesh-261028.osm.pbf",
+      "sha256": "59b394608adbffe28185091d637806954ddd65fd48d39ddbdf29ad90cfb1bf27",
+      "method": "osmium tags-filter nwr/amenity=school,hospital,clinic nwr/healthcare=hospital,clinic; complete referenced geometry; bbox-centres retained inside 90.23,23.58,90.57,23.97"
+    },
+    "observedAt": "2026-10-28T21:21:02Z",
+    "license": "ODbL 1.0",
+    "attribution": "© OpenStreetMap contributors",
+    "selection": "osmium tags-filter nwr/amenity=school,hospital,clinic nwr/healthcare=hospital,clinic; complete referenced geometry; bbox-centres retained inside 90.23,23.58,90.57,23.97",
+    "sha256": "48888c43f721b41861e169c914f70931d4e6a3750691e53bc4bd78e9a10ac016",
+    "objects": 2181,
+    "limits": "Mapped school, hospital and clinic objects only. Campus objects may duplicate institutions. Incomplete mapping; no capacity, opening status or service catchments. Ways and relations use bounding-box centres."
+  },
+  "assets": {
+    "people-grid.json": {
+      "sha256": "613640fbb92c53c0f58082fae70f7ce4c9432d17a5878458332f0b1ff2612524",
+      "bytes": 161693,
+      "url": "/data/people-grid.json"
+    },
+    "facilities.geojson": {
+      "sha256": "3cb63301285978a8440cc3bbe050dedbeac81b8cc863fa4b353c4183f764c69e",
+      "bytes": 459701,
+      "url": "/data/facilities.geojson"
+    }
+  }
+}

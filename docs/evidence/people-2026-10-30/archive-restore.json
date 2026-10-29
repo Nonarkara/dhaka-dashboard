@@ -1,0 +1,11 @@
+{
+  "privateBucket": "dhaka-observations",
+  "restoredInputs": [
+    "WorldPop TIFF",
+    "dated derived OSM input"
+  ],
+  "derivedBytesMatch": {
+    "people-grid.json": true,
+    "facilities.geojson": true
+  }
+}

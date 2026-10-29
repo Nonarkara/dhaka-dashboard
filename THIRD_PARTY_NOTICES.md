@@ -44,3 +44,8 @@ Daily currency reference: Fawaz Ahmed Currency API, CC0-1.0, https://github.com/
 ## Three.js r168
 
 Self-hosted `public/vendor/three-0.168.0/three.module.js`, from https://unpkg.com/three@0.168.0/build/three.module.js, MIT license retained alongside it in LICENSE. Used for the schematic Parliament model. No third-party architectural model or texture is included.
+# Population and facility reference layers
+
+`public/data/people-grid.json` derives from Bondarenko M. et al. (2025), WorldPop Global Demographic Data R2025A v1, Bangladesh constrained population counts for 2025, [DOI 10.5258/SOTON/WP00839](https://doi.org/10.5258/SOTON/WP00839), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Changes: native pixel-centre aggregation into 1 km UTM46N cells and WGS84 coordinate rounding; no third-party textures or imagery are included.
+
+`public/data/facilities.geojson` is derived from © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), via the Geofabrik Bangladesh 261028 extract. Changes: tag selection, representative bounding-box centres for ways/relations, bounded cell assignment and removal of unused tags. The full available derivative database is distributed in the GeoJSON, with its separately licensed provenance manifest. The OSM object-count columns in people-grid.json also retain the OSM source and ODbL licence; only the population fields derive from WorldPop. These facility records are not licensed as WorldPop data. See `docs/PEOPLE-DATA.md` for exact sources, dates, hashes and transformations.

@@ -65,6 +65,7 @@ The dashboard runs on a Cloudflare Worker serving a zero-bundle-overhead static 
 | `/api/atlas/wind` | GET | Modeled surface wind; pressure-level transport and pollution attribution unavailable |
 | `/api/atlas/outlook?kind=air` or `kind=flood` | GET | Regional CAMS PM2.5 / GloFAS daily discharge playback; warning/arrival/harvest guidance unavailable |
 | `/api/atlas/instruments` | GET | Dated national World Bank annual series and daily CC0 FX references; partial failure metadata |
+| `/api/atlas/people` | GET | WorldPop 2025 population model and dated OSM facility reference manifest; asset hashes and source limits |
 | `/api/atlas/environment` | GET | Dated NASA GIBS WMTS endpoints and RainViewer radar metadata |
 | `/api/atlas/earthquake` | GET | USGS seismic events in the Bengal Basin and Dauki Fault zone |
 | `/api/atlas/search?q=` | GET | Address geocoder bounded to Greater Dhaka |

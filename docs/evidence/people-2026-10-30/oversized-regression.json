@@ -1,0 +1,57 @@
+{
+  "body": {
+    "bottom": 485.5703125,
+    "clientWidth": 147,
+    "height": 344.5703125,
+    "scrollWidth": 259,
+    "width": 147,
+    "x": 10,
+    "y": 141
+  },
+  "controls": [
+    {
+      "height": 36,
+      "id": "summary"
+    },
+    {
+      "height": 36,
+      "id": "people-filter"
+    },
+    {
+      "height": 36,
+      "id": "people-cell"
+    }
+  ],
+  "header": {
+    "bottom": 48,
+    "clientWidth": 390,
+    "height": 48,
+    "scrollWidth": 390,
+    "width": 390,
+    "x": 0,
+    "y": 0
+  },
+  "height": 844,
+  "key": {
+    "bottom": 486.5703125,
+    "clientWidth": 147,
+    "height": 430.5703125,
+    "scrollWidth": 147,
+    "width": 150,
+    "x": 8,
+    "y": 56
+  },
+  "lang": "en",
+  "map": {
+    "bottom": 844,
+    "clientWidth": 390,
+    "height": 796,
+    "scrollWidth": 390,
+    "width": 390,
+    "x": 0,
+    "y": 48
+  },
+  "overflow": false,
+  "pass": false,
+  "width": 390
+}

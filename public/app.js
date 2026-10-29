@@ -38,6 +38,12 @@
   }
 
   const LENS_STORIES = {
+    people: {
+      title: "Population model & mapped facilities",
+      title_bn: "জনসংখ্যা মডেল ও মানচিত্রভুক্ত প্রতিষ্ঠান",
+      desc: "WorldPop 2025 estimates in 1 km² cells, with dated OSM school and healthcare objects. Not capacity or service coverage.",
+      desc_bn: "১ বর্গকিমি সেলে WorldPop ২০২৫ অনুমান এবং তারিখসহ OSM স্কুল ও স্বাস্থ্যসেবার বস্তু। ধারণক্ষমতা বা সেবার আওতা নয়।"
+    },
     city: {
       title: "Read the city, from skyline to street",
       title_bn: "আকাশরেখা থেকে অলিগলি: ঢাকার প্রতিটি স্তরের পাঠ",
@@ -199,6 +205,7 @@
       map.on("load", async () => {
         hideLoading();
         window.AtlasForecast?.attach(map);
+        window.AtlasPeople?.attach(map);
         await Promise.all([loadDataLayers(), loadParliamentBuildings()]);
       });
 
@@ -731,7 +738,7 @@
         populateQuickJump(areasData);
         const areaId = new URLSearchParams(window.location.search).get("area");
         const initialArea = areasData.find(area => area.id === areaId);
-        if (initialArea && !["air", "rivers"].includes(currentLens)) flyToArea(initialArea, 0);
+        if (initialArea && currentLens === "city") flyToArea(initialArea, 0);
       }
     } catch (e) {
       console.warn("Could not load areas json:", e);
@@ -776,6 +783,7 @@
     const hud = $("#atlas-observation-hud");
     if (!hud) return;
     if (hud.dataset) hud.dataset.owner = "feature";
+    hud.classList.remove('people-inspection');
 
     const isBn = document.documentElement.lang === "bn";
     const name = (isBn && props.name_bn) ? props.name_bn : props.name;
@@ -980,6 +988,7 @@
   }
 
   const LENS_VIEWPORTS = {
+    people: { center: [90.40, 23.78], zoom: 11.8, pitch: 35, bearing: 0 },
     city: { center: [90.4125, 23.8103], zoom: 13, pitch: 50, bearing: 15 },
     heritage: { center: [90.378, 23.762], zoom: 16.5, pitch: 60, bearing: 45 },
     transit: { center: [90.375, 23.785], zoom: 14, pitch: 55, bearing: 25 },
@@ -1048,6 +1057,7 @@
     }
 
     clearDynamicLayers();
+    window.AtlasPeople?.activate(lensId);
     if (["haze", "rain", "radar"].includes(lensId)) loadLensEvidence(lensId);
 
     if (map.getLayer("rivers-lines")) {

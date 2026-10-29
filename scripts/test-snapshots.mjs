@@ -66,6 +66,17 @@ assert.equal((await sourceHealth(env)).reasonCode,null);
 const unavailableEnv={OBSERVATION_DB:{prepare(){throw Error('db offline');}}};
 assert.equal((await sourceHealth(unavailableEnv)).reasonCode,'snapshot-database-unreachable');
 assert.equal((await observationHistory(unavailableEnv,null,null)).reasonCode,'snapshot-database-unreachable');
+const scheduledTime=Date.now();
+await worker.scheduled({cron:'*/15 * * * *',scheduledTime},env,{});
+assert.equal((await sourceHealth(env)).collector.last_scheduled_at,new Date(scheduledTime).toISOString(),'automatic scheduler heartbeat lost');
+assert.equal((await sourceHealth(env)).collector.published_id,(await readSnapshot(env)).delivery.snapshotId);
+assert.equal((await sourceHealth(env)).runs[0].trigger_source,'scheduled');
+const manualTime=Date.now();assert.equal(await collectSnapshot(env,async()=>make(),manualTime,true),'published');
+assert.equal((await sourceHealth(env)).runs[0].trigger_source,'manual');
+assert.equal((await sourceHealth(env)).collector.last_scheduled_at,new Date(scheduledTime).toISOString(),'manual run must not impersonate scheduler heartbeat');
+const currentCopy=(await (await worker.fetch(new Request('https://test.invalid/api/atlas/collage'),env)).json()).domains;
+assert.equal(currentCopy.find(d=>d.id==='energy').question,'What is the regional long-term solar resource?');
+assert.equal(currentCopy.find(d=>d.id==='economy').question,'How bright is this sampled area at night?');
 const history=await observationHistory(env,'place-0','signal-0');assert.ok(history.records.length>=2);assert.ok(history.records.some(r=>r.value===0));
 assert.ok((await sourceHealth(env)).runs.some(r=>r.status==='failed'));
 const sample=samplingWindow(23.81,90.412,12,7);assert.equal(sample.radiusPx,7);assert.ok(sample.bbox[0]<90.412&&sample.bbox[2]>90.412&&sample.bbox[1]<23.81&&sample.bbox[3]>23.81);
@@ -95,4 +106,11 @@ try{
  assert.equal(calls,2,'concurrent recovery fetched the same tile twice');
  assert.equal(a.measurements[0].value,11.11);assert.equal(a.measurements[0].coverage,0.36);assert.equal(b.measurements[0].value,11.11);
 }finally{Date.now=originalNow;globalThis.fetch=originalFetch;}
+const failedScheduleEnv={...env,OBSERVATION_DB:new DB(),OBSERVATION_ARCHIVE:new Bucket()};
+const beforeFailureFetch=globalThis.fetch;globalThis.fetch=async()=>{throw Error('fixture-upstream-offline');};
+try {
+ await assert.rejects(()=>worker.scheduled({cron:'*/15 * * * *',scheduledTime},failedScheduleEnv,{}),/scheduled-collection-failed/);
+ const failedHealth=await sourceHealth(failedScheduleEnv);
+ assert.equal(failedHealth.runs[0].trigger_source,'scheduled');assert.equal(failedHealth.runs[0].status,'failed');assert.equal(failedHealth.collector.published_id,null);
+} finally {globalThis.fetch=beforeFailureFetch;}
 console.log('✓ Snapshot persistence: cold reads, zero, failed/reduced/partial runs, R2/D1 faults, lease race, history, stale/future/schema rejection and spatial/solar metadata');

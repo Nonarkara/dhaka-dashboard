@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,6 +7,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 
 console.log("==> Running verify-local.mjs preflight checks...");
+const fixtures = readdirSync(join(root, 'public')).filter(name => name.startsWith('__'));
+if (fixtures.length) throw Error(`Local preview fixtures must not ship: ${fixtures.join(', ')}`);
 
 const REQUIRED_FILES = [
   "package.json",
@@ -18,6 +20,10 @@ const REQUIRED_FILES = [
   "public/index.html",
   "public/research.html",
   "public/app.js",
+  "public/people.js",
+  "public/data/people-manifest.json",
+  "public/data/people-grid.json",
+  "public/data/facilities.geojson",
   "public/dashboard.js",
   "public/i18n.js",
   "public/translations.js",

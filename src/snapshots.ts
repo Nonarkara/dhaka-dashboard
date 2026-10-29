@@ -63,7 +63,7 @@ export async function collectSnapshot(env: SnapshotEnv, build: () => Promise<Col
   if (!lock.meta.changes) return "not-due-or-running";
   let rawCount = 0;
   try {
-    await db.prepare("INSERT INTO ingestion_runs(id,started_at,status) VALUES (?,?,'collecting')").bind(id, started).run();
+    await db.prepare("INSERT INTO ingestion_runs(id,started_at,status,trigger_source) VALUES (?,?,'collecting',?)").bind(id, started, force ? "manual" : "scheduled").run();
     const data = await withSourceArchive(async (url, response) => {
       const bytes = await response.arrayBuffer();
       const digest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))).map(n => n.toString(16).padStart(2, "0")).join("");
@@ -108,7 +108,7 @@ export async function collectSnapshot(env: SnapshotEnv, build: () => Promise<Col
 export async function sourceHealth(env: SnapshotEnv) {
   try {
   if (!env.OBSERVATION_DB) return { status: "unavailable", reasonCode: "snapshot-storage-not-configured", timestamp: new Date().toISOString() };
-  const state = await env.OBSERVATION_DB.prepare("SELECT last_attempt_at,last_success_at,reason_code,published_id FROM collector_state WHERE name='collage'").first();
+  const state = await env.OBSERVATION_DB.prepare("SELECT last_attempt_at,last_success_at,last_scheduled_at,reason_code,published_id FROM collector_state WHERE name='collage'").first();
   const runs = await env.OBSERVATION_DB.prepare("SELECT * FROM ingestion_runs ORDER BY started_at DESC LIMIT 10").all();
   const snapshot = await readSnapshot(env);
   return { status: snapshot?.delivery.status ?? "unavailable", reasonCode: snapshot ? snapshot.delivery.reasonCode : "published-snapshot-unavailable",

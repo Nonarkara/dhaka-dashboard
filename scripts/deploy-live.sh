@@ -41,5 +41,6 @@ echo "==> 8. Verifying the live satellite collage..."
 npm run verify:satellite
 
 node scripts/verify-snapshots-live.mjs
+node scripts/verify-people-live.mjs
 
 echo "==> Deploy complete: dhaka.nonarkara.org is live!"
