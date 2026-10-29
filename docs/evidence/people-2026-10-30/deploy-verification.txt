@@ -22,9 +22,9 @@ Worker version: abf40126-2a6c-4024-b88d-7d566252e01f
   ✓ economy returns macroeconomic indicators (status=200 count=8)
   ✓ city watch strip answers with flood and air indicators (status=200)
   ✓ instruments answer with a live rate and dated national series (status=200 macro=17 fx=124.03669145)
-  ✓ every national reading carries its reporting period 
+  ✓ every national reading carries its reporting period
   ✓ collage returns measured satellite signals for the districts (status=200 districts=14 measured=86)
-  ✓ every measured signal carries a unit, a date and a resolution 
+  ✓ every measured signal carries a unit, a date and a resolution
   ✓ the collage reads its domains in English and Bengali (readings=86)
   ✓ economy corridors carry measured radiance, not registry figures (measured=10 corridors=10)
 

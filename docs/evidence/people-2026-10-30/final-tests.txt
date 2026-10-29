@@ -1,0 +1,33 @@
+
+> dhaka-dashboard@1.0.0 test
+> node scripts/test-release-contract.mjs && node scripts/test-client-contract.mjs && node scripts/test-theme-contract.mjs && node scripts/test-environment-contract.mjs && node scripts/test-i18n-contract.mjs && node scripts/test-dhaka-contract.mjs && node scripts/test-anti-slop-design.mjs && node scripts/test-data-behavior.mjs && node scripts/test-building-behavior.mjs && node scripts/test-outlook-behavior.mjs && node scripts/test-instruments-behavior.mjs && node --import ./scripts/lib/ts-resolver.mjs scripts/test-satellite-contract.mjs && node --import ./scripts/lib/ts-resolver.mjs scripts/test-snapshots.mjs && node --import ./scripts/lib/ts-resolver.mjs scripts/test-people-behavior.mjs
+
+==> Running test-release-contract.mjs...
+✓ test-release-contract.mjs passed: Wrangler and package contracts satisfied.
+==> Running test-client-contract.mjs...
+✓ test-client-contract.mjs passed: DOM and accessibility contracts verified.
+==> Running test-theme-contract.mjs...
+✓ test-theme-contract.mjs passed: Wada Sanzo palette and theme definitions verified.
+==> Running test-environment-contract.mjs...
+✓ test-environment-contract.mjs passed: 4 GIBS layers verified against the GIBS capabilities catalogue (1330 layers, captured 2026-10-28); 3 environmental endpoints present.
+==> Running test-i18n-contract.mjs...
+  Checking 259 Bengali translation entries...
+✓ test-i18n-contract.mjs passed: 100% translation key validity verified.
+==> Running test-dhaka-contract.mjs...
+  MRT Line 6 stations verified: 17
+✓ test-dhaka-contract.mjs passed: Rivers, Macro indicators, and Metro networks verified.
+==> Running test-anti-slop-design.mjs...
+✓ test-anti-slop-design.mjs passed: No AI slop or generic placeholders; sharp modernist geometry enforced.
+✓ Data behavior: upstream failure, malformed payload, null readings and six AQI boundaries
+✓ Building behavior: 4076 real footprints, Parliament courtyards, all lenses, exclusive detail switch, pan/offline/2D fallback and authored camera
+✓ Camera lifecycle: authored Parliament and manual same-lens views survive evidence/language refresh
+✓ Inspection security: untrusted map labels render as text
+✓ Parliament custom render: MapLibre6 matrix, actual Three.js array storage, shared canvas and visibility
+✓ Outlook behavior: native steps, valid horizon, duplicate cells, real zero vs missing, units, ensemble quartiles, offline envelope and mapped-use classification
+✓ Actual player: early selection, failed-first-load retry focus, paused start, play/pause, scrub missing frame, response race and watch restoration
+✓ Warning regression: seven-day maxima, zero, missing reaches, neutral warning status, one click handler and stale inspection closure
+✓ National data: correct population scale, Bengali digits, null/zero, country/indicator/date validation, daily FX freshness, partial outages and single-flight cache
+✓ Satellite contract: 14 checks passed — catalogue, colour maps, tile geometry, units, coverage, ranking and no unsourced figures
+snapshot collector: not-due-or-running
+✓ Snapshot persistence: cold reads, zero, failed/reduced/partial runs, R2/D1 faults, lease race, history, stale/future/schema rejection and spatial/solar metadata
+✓ People reference: 1280 cells, 2181 objects; hashes, counts, unknown/zero, async cancellation, retry, filter/language, keyboard inspection, source escaping and API failure

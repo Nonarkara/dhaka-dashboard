@@ -1,0 +1,26 @@
+[
+  {
+    "scheduledAt": "2026-10-29T20:00:48.717000+00:00",
+    "cron": "*/15 * * * *",
+    "outcome": "ok",
+    "workerVersion": "abf40126-2a6c-4024-b88d-7d566252e01f",
+    "messages": [
+      [
+        "snapshot collector: not-due-or-running"
+      ]
+    ],
+    "exceptions": []
+  },
+  {
+    "scheduledAt": "2026-10-29T20:15:48.717000+00:00",
+    "cron": "*/15 * * * *",
+    "outcome": "ok",
+    "workerVersion": "abf40126-2a6c-4024-b88d-7d566252e01f",
+    "messages": [
+      [
+        "snapshot collector: published"
+      ]
+    ],
+    "exceptions": []
+  }
+]
