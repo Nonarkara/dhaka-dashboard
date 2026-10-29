@@ -343,12 +343,38 @@ ok("the domains are named in both languages", () => {
   // have no per-district instrument of its own and could only repeat the night
   // radiance already reported under Economy — the same number printed twice
   // and read as two findings.
-  assert.equal(DOMAINS.length, 6, "the domain count changed");
+  assert.equal(DOMAINS.length, 7, "the domain count changed — the seven city domains are the deliverable");
   for (const d of DOMAINS) {
     assert.ok(d.label && d.label.length > 0, "a domain has no English label");
     assert.ok(d.label_bn && d.label_bn.length > 0, "a domain has no Bengali label");
     assert.ok(d.question && d.question.length > 0, "a domain has no question");
     assert.ok(d.question_bn && d.question_bn.length > 0, "a domain has no Bengali question");
+  }
+});
+
+// ── 10b. The solar resource must be a real reading, never a silent zero ───
+ok("the solar resource rejects a payload it cannot read", async () => {
+  const { selectSolar } = await import("../src/solar-resource.ts");
+
+  const good = { properties: { parameter: { ALLSKY_SFC_SW_DWN: { ANN: 4.5031, JAN: 3.6233, JUL: 4.3798 } } } };
+  const selected = selectSolar(good);
+  assert.equal(selected.annual, 4.5031);
+  assert.equal(selected.monthly.length, 2, "the monthly figures were dropped");
+
+  // A payload with no parameter, a fill value, a zero, or a non-number must
+  // be refused. A climatology that returned zero would read as "this place
+  // gets no sun", which is the worst kind of wrong.
+  for (const bad of [
+    {},
+    { properties: {} },
+    { properties: { parameter: {} } },
+    { properties: { parameter: { ALLSKY_SFC_SW_DWN: {} } } },
+    { properties: { parameter: { ALLSKY_SFC_SW_DWN: { ANN: -999 } } } },
+    { properties: { parameter: { ALLSKY_SFC_SW_DWN: { ANN: 0 } } } },
+    { properties: { parameter: { ALLSKY_SFC_SW_DWN: { ANN: "4.5" } } } },
+    { properties: { parameter: { ALLSKY_SFC_SW_DWN: { ANN: NaN } } } },
+  ]) {
+    assert.throws(() => selectSolar(bad), /power-(invalid-response|no-valid-observation)/);
   }
 });
 

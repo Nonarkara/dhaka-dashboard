@@ -1,13 +1,30 @@
 // National reference data. Annual statistics and daily FX are not live readings.
+//
+// Each series carries the city domain it speaks to, so the national picture
+// can be read against the satellite picture: what the instruments measured
+// in one district, and what the state is doing about it nationally.
 export const MACRO_SPECS = [
-  {id:'gdp',label:'GDP',label_bn:'জিডিপি',unit:'USD',indicator:'NY.GDP.MKTP.CD',format:'usd'},
-  {id:'population',label:'Population',label_bn:'জনসংখ্যা',unit:'people',indicator:'SP.POP.TOTL',format:'count'},
-  {id:'inflation',label:'CPI inflation',label_bn:'মূল্যস্ফীতি',unit:'%',indicator:'FP.CPI.TOTL.ZG',format:'pct'},
-  {id:'remittance',label:'Remittances',label_bn:'প্রবাসী আয়',unit:'USD',indicator:'BX.TRF.PWKR.CD.DT',format:'usd'},
-  {id:'exports',label:'Exports',label_bn:'রপ্তানি',unit:'USD',indicator:'BX.GSR.GNFS.CD',format:'usd'},
-  {id:'industry',label:'Industry share',label_bn:'শিল্পখাতের অংশ',unit:'% GDP',indicator:'NV.IND.TOTL.ZS',format:'pct'},
-  {id:'unemployment',label:'Unemployment',label_bn:'বেকারত্ব',unit:'%',indicator:'SL.UEM.TOTL.ZS',format:'pct'},
-  {id:'fx-period',label:'Official FX annual average',label_bn:'সরকারি বার্ষিক গড় বিনিময় হার',unit:'BDT/USD',indicator:'PA.NUS.FCRF',format:'rate'},
+  {id:'gdp',label:'GDP',label_bn:'জিডিপি',unit:'USD',indicator:'NY.GDP.MKTP.CD',format:'usd',domain:'economy'},
+  {id:'population',label:'Population',label_bn:'জনসংখ্যা',unit:'people',indicator:'SP.POP.TOTL',format:'count',domain:'people'},
+  {id:'inflation',label:'CPI inflation',label_bn:'মূল্যস্ফীতি',unit:'%',indicator:'FP.CPI.TOTL.ZG',format:'pct',domain:'economy'},
+  {id:'remittance',label:'Remittances',label_bn:'প্রবাসী আয়',unit:'USD',indicator:'BX.TRF.PWKR.CD.DT',format:'usd',domain:'economy'},
+  {id:'exports',label:'Exports',label_bn:'রপ্তানি',unit:'USD',indicator:'BX.GSR.GNFS.CD',format:'usd',domain:'economy'},
+  {id:'industry',label:'Industry share',label_bn:'শিল্পখাতের অংশ',unit:'% GDP',indicator:'NV.IND.TOTL.ZS',format:'pct',domain:'economy'},
+  {id:'unemployment',label:'Unemployment',label_bn:'বেকারত্ব',unit:'%',indicator:'SL.UEM.TOTL.ZS',format:'pct',domain:'people'},
+  {id:'fx-period',label:'Official FX annual average',label_bn:'সরকারি বার্ষিক গড় বিনিময় হার',unit:'BDT/USD',indicator:'PA.NUS.FCRF',format:'rate',domain:'economy'},
+  // Capacities and education.
+  {id:'literacy',label:'Adult literacy rate',label_bn:'প্রাপ্তবয়স্কদের সাক্ষরতার হার',unit:'%',indicator:'SE.ADT.LITR.ZS',format:'pct',domain:'people'},
+  {id:'school-enrolment',label:'Secondary school enrolment',label_bn:'মাধ্যমিক বিদ্যালয়ে ভর্তি',unit:'%',indicator:'SE.SEC.ENRR',format:'pct',domain:'people'},
+  {id:'life-expectancy',label:'Life expectancy at birth',label_bn:'জন্মের সময় আয়ুক্ষমাপ',unit:'years',indicator:'SP.DYN.LE00.IN',format:'count',domain:'smart-living'},
+  {id:'physicians',label:'Physicians per 1,000 people',label_bn:'হাজার মানুষে চিকিৎসক',unit:'per 1,000',indicator:'SH.MED.PHYS.ZS',format:'count',domain:'smart-living'},
+  {id:'urban-share',label:'Urban population share',label_bn:'শহুরে জনগণের অনুপাত',unit:'%',indicator:'SP.URB.TOTL.IN.ZS',format:'pct',domain:'mobility'},
+  // Energy.
+  {id:'electricity-access',label:'Electricity access',label_bn:'বিদ্যুৎ সরবরাহ',unit:'%',indicator:'EG.ELC.ACCS.ZS',format:'pct',domain:'energy'},
+  {id:'renewables',label:'Renewable electricity share',label_bn:'নবায়নযোগ্য বিদ্যুতের অংশ',unit:'%',indicator:'EG.ELC.RNEW.ZS',format:'pct',domain:'energy'},
+  // Environment.
+  {id:'co2-per-capita',label:'CO₂ per person',label_bn:'জনপ্রতি কার্বন ডাই-অক্সাইড',unit:'t',indicator:'EN.GHG.CO2.PC.CE.AR5',format:'count',domain:'environment'},
+  // Governance.
+  {id:'tax-revenue',label:'Tax revenue',label_bn:'কর আদায়',unit:'% GDP',indicator:'GC.TAX.TOTL.GD.ZS',format:'pct',domain:'governance'},
 ] as const;
 const FX_URLS = ['https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json','https://latest.currency-api.pages.dev/v1/currencies/usd.json'];
 export function selectMacro(raw: unknown, indicator: string, now=Date.now()) {

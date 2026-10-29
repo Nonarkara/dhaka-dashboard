@@ -51,7 +51,9 @@ const measured = collage.districts.flatMap(d => d.measurements).filter(m => m.st
 for (const m of measured) {
   assert.ok(m.value !== null && Number.isFinite(m.value), `a measurement of ${m.layerId} has no value`);
   assert.ok(m.observationDate || m.vintage, `a measurement of ${m.layerId} has neither a date nor a vintage`);
-  assert.ok(m.resolutionM > 0, `a measurement of ${m.layerId} has no resolution`);
+  // Resolution may be null for non-raster, point-based measurements (e.g. a
+  // climatology such as NASA POWER solar). When present it must be positive.
+  assert.ok(m.resolutionM === null || m.resolutionM > 0, `a measurement of ${m.layerId} has no resolution`);
   assert.ok(m.unit, `a measurement of ${m.layerId} has no unit`);
 }
 
@@ -61,6 +63,10 @@ for (const layer of MEASURED_LAYERS) {
   const any = measured.some(m => m.layerId === layer.id);
   assert.ok(any, `no district could be measured for ${layer.id}`);
 }
+// The solar resource is measured point-by-point rather than from a raster,
+// so it is not in MEASURED_LAYERS. It must still have produced readings.
+const solarAny = measured.some(m => m.layerId === "NASA_POWER_ALLSKY_SFC_SW_DWN");
+assert.ok(solarAny, "no district could be measured for the solar resource");
 
 // The readings must be real sentences that name their measurement.
 let withReading = 0;

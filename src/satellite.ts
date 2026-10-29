@@ -171,6 +171,13 @@ export const DOMAINS = [
     question_bn: "বায়ু, তাপ ও মাটি এই স্থানের কী বলছে?",
   },
   {
+    id: "energy",
+    label: "Energy",
+    label_bn: "জ্বালানি",
+    question: "How much sun falls on this place, and how much light does it make?",
+    question_bn: "এই স্থানে কত রোদ পড়ে, আর এটি কত আলো তৈরি করে?",
+  },
+  {
     id: "economy",
     label: "Economy",
     label_bn: "অর্থনীতি",

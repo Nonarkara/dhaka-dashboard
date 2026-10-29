@@ -29,6 +29,7 @@ import {
   type MeasurePoint,
   type Measurement,
 } from "./satellite.js";
+import { getSolarResource } from "./solar-resource.js";
 
 export { DOMAINS };
 
@@ -155,6 +156,16 @@ interface SignalReading {
 }
 
 const SIGNAL_READINGS: Record<string, SignalReading> = {
+  NASA_POWER_ALLSKY_SFC_SW_DWN: {
+    layerId: "NASA_POWER_ALLSKY_SFC_SW_DWN",
+    higherIs: "more",
+    highNote: "the strongest solar resource in the city",
+    highNote_bn: "শহরের সবচেয়ে বেশি সৌর সম্পদ",
+    lowNote: "the weakest solar resource in the city",
+    lowNote_bn: "শহরের সবচেয়ে কম সৌর সম্পদ",
+    display: (v) => `${v.toFixed(2)} kWh/m²/day`,
+    displayBn: (v) => `${v.toFixed(2)} kWh/m²/দিন`,
+  },
   VIIRS_SNPP_DayNightBand_At_Sensor_Radiance: {
     layerId: "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance",
     higherIs: "more",
@@ -255,8 +266,9 @@ function showValue(
 /** The order domains are listed in, and their signal grouping. */
 const DOMAIN_SIGNALS: Record<string, string[]> = {
   // One instrument per domain, so two domains never print the same
-  // measurement as their own finding. Six instruments, six domains.
+  // measurement as their own finding. Seven instruments, seven domains.
   environment: ["MODIS_Terra_Land_Surface_Temp_Day_TES"],
+  energy: ["NASA_POWER_ALLSKY_SFC_SW_DWN"],
   economy: ["VIIRS_SNPP_DayNightBand_At_Sensor_Radiance"],
   mobility: ["Landsat_Human_Built-up_And_Settlement_Extent"],
   people: ["MODIS_Terra_L3_NDVI_16Day"],
@@ -480,6 +492,42 @@ export function readingsFromMeasurements(
 }
 
 /**
+ * Measure the solar resource at each point.
+ *
+ * The reading is shaped like every other measurement so that the ranking, the
+ * coverage rule and the provenance rules all apply to it unchanged. What
+ * distinguishes it is its provenance: it is modelled, not observed, and it
+ * says so.
+ */
+async function measureSolar(points: MeasurePoint[]): Promise<{ measurements: Measurement[] }> {
+  const readings = await Promise.all(points.map(p => getSolarResource(p.lat, p.lng)));
+  return {
+    measurements: readings.map((r, index) => ({
+      layerId: "NASA_POWER_ALLSKY_SFC_SW_DWN",
+      label: r.label,
+      label_bn: r.label_bn,
+      domain: "energy",
+      unit: r.unit,
+      resolutionM: null,
+      status: r.status,
+      value: r.value,
+      min: r.value,
+      max: r.value,
+      mean: r.value,
+      // A climatology covers the whole period, so the window is fully
+      // observed — there is no partial coverage to report.
+      coverage: r.status === "ok" ? 1 : 0,
+      samples: r.status === "ok" ? 1 : 0,
+      observationDate: r.period,
+      vintage: null,
+      static: false,
+      censored: false,
+      reasonCode: r.reasonCode,
+    })),
+  };
+}
+
+/**
  * Build the collage for a set of districts.
  *
  * Signals are measured layer by layer, and each layer's acquisition is
@@ -498,9 +546,13 @@ export async function buildCollage(
   // one after another. Measuring them in sequence took almost half a minute,
   // which is most of a Worker's request budget spent waiting on the network
   // instead of doing work.
-  const layerResults = await Promise.all(
-    MEASURED_LAYERS.map((layer) => measureLayer(layer, points, radiusPx)),
-  );
+  const layerResults = await Promise.all([
+    ...MEASURED_LAYERS.map((layer) => measureLayer(layer, points, radiusPx)),
+    // The solar resource is not a raster but it is a measurement, and it is
+    // the only instrument that speaks to the energy domain: what the sun
+    // does to a place, as opposed to what the place does at night.
+    measureSolar(points),
+  ]);
   for (const { measurements } of layerResults) {
     // measureLayer returns one measurement per point, in the order it was
     // given, so they zip back onto the districts exactly.
@@ -529,9 +581,15 @@ export async function buildCollage(
       if (m.status === "ok") measured++;
     }
 
-    // The headline is the reading for the environment: it is the one a
-    // resident feels first.
-    const lead = readings.find((r) => r.domain === "environment") ?? readings[0];
+    // The headline is the first reading that exists. The environment is
+    // preferred because it is the one a resident feels first — but if the
+    // sky was closed over that district that day, the headline falls through
+    // to the next reading rather than claiming nothing could be measured
+    // when four other instruments did measure something.
+    const lead =
+      readings.find(r => r.domain === "environment" && r.status === "ok") ??
+      readings.find(r => r.status === "ok") ??
+      null;
     results.push({
       id: district.id,
       name: district.name,
