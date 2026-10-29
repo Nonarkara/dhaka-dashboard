@@ -189,6 +189,12 @@
   letter-spacing: 0.06em;
   color: var(--dim);
 }
+.collage-question {
+  margin: 0 0 5px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--dim);
+}
 .collage-reading { margin: 0 0 7px; font-size: 12px; line-height: 1.45; }
 .collage-basis {
   display: flex;
@@ -442,6 +448,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 #collage-dialog .collage-grid { display:block; }
 #collage-dialog .collage-card { border:0; border-top:1px solid var(--line); padding:8px 0; }
 #collage-dialog .collage-card h4 { font-size:12px; }
+#collage-dialog .collage-question { font-size:12px; margin:0 0 5px; color:var(--dim); }
 #collage-dialog .collage-reading { font-size:14px; }
 #collage-dialog .collage-basis { border:0; padding:0; font-size:12px; overflow-wrap:anywhere; }
 .collage-sample { margin-top:6px; min-height:36px; font-size:13px; }

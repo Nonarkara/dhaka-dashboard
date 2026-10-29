@@ -62,12 +62,12 @@ availability and its observation dates are read from it, never guessed.
 
 | Layer | Quantity | Unit | Level | Ground resolution over Dhaka | Cadence |
 |---|---|---|---|---|---|
-| `VIIRS_SNPP_DayNightBand_At_Sensor_Radiance` | Night-time radiance | nW/(cm² sr) | 8 | 668 m | daily |
-| `MODIS_Terra_Land_Surface_Temp_Day_TES` | Land surface temperature, day | K | 7 | 1.34 km | daily |
-| `MODIS_Terra_Land_Surface_Temp_Night_TES` | Land surface temperature, night | K | 7 | 1.34 km | daily |
-| `MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth` | Aerosol optical depth | 1 | 7 | 1.34 km | daily |
-| `MODIS_Terra_L3_NDVI_16Day` | Vegetation index | 1 | 9 | 334 m | 16-day |
-| `Landsat_Human_Built-up_And_Settlement_Extent` | Built-up and settlement | class | 12 | 42 m | static (2010) |
+| `VIIRS_SNPP_DayNightBand_At_Sensor_Radiance` | Night-time radiance | nW/(cm² sr) | 8 | 559 m | daily |
+| `MODIS_Terra_Land_Surface_Temp_Day_TES` | Land surface temperature, day | K | 7 | 1.12 km | daily |
+| `MODIS_Terra_Land_Surface_Temp_Night_TES` | Land surface temperature, night | K | 7 | 1.12 km | daily |
+| `MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth` | Aerosol optical depth | 1 | 7 | 1.12 km | daily |
+| `MODIS_Terra_L3_NDVI_16Day` | Vegetation index | 1 | 9 | 280 m | 16-day |
+| `Landsat_Human_Built-up_And_Settlement_Extent` | Built-up and settlement | class | 12 | 35 m | static (2010) |
 
 Night radiance is the interesting one: it is a measurement of how much
 artificial light a place leaves on after dark, which makes it a proxy for
@@ -178,6 +178,19 @@ mission.
   — works, daily, CC0, with a `date` field the atlas validates.
 - `https://open.er-api.com/v6/latest/USD` — works, daily.
 
+### FFWC — the official flood forecast centre
+
+`https://api.ffwc.gov.bd/` — **verified reachable, but gated.** Every path
+answers `403 Access Denied: Invalid Security Header`, so the service needs a
+registered security header before it will answer. It is not an anonymous
+upstream and it is not scrapable.
+
+This matters more than any other entry here: FFWC is the official source for
+river stages and flood warnings, and the atlas currently says so honestly
+rather than approximating a warning from rainfall. When a credential is
+available, this is the first upstream to connect — an official stage with a
+datum beats a modelled tier, and it would retire the proxy.
+
 ### Overpass / OpenStreetMap — facilities
 
 - **At capacity on the day of checking** (HTTP 502 on `overpass-api.de`, and
@@ -205,22 +218,67 @@ Recorded so the next person does not repeat it.
 
 ---
 
+## 4b · Four corrections made after review
+
+A review of this work found four things that were wrong or overstated. They
+are recorded here because the corrections are the point, not the code.
+
+**1. The ground resolution was inverted.** The adapter divided the projected
+pixel spacing by `cos(latitude)` instead of multiplying, which overstated the
+footprint by `sec(latitude)` — 9.3% at Dhaka's latitude. The tile arithmetic
+was never affected, so the measurements were right and the number the atlas
+*reported* was wrong. The check is now independent of the formula: at level 7
+a tile spans 360/128 degrees, so one pixel is 0.0109863 degrees of longitude,
+which at 23.81° north is 1118.9 m. The formula must agree with that.
+
+**2. The solar reading threw away its own period.** NASA POWER's response
+states its averaging range — *"25-year Meteorological and Solar Monthly &
+Annual Climatologies (January 2001 - December 2025)"* — and the adapter
+replaced it with the phrase "climatological normal". A number without its
+period is a number without a meaning. The period, the source grid
+(`SYN1DEG`) and the point the upstream answered for are all kept now.
+
+**3. A reading claimed a rate it had not measured.** One phrasing said the
+coolest district after dark was "the fastest night-time cooling in the city".
+A single night-time surface temperature is one observation; it does not
+measure a rate of change, and a measurement that says it does is making a
+claim the instrument never made. It now says "the coolest surface after
+dark".
+
+**4. A failed tile was remembered forever.** The tile cache stored failures
+as well as successes, so one transient network error kept a district
+reporting "no observation" for the rest of the isolate's life. Only a tile
+that was actually fetched is cached now.
+
+A fifth point was partly right and partly wrong. The review asked that the
+sampled footprint be shown rather than implying whole-district averages —
+which is right, and the reading now carries the width of the window it was
+taken over ("sampled over 3.4 km"). It also asked that district polygons be
+introduced before claiming district statistics. That is the right long-term
+answer and it is not done: `dhaka-areas.json` still holds district *centres*,
+and every district reading is a sample around that centre. The atlas says so
+rather than implying otherwise, and the polygons remain open work.
+
 ## 5 · What the collage is for
 
 Seven domains, each answered by a different instrument, all measured over the
 same districts on the same acquisitions:
 
-| Domain | Signal | What it actually measures |
-|---|---|---|
-| Environment | day + night land surface temperature | the heat island, as a difference between two instruments |
-| Environment | aerosol optical depth | how much particulate is in the column above the district |
-| Environment | vegetation index | how much of the ground is still growing things |
-| Energy | night radiance | how much light the district leaves on after dark |
-| Economy | night radiance, ranked | where the city's work is happening, relative to the city |
-| Mobility | built-up extent | how much of the ground is built, at 42 m |
-| People | vegetation index, ranked | the inverse of built-up: the space left for people |
-| Smart living | night heat + aerosol | where an ordinary day is most at risk |
-| Governance | aerosol + built-up | where the city can see, and how sharply |
+| Domain | Instrument | What it actually measures | National companion |
+|---|---|---|---|
+| Environment | MODIS land surface temperature, daytime | how hot the district's ground is at midday | CO₂ per person (World Bank) |
+| Energy | NASA POWER solar climatology | the sun's own contribution — the ceiling on rooftop solar | electricity access, renewable share |
+| Economy | VIIRS night radiance | where the city's work is happening, relative to the city | GDP, exports, industry share, remittances, inflation |
+| Mobility | Landsat built-up extent | how much of the ground is built, at 35 m | urban population share |
+| People | MODIS vegetation index | how much of the ground is still growing things — the space left for people | literacy, secondary enrolment, unemployment, population |
+| Smart living | MODIS land surface temperature, night-time | the heat that stays after dark | life expectancy, physicians per 1,000 |
+| Governance | MAIAC aerosol optical depth | what the atmosphere lets the satellite see of the city | tax revenue |
+
+One instrument per domain, so no two domains print the same measurement as
+their own finding. The national companions are dated World Bank series, so
+the two halves of the picture can be read against each other: what the
+instruments measured in one district, and what the state is doing about it
+nationally.
 
 The value is not in any single row. It is in the disagreement: a district can
 be hot at night, bright at midnight and almost bare of vegetation, and none

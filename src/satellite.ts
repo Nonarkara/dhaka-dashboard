@@ -175,8 +175,8 @@ export const DOMAINS = [
     id: "energy",
     label: "Energy",
     label_bn: "জ্বালানি",
-    question: "How much sun falls on this place, and how much light does it make?",
-    question_bn: "এই স্থানে কত রোদ পড়ে, আর এটি কত আলো তৈরি করে?",
+    question: "How much sun falls on this place, and how much of it could be caught?",
+    question_bn: "এই স্থানে কত রোদ পড়ে, আর তার কতটুকু ধরা যেতে পারে?",
   },
   {
     id: "economy",

@@ -94,6 +94,7 @@
       card.dataset.state = 'ok';
       card.innerHTML = `
         <h4>${esc(bn() ? domain.label_bn : domain.label)}</h4>
+        <p class="collage-question">${esc(bn() ? domain.question_bn : domain.question)}</p>
         <p class="collage-reading">${esc(bn() ? reading.reading_bn : reading.reading)}</p>
         <div class="collage-basis">
           <span>${esc(bn() ? basis.label_bn : basis.label)}</span>

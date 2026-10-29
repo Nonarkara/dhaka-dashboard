@@ -571,7 +571,16 @@
             source: "landmarks",
             paint: {
               "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 5, 16, 9],
-              "circle-color": "#d9583b",
+              "circle-color": [
+                "match",
+                ["get", "category"],
+                "civic", "#d96629",
+                "finance", "#0093a5",
+                "transit", "#0093a5",
+                "heritage", "#c5a56e",
+                "hydrology", "#257da4",
+                "#d96629"
+              ],
               "circle-stroke-width": 2,
               "circle-stroke-color": "#ffffff"
             }
