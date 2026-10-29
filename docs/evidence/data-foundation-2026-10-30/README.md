@@ -29,3 +29,11 @@ Eight en/bn cases390x844,1024x900,1440x900,1280x720 pass in geometry.json. Selec
 Screenshots: before-390.png and isolated-old.png are before/restored;390/1024/1440/1280 en/bn are repaired; outage-390.png/recovered-390.png prove failure/recovery; sample-footprint.png shows the dashed Parliament window; parliament-fixed.png shows the schematic with surrounding mapped blocks. Browser errors after repaired reload were empty. Source observations have different dates; GIBS request dates are not verified overpass times, and values derived from display bins remain estimates pending native product integration.
 
 Independent /root/flood_review closed all source, storage, scientific, rendering and geometry findings. Published-source labels, original period, lower bounds and unknown coverage remain visible. Final deployed-byte/API verification follows below.
+
+## Final production release
+
+Canonical `bash scripts/deploy-live.sh` completed with build `dhaka-atlas-20261029-1793297872-2192a5f`, Worker version `cd2268a3-39ac-4d20-916d-219665c4d32d` and configured schedule `*/15 * * * *`. All13 suites/typecheck/dataset checks,13 API smoke checks, exact hashes including collage.js and local Three module, four decoded GIBS products, live stored-satellite verification and persistent-source/history checks passed. Production serves86/98 available readings from snapshot `a157e167-91c9-43b6-90e7-663fab259288`. Stored response dates and the actual POWER period remain distinct from collection time.
+
+The first deployment completed publication but its final verifier incorrectly demanded an exact rank for censored lower-bound readings. Commit2192a5f fixes the gate to require≥and a null rank for censored values, while retaining positive-rank requirements for exact values. The full canonical chain was then rerun successfully; no gate was bypassed.
+
+Live browser confirmed source/period/scale/coverage qualifiers, lower-bound notation, history links and the first-screen reading geometry. `live-390-en.png`, `live-sources.json`, and `live-history.json` preserve evidence. Source/renderer regressions were also captured in the shared vault; durable collection architecture was logged under project Dhaka.
