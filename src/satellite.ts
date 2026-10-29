@@ -438,6 +438,29 @@ export function samplingWindow(lat: number, lng: number, level: number, radiusPx
   return {type:"point-window", radiusPx, bbox:[lon(gx-radiusPx),latitude(gy+radiusPx+1),lon(gx+radiusPx+1),latitude(gy-radiusPx)], scope:"sampled-pixels-not-district-average"};
 }
 
+/**
+ * The tile cache's health.
+ *
+ * A failure that is remembered is a failure that does not get another
+ * chance, so the cache is asked to report whether it is holding any.
+ */
+export function gibsTileCacheStats(): {
+  entries: number;
+  failures: number;
+  /** The longest a cached failure can still be served for. */
+  maxFailureTtlMs: number;
+} {
+  let failures = 0;
+  let maxFailureTtlMs = 0;
+  const now = Date.now();
+  for (const entry of tileCache.values()) {
+    if (entry.value !== null) continue;
+    failures++;
+    maxFailureTtlMs = Math.max(maxFailureTtlMs, entry.expires - now);
+  }
+  return { entries: tileCache.size, failures, maxFailureTtlMs };
+}
+
 /* ── Measurement ─────────────────────────────────────────────────────────── */
 
 /**

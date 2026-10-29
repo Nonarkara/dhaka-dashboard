@@ -159,7 +159,7 @@ interface SignalReading {
   displayBn?: (value: number) => string;
 }
 
-const SIGNAL_READINGS: Record<string, SignalReading> = {
+export const SIGNAL_READINGS: Record<string, SignalReading> = {
   NASA_POWER_ALLSKY_SFC_SW_DWN: {
     layerId: "NASA_POWER_ALLSKY_SFC_SW_DWN",
     higherIs: "more",
@@ -231,7 +231,7 @@ const SIGNAL_READINGS: Record<string, SignalReading> = {
  * domains print the same sentence about the same number, and a reader is
  * entitled to read that as two findings when it is one.
  */
-const DOMAIN_PHRASING: Record<string, Record<string, { high: string; high_bn: string; low: string; low_bn: string }>> = {
+export const DOMAIN_PHRASING: Record<string, Record<string, { high: string; high_bn: string; low: string; low_bn: string }>> = {
   governance: {
     MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: {
       high: "the least transparent air over the city — orbital observation is most limited here",

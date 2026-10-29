@@ -380,6 +380,57 @@ ok("the solar resource rejects a payload it cannot read", async () => {
   }
 });
 
+// ── 10b. A reading must not claim a rate it did not measure ────────────────
+ok("no reading claims a rate of change from a single observation", async () => {
+  const { DOMAIN_PHRASING, SIGNAL_READINGS } = await import("../src/collage.ts");
+  // A night-time surface temperature is one observation. It does not measure
+  // how fast anything cools, and a reading that says it does is making a
+  // claim the instrument never made.
+  const banned = ["cooling", "fastest", "warming", "rate of"];
+  const scan = (table, where) => {
+    for (const [key, entry] of Object.entries(table)) {
+      for (const [field, text] of Object.entries(entry)) {
+        if (typeof text !== "string") continue;
+        for (const word of banned) {
+          assert.ok(!text.toLowerCase().includes(word),
+            `the ${where} phrasing for ${key}.${field} claims "${word}": ${text}`);
+        }
+      }
+    }
+  };
+  // Both tables compose readings, so both are guarded.
+  scan(SIGNAL_READINGS, "signal");
+  for (const [domain, phrases] of Object.entries(DOMAIN_PHRASING)) {
+    for (const [layer, phrase] of Object.entries(phrases)) {
+      for (const [field, text] of Object.entries(phrase)) {
+        for (const word of banned) {
+          assert.ok(!String(text).toLowerCase().includes(word),
+            `the ${domain} reading for ${layer}.${field} claims "${word}": ${text}`);
+        }
+      }
+    }
+  }
+});
+
+// ── 10c. The cache must not remember a failure for long ────────────────────
+ok("a failed tile is not cached for the life of the isolate", async () => {
+  const { gibsTileCacheStats } = await import("../src/satellite.ts");
+  const { measureLayer, MEASURED_LAYERS } = await import("../src/satellite.ts");
+  // A tile far outside the published range: the fetch will fail.
+  const layer = { ...MEASURED_LAYERS[0], id: "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance" };
+  await measureLayer(layer, [{ id: "x", lat: 89.9, lng: 179.9 }], 1, ["2020-01-01"]);
+  const stats = gibsTileCacheStats();
+  // A failure may be remembered briefly, so a transient network error does
+  // not hammer the upstream on every request — but it must expire. A failure
+  // cached for the life of the isolate would keep a district reporting "no
+  // observation" for hours after the sky cleared.
+  assert.ok(stats.failures >= 0, "the cache is not reporting its failures");
+  assert.ok(stats.maxFailureTtlMs <= 60_000,
+    `a cached failure can still be served for ${stats.maxFailureTtlMs} ms`);
+  assert.ok(stats.maxFailureTtlMs < 30 * 60_000,
+    "a cached failure outlives the successful-tile TTL");
+});
+
 // ── 11. No fabricated figures survive in the economy registry ─────────────
 ok("the economy registry carries no unsourced figures", () => {
   const geo = JSON.parse(readFileSync("public/dhaka-economy.geojson", "utf8"));

@@ -72,6 +72,18 @@ const MUTATIONS = [
     replace: "  const shownBn = showValue(best.value, best.unit, spec?.displayBn);",
   },
   {
+    name: "a reading that claims a rate of change it did not measure",
+    file: "src/collage.ts",
+    find: 'lowNote: "the lowest sampled night-time surface temperature",',
+    replace: 'lowNote: "the fastest night-time cooling in the city",',
+  },
+  {
+    name: "a failed tile cached for the life of the isolate",
+    file: "src/satellite.ts",
+    find: "  tileCache.set(key, {value:result, expires:Date.now() + (result ? 30*60000 : 60000)});",
+    replace: "  tileCache.set(key, {value:result, expires:Date.now() + (result ? 30*60000 : 3600*60000)});",
+  },
+  {
     name: "an unsourced workforce figure back in the economy registry",
     file: "public/dhaka-economy.geojson",
     // Replace the null in place. Inserting a second key with the same name
