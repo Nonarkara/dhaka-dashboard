@@ -41,3 +41,9 @@ The earlier harvest-warning implementation was not scientifically validated. Tes
 - Warning thresholds, field inundation, local crop-stage guidance and arrival predictions remain explicitly unavailable until validated official inputs are connected.
 - Reach playback, ensemble ranges, clickable inspection, valid/retrieval times and missing-data behavior are preserved. Inspection closes on frame/lens/language changes to avoid stale values.
 - National instruments retain a device clock, dated World Bank WDI annual series and CC0 daily FX reference data. Full labels, periods, source links and unavailable states are accessible from Map → Bangladesh data on phones. No population billion/million conversion or live-FX claim is inferred.
+
+## Rainfall / flood regression correction · 29 October 2026
+
+A later release inferred normal/watch/alert/danger from unsupported 30/60/100 mm point-rain thresholds. It also classified the unmapped Narayanganj query as normal and excluded it from unavailable counts. This is superseded: all six station flood assessments remain unavailable until validated inputs exist. Five nearby query points retain complete 24-hour modeled rainfall totals with UTC interval bounds, retrieval time, units, source and an unvalidated station-match label; the sixth remains explicitly unmapped. Open-Meteo precipitation is a preceding-hour sum, so the interval starts one hour before the first returned timestamp and ends at the last. Missing, partial, negative, wrong-unit, nonconsecutive and expired series cannot become zero or normal.
+
+This release excludes the unrelated uncommitted satellite, collage, instruments and solar-resource changes present in the primary checkout.

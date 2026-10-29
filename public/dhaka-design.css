@@ -242,7 +242,8 @@
 }
 
 .river-reference-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
-.river-reference-row small { grid-column: 1 / -1; color: var(--dim); }
+.river-reference-row > div { display: grid; gap: 2px; min-width: 0; }
+.river-reference-row small { grid-column: 1 / -1; color: var(--dim); font-size: 12px; overflow-wrap: anywhere; }
 .aqi-bar.missing { background: transparent; border-bottom: 1px solid var(--dim); }
 .dashboard-modal a { color: var(--ink); }
 @media (max-width: 600px) {

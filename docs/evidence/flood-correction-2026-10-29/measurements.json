@@ -1,0 +1,134 @@
+[
+  {
+    "dialog": {
+      "height": 717.3984375,
+      "scrollHeight": 720,
+      "scrollWidth": 349,
+      "width": 351,
+      "x": 19.5,
+      "y": 63.296875
+    },
+    "firstRow": {
+      "height": 155.125,
+      "scrollHeight": 154,
+      "scrollWidth": 325,
+      "width": 325,
+      "x": 32.5,
+      "y": 211.828125
+    },
+    "header": {
+      "height": 53,
+      "scrollHeight": 52,
+      "scrollWidth": 349,
+      "width": 349,
+      "x": 20.5,
+      "y": 64.296875
+    },
+    "map": {
+      "height": 796,
+      "scrollHeight": 796,
+      "scrollWidth": 390,
+      "width": 390,
+      "x": 0,
+      "y": 48
+    },
+    "page": {
+      "height": 844,
+      "width": 390
+    },
+    "paragraphsBeforeRows": 1,
+    "reasonVisible": true,
+    "viewport": {
+      "height": 844,
+      "width": 390
+    }
+  },
+  {
+    "dialog": {
+      "height": 765,
+      "scrollHeight": 768,
+      "scrollWidth": 758,
+      "width": 760,
+      "x": 132,
+      "y": 67.5
+    },
+    "firstRow": {
+      "height": 155.125,
+      "scrollHeight": 154,
+      "scrollWidth": 726,
+      "width": 726,
+      "x": 149,
+      "y": 201.1875
+    },
+    "header": {
+      "height": 53,
+      "scrollHeight": 52,
+      "scrollWidth": 758,
+      "width": 758,
+      "x": 133,
+      "y": 68.5
+    },
+    "map": {
+      "height": 852,
+      "scrollHeight": 852,
+      "scrollWidth": 1024,
+      "width": 1024,
+      "x": 0,
+      "y": 48
+    },
+    "page": {
+      "height": 900,
+      "width": 1024
+    },
+    "paragraphsBeforeRows": 1,
+    "reasonVisible": true,
+    "viewport": {
+      "height": 900,
+      "width": 1024
+    }
+  },
+  {
+    "dialog": {
+      "height": 765,
+      "scrollHeight": 768,
+      "scrollWidth": 758,
+      "width": 760,
+      "x": 340,
+      "y": 67.5
+    },
+    "firstRow": {
+      "height": 155.125,
+      "scrollHeight": 154,
+      "scrollWidth": 726,
+      "width": 726,
+      "x": 357,
+      "y": 201.1875
+    },
+    "header": {
+      "height": 53,
+      "scrollHeight": 52,
+      "scrollWidth": 758,
+      "width": 758,
+      "x": 341,
+      "y": 68.5
+    },
+    "map": {
+      "height": 852,
+      "scrollHeight": 852,
+      "scrollWidth": 1440,
+      "width": 1440,
+      "x": 0,
+      "y": 48
+    },
+    "page": {
+      "height": 900,
+      "width": 1440
+    },
+    "paragraphsBeforeRows": 1,
+    "reasonVisible": true,
+    "viewport": {
+      "height": 900,
+      "width": 1440
+    }
+  }
+]

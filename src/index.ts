@@ -780,10 +780,9 @@ const worker = {
         const response = await worker.fetch(new Request(new URL(path, request.url), { headers: request.headers }), env);
         return await response.json() as { status: string; provenance: string; reasonCode?: string; source?: string; data?: { current?: { time?: string; us_aqi?: number; wind_speed_10m?: number; wind_direction_10m?: number } } };
       };
-      const [air, weather, rivers] = await Promise.all([
+      const [air, weather] = await Promise.all([
         read("/api/atlas/air-quality"),
         read("/api/atlas/weather"),
-        read("/api/dhaka/rivers"),
       ]);
       const aqi = air.data?.current?.us_aqi;
       const wind = weather.data?.current;
@@ -791,18 +790,7 @@ const worker = {
         status: "unavailable", provenance: "unavailable", reasonCode, source,
         timestamp: new Date().toISOString(), observedAt: null,
       });
-      // The modeled flood risk tier is the worst tier across the catchments.
-      // Live gauge readings are not connected — this is a rainfall proxy, not
-      // an official FFWC warning, and it is labelled as such downstream.
-      const riverBody = rivers as { status: string; provenance: string; reasonCode?: string; stations?: Array<{ floodRisk?: { tier: string } }>; summary?: { normal: number; watch: number; alert: number; danger: number } } | null;
-      const floodStations = riverBody?.stations ?? [];
-      const floodTiers = floodStations.map(s => s.floodRisk?.tier).filter(Boolean) as string[];
-      const worstTier = floodTiers.includes("danger") ? "danger"
-        : floodTiers.includes("alert") ? "alert"
-        : floodTiers.includes("watch") ? "watch"
-        : floodTiers.includes("normal") ? "normal"
-        : null;
-      const floodOk = riverBody?.status === "ok" && floodTiers.length > 0;
+      // Rainfall alone does not establish river flood risk or a safe state.
       return jsonResponse({
         status: "partial", city: "Dhaka", timestamp: new Date().toISOString(),
         indicators: {
@@ -816,16 +804,7 @@ const worker = {
             status: "ok", provenance: "modeled", wind_speed_10m: wind.wind_speed_10m,
             wind_direction_10m: wind.wind_direction_10m, observedAt: wind.time, source: weather.source,
           } : missing("Open-Meteo", weather.reasonCode || "invalid-current-wind"),
-          floodRisk: floodOk ? {
-            status: worstTier ?? "normal",
-            provenance: "modeled",
-            source: "BWDB / FFWC + Open-Meteo (24h rainfall)",
-            summary: riverBody.summary,
-            tier: worstTier,
-            reasonCode: null,
-            observedAt: null,
-            timestamp: new Date().toISOString(),
-          } : missing("BWDB / FFWC", riverBody?.reasonCode || "river-observations-not-connected"),
+          floodRisk: missing("BWDB / FFWC", "validated-flood-assessment-not-connected"),
           economy: missing("Bangladesh Bank / DSE", "dated-bulletin-not-connected"),
         },
       });
@@ -839,17 +818,14 @@ const worker = {
     }
 
     // ── /api/dhaka/rivers ────────────────────────────────────────────────────
-    // Flood risk tiers are computed from Open-Meteo 24-hour rainfall
-    // accumulation (catchment level) combined with BWDB danger levels. Live
-    // river-gauge readings are not connected; this is a modeled risk proxy,
-    // not an official flood warning.
+    // Preserve point rainfall forecasts; no calibrated flood assessment exists.
     if (url.pathname === "/api/dhaka/rivers") {
-      const cacheKey = "rivers:flood-risk";
+      const cacheKey = "rivers:rainfall-reference-v2";
       const { data, error } = await fetchWithCache(
         cacheKey,
         20 * 60 * 1000,
         async () => {
-          // Fetch 24h rainfall for the 5 catchments
+          // Five geographic query points, not catchment-wide rainfall estimates.
           const points = [
             { id: "buriganga", name: "Buriganga Catchment", lat: 23.7001, lng: 90.4150 },
             { id: "turag", name: "Turag Basin", lat: 23.7980, lng: 90.3420 },
@@ -865,11 +841,25 @@ const worker = {
                   { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
                 );
                 if (!r.ok) throw new Error(`upstream-http-${r.status}`);
-                const j = (await r.json()) as { current?: { precipitation?: number }; hourly?: { precipitation?: number[] } };
-                if (!Number.isFinite(j.current?.precipitation) || !j.hourly?.precipitation?.length) throw new Error("invalid-rainfall-payload");
-                return { ...p, status: "ok" as const, current_mm: j.current!.precipitation, rain_24h_sum_mm: j.hourly!.precipitation!.reduce((a: number, b: number) => a + b, 0) };
-              } catch {
-                return { ...p, status: "unavailable" as const, reasonCode: "upstream-or-invalid-rainfall" as const, current_mm: null, rain_24h_sum_mm: null };
+                const j = (await r.json()) as { hourly?: { time?: string[]; precipitation?: unknown[] }; hourly_units?: { precipitation?: string } };
+                const times = j.hourly?.time;
+                const values = j.hourly?.precipitation;
+                if (j.hourly_units?.precipitation !== "mm" || !Array.isArray(times) || times.length !== 24 ||
+                    !Array.isArray(values) || values.length !== 24 ||
+                    values.some(v => typeof v !== "number" || !Number.isFinite(v) || v < 0)) throw new Error("invalid-rainfall-payload");
+                // Open-Meteo precipitation timestamps mark the preceding-hour sum.
+                const dates = times.map(t => typeof t === "string" ? Date.parse(`${t}+06:00`) : NaN);
+                if (dates.some((t, i) => !Number.isFinite(t) || (i > 0 && t - dates[i - 1] !== 3600000)) ||
+                    Math.abs(dates[0] - Date.now()) > 3600000) throw new Error("invalid-rainfall-period");
+                return { ...p, status: "ok" as const, provenance: "modeled", source: "Open-Meteo Weather API",
+                  retrievedAt: new Date().toISOString(), validFrom: new Date(dates[0] - 3600000).toISOString(),
+                  validTo: new Date(dates[23]).toISOString(), unit: "mm",
+                  rain_24h_sum_mm: (values as number[]).reduce((a, b) => a + b, 0) };
+
+              } catch (error) {
+                const message = error instanceof Error ? error.message : "";
+                const reasonCode = message === "upstream-http-429" ? "provider-rate-limited" : message.startsWith("invalid-rainfall") ? message : "upstream-unreachable";
+                return { ...p, status: "unavailable" as const, reasonCode, retrievedAt: new Date().toISOString(), validFrom: null, validTo: null, unit: "mm", rain_24h_sum_mm: null };
               }
             }),
           );
@@ -887,32 +877,14 @@ const worker = {
           const stations = RIVER_STATIONS.map(st => {
             const rain = rainById.get(Object.keys(catchmentToStation).find(k => catchmentToStation[k] === st.id) || "");
             const rain24h = rain?.rain_24h_sum_mm ?? null;
-            const rainCurrent = rain?.current_mm ?? null;
-            const rainStatus = rain?.status ?? "unavailable";
-
-            // Flood risk tier from 24h rainfall accumulation relative to danger level.
-            // No live river readings exist, so this is a modeled proxy only.
-            let riskTier: "normal" | "watch" | "alert" | "danger" = "normal";
-            let riskReason = null;
-            if (rainStatus === "unavailable") {
-              riskTier = "normal"; // can't assess without rainfall data
-              riskReason = "rainfall-data-unavailable";
-            } else if (rain24h !== null) {
-              const danger = st.danger_level_m;
-              // Heuristic: 24h rainfall > 50mm suggests catchment saturation;
-              // > 100mm suggests elevated river levels approaching danger.
-              const saturation = rain24h / 100; // 0-1+ scale
-              if (saturation >= 1.0) {
-                riskTier = "danger";
-                riskReason = "heavy-24h-rainfall-catchment-saturated";
-              } else if (saturation >= 0.6) {
-                riskTier = "alert";
-                riskReason = "significant-24h-rainfall";
-              } else if (saturation >= 0.3) {
-                riskTier = "watch";
-                riskReason = "moderate-24h-rainfall";
-              }
-            }
+            const rainfall = {
+              status: rain?.status ?? "unavailable", provenance: rain?.status === "ok" ? "modeled" : "unavailable",
+              reasonCode: rain?.status === "ok" ? null : rain?.reasonCode ?? "rainfall-query-not-mapped",
+              value: rain24h, unit: "mm", source: "Open-Meteo Weather API", sourceUrl: "https://open-meteo.com/en/docs",
+              retrievedAt: rain?.retrievedAt ?? null, validFrom: rain?.validFrom ?? null, validTo: rain?.validTo ?? null,
+              query: rain ? { latitude: rain.lat, longitude: rain.lng, name: rain.name } : null,
+              spatialScope: "query-point-not-catchment", stationMatchStatus: "unvalidated",
+            };
 
             return {
               ...st,
@@ -921,39 +893,32 @@ const worker = {
               status: "unavailable",
               readingsStatus: "unavailable",
               reasonCode: "river-observations-not-connected",
+              rainfall,
               floodRisk: {
-                tier: riskTier,
-                reasonCode: riskReason,
-                rain_24h_mm: rain24h,
-                rain_current_mm: rainCurrent,
-                rainfallStatus: rainStatus,
-                danger_level_m: st.danger_level_m,
-                warning_level_m: st.warning_level_m,
-                note: "Modeled flood risk proxy from 24h rainfall accumulation. Not an official FFWC flood warning.",
+                status: "unavailable", provenance: "unavailable", tier: null,
+                reasonCode: "validated-flood-assessment-not-connected",
+                timestamp: new Date().toISOString(),
+                note: "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected.",
               },
             };
           });
 
           const anyRain = rainfall.some(r => r.status === "ok");
-          const anyDanger = stations.some(s => s.floodRisk.tier === "danger");
-          const anyAlert = stations.some(s => s.floodRisk.tier === "alert");
 
           return {
-            status: anyRain ? "ok" : "unavailable",
-            provenance: "modeled",
+            status: anyRain ? "partial" : "unavailable",
+            provenance: anyRain ? "modeled" : "unavailable",
             readingsStatus: "unavailable",
             reasonCode: anyRain ? null : "river-observations-not-connected",
             observedAt: null,
             timestamp: new Date().toISOString(),
             stations,
             summary: {
-              normal: stations.filter(s => s.floodRisk.tier === "normal").length,
-              watch: stations.filter(s => s.floodRisk.tier === "watch").length,
-              alert: stations.filter(s => s.floodRisk.tier === "alert").length,
-              danger: stations.filter(s => s.floodRisk.tier === "danger").length,
-              unavailable: stations.filter(s => s.floodRisk.tier === "normal" && rainfall.some(r => r.id === Object.keys(catchmentToStation).find(k => catchmentToStation[k] === s.id)) && rainfall.find(r => r.id === Object.keys(catchmentToStation).find(k => catchmentToStation[k] === s.id))?.status === "unavailable").length,
+              assessed: 0, unavailable: stations.length,
+              rainfallAvailable: stations.filter(s => s.rainfall.status === "ok").length,
+              rainfallUnavailable: stations.filter(s => s.rainfall.status !== "ok").length,
             },
-            note: "Danger levels are officially surveyed benchmarks in metres Above Mean Sea Level (m MSL). Flood risk tiers are modeled from 24h rainfall accumulation — not live gauge readings or an official FFWC warning.",
+            note: "Registry danger levels are unverified reference values. Point rainfall forecasts do not establish river levels, catchment saturation or flood warnings.",
           };
         },
         null,
@@ -966,13 +931,13 @@ const worker = {
           provenance: "unavailable",
           observedAt: null,
           readingsStatus: "unavailable",
-          stations: RIVER_STATIONS.map(s => ({ ...s, floodRisk: { tier: "normal" as const, reasonCode: "upstream-unreachable", rain_24h_mm: null, rain_current_mm: null, rainfallStatus: "unavailable", danger_level_m: s.danger_level_m, warning_level_m: s.warning_level_m, note: "Modeled flood risk proxy unavailable — upstream unreachable." } })),
+          stations: RIVER_STATIONS.map(s => ({ ...s, rainfall: { status: "unavailable", value: null, unit: "mm", reasonCode: "upstream-unreachable", retrievedAt: new Date().toISOString() }, floodRisk: { status: "unavailable", tier: null, reasonCode: "validated-flood-assessment-not-connected", timestamp: new Date().toISOString() } })),
           timestamp: new Date().toISOString(),
           error: error || null,
         }, { status: 503 });
       }
 
-      return jsonResponse(data, { status: data.status === "ok" ? 200 : 503 });
+      return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200 });
     }
 
     // ── /api/dhaka/economy ───────────────────────────────────────────────────

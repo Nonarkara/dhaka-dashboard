@@ -78,44 +78,35 @@
     if (!container) return;
     try {
       const res = await fetch("/api/dhaka/rivers", { signal: AbortSignal.timeout(15000) });
-      if (!res.ok) throw new Error("Rivers API unavailable");
       const data = await res.json();
+      if (!Array.isArray(data.stations)) throw new Error("Invalid river registry");
       const isBn = document.documentElement.lang === "bn";
-
-      const tierLabel = (t) => ({ normal: tr("Normal","সাধারণ"), watch: tr("Watch","সতর্ক"), alert: tr("Alert","সতর্ক"), danger: tr("Danger","বিপদ") })[t] || t;
-      const tierClass = (t) => `river-tier river-tier-${t}`;
-
+      const escape = value => String(value ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const date = value => value ? new Date(value).toLocaleString(isBn ? "bn-BD" : "en-GB", { timeZone: "Asia/Dhaka", dateStyle: "medium", timeStyle: "short" }) : tr("Unavailable", "অনুপলব্ধ");
       container.innerHTML = `
-        <p>${tr("Modeled flood risk from 24-hour rainfall accumulation plus BWDB danger levels. Live gauge readings are not connected — tiers are a risk proxy, not an official FFWC flood warning.", "২৪ ঘণ্টার বৃষ্টিপাত ও বিউডব্লিউডি বিপদসীমার ওপর ভিত্তি করে মডেলভিত্তিক বন্যা ঝুঁকির স্তর। সরাসরি গেজ পাঠন সংযুক্ত নয় — স্তরগুলি একটি ঝুঁকি প্রক্সি, সরকারি એফএফডাব্লুসি বন্যা সতর্কবার্তা নয়।")}</p>
-        <div style="display:flex;gap:8px;margin-bottom:8px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;">
-          <span style="color:var(--ok)">● ${tr("Normal","সাধারণ")}: ${data.summary?.normal ?? 0}</span>
-          <span style="color:var(--amber)">● ${tr("Watch","সতর্ক")}: ${data.summary?.watch ?? 0}</span>
-          <span style="color:var(--warn)">● ${tr("Alert","সতর্কব군요")}: ${data.summary?.alert ?? 0}</span>
-          <span style="color:#dd4027">● ${tr("Danger","বিপদ")}: ${data.summary?.danger ?? 0}</span>
-        </div>
+        <p>${tr("Flood assessment unavailable. Gauge observations and validated warning thresholds are not connected. Rainfall below is a point forecast, not catchment rainfall or a flood warning.", "বন্যা মূল্যায়ন অনুপলব্ধ। গেজ পর্যবেক্ষণ ও যাচাইকৃত সতর্কসীমা সংযুক্ত নেই। নিচের বৃষ্টি নির্দিষ্ট স্থানের পূর্বাভাস; অববাহিকার বৃষ্টিপাত বা বন্যার সতর্কবার্তা নয়।")}</p>
         <div class="river-reference-list">${data.stations.map(st => {
-          const fr = st.floodRisk || { tier: "normal", reasonCode: null, rain_24h_mm: null, rain_current_mm: null, rainfallStatus: "unavailable", danger_level_m: st.danger_level_m, warning_level_m: st.warning_level_m, note: "" };
-          const rainText = fr.rain_24h_mm !== null ? `${fr.rain_24h_mm.toFixed(1)} mm` : tr("Unavailable","অনুপলব্ধ");
-          const tierColor = { normal: "var(--ok)", watch: "var(--amber)", alert: "var(--warn)", danger: "#dd4027" }[fr.tier];
-          return `
-          <div class="river-reference-row">
-            <div>
-              <strong>${isBn ? st.name_bn : st.name}</strong>
-              <span class="river-tier-badge" style="background:${tierColor};color:#000;border-radius:0;padding:1px 6px;font-size:9px;margin-left:6px;">${tierLabel(fr.tier)}</span>
-              <span>${tr("Current", "বর্তমান")}: ${tr("Unavailable", "অনুপলব্ধ")}</span>
-              <small>${st.station_code} · ${st.agency} · ${tr("Danger", "বিপদসীমা")} ${st.danger_level_m} m · ${tr("24h Rain", "২৪ ঘণ্টা বৃষ্টি")} ${rainText} · ${tr("Rainfall", "বৃষ্টিপাত")} ${fr.rainfallStatus === "ok" ? tr("received","পাওয়া গেছে") : tr("unavailable","অনুপলব্ধ")}</small>
-              ${fr.reasonCode ? `<div style="font-size:10px;color:var(--dim);margin-top:2px;">${fr.reasonCode} · ${fr.note || ""}</div>` : ""}
-            </div>
-          </div>`;
+          const rain = st.rainfall || {};
+          const available = rain.status === "ok" && Number.isFinite(rain.value);
+          const value = available ? `${new Intl.NumberFormat(isBn ? "bn-BD" : "en-GB", { maximumFractionDigits: 1 }).format(rain.value)} mm` : tr("Unavailable", "অনুপলব্ধ");
+          return `<div class="river-reference-row"><div>
+            <strong>${escape(isBn ? st.name_bn : st.name)}</strong>
+            <span>${tr("Gauge reading", "গেজের পাঠ")}: ${tr("Unavailable", "অনুপলব্ধ")}</span>
+            <span>${tr("24-hour modeled point rain", "২৪ ঘণ্টার মডেলভিত্তিক স্থানীয় বৃষ্টি")}: ${value}</span>
+            ${available ? `<small>${tr("Valid", "প্রযোজ্য সময়")}: ${escape(date(rain.validFrom))} – ${escape(date(rain.validTo))} · ${tr("Dhaka time", "ঢাকার সময়")}</small>` : `<small data-language-fixed>${escape(rain.reasonCode || "rainfall-unavailable")}</small>`}
+            ${rain.query ? `<small>${available ? tr("Retrieved", "সংগ্রহ") : tr("Attempted", "চেষ্টার সময়")}: ${escape(date(rain.retrievedAt))} · ${escape(rain.source || "Open-Meteo")}</small>` : `<small>${tr("No linked rainfall query", "বৃষ্টির অনুসন্ধান সংযুক্ত নেই")}</small>`}
+            ${rain.query ? `<small>${tr("Query point", "অনুসন্ধানের স্থান")}: ${escape(rain.query.latitude)}, ${escape(rain.query.longitude)} · ${tr("Gauge match unvalidated", "গেজের সঙ্গে মিল যাচাই করা হয়নি")}</small>` : ""}
+            <small>${escape(st.station_code)} · ${escape(st.agency)} · ${tr("Unverified registry danger level", "যাচাইহীন তালিকার বিপদসীমা")}: ${escape(st.danger_level_m)} m MSL</small>
+          </div></div>`;
         }).join("")}</div>
-        <p><a href="https://ffwc.gov.bd" target="_blank" rel="noopener">BWDB / FFWC ↗</a> · ${tr("Reference datum: m MSL. Observed time: unavailable.", "তথ্যসূত্র একক: m MSL। পর্যবেক্ষণের সময়: অনুপলব্ধ।")}</p>
+        <p><a href="https://ffwc.gov.bd" target="_blank" rel="noopener">BWDB / FFWC ↗</a> · <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener">Open-Meteo ↗</a></p>
       `;
     } catch (err) {
-      container.innerHTML = `<p style="color:var(--warn);padding:8px;">River water level feed unavailable.</p>`;
+      container.innerHTML = `<p>${tr("River readings and rainfall unavailable. Flood assessment unavailable.", "নদীর পাঠ ও বৃষ্টিপাত অনুপলব্ধ। বন্যা মূল্যায়ন অনুপলব্ধ।")}</p>`;
     }
   }
 
-  function aqiGuidance(aqi, isBn) {
+  function aqiGuidance(aqi) {
     if (typeof aqi !== "number" || !Number.isFinite(aqi)) {
       return `<span style="color:var(--dim)">${tr("No AQI data — cannot determine action.","একিউআই তথ্য নেই — পদক্ষেপ নির্ধারিত করা যায় না।")}</span>`;
     }
@@ -126,7 +117,7 @@
       return `<span style="color:var(--amber)">${tr("Moderate — sensitive people reduce prolonged outdoor exertion.","মধ্যম — সংবেদনশীল ব্যক্তিরা দীর্ঘ বাহ্য পরিশ্রম হ্রাস করুন।")}</span>`;
     }
     if (aqi <= 150) {
-      return `<span style="color:#f97316">${tr("Unhealthy for Sensitive Groups — sensitive groups reduce outdoor exertion; schools consider limiting outdoor activity.","সंবেদনশীল গোষ্ঠীর জন্য Assalunhealthy — সংবেদনশীল গোষ্ঠী বাহ্য પરিশ্রম হ্রাস করুন; স্কুল বাহ্য কার্যক্রম সীমিত করার কথা চিন্তা করুন।")}</span>`;
+      return `<span style="color:#f97316">${tr("Unhealthy for Sensitive Groups — sensitive groups reduce outdoor exertion; schools consider limiting outdoor activity.","সংবেদনশীল গোষ্ঠীর জন্য অস্বাস্থ্যকর — বাইরে পরিশ্রম কমান; স্কুলে বাইরের কার্যক্রম সীমিত করার কথা বিবেচনা করুন।")}</span>`;
     }
     if (aqi <= 200) {
       return `<span style="color:var(--warn)">${tr("Unhealthy — everyone reduce prolonged outdoor exertion; consider mask use; restrict construction and brick kiln operations.","অস্বাস্থ্যকর — সবাই দীর্ঘ বাহ্য পরিশ্রম হ্রাস করুন; মাস্ক ব্যবহার বিবেচনা করুন; নির্মাণ ও ইটভাটা কার্যক্রম সীমিত করুন।")}</span>`;
@@ -174,7 +165,7 @@
         </div>
         <div class="aqi-action-card" style="margin-top:8px;padding:6px 8px;background:var(--bg-raised);border:1px solid var(--line);font-size:11px;">
           <strong style="text-transform:uppercase;letter-spacing:0.05em;font-family:var(--font-mono);font-size:10px;color:var(--dim);">${tr("Admin action guidance","প্রশাসনিক পদক্ষেপের দিকনির্দেশনা")}</strong>
-          <div style="margin-top:4px;">${aqiGuidance(data.data.current?.us_aqi, isBn)}</div>
+          <div style="margin-top:4px;">${aqiGuidance(data.data.current?.us_aqi)}</div>
         </div>
       `;
     } catch (err) {

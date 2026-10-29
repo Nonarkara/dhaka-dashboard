@@ -1,0 +1,357 @@
+{
+  "old": {
+    "firstRowY": 307.0078125,
+    "paragraphsBeforeRows": 2,
+    "viewport": {
+      "height": 844,
+      "width": 390
+    },
+    "pass": false
+  },
+  "after": [
+    {
+      "dialog": {
+        "height": 717.3984375,
+        "scrollWidth": 349,
+        "width": 351,
+        "x": 19.5,
+        "y": 63.296875
+      },
+      "firstRow": {
+        "height": 155.125,
+        "scrollWidth": 325,
+        "width": 325,
+        "x": 32.5,
+        "y": 211.828125
+      },
+      "header": {
+        "height": 53,
+        "scrollWidth": 349,
+        "width": 349,
+        "x": 20.5,
+        "y": 64.296875
+      },
+      "map": {
+        "height": 796,
+        "scrollWidth": 390,
+        "width": 390,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 844,
+        "width": 390
+      },
+      "paragraphsBeforeRows": 1,
+      "qualification": "Flood assessment unavailable. Gauge observations and validated warning thresholds are not connected. Rainfall below is a point forecast, not catchment rainfall or a flood warning.",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "lang": "en",
+      "state": "values-fixture",
+      "pass": true
+    },
+    {
+      "dialog": {
+        "height": 765,
+        "scrollWidth": 758,
+        "width": 760,
+        "x": 132,
+        "y": 67.5
+      },
+      "firstRow": {
+        "height": 155.125,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 149,
+        "y": 201.1875
+      },
+      "header": {
+        "height": 53,
+        "scrollWidth": 758,
+        "width": 758,
+        "x": 133,
+        "y": 68.5
+      },
+      "map": {
+        "height": 852,
+        "scrollWidth": 1024,
+        "width": 1024,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 900,
+        "width": 1024
+      },
+      "paragraphsBeforeRows": 1,
+      "qualification": "Flood assessment unavailable. Gauge observations and validated warning thresholds are not connected. Rainfall below is a point forecast, not catchment rainfall or a flood warning.",
+      "viewport": {
+        "height": 900,
+        "width": 1024
+      },
+      "lang": "en",
+      "state": "values-fixture",
+      "pass": true
+    },
+    {
+      "dialog": {
+        "height": 765,
+        "scrollWidth": 758,
+        "width": 760,
+        "x": 340,
+        "y": 67.5
+      },
+      "firstRow": {
+        "height": 155.125,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 357,
+        "y": 201.1875
+      },
+      "header": {
+        "height": 53,
+        "scrollWidth": 758,
+        "width": 758,
+        "x": 341,
+        "y": 68.5
+      },
+      "map": {
+        "height": 852,
+        "scrollWidth": 1440,
+        "width": 1440,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 900,
+        "width": 1440
+      },
+      "paragraphsBeforeRows": 1,
+      "qualification": "Flood assessment unavailable. Gauge observations and validated warning thresholds are not connected. Rainfall below is a point forecast, not catchment rainfall or a flood warning.",
+      "viewport": {
+        "height": 900,
+        "width": 1440
+      },
+      "lang": "en",
+      "state": "values-fixture",
+      "pass": true
+    },
+    {
+      "dialog": {
+        "height": 612,
+        "scrollWidth": 758,
+        "width": 760,
+        "x": 260,
+        "y": 54
+      },
+      "firstRow": {
+        "height": 155.125,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 277,
+        "y": 187.6875
+      },
+      "header": {
+        "height": 53,
+        "scrollWidth": 758,
+        "width": 758,
+        "x": 261,
+        "y": 55
+      },
+      "map": {
+        "height": 672,
+        "scrollWidth": 1280,
+        "width": 1280,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 720,
+        "width": 1280
+      },
+      "paragraphsBeforeRows": 1,
+      "qualification": "Flood assessment unavailable. Gauge observations and validated warning thresholds are not connected. Rainfall below is a point forecast, not catchment rainfall or a flood warning.",
+      "viewport": {
+        "height": 720,
+        "width": 1280
+      },
+      "lang": "en",
+      "state": "values-fixture",
+      "pass": true
+    },
+    {
+      "dialog": {
+        "height": 717.3984375,
+        "scrollWidth": 349,
+        "width": 351,
+        "x": 19.5,
+        "y": 63.296875
+      },
+      "firstRow": {
+        "height": 172.5234375,
+        "scrollWidth": 325,
+        "width": 325,
+        "x": 32.5,
+        "y": 211.828125
+      },
+      "header": {
+        "height": 53,
+        "scrollWidth": 349,
+        "width": 349,
+        "x": 20.5,
+        "y": 64.296875
+      },
+      "map": {
+        "height": 796,
+        "scrollWidth": 390,
+        "width": 390,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 844,
+        "width": 390
+      },
+      "paragraphsBeforeRows": 1,
+      "qualification": "বন্যা মূল্যায়ন অনুপলব্ধ। গেজ পর্যবেক্ষণ ও যাচাইকৃত সতর্কসীমা সংযুক্ত নেই। নিচের বৃষ্টি নির্দিষ্ট স্থানের পূর্বাভাস; অববাহিকার বৃষ্টিপাত বা বন্যার সতর্কবার্তা নয়।",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "lang": "bn",
+      "state": "values-fixture",
+      "pass": true
+    },
+    {
+      "dialog": {
+        "height": 765,
+        "scrollWidth": 758,
+        "width": 760,
+        "x": 132,
+        "y": 67.5
+      },
+      "firstRow": {
+        "height": 155.125,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 149,
+        "y": 201.1875
+      },
+      "header": {
+        "height": 53,
+        "scrollWidth": 758,
+        "width": 758,
+        "x": 133,
+        "y": 68.5
+      },
+      "map": {
+        "height": 852,
+        "scrollWidth": 1024,
+        "width": 1024,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 900,
+        "width": 1024
+      },
+      "paragraphsBeforeRows": 1,
+      "qualification": "বন্যা মূল্যায়ন অনুপলব্ধ। গেজ পর্যবেক্ষণ ও যাচাইকৃত সতর্কসীমা সংযুক্ত নেই। নিচের বৃষ্টি নির্দিষ্ট স্থানের পূর্বাভাস; অববাহিকার বৃষ্টিপাত বা বন্যার সতর্কবার্তা নয়।",
+      "viewport": {
+        "height": 900,
+        "width": 1024
+      },
+      "lang": "bn",
+      "state": "values-fixture",
+      "pass": true
+    },
+    {
+      "dialog": {
+        "height": 765,
+        "scrollWidth": 758,
+        "width": 760,
+        "x": 340,
+        "y": 67.5
+      },
+      "firstRow": {
+        "height": 155.125,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 357,
+        "y": 201.1875
+      },
+      "header": {
+        "height": 53,
+        "scrollWidth": 758,
+        "width": 758,
+        "x": 341,
+        "y": 68.5
+      },
+      "map": {
+        "height": 852,
+        "scrollWidth": 1440,
+        "width": 1440,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 900,
+        "width": 1440
+      },
+      "paragraphsBeforeRows": 1,
+      "qualification": "বন্যা মূল্যায়ন অনুপলব্ধ। গেজ পর্যবেক্ষণ ও যাচাইকৃত সতর্কসীমা সংযুক্ত নেই। নিচের বৃষ্টি নির্দিষ্ট স্থানের পূর্বাভাস; অববাহিকার বৃষ্টিপাত বা বন্যার সতর্কবার্তা নয়।",
+      "viewport": {
+        "height": 900,
+        "width": 1440
+      },
+      "lang": "bn",
+      "state": "values-fixture",
+      "pass": true
+    },
+    {
+      "dialog": {
+        "height": 612,
+        "scrollWidth": 758,
+        "width": 760,
+        "x": 260,
+        "y": 54
+      },
+      "firstRow": {
+        "height": 155.125,
+        "scrollWidth": 726,
+        "width": 726,
+        "x": 277,
+        "y": 187.6875
+      },
+      "header": {
+        "height": 53,
+        "scrollWidth": 758,
+        "width": 758,
+        "x": 261,
+        "y": 55
+      },
+      "map": {
+        "height": 672,
+        "scrollWidth": 1280,
+        "width": 1280,
+        "x": 0,
+        "y": 48
+      },
+      "page": {
+        "height": 720,
+        "width": 1280
+      },
+      "paragraphsBeforeRows": 1,
+      "qualification": "বন্যা মূল্যায়ন অনুপলব্ধ। গেজ পর্যবেক্ষণ ও যাচাইকৃত সতর্কসীমা সংযুক্ত নেই। নিচের বৃষ্টি নির্দিষ্ট স্থানের পূর্বাভাস; অববাহিকার বৃষ্টিপাত বা বন্যার সতর্কবার্তা নয়।",
+      "viewport": {
+        "height": 720,
+        "width": 1280
+      },
+      "lang": "bn",
+      "state": "values-fixture",
+      "pass": true
+    }
+  ]
+}
