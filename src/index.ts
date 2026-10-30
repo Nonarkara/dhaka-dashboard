@@ -976,6 +976,44 @@ const worker = {
       }, { headers: { "cache-control": "no-store" } });
     }
 
+    // ── /api/dhaka/ffwc ────────────────────────────────────────────────────
+    // FFWC station observations and forecasts. The official FFWC API advertises
+    // current water levels, warnings and short-term forecasts, but requires
+    // registration for developer documentation and was unreachable from this
+    // environment. The endpoint structure below follows the recommended data
+    // contract; it returns unavailable until a live payload can be validated.
+    // River observations remain river observations — they are not interpolated
+    // into street flood depths or evacuation instructions.
+    if (url.pathname === "/api/dhaka/ffwc") {
+      return jsonResponse({
+        status: "unavailable",
+        city: "Dhaka",
+        provenance: "unavailable",
+        reasonCode: "ffwc-api-not-validated",
+        retrievedAt: new Date().toISOString(),
+        source: {
+          name: "Bangladesh Water Development Board / Flood Forecasting & Warning Centre",
+          name_bn: "বাংলাদেশ পানি উন্নয়ন বোর্ড / বন্যা পূর্বাভাস ও সতর্কতা কেন্দ্র",
+          sourceUrl: "https://api3.ffwc.gov.bd/",
+          note: "API documentation requires registration. Live payload, timestamps, units and station geometry not yet validated.",
+          note_bn: "এপিআই নথিপত্রের জন্য নিবন্ধন প্রয়োজন। লাইভ পেলোড, সময়STAMP, একক ও স্টেশন জ্যামিতি এখনও যাচাই করা হয়নি।।",
+        },
+        stations: RIVER_STATIONS.map(st => ({
+          ...st,
+          current_level_m: null,
+          trend: "unavailable",
+          status: "unavailable",
+          readingsStatus: "unavailable",
+          reasonCode: "ffwc-api-not-validated",
+          observation: null,
+          forecast: null,
+        })),
+        timestamp: new Date().toISOString(),
+        note: "No live FFWC gauge feed connected. Station registry entries remain unverified reference values until the API is tested and calibrated.",
+        note_bn: "কোনো সরাসরি এফডব্লুসি গেজ পাঠন সংযুক্ত নয়। স্টেশন নিবন্ধন নিবন্ধ পর্যালোচনা এবং ক্যালিব্রেশন না হওয়া পর্যন্ত রেফারেন্স মান থাকে।",
+      }, { headers: { "cache-control": "no-store" } });
+    }
+
     // ── /api/dhaka/economy ───────────────────────────────────────────────────
     // Combines Bangladesh-specific reference indicators (RMG, DSEX, EPZs) with
     // dated World Bank WDI observations where they overlap (CPI, remittance,

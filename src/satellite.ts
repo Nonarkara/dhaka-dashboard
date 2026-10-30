@@ -282,6 +282,24 @@ export function groundResolutionM(level: number, lat: number): number {
   return equator * Math.max(cos, 1e-6);
 }
 
+/**
+ * Bounding box of the sampled window around a point, in [west, south, east, north]
+ * degrees. Derived from the ground resolution and the sampling radius in pixels;
+ * approximate but sufficient to render the sampled footprint on the map.
+ */
+export function sampleWindowBbox(
+  lat: number,
+  lng: number,
+  level: number,
+  radiusPx: number,
+): [number, number, number, number] | null {
+  const res = groundResolutionM(level, lat);
+  const cos = Math.max(Math.cos((lat * Math.PI) / 180), 1e-6);
+  const halfDegLat = (radiusPx * res) / 111320;
+  const halfDegLng = (radiusPx * res) / (111320 * cos);
+  return [lng - halfDegLng, lat - halfDegLat, lng + halfDegLng, lat + halfDegLat];
+}
+
 /** The XY tile covering a point, and the pixel within that tile. */
 export function tileForPoint(
   lat: number,
@@ -683,6 +701,7 @@ export async function measureLayer(
       if (layer.classes && layer.classTarget !== undefined) {
         const hits = sample.classCounts.get(layer.classTarget) ?? 0;
         const share = hits / sample.values.length;
+        const bbox = sampleWindowBbox(point.lat, point.lng, layer.tileLevel, radiusPx);
         return {
           layerId: layer.id,
           label: layer.label,
@@ -702,11 +721,18 @@ export async function measureLayer(
           static: layer.static === true,
           censored: false,
           reasonCode: null,
+          sampling: {
+            type: "point-window" as const,
+            radiusPx,
+            bbox,
+            scope: `square window ${radiusPx * 2 + 1}px across around ${point.id}`,
+          },
         };
       }
 
       const values = sample.values;
       const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
+      const bbox = sampleWindowBbox(point.lat, point.lng, layer.tileLevel, radiusPx);
       return {
         layerId: layer.id,
         label: layer.label,
@@ -726,6 +752,12 @@ export async function measureLayer(
         static: layer.static === true,
         censored: sample.censored,
         reasonCode: null,
+        sampling: {
+          type: "point-window" as const,
+          radiusPx,
+          bbox,
+          scope: `square window ${radiusPx * 2 + 1}px across around ${point.id}`,
+        },
       };
     }),
   );
@@ -737,7 +769,9 @@ function unavailableMeasurement(
   point: MeasurePoint,
   reasonCode: string,
   date: string | null = null,
+  radiusPx = layer.radiusPx ?? 2,
 ): Measurement {
+  const bbox = sampleWindowBbox(point.lat, point.lng, layer.tileLevel, radiusPx);
   return {
     layerId: layer.id,
     label: layer.label,
@@ -757,6 +791,12 @@ function unavailableMeasurement(
     static: layer.static === true,
     censored: false,
     reasonCode,
+    sampling: {
+      type: "point-window" as const,
+      radiusPx,
+      bbox,
+      scope: `square window ${radiusPx * 2 + 1}px across around ${point.id}`,
+    },
   };
 }
 
@@ -784,6 +824,7 @@ export async function measureLayerAt(
 
   const colormap = GIBS_COLORMAPS[layer.id];
   if (!colormap) {
+    const bbox = sampleWindowBbox(point.lat, point.lng, layer.tileLevel, radiusPx);
     return {
       ...base,
       status: "unavailable",
@@ -798,6 +839,12 @@ export async function measureLayerAt(
       static: layer.static === true,
       censored: false,
       reasonCode: "colormap-unresolved",
+      sampling: {
+        type: "point-window" as const,
+        radiusPx,
+        bbox,
+        scope: `square window ${radiusPx * 2 + 1}px across around ${point.id}`,
+      },
     };
   }
 
@@ -810,6 +857,7 @@ export async function measureLayerAt(
 
   const resolved = await resolveObservationDate(layer, colormap, point, radiusPx, candidates);
   if (!resolved) {
+    const bbox = sampleWindowBbox(point.lat, point.lng, layer.tileLevel, radiusPx);
     return {
       ...base,
       status: "unavailable",
@@ -824,6 +872,12 @@ export async function measureLayerAt(
       static: layer.static === true,
       censored: false,
       reasonCode: "no-observation-in-window",
+      sampling: {
+        type: "point-window" as const,
+        radiusPx,
+        bbox,
+        scope: `square window ${radiusPx * 2 + 1}px across around ${point.id}`,
+      },
     };
   }
 
@@ -831,6 +885,7 @@ export async function measureLayerAt(
   const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
   const min = Math.min(...values);
   const max = Math.max(...values);
+  const bbox = sampleWindowBbox(point.lat, point.lng, layer.tileLevel, radiusPx);
   return {
     ...base,
     status: "ok",
@@ -847,6 +902,12 @@ export async function measureLayerAt(
     static: layer.static === true,
     censored: resolved.sample.censored,
     reasonCode: null,
+    sampling: {
+      type: "point-window" as const,
+      radiusPx,
+      bbox,
+      scope: `square window ${radiusPx * 2 + 1}px across around ${point.id}`,
+    },
   };
 }
 
