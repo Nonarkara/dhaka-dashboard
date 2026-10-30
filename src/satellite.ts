@@ -371,7 +371,7 @@ interface DecodedTile {
 }
 
 /**
- * Decoded tiles, kept for the life of the isolate.
+ * Decoded tiles cached for 30 minutes; failed tiles cached for one minute.
  *
  * A measurement over fourteen districts touches the same tile repeatedly —
  * districts share tiles, and the date search tries the same tile on several
@@ -446,6 +446,7 @@ export function samplingWindow(lat: number, lng: number, level: number, radiusPx
  */
 export function gibsTileCacheStats(): {
   entries: number;
+  /** Failures whose TTL has not expired. */
   failures: number;
   /** The longest a cached failure can still be served for. */
   maxFailureTtlMs: number;
@@ -454,7 +455,7 @@ export function gibsTileCacheStats(): {
   let maxFailureTtlMs = 0;
   const now = Date.now();
   for (const entry of tileCache.values()) {
-    if (entry.value !== null) continue;
+    if (entry.value !== null || entry.expires <= now) continue;
     failures++;
     maxFailureTtlMs = Math.max(maxFailureTtlMs, entry.expires - now);
   }

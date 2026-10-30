@@ -19,7 +19,12 @@
         "current_water_level_m": null,
         "trend": "unavailable",
         "provenance": "reference",
-        "observedAt": null
+        "observedAt": null,
+        "evidence_class": "unverified_reference",
+        "geometry_method": "unverified",
+        "verification_status": "unreviewed",
+        "vertical_datum": null,
+        "source_record_url": null
       },
       "geometry": {
         "type": "Point",
@@ -46,7 +51,12 @@
         "current_water_level_m": null,
         "trend": "unavailable",
         "provenance": "reference",
-        "observedAt": null
+        "observedAt": null,
+        "evidence_class": "unverified_reference",
+        "geometry_method": "unverified",
+        "verification_status": "unreviewed",
+        "vertical_datum": null,
+        "source_record_url": null
       },
       "geometry": {
         "type": "Point",
@@ -73,7 +83,12 @@
         "current_water_level_m": null,
         "trend": "unavailable",
         "provenance": "reference",
-        "observedAt": null
+        "observedAt": null,
+        "evidence_class": "unverified_reference",
+        "geometry_method": "unverified",
+        "verification_status": "unreviewed",
+        "vertical_datum": null,
+        "source_record_url": null
       },
       "geometry": {
         "type": "Point",
@@ -100,7 +115,12 @@
         "current_water_level_m": null,
         "trend": "unavailable",
         "provenance": "reference",
-        "observedAt": null
+        "observedAt": null,
+        "evidence_class": "unverified_reference",
+        "geometry_method": "unverified",
+        "verification_status": "unreviewed",
+        "vertical_datum": null,
+        "source_record_url": null
       },
       "geometry": {
         "type": "Point",
@@ -127,7 +147,12 @@
         "current_water_level_m": null,
         "trend": "unavailable",
         "provenance": "reference",
-        "observedAt": null
+        "observedAt": null,
+        "evidence_class": "unverified_reference",
+        "geometry_method": "unverified",
+        "verification_status": "unreviewed",
+        "vertical_datum": null,
+        "source_record_url": null
       },
       "geometry": {
         "type": "Point",
@@ -154,7 +179,12 @@
         "current_water_level_m": null,
         "trend": "unavailable",
         "provenance": "reference",
-        "observedAt": null
+        "observedAt": null,
+        "evidence_class": "unverified_reference",
+        "geometry_method": "unverified",
+        "verification_status": "unreviewed",
+        "vertical_datum": null,
+        "source_record_url": null
       },
       "geometry": {
         "type": "Point",

@@ -1,3 +1,5 @@
+import { DDM_SOURCE_REVIEW } from "./ddm-source-review.js";
+
 /**
  * Authoritative reference and observed data registries for Dhaka.
  * Sourced from Bangladesh Bank, Bangladesh Bureau of Statistics (BBS),
@@ -15,6 +17,7 @@
  * identifier, retrieval date, licence, transformation history and uncertainty.
  */
 export type EvidenceClass =
+  | "unverified_reference"
   | "official_inventory"
   | "community_mapped"
   | "remote_sensing_derived"
@@ -22,6 +25,7 @@ export type EvidenceClass =
   | "field_verified";
 
 export type GeometryMethod =
+  | "unverified"
   | "source_geometry"
   | "reviewed_geocode"
   | "documented_derivation";
@@ -42,22 +46,23 @@ export interface SpatialEvidence {
   limitations: string[];
 }
 
-/** The reviewed Dhaka study boundary: Dhaka North City Corporation (DNCC)
- * and Dhaka South City Corporation (DSCC), derived from the atlas's own areas
- * list. Coordinates are a bounding-box approximation for clipping OSM
- * extracts; they are not administrative polygons and must not be used as
- * legal boundaries or evacuation zones. */
+/** Population-grid study extent, not a reviewed municipal boundary.
+ * scripts/refresh-people.py expands the atlas bbox to whole 1 km UTM46N
+ * cells and exports their outer WGS84 corners. */
 export const DHAKA_STUDY_BOUNDARY = {
-  name: "Dhaka North + South City Corporations",
-  name_bn: "ঢাকা উত্তর ও দক্ষিণ সিটি কর্পোরেশন",
-  source: "atlas-curated areas list (public/dhaka-areas.json)",
-  sourceUrl: "/dhaka-areas.json",
+  name: "Dhaka population-grid study extent",
+  name_bn: "ঢাকার জনসংখ্যা গ্রিডের অধ্যয়ন এলাকা",
+  source: "WorldPop population-grid extent; scripts/refresh-people.py",
+  sourceUrl: "/data/people-manifest.json",
   bbox: [90.23895227009733, 23.594164517100097, 90.55988906432036, 23.960378575820744],
   crs: "EPSG:4326",
+  geometryMethod: "documented_derivation",
+  verificationStatus: "unreviewed",
+  derivation: "Atlas bbox [90.25,23.60,90.55,23.95] expanded to whole 1 km UTM46N cells; outer corners exported to WGS84.",
   limitations: [
-    "Bounding-box approximation of DNCC/DSCC extent, not administrative polygons.",
+    "Population-grid study extent only; no DNCC/DSCC boundary match has been established.",
     "Does not represent legal jurisdiction or evacuation zones.",
-    "Clip boundary for OSM extract only; features outside are excluded.",
+    "Facility reference is clipped to this grid; legacy river references can lie outside it.",
     "Study boundary must be reviewed against official DNCC/DSCC limits before planning use.",
   ],
 } as const;
@@ -70,22 +75,22 @@ export const FLOOD_SCENARIO_TYPES = [
     id: "river_flood",
     label: "River flood",
     label_bn: "নদী বন্যা",
-    note: "River-station gauge levels relative to surveyed danger levels.",
-    note_bn: "নদীগ 정부의 গেজ পতন বিপদসীমার সাপেক্ষে।",
+    note: "Requires river-station gauge levels and verified danger levels with a matched vertical datum.",
+    note_bn: "নদীর গেজে পানির স্তর যাচাইকৃত বিপদসীমার সঙ্গে তুলনা করা প্রয়োজন।",
   },
   {
     id: "rainfall_waterlogging",
     label: "Rainfall waterlogging",
-    label_bn: "বৃষ্টি জলাবদ্ধতা",
+    label_bn: "বৃষ্টিজনিত জলাবদ্ধতা",
     note: "Urban drainage response to intense local rainfall; not a river threshold.",
-    note_bn: "শহুরে নিকাশের তীব্রস্থানীয় বৃষ্টির প্রতিক্রিয়া; নদী সীমা নয়।",
+    note_bn: "তীব্র স্থানীয় বৃষ্টিতে শহরের নিষ্কাশন ব্যবস্থার প্রতিক্রিয়া; এটি নদীর বিপদসীমা নয়।",
   },
   {
     id: "compound_flood",
     label: "Compound flood",
-    label_bn: "সম্মিশ্র বন্যা",
+    label_bn: "যৌথ বন্যা",
     note: "Coincident river flood and rainfall waterlogging; requires both evidence streams.",
-    note_bn: "নদী বন্যা ও বৃষ্টি জলাবদ্ধতার মিলন; উভয়প্রকার প্রমাণ প্রয়োজন।",
+    note_bn: "একই সময়ে নদীর বন্যা ও বৃষ্টিজনিত জলাবদ্ধতা; দুই ধরনের প্রমাণই প্রয়োজন।",
   },
 ] as const;
 
@@ -246,10 +251,24 @@ export interface RiverStation {
   lng: number;
   agency: string;
   source_url: string;
-  /** Provenance for the station location and threshold values. The station
-   * coordinates come from the BWDB/FFWC registry; they are reference
-   * locations, not field-verified survey marks. */
+  /** Legacy reference location/code/threshold: authoritative match is unverified. */
   evidence?: SpatialEvidence;
+}
+
+function legacyStationEvidence(): SpatialEvidence {
+  return {
+    sourceName: "Legacy atlas reference; BWDB/FFWC station match unverified",
+    sourceUrl: "https://ffwc.gov.bd", sourceFeatureId: null,
+    retrievedAt: null, observedAt: null, license: null,
+    evidenceClass: "unverified_reference", geometryMethod: "unverified",
+    positionalAccuracyM: null, verificationStatus: "unreviewed",
+    limitations: [
+      "Legacy coordinate, station code and threshold lack a captured authoritative record-level match.",
+      "Provider homepage is a discovery link, not proof of registry geometry or survey provenance.",
+      "Location, code match, threshold and vertical datum require independent review.",
+      "No live gauge observation is connected; current level is unknown.",
+    ],
+  };
 }
 
 export const RIVER_STATIONS: RiverStation[] = [
@@ -271,23 +290,7 @@ export const RIVER_STATIONS: RiverStation[] = [
     lng: 90.4150,
     agency: "BWDB / FFWC",
     source_url: "https://ffwc.gov.bd",
-    evidence: {
-      sourceName: "BWDB / FFWC station registry",
-      sourceUrl: "https://ffwc.gov.bd",
-      sourceFeatureId: "SW42",
-      retrievedAt: null,
-      observedAt: null,
-      license: null,
-      evidenceClass: "official_inventory" as const,
-      geometryMethod: "reviewed_geocode" as const,
-      positionalAccuracyM: null,
-      verificationStatus: "unreviewed" as const,
-      limitations: [
-        "Station coordinates are registry reference values, not field-verified survey marks.",
-        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
-        "No live gauge feed connected; current_level_m is null.",
-      ],
-    },
+    evidence: legacyStationEvidence(),
   },
   {
     id: "turag-mirpur",
@@ -307,23 +310,7 @@ export const RIVER_STATIONS: RiverStation[] = [
     lng: 90.3420,
     agency: "BWDB / FFWC",
     source_url: "https://ffwc.gov.bd",
-    evidence: {
-      sourceName: "BWDB / FFWC station registry",
-      sourceUrl: "https://ffwc.gov.bd",
-      sourceFeatureId: "SW299",
-      retrievedAt: null,
-      observedAt: null,
-      license: null,
-      evidenceClass: "official_inventory" as const,
-      geometryMethod: "reviewed_geocode" as const,
-      positionalAccuracyM: null,
-      verificationStatus: "unreviewed" as const,
-      limitations: [
-        "Station coordinates are registry reference values, not field-verified survey marks.",
-        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
-        "No live gauge feed connected; current_level_m is null.",
-      ],
-    },
+    evidence: legacyStationEvidence(),
   },
   {
     id: "balu-demra",
@@ -343,23 +330,7 @@ export const RIVER_STATIONS: RiverStation[] = [
     lng: 90.5050,
     agency: "BWDB / FFWC",
     source_url: "https://ffwc.gov.bd",
-    evidence: {
-      sourceName: "BWDB / FFWC station registry",
-      sourceUrl: "https://ffwc.gov.bd",
-      sourceFeatureId: "SW08",
-      retrievedAt: null,
-      observedAt: null,
-      license: null,
-      evidenceClass: "official_inventory" as const,
-      geometryMethod: "reviewed_geocode" as const,
-      positionalAccuracyM: null,
-      verificationStatus: "unreviewed" as const,
-      limitations: [
-        "Station coordinates are registry reference values, not field-verified survey marks.",
-        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
-        "No live gauge feed connected; current_level_m is null.",
-      ],
-    },
+    evidence: legacyStationEvidence(),
   },
   {
     id: "lakhya-narayanganj",
@@ -379,23 +350,7 @@ export const RIVER_STATIONS: RiverStation[] = [
     lng: 90.5110,
     agency: "BWDB / FFWC",
     source_url: "https://ffwc.gov.bd",
-    evidence: {
-      sourceName: "BWDB / FFWC station registry",
-      sourceUrl: "https://ffwc.gov.bd",
-      sourceFeatureId: "SW179",
-      retrievedAt: null,
-      observedAt: null,
-      license: null,
-      evidenceClass: "official_inventory" as const,
-      geometryMethod: "reviewed_geocode" as const,
-      positionalAccuracyM: null,
-      verificationStatus: "unreviewed" as const,
-      limitations: [
-        "Station coordinates are registry reference values, not field-verified survey marks.",
-        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
-        "No live gauge feed connected; current_level_m is null.",
-      ],
-    },
+    evidence: legacyStationEvidence(),
   },
   {
     id: "tongi-khal-tongi",
@@ -415,23 +370,7 @@ export const RIVER_STATIONS: RiverStation[] = [
     lng: 90.4010,
     agency: "BWDB / FFWC",
     source_url: "https://ffwc.gov.bd",
-    evidence: {
-      sourceName: "BWDB / FFWC station registry",
-      sourceUrl: "https://ffwc.gov.bd",
-      sourceFeatureId: "SW298",
-      retrievedAt: null,
-      observedAt: null,
-      license: null,
-      evidenceClass: "official_inventory" as const,
-      geometryMethod: "reviewed_geocode" as const,
-      positionalAccuracyM: null,
-      verificationStatus: "unreviewed" as const,
-      limitations: [
-        "Station coordinates are registry reference values, not field-verified survey marks.",
-        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
-        "No live gauge feed connected; current_level_m is null.",
-      ],
-    },
+    evidence: legacyStationEvidence(),
   },
   {
     id: "dhaleshwari-rekabi-bazar",
@@ -451,23 +390,7 @@ export const RIVER_STATIONS: RiverStation[] = [
     lng: 90.4950,
     agency: "BWDB / FFWC",
     source_url: "https://ffwc.gov.bd",
-    evidence: {
-      sourceName: "BWDB / FFWC station registry",
-      sourceUrl: "https://ffwc.gov.bd",
-      sourceFeatureId: "SW68",
-      retrievedAt: null,
-      observedAt: null,
-      license: null,
-      evidenceClass: "official_inventory" as const,
-      geometryMethod: "reviewed_geocode" as const,
-      positionalAccuracyM: null,
-      verificationStatus: "unreviewed" as const,
-      limitations: [
-        "Station coordinates are registry reference values, not field-verified survey marks.",
-        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
-        "No live gauge feed connected; current_level_m is null.",
-      ],
-    },
+    evidence: legacyStationEvidence(),
   }
 ];
 
@@ -565,22 +488,26 @@ export const AIR_STATIONS: AirStation[] = [
 
 /** DDM (Department of Disaster Management) shelter inventory source.
  * The DDM table is publicly accessible but reuse terms are pending review.
- * Records contain name, area, constructed_by, construction_year,
- * covering_people, location, contact_person and status — but NO coordinates.
+ * The table omits coordinate columns, but its inline JSON includes lat/lon.
+ * Source contacts and records are excluded from the public aggregate review.
  * No shelter pin may be created without source geometry or a reviewed
  * building-level match. Operational readiness, capacity and accessibility
  * are kept as separate attributes from the source listing. */
 export const DDM_SHELTER_SOURCE = {
   name: "Department of Disaster Management (DDM) AWARE Shelter Information",
-  name_bn: "দ্য departamento এর দুর্যোগ ব্যবস্থাপনা বিভাগ আশ্রয় তথ্য",
+  name_bn: "দুর্যোগ ব্যবস্থাপনা অধিদপ্তরের AWARE আশ্রয়কেন্দ্রের তথ্য",
   sourceUrl: "https://rapid.ddm.gov.bd/service/shelter_info",
   agency: "Department of Disaster Management (DDM), Ministry of Disaster Management and Relief",
-  retrievedAt: null,
-  recordCount: null,
+  retrievedAt: DDM_SOURCE_REVIEW.retrievedAt,
+  observedAt: null,
+  recordCount: DDM_SOURCE_REVIEW.recordCount,
+  coordinatePairCount: DDM_SOURCE_REVIEW.coordinatePairCount,
+  withinStudyExtentCount: DDM_SOURCE_REVIEW.withinStudyExtentCount,
   dhakaRecordCount: null,
+  structureReview: DDM_SOURCE_REVIEW,
   limitations: [
-    "Source page is HTML table; no machine-readable API discovered.",
-    "Table has no latitude/longitude columns; coordinates must come from source geometry or reviewed building-level match.",
+    "Source page has a table and embedded structured JSON; no separate API established by this review.",
+    "Embedded JSON contains lat/lon; individual positions and current shelter availability remain unreviewed.",
     "National inventory — Dhaka North/South coverage not yet established.",
     "covering_people is source-reported, not verified available capacity.",
     "Personal contact details must not be republished in the public interface.",
@@ -620,6 +547,9 @@ export interface ShelterRegisterEntry {
   readiness: ShelterReadiness;
   /** Whether this entry may appear as a map pin. False until geometry is reviewed. */
   mappable: boolean;
+  /** Traceable location review, independent of operational readiness. */
+  geometryReview?: { reviewedAt: string; reference: string };
+  publicationReview?: { status: "permitted"; reviewedAt: string; reference: string };
 }
 
 /** The DDM shelter register. Starts empty: no shelter pins are created

@@ -178,6 +178,10 @@ assert.equal(map.camera,peopleCamera,'same-lens people refresh must preserve the
 assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('<img'));
 assert.ok(elements.get('atlas-observation-hud').innerHTML.includes('&lt;img'));
 console.log('✓ Inspection security: untrusted map labels render as text');
+api.showInspectionHUD('gauge',{});
+assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('SW42'),'missing station code must not invent a match');
+assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('m MSL'),'unverified datum must not look surveyed');
+assert.ok(elements.get('atlas-observation-hud').innerHTML.includes('vertical datum are unverified'));
 
 // Actual Three.js matrices accept the MapLibre6 render input without .elements.set.
 let renders=0;

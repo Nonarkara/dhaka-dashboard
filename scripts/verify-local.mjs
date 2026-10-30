@@ -21,6 +21,7 @@ const REQUIRED_FILES = [
   "public/research.html",
   "public/app.js",
   "public/people.js",
+  "public/data/ddm-source-review.json",
   "public/data/people-manifest.json",
   "public/data/people-grid.json",
   "public/data/facilities.geojson",

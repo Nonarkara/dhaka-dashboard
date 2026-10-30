@@ -1,0 +1,31 @@
+{
+  "sourceUrl": "https://rapid.ddm.gov.bd/service/shelter_info",
+  "retrievedAt": "2026-10-30T06:39:00.858Z",
+  "observedAt": null,
+  "sourceSha256": "c4a0393154202a1290c6479356213d05b3bc43cdfc1fe55c1c3a9d90f7551634",
+  "structure": "html-table-and-inline-json",
+  "method": "Parse the shelter JSON array embedded in the source page; count finite non-origin coordinate pairs and points inside the population-grid extent. Do not execute scripts or import records.",
+  "recordCount": 1950,
+  "coordinatePairCount": 1950,
+  "withinStudyExtentCount": 5,
+  "studyExtentSource": "/data/people-manifest.json",
+  "studyExtentBbox": [
+    90.23895227009733,
+    23.594164517100097,
+    90.55988906432036,
+    23.960378575820744
+  ],
+  "recordGeometryStatus": "unreviewed",
+  "reuseStatus": "unreviewed",
+  "excludedFields": [
+    "contact_person",
+    "contact_no"
+  ],
+  "limitations": [
+    "Source structure and coordinate presence reviewed; individual location accuracy and source update date are unknown.",
+    "Within-extent count is not DNCC/DSCC coverage, unique buildings or operational shelter availability.",
+    "Source-reported capacity, status and accessibility fields are not independently verified readiness.",
+    "No separate API or reuse licence established by this page inspection.",
+    "No source records, coordinates or personal contacts are included in this aggregate review."
+  ]
+}

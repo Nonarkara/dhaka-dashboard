@@ -1,0 +1,70 @@
+{
+  "close": {
+    "bottom": 108.296875,
+    "clientWidth": 34,
+    "height": 36,
+    "scrollWidth": 34,
+    "width": 36,
+    "x": 319.5,
+    "y": 72.296875
+  },
+  "dialog": {
+    "bottom": 780.6953125,
+    "clientWidth": 349,
+    "height": 717.3984375,
+    "scrollWidth": 349,
+    "width": 351,
+    "x": 19.5,
+    "y": 63.296875
+  },
+  "expanded": true,
+  "firstRiverRow": {
+    "bottom": 898.6640625,
+    "clientWidth": 325,
+    "height": 172.5234375,
+    "scrollWidth": 325,
+    "width": 325,
+    "x": 32.5,
+    "y": 726.140625
+  },
+  "header": {
+    "bottom": 48,
+    "clientWidth": 390,
+    "height": 48,
+    "scrollWidth": 390,
+    "width": 390,
+    "x": 0,
+    "y": 0
+  },
+  "height": 844,
+  "lang": "en",
+  "map": {
+    "bottom": 844,
+    "clientWidth": 390,
+    "height": 796,
+    "scrollWidth": 390,
+    "width": 390,
+    "x": 0,
+    "y": 48
+  },
+  "pass": false,
+  "status": {
+    "bottom": 718.140625,
+    "clientWidth": 325,
+    "height": 320.71875,
+    "scrollWidth": 325,
+    "width": 325,
+    "x": 32.5,
+    "y": 397.421875
+  },
+  "summary": {
+    "bottom": 391.421875,
+    "clientWidth": 325,
+    "height": 179.59375,
+    "scrollWidth": 325,
+    "width": 325,
+    "x": 32.5,
+    "y": 211.828125
+  },
+  "width": 390
+}

@@ -73,18 +73,52 @@
     }
   }
 
+  const planningDisclosure = () => `<details class="planning-evidence" id="planning-evidence"><summary>${tr("Planning evidence & shelter review", "পরিকল্পনার প্রমাণ ও আশ্রয়কেন্দ্র পর্যালোচনা")}</summary><div id="planning-shelter-status" role="status">${tr("Checking source review…", "উৎসের পর্যালোচনা দেখা হচ্ছে…")}</div></details>`;
+
+  async function loadPlanningEvidence(container) {
+    const slot=container.querySelector('#planning-shelter-status');
+    if(!slot)return;
+    const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    try {
+      const response=await fetch('/api/dhaka/shelters',{signal:AbortSignal.timeout(15000)});
+      if(!response.ok)throw Error('shelter-review-unavailable');
+      const data=await response.json(),review=data.source?.structureReview;
+      if(!review||!Number.isInteger(data.registerCount)||!Number.isInteger(data.mappableCount))throw Error('invalid-shelter-review');
+      if(!slot.isConnected)return;
+      const isBn=document.documentElement.lang==='bn';
+      const number=value=>Number.isInteger(value)?new Intl.NumberFormat(isBn?'bn-BD':'en-GB').format(value):tr('Unknown','অজানা');
+      const time=Number.isFinite(Date.parse(review.retrievedAt))?new Date(review.retrievedAt).toLocaleString(isBn?'bn-BD':'en-GB',{timeZone:'Asia/Dhaka',dateStyle:'medium',timeStyle:'short'}):tr('Unknown','অজানা');
+      slot.dataset.status='reference';
+      delete slot.dataset.reasonCode;slot.dataset.checkedAt=new Date().toISOString();
+      slot.innerHTML=`<p><strong>${escape(tr(data.studyBoundary?.name,data.studyBoundary?.name_bn))}</strong> · ${tr('1 km cells; not a DNCC/DSCC boundary or evacuation zone.','১ কিমি সেল; DNCC/DSCC সীমানা বা সরিয়ে নেওয়ার এলাকা নয়।')}</p>
+        <p>${tr('Legacy river locations, station codes, thresholds and vertical datum remain unverified. Scenario types describe required evidence, not active flood warnings.','আগের নদীর অবস্থান, স্টেশন কোড, বিপদসীমা ও উচ্চতার ভিত্তি এখনও যাচাইহীন। বন্যার ধরন প্রয়োজনীয় প্রমাণ বোঝায়; সক্রিয় সতর্কবার্তা নয়।')}</p>
+        <p>${tr('Imported shelter records','আমদানি করা আশ্রয়কেন্দ্রের রেকর্ড')}: <strong>${number(data.registerCount)}</strong> · ${tr('Published pins','প্রকাশিত চিহ্ন')}: <strong>${number(data.mappableCount)}</strong></p>
+        <p>${tr('DDM source snapshot','DDM উৎসের স্ন্যাপশট')}: ${number(review.recordCount)} ${tr('records with','রেকর্ডে')} ${number(review.coordinatePairCount)} ${tr('coordinate pairs;','জোড়া স্থানাঙ্ক;')} ${number(review.withinStudyExtentCount)} ${tr('points inside this study extent, unreviewed. These counts do not establish usable shelters or municipal coverage.','বিন্দু এই অধ্যয়ন এলাকায়, এখনও পর্যালোচনা হয়নি। এই সংখ্যা ব্যবহারযোগ্য আশ্রয়কেন্দ্র বা পৌর এলাকার আওতা প্রতিষ্ঠা করে না।')}</p>
+        <p>${tr('Source retrieved','উৎস সংগ্রহ')}: ${escape(time)} · ${tr('Dhaka time. Source update date, location accuracy, readiness and reuse terms remain unverified.','ঢাকার সময়। উৎসের হালনাগাদের তারিখ, অবস্থানের নির্ভুলতা, প্রস্তুতি ও পুনর্ব্যবহারের শর্ত যাচাই হয়নি।')}</p>
+        <a href="https://rapid.ddm.gov.bd/service/shelter_info" target="_blank" rel="noopener">${tr('DDM source page','DDM উৎসের পাতা')} ↗</a>`;
+    } catch {
+      if(!slot.isConnected)return;
+      slot.dataset.status='unavailable';slot.dataset.reasonCode='shelter-review-unavailable';slot.dataset.checkedAt=new Date().toISOString();
+      slot.innerHTML=`<p>${tr('Shelter source review unavailable. No shelter availability is established.','আশ্রয়কেন্দ্রের উৎসের পর্যালোচনা অনুপলব্ধ। কোনো আশ্রয়কেন্দ্রের প্রাপ্যতা প্রতিষ্ঠিত নয়।')}</p><button type="button" class="atlas-btn" id="planning-review-retry">${tr('Retry source review','আবার উৎসের পর্যালোচনা দেখুন')}</button>`;
+      slot.querySelector('#planning-review-retry').onclick=()=>loadPlanningEvidence(container);
+    }
+  }
+
   async function loadRivers() {
     const container = $("#rivers-list-container");
     if (!container) return;
+    container.innerHTML=`<p>${tr("Flood assessment unavailable. Gauge observations and validated warning thresholds are not connected. Rainfall below is a point forecast, not catchment rainfall or a flood warning.", "বন্যা মূল্যায়ন অনুপলব্ধ। গেজ পর্যবেক্ষণ ও যাচাইকৃত সতর্কসীমা সংযুক্ত নেই। নিচের বৃষ্টি নির্দিষ্ট স্থানের পূর্বাভাস; অববাহিকার বৃষ্টিপাত বা বন্যার সতর্কবার্তা নয়।")}</p>${planningDisclosure()}<div id="river-readings"><p role="status">${tr('Checking rainfall references…','বৃষ্টির তথ্যসূত্র দেখা হচ্ছে…')}</p></div>`;
+    const readings=container.querySelector('#river-readings');
+    loadPlanningEvidence(container);
     try {
       const res = await fetch("/api/dhaka/rivers", { signal: AbortSignal.timeout(15000) });
       const data = await res.json();
       if (!Array.isArray(data.stations)) throw new Error("Invalid river registry");
+      if(!readings.isConnected)return;
       const isBn = document.documentElement.lang === "bn";
       const escape = value => String(value ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       const date = value => value ? new Date(value).toLocaleString(isBn ? "bn-BD" : "en-GB", { timeZone: "Asia/Dhaka", dateStyle: "medium", timeStyle: "short" }) : tr("Unavailable", "অনুপলব্ধ");
-      container.innerHTML = `
-        <p>${tr("Flood assessment unavailable. Gauge observations and validated warning thresholds are not connected. Rainfall below is a point forecast, not catchment rainfall or a flood warning.", "বন্যা মূল্যায়ন অনুপলব্ধ। গেজ পর্যবেক্ষণ ও যাচাইকৃত সতর্কসীমা সংযুক্ত নেই। নিচের বৃষ্টি নির্দিষ্ট স্থানের পূর্বাভাস; অববাহিকার বৃষ্টিপাত বা বন্যার সতর্কবার্তা নয়।")}</p>
+      readings.innerHTML = `
         <div class="river-reference-list">${data.stations.map(st => {
           const rain = st.rainfall || {};
           const available = rain.status === "ok" && Number.isFinite(rain.value);
@@ -96,13 +130,13 @@
             ${available ? `<small>${tr("Valid", "প্রযোজ্য সময়")}: ${escape(date(rain.validFrom))} – ${escape(date(rain.validTo))} · ${tr("Dhaka time", "ঢাকার সময়")}</small>` : `<small data-language-fixed>${escape(rain.reasonCode || "rainfall-unavailable")}</small>`}
             ${rain.query ? `<small>${available ? tr("Retrieved", "সংগ্রহ") : tr("Attempted", "চেষ্টার সময়")}: ${escape(date(rain.retrievedAt))} · ${escape(rain.source || "Open-Meteo")}</small>` : `<small>${tr("No linked rainfall query", "বৃষ্টির অনুসন্ধান সংযুক্ত নেই")}</small>`}
             ${rain.query ? `<small>${tr("Query point", "অনুসন্ধানের স্থান")}: ${escape(rain.query.latitude)}, ${escape(rain.query.longitude)} · ${tr("Gauge match unvalidated", "গেজের সঙ্গে মিল যাচাই করা হয়নি")}</small>` : ""}
-            <small>${escape(st.station_code)} · ${escape(st.agency)} · ${tr("Unverified registry danger level", "যাচাইহীন তালিকার বিপদসীমা")}: ${escape(st.danger_level_m)} m MSL</small>
+            <small>${escape(st.station_code)} · ${escape(st.agency)} · ${tr("Unverified registry danger level", "যাচাইহীন তালিকার বিপদসীমা")}: ${escape(st.danger_level_m)} m · ${tr('Vertical datum unverified','উচ্চতার ভিত্তি যাচাইহীন')}</small>
           </div></div>`;
         }).join("")}</div>
         <p><a href="https://ffwc.gov.bd" target="_blank" rel="noopener">BWDB / FFWC ↗</a> · <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener">Open-Meteo ↗</a></p>
       `;
     } catch (err) {
-      container.innerHTML = `<p>${tr("River readings and rainfall unavailable. Flood assessment unavailable.", "নদীর পাঠ ও বৃষ্টিপাত অনুপলব্ধ। বন্যা মূল্যায়ন অনুপলব্ধ।")}</p>`;
+      if(readings.isConnected)readings.innerHTML = `<p>${tr("River readings and rainfall unavailable. Flood assessment unavailable.", "নদীর পাঠ ও বৃষ্টিপাত অনুপলব্ধ। বন্যা মূল্যায়ন অনুপলব্ধ।")}</p>`;
     }
   }
 
