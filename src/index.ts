@@ -1003,7 +1003,7 @@ const worker = {
           name_bn: "বাংলাদেশ পানি উন্নয়ন বোর্ড / বন্যা পূর্বাভাস ও সতর্কতা কেন্দ্র",
           sourceUrl: "https://api3.ffwc.gov.bd/",
           note: "API documentation requires registration. Live payload, timestamps, units and station geometry not yet validated.",
-          note_bn: "এপিআই নথিপত্রের জন্য নিবন্ধন প্রয়োজন। লাইভ পেলোড, সময়STAMP, একক ও স্টেশন জ্যামিতি এখনও যাচাই করা হয়নি।।",
+          note_bn: "এপিআই নথিপত্রের জন্য নিবন্ধন প্রয়োজন। লাইভ পেলোড, সময়STAMP, একক ও স্টেশন জ্যামিতি এখনও যাচাই করা হয়নি।",
         },
         stations: RIVER_STATIONS.map(st => ({
           ...st,
@@ -1096,6 +1096,76 @@ const worker = {
         return jsonResponse({status: 'unavailable', reasonCode: 'reference-manifest-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
       }
     }
+
+    // ── /api/dhaka/population ───────────────────────────────────────────────
+    // WorldPop 2025 R2025A gridded population model, aggregated into 1 km cells.
+    // Modeled estimate — not census, not current residents, not capacity.
+    if (url.pathname === "/api/dhaka/population") {
+      const cacheKey = "population:grid-v1";
+      const { data, error } = await fetchWithCache(
+        cacheKey,
+        24 * 60 * 60 * 1000,
+        async () => {
+          const res = await env.ASSETS.fetch(new URL('/data/people-grid.json', request.url));
+          if (!res.ok) throw Error('population-grid-unavailable');
+          return res.json();
+        },
+        null,
+      );
+      if (!data) {
+        return jsonResponse({status: 'unavailable', reasonCode: 'population-grid-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
+      }
+      const grid = data as { columns?: string[]; cells?: unknown[][] };
+      return jsonResponse({
+        status: 'reference',
+        provenance: 'modeled',
+        source: 'WorldPop Global Demographic Data R2025A v1',
+        sourceUrl: 'https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2025/BGD/v1/100m/constrained/bgd_pop_2025_CN_100m_R2025A_v1.tif',
+        doi: '10.5258/SOTON/WP00839',
+        license: 'CC BY 4.0',
+        year: 2025,
+        note: 'Modeled estimate for 2025, not census or current residents. Nodata remains unknown; valid-pixel share is not accuracy or confidence.',
+        note_bn: '২০২৫ সালের মডেলভিত্তিক অনুমান, জনগণনা বা বর্তমান বাসিন্দা নয়। নোডাটা অজানা আছে; বৈধ-পিক্সেল শেয়ার নির্ভুলতা বা বিশ্বাস নয়।',
+        cells: grid.cells?.length ?? 0,
+        grid: grid.columns,
+        data: grid.cells,
+      }, {headers: {'cache-control': 'public, max-age=86400, stale-while-revalidate=604800'}});
+    }
+
+    // ── /api/dhaka/facilities ───────────────────────────────────────────────
+    // Dated OSM school, hospital and clinic objects from Geofabrik Bangladesh extract.
+    // Mapped objects only — no capacity, opening status or service catchments.
+    if (url.pathname === "/api/dhaka/facilities") {
+      const cacheKey = "facilities:osm-v1";
+      const { data, error } = await fetchWithCache(
+        cacheKey,
+        24 * 60 * 60 * 1000,
+        async () => {
+          const res = await env.ASSETS.fetch(new URL('/data/facilities.geojson', request.url));
+          if (!res.ok) throw Error('facilities-grid-unavailable');
+          return res.json();
+        },
+        null,
+      );
+      if (!data) {
+        return jsonResponse({status: 'unavailable', reasonCode: 'facilities-grid-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
+      }
+      const geo = data as { features?: unknown[] };
+      const featureCount = geo.features?.length ?? 0;
+      return jsonResponse({
+        status: 'reference',
+        provenance: 'community_mapped',
+        source: 'OpenStreetMap contributors via Geofabrik Bangladesh extract (261028)',
+        sourceUrl: 'https://download.geofabrik.de/asia/bangladesh-261028.osm.pbf',
+        license: 'ODbL 1.0',
+        observedAt: '2026-10-28T21:21:02Z',
+        note: 'Mapped school, hospital and clinic objects only. Campus objects may duplicate institutions. Incomplete mapping; no capacity, opening status or service catchments. Ways and relations use bounding-box centres.',
+        note_bn: 'শুধুমাত্র স্কুল, হাসপাতাল ও ক্লিনিক অবজেক্টের মানচিত্র। ক্যাম্পাস অবজেক্ট প্রতিষ্ঠান ডুপ্লিকেট করতে পারে। অসম্পূর্ণ মানচিত্রণ; ক্ষমতা, খোলার θέση বা সেবা কভারেজ নেই। ওয়ে ও রিলেশন বাউন্ডিং-বক্স সেন্টার ব্যবহার করে।',
+        objects: featureCount,
+        data: geo,
+      }, {headers: {'cache-control': 'public, max-age=86400, stale-while-revalidate=604800'}});
+    }
+
     if (url.pathname === "/api/atlas/sources") {
       return jsonResponse(await sourceHealth(env), {headers:{"cache-control":"no-store"}});
     }
