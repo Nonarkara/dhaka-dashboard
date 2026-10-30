@@ -5,6 +5,90 @@
  * and Bangladesh Water Development Board (BWDB) / FFWC.
  */
 
+/**
+ * Provenance contract for every spatial feature imported into the Dhaka
+ * planning mode. A feature can have excellent geographic provenance while
+ * its operational readiness, capacity and accessibility remain unknown.
+ *
+ * Never invent coordinates. Accept geometry only from an identified source
+ * record or a reproducible, documented derivation. Preserve the source
+ * identifier, retrieval date, licence, transformation history and uncertainty.
+ */
+export type EvidenceClass =
+  | "official_inventory"
+  | "community_mapped"
+  | "remote_sensing_derived"
+  | "model_output"
+  | "field_verified";
+
+export type GeometryMethod =
+  | "source_geometry"
+  | "reviewed_geocode"
+  | "documented_derivation";
+
+export type VerificationStatus = "unreviewed" | "reviewed" | "field_verified";
+
+export interface SpatialEvidence {
+  sourceName: string;
+  sourceUrl: string;
+  sourceFeatureId: string | null;
+  retrievedAt: string | null;
+  observedAt: string | null;
+  license: string | null;
+  evidenceClass: EvidenceClass;
+  geometryMethod: GeometryMethod;
+  positionalAccuracyM: number | null;
+  verificationStatus: VerificationStatus;
+  limitations: string[];
+}
+
+/** The reviewed Dhaka study boundary: Dhaka North City Corporation (DNCC)
+ * and Dhaka South City Corporation (DSCC), derived from the atlas's own areas
+ * list. Coordinates are a bounding-box approximation for clipping OSM
+ * extracts; they are not administrative polygons and must not be used as
+ * legal boundaries or evacuation zones. */
+export const DHAKA_STUDY_BOUNDARY = {
+  name: "Dhaka North + South City Corporations",
+  name_bn: "ঢাকা উত্তর ও দক্ষিণ সিটি কর্পোরেশন",
+  source: "atlas-curated areas list (public/dhaka-areas.json)",
+  sourceUrl: "/dhaka-areas.json",
+  bbox: [90.23895227009733, 23.594164517100097, 90.55988906432036, 23.960378575820744],
+  crs: "EPSG:4326",
+  limitations: [
+    "Bounding-box approximation of DNCC/DSCC extent, not administrative polygons.",
+    "Does not represent legal jurisdiction or evacuation zones.",
+    "Clip boundary for OSM extract only; features outside are excluded.",
+    "Study boundary must be reviewed against official DNCC/DSCC limits before planning use.",
+  ],
+} as const;
+
+/** Flood scenario types, kept separate because each requires different evidence.
+ * River thresholds must never be reused as implicit citywide waterlogging
+ * triggers; compound flood requires both evidence streams. */
+export const FLOOD_SCENARIO_TYPES = [
+  {
+    id: "river_flood",
+    label: "River flood",
+    label_bn: "নদী বন্যা",
+    note: "River-station gauge levels relative to surveyed danger levels.",
+    note_bn: "নদীগ 정부의 গেজ পতন বিপদসীমার সাপেক্ষে।",
+  },
+  {
+    id: "rainfall_waterlogging",
+    label: "Rainfall waterlogging",
+    label_bn: "বৃষ্টি জলাবদ্ধতা",
+    note: "Urban drainage response to intense local rainfall; not a river threshold.",
+    note_bn: "শহুরে নিকাশের তীব্রস্থানীয় বৃষ্টির প্রতিক্রিয়া; নদী সীমা নয়।",
+  },
+  {
+    id: "compound_flood",
+    label: "Compound flood",
+    label_bn: "সম্মিশ্র বন্যা",
+    note: "Coincident river flood and rainfall waterlogging; requires both evidence streams.",
+    note_bn: "নদী বন্যা ও বৃষ্টি জলাবদ্ধতার মিলন; উভয়প্রকার প্রমাণ প্রয়োজন।",
+  },
+] as const;
+
 export interface MacroIndicator {
   id: string;
   category: "export" | "remittance" | "market" | "inflation" | "reserves" | "currency";
@@ -162,6 +246,10 @@ export interface RiverStation {
   lng: number;
   agency: string;
   source_url: string;
+  /** Provenance for the station location and threshold values. The station
+   * coordinates come from the BWDB/FFWC registry; they are reference
+   * locations, not field-verified survey marks. */
+  evidence?: SpatialEvidence;
 }
 
 export const RIVER_STATIONS: RiverStation[] = [
@@ -182,7 +270,24 @@ export const RIVER_STATIONS: RiverStation[] = [
     lat: 23.7001,
     lng: 90.4150,
     agency: "BWDB / FFWC",
-    source_url: "https://ffwc.gov.bd"
+    source_url: "https://ffwc.gov.bd",
+    evidence: {
+      sourceName: "BWDB / FFWC station registry",
+      sourceUrl: "https://ffwc.gov.bd",
+      sourceFeatureId: "SW42",
+      retrievedAt: null,
+      observedAt: null,
+      license: null,
+      evidenceClass: "official_inventory" as const,
+      geometryMethod: "reviewed_geocode" as const,
+      positionalAccuracyM: null,
+      verificationStatus: "unreviewed" as const,
+      limitations: [
+        "Station coordinates are registry reference values, not field-verified survey marks.",
+        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
+        "No live gauge feed connected; current_level_m is null.",
+      ],
+    },
   },
   {
     id: "turag-mirpur",
@@ -201,7 +306,24 @@ export const RIVER_STATIONS: RiverStation[] = [
     lat: 23.7980,
     lng: 90.3420,
     agency: "BWDB / FFWC",
-    source_url: "https://ffwc.gov.bd"
+    source_url: "https://ffwc.gov.bd",
+    evidence: {
+      sourceName: "BWDB / FFWC station registry",
+      sourceUrl: "https://ffwc.gov.bd",
+      sourceFeatureId: "SW299",
+      retrievedAt: null,
+      observedAt: null,
+      license: null,
+      evidenceClass: "official_inventory" as const,
+      geometryMethod: "reviewed_geocode" as const,
+      positionalAccuracyM: null,
+      verificationStatus: "unreviewed" as const,
+      limitations: [
+        "Station coordinates are registry reference values, not field-verified survey marks.",
+        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
+        "No live gauge feed connected; current_level_m is null.",
+      ],
+    },
   },
   {
     id: "balu-demra",
@@ -220,7 +342,24 @@ export const RIVER_STATIONS: RiverStation[] = [
     lat: 23.7140,
     lng: 90.5050,
     agency: "BWDB / FFWC",
-    source_url: "https://ffwc.gov.bd"
+    source_url: "https://ffwc.gov.bd",
+    evidence: {
+      sourceName: "BWDB / FFWC station registry",
+      sourceUrl: "https://ffwc.gov.bd",
+      sourceFeatureId: "SW08",
+      retrievedAt: null,
+      observedAt: null,
+      license: null,
+      evidenceClass: "official_inventory" as const,
+      geometryMethod: "reviewed_geocode" as const,
+      positionalAccuracyM: null,
+      verificationStatus: "unreviewed" as const,
+      limitations: [
+        "Station coordinates are registry reference values, not field-verified survey marks.",
+        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
+        "No live gauge feed connected; current_level_m is null.",
+      ],
+    },
   },
   {
     id: "lakhya-narayanganj",
@@ -239,7 +378,24 @@ export const RIVER_STATIONS: RiverStation[] = [
     lat: 23.6190,
     lng: 90.5110,
     agency: "BWDB / FFWC",
-    source_url: "https://ffwc.gov.bd"
+    source_url: "https://ffwc.gov.bd",
+    evidence: {
+      sourceName: "BWDB / FFWC station registry",
+      sourceUrl: "https://ffwc.gov.bd",
+      sourceFeatureId: "SW179",
+      retrievedAt: null,
+      observedAt: null,
+      license: null,
+      evidenceClass: "official_inventory" as const,
+      geometryMethod: "reviewed_geocode" as const,
+      positionalAccuracyM: null,
+      verificationStatus: "unreviewed" as const,
+      limitations: [
+        "Station coordinates are registry reference values, not field-verified survey marks.",
+        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
+        "No live gauge feed connected; current_level_m is null.",
+      ],
+    },
   },
   {
     id: "tongi-khal-tongi",
@@ -258,7 +414,24 @@ export const RIVER_STATIONS: RiverStation[] = [
     lat: 23.8890,
     lng: 90.4010,
     agency: "BWDB / FFWC",
-    source_url: "https://ffwc.gov.bd"
+    source_url: "https://ffwc.gov.bd",
+    evidence: {
+      sourceName: "BWDB / FFWC station registry",
+      sourceUrl: "https://ffwc.gov.bd",
+      sourceFeatureId: "SW298",
+      retrievedAt: null,
+      observedAt: null,
+      license: null,
+      evidenceClass: "official_inventory" as const,
+      geometryMethod: "reviewed_geocode" as const,
+      positionalAccuracyM: null,
+      verificationStatus: "unreviewed" as const,
+      limitations: [
+        "Station coordinates are registry reference values, not field-verified survey marks.",
+        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
+        "No live gauge feed connected; current_level_m is null.",
+      ],
+    },
   },
   {
     id: "dhaleshwari-rekabi-bazar",
@@ -277,7 +450,24 @@ export const RIVER_STATIONS: RiverStation[] = [
     lat: 23.5630,
     lng: 90.4950,
     agency: "BWDB / FFWC",
-    source_url: "https://ffwc.gov.bd"
+    source_url: "https://ffwc.gov.bd",
+    evidence: {
+      sourceName: "BWDB / FFWC station registry",
+      sourceUrl: "https://ffwc.gov.bd",
+      sourceFeatureId: "SW68",
+      retrievedAt: null,
+      observedAt: null,
+      license: null,
+      evidenceClass: "official_inventory" as const,
+      geometryMethod: "reviewed_geocode" as const,
+      positionalAccuracyM: null,
+      verificationStatus: "unreviewed" as const,
+      limitations: [
+        "Station coordinates are registry reference values, not field-verified survey marks.",
+        "Danger levels are officially surveyed benchmarks (m MSL) but unverified against live observations.",
+        "No live gauge feed connected; current_level_m is null.",
+      ],
+    },
   }
 ];
 
@@ -372,3 +562,71 @@ export const AIR_STATIONS: AirStation[] = [
     characteristic_bn: "ইটভাটা ক্লাস্টার এবং পোশাক শিল্পের বয়লার নির্গমন"
   }
 ];
+
+/** DDM (Department of Disaster Management) shelter inventory source.
+ * The DDM table is publicly accessible but reuse terms are pending review.
+ * Records contain name, area, constructed_by, construction_year,
+ * covering_people, location, contact_person and status — but NO coordinates.
+ * No shelter pin may be created without source geometry or a reviewed
+ * building-level match. Operational readiness, capacity and accessibility
+ * are kept as separate attributes from the source listing. */
+export const DDM_SHELTER_SOURCE = {
+  name: "Department of Disaster Management (DDM) AWARE Shelter Information",
+  name_bn: "দ্য departamento এর দুর্যোগ ব্যবস্থাপনা বিভাগ আশ্রয় তথ্য",
+  sourceUrl: "https://rapid.ddm.gov.bd/service/shelter_info",
+  agency: "Department of Disaster Management (DDM), Ministry of Disaster Management and Relief",
+  retrievedAt: null,
+  recordCount: null,
+  dhakaRecordCount: null,
+  limitations: [
+    "Source page is HTML table; no machine-readable API discovered.",
+    "Table has no latitude/longitude columns; coordinates must come from source geometry or reviewed building-level match.",
+    "National inventory — Dhaka North/South coverage not yet established.",
+    "covering_people is source-reported, not verified available capacity.",
+    "Personal contact details must not be republished in the public interface.",
+    "Reuse terms pending review — treat as publicly accessible, not open data.",
+  ],
+} as const;
+
+export interface ShelterReadiness {
+  /** Separate from the source listing: operational status for a specific event. */
+  operationalStatus: "unreviewed" | "reviewed" | "field_verified" | "closed" | "capacity-limited";
+  capacityVerified: boolean;
+  accessibilityReviewed: boolean;
+  structuralAssessment: boolean;
+  ownerOperatorPermission: boolean;
+  operatingArrangements: boolean;
+  reviewedAt: string | null;
+  reviewedBy: string | null;
+  limitations: string[];
+}
+
+export interface ShelterRegisterEntry {
+  id: string;
+  name: string;
+  name_bn: string | null;
+  type: "cyclone_shelter" | "flood_shelter" | "disaster_killa" | "unreviewed";
+  area: string | null;
+  area_bn: string | null;
+  constructedBy: string | null;
+  constructionYear: number | null;
+  coveringPeople: number | null;
+  coveringPeopleUnit: "source-reported" | "verified" | null;
+  location: string | null;
+  /** Geometry is null until source geometry or reviewed building-level match exists. */
+  lat: number | null;
+  lng: number | null;
+  evidence: SpatialEvidence;
+  readiness: ShelterReadiness;
+  /** Whether this entry may appear as a map pin. False until geometry is reviewed. */
+  mappable: boolean;
+}
+
+/** The DDM shelter register. Starts empty: no shelter pins are created
+ * without source geometry or a reviewed building-level match. */
+export const SHELTER_REGISTER: ShelterRegisterEntry[] = [];
+
+/** Shelter scenario types, separate from flood scenario types. */
+export const SHELTER_SCENARIO_TYPES = [
+  { id: "shelter_inventory_review", label: "Shelter inventory review", label_bn: "আশ্রয় তালিকা পর্যালোচনা", note: "DDM national shelter inventory; Dhaka records unreviewed.", note_bn: "DDM জাতীয় আশ্রয় তালিকা; ঢাকা রেকর্ড পর্যালোচনাধীন।" },
+] as const;

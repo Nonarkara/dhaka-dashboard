@@ -6,7 +6,7 @@ import { checkRateLimit } from "./rate-limit.js";
 import type { RateLimitEnv } from "./rate-limit.js";
 import { inspectGibsTile, workerInflate } from "./gibs-png.js";
 import { GIBS_CATALOGUE_CAPTURED, GIBS_CATALOGUE_LATEST } from "./gibs-catalogue.js";
-import { MACRO_INDICATORS, RIVER_STATIONS, AIR_STATIONS } from "./dhaka-data.js";
+import { MACRO_INDICATORS, RIVER_STATIONS, AIR_STATIONS, DHAKA_STUDY_BOUNDARY, FLOOD_SCENARIO_TYPES, DDM_SHELTER_SOURCE, SHELTER_REGISTER, SHELTER_SCENARIO_TYPES } from "./dhaka-data.js";
 import { buildCollage, DOMAINS, type CollageResult, type CorridorPoint, type District } from "./collage.js";
 
 export interface Env extends RateLimitEnv, SnapshotEnv {
@@ -922,12 +922,14 @@ const worker = {
             observedAt: null,
             timestamp: new Date().toISOString(),
             stations,
+            studyBoundary: DHAKA_STUDY_BOUNDARY,
+            scenarioTypes: FLOOD_SCENARIO_TYPES,
             summary: {
               assessed: 0, unavailable: stations.length,
               rainfallAvailable: stations.filter(s => s.rainfall.status === "ok").length,
               rainfallUnavailable: stations.filter(s => s.rainfall.status !== "ok").length,
             },
-            note: "Registry danger levels are unverified reference values. Point rainfall forecasts do not establish river levels, catchment saturation or flood warnings.",
+            note: "Registry danger levels are unverified reference values. Point rainfall forecasts do not establish river levels, catchment saturation or flood warnings. Scenario types are classifications only; none establishes a warning, evacuation route or shelter assignment.",
           };
         },
         null,
@@ -941,12 +943,37 @@ const worker = {
           observedAt: null,
           readingsStatus: "unavailable",
           stations: RIVER_STATIONS.map(s => ({ ...s, rainfall: { status: "unavailable", value: null, unit: "mm", reasonCode: "upstream-unreachable", retrievedAt: new Date().toISOString() }, floodRisk: { status: "unavailable", tier: null, reasonCode: "validated-flood-assessment-not-connected", timestamp: new Date().toISOString() } })),
+          studyBoundary: DHAKA_STUDY_BOUNDARY,
+          scenarioTypes: FLOOD_SCENARIO_TYPES,
           timestamp: new Date().toISOString(),
           error: error || null,
         }, { status: 503 });
       }
 
       return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200 });
+    }
+
+    // ── /api/dhaka/shelters ────────────────────────────────────────────────────
+    // DDM shelter register: reviewable inventory only. No shelter pin is
+    // created without source geometry or a reviewed building-level match.
+    // Operational readiness, capacity and accessibility are separate from the
+    // source listing. DDM source page is publicly accessible; reuse terms
+    // pending review — not treated as open data.
+    if (url.pathname === "/api/dhaka/shelters") {
+      return jsonResponse({
+        status: "unreviewed",
+        city: "Dhaka",
+        provenance: "reference",
+        reasonCode: "shelter-register-pending-review",
+        retrievedAt: new Date().toISOString(),
+        source: DDM_SHELTER_SOURCE,
+        register: SHELTER_REGISTER,
+        registerCount: SHELTER_REGISTER.length,
+        mappableCount: SHELTER_REGISTER.filter(s => s.mappable).length,
+        scenarioTypes: SHELTER_SCENARIO_TYPES,
+        note: "DDM national shelter inventory is publicly accessible but has no machine-readable API, no coordinates, and unreviewed Dhaka coverage. No shelter pins are created until source geometry or a reviewed building-level match exists. Official listing is not operational readiness.",
+        note_bn: "DDM জাতীয় আশ্রয় তালিকা জনগণের জন্য উন্মুক্ত তবে কোনো মেশিন-পাঠযোগ্য এপিআই, স্থানাঙ্ক বা পর্যালোচিত ঢাকা কভারেজ নেই। জ্যামিতি বা পর্যালোচিত ভবন-স্তরের মিল না থাকা পর্যন্ত কোনো আশ্রয় পিন তৈরি করা হয় না। অফিসিয়াল তালিকা চালু অবস্থার সমান নয়।",
+      }, { headers: { "cache-control": "no-store" } });
     }
 
     // ── /api/dhaka/economy ───────────────────────────────────────────────────
