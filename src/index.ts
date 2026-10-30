@@ -1,5 +1,6 @@
 import { readSnapshot, collectSnapshot, sourceHealth, observationHistory, historicalSnapshot, type SnapshotEnv } from "./snapshots.js";
 import { getInstruments } from "./instruments.js";
+import { publicShelterRegister } from "./planning.js";
 import { getOutlook } from "./outlook.js";
 import { BUILD_ID, ATLAS_VERSION } from "./build-id.js";
 import { checkRateLimit } from "./rate-limit.js";
@@ -960,19 +961,25 @@ const worker = {
     // source listing. DDM source page is publicly accessible; reuse terms
     // pending review — not treated as open data.
     if (url.pathname === "/api/dhaka/shelters") {
+      const register=publicShelterRegister(SHELTER_REGISTER);
       return jsonResponse({
         status: "unreviewed",
         city: "Dhaka",
         provenance: "reference",
         reasonCode: "shelter-register-pending-review",
-        retrievedAt: new Date().toISOString(),
+        timestamp: new Date().toISOString(),
+        retrievedAt: DDM_SHELTER_SOURCE.retrievedAt,
+        observedAt: null,
         source: DDM_SHELTER_SOURCE,
-        register: SHELTER_REGISTER,
-        registerCount: SHELTER_REGISTER.length,
-        mappableCount: SHELTER_REGISTER.filter(s => s.mappable).length,
+        register,
+        registerCount: register.length,
+        mappableCount: register.filter(s => s.mappable).length,
+        studyBoundary: DHAKA_STUDY_BOUNDARY,
+        inventoryStatus: "not-imported",
+        readinessStatus: "not-derived-from-listing",
         scenarioTypes: SHELTER_SCENARIO_TYPES,
-        note: "DDM national shelter inventory is publicly accessible but has no machine-readable API, no coordinates, and unreviewed Dhaka coverage. No shelter pins are created until source geometry or a reviewed building-level match exists. Official listing is not operational readiness.",
-        note_bn: "DDM জাতীয় আশ্রয় তালিকা জনগণের জন্য উন্মুক্ত তবে কোনো মেশিন-পাঠযোগ্য এপিআই, স্থানাঙ্ক বা পর্যালোচিত ঢাকা কভারেজ নেই। জ্যামিতি বা পর্যালোচিত ভবন-স্তরের মিল না থাকা পর্যন্ত কোনো আশ্রয় পিন তৈরি করা হয় না। অফিসিয়াল তালিকা চালু অবস্থার সমান নয়।",
+        note: "The DDM page embeds structured coordinates. Source-structure counts do not establish individual location accuracy, municipal coverage or operational readiness. No records are imported and no shelter pins are published pending location and publication review.",
+        note_bn: "DDM পাতায় কাঠামোবদ্ধ স্থানাঙ্ক রয়েছে। উৎসের রেকর্ডের সংখ্যা দিয়ে প্রতিটি অবস্থানের নির্ভুলতা, পৌর এলাকার আওতা বা কার্যকর প্রস্তুতি প্রতিষ্ঠিত হয় না। অবস্থান ও প্রকাশের পর্যালোচনা না হওয়া পর্যন্ত কোনো রেকর্ড আমদানি বা আশ্রয়কেন্দ্রের চিহ্ন প্রকাশ করা হয়নি।",
       }, { headers: { "cache-control": "no-store" } });
     }
 

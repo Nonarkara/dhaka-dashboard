@@ -449,6 +449,11 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .people-inspection #people-close { float:right; margin-left:6px; }
 .people-inspection > a,.people-inspection > label { display:block; margin-top:6px; }
 .people-inspection select { width:100%; min-height:36px; font:inherit; background:var(--bg); color:var(--ink); border:1px solid var(--line); }
+.planning-evidence { margin:8px 0; font-size:14px; line-height:1.4; }
+.planning-evidence summary { min-height:36px; padding:6px 0; cursor:pointer; font-weight:600; }
+.planning-evidence p { max-width:65ch; margin:6px 0; }
+.planning-evidence a { display:inline-block; min-height:36px; padding:6px 0; }
+.planning-evidence button { min-height:36px; }
 @media (max-width:600px) {
   .atlas-observation-hud.people-inspection { top:120px; bottom:auto; left:8px; right:auto; max-height:42%; }
 }

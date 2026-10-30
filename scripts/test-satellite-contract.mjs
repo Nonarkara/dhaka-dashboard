@@ -26,7 +26,8 @@ const { GIBS_CATALOGUE_LATEST } = await import("../src/gibs-catalogue.ts");
 const { readingsFromMeasurements } = await import("../src/collage.ts");
 
 let checks = 0;
-const ok = (label, fn) => { fn(); checks++; };
+const cases = [];
+const ok = (label, fn) => { cases.push({ label, fn }); };
 
 // ── 1. Every measured layer exists in the capabilities catalogue ────────────
 ok("every measured layer exists in the GIBS catalogue", () => {
@@ -415,20 +416,49 @@ ok("no reading claims a rate of change from a single observation", async () => {
 // ── 10c. The cache must not remember a failure for long ────────────────────
 ok("a failed tile is not cached for the life of the isolate", async () => {
   const { gibsTileCacheStats } = await import("../src/satellite.ts");
-  const { measureLayer, MEASURED_LAYERS } = await import("../src/satellite.ts");
-  // A tile far outside the published range: the fetch will fail.
-  const layer = { ...MEASURED_LAYERS[0], id: "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance" };
-  await measureLayer(layer, [{ id: "x", lat: 89.9, lng: 179.9 }], 1, ["2020-01-01"]);
-  const stats = gibsTileCacheStats();
-  // A failure may be remembered briefly, so a transient network error does
-  // not hammer the upstream on every request — but it must expire. A failure
-  // cached for the life of the isolate would keep a district reporting "no
-  // observation" for hours after the sky cleared.
-  assert.ok(stats.failures >= 0, "the cache is not reporting its failures");
-  assert.ok(stats.maxFailureTtlMs <= 60_000,
-    `a cached failure can still be served for ${stats.maxFailureTtlMs} ms`);
-  assert.ok(stats.maxFailureTtlMs < 30 * 60_000,
-    "a cached failure outlives the successful-tile TTL");
+  // This static, colormapped layer skips date discovery. A zero-radius
+  // window touches exactly one tile, so the failure and retry counts are exact.
+  const layer = MEASURED_LAYERS.find(l => l.id === "Landsat_Human_Built-up_And_Settlement_Extent");
+  assert.ok(layer?.static && GIBS_COLORMAPS[layer.id], "the cache experiment needs a known static colour map");
+  const points = [{ id: "cache-probe", lat: 23.81, lng: 90.41 }];
+  const originalFetch = globalThis.fetch;
+  const originalNow = Date.now;
+  let now = Date.UTC(2026, 9, 30);
+  const requests = [];
+  try {
+    Date.now = () => now;
+    globalThis.fetch = async url => {
+      requests.push(String(url));
+      return new Response("controlled upstream failure", { status: 503 });
+    };
+    assert.equal(gibsTileCacheStats().failures, 0, "the experiment must start without cached failures");
+    const first = await measureLayer(layer, points, 0);
+    assert.equal(first.measurements[0].status, "unavailable");
+    assert.equal(first.measurements[0].reasonCode, "cloud-or-no-observation");
+    assert.equal(first.measurements[0].value, null);
+    assert.equal(requests.length, 1, "the first failure must attempt exactly one tile");
+    assert.ok(requests[0].includes(layer.id), "the experiment fetched the wrong layer");
+    assert.equal(gibsTileCacheStats().failures, 1, "the failed tile was not cached");
+    assert.equal(gibsTileCacheStats().maxFailureTtlMs, 60_000, "a cached failure must expire in one minute");
+
+    now += 59_999;
+    await measureLayer(layer, points, 0);
+    assert.equal(requests.length, 1, "the cached failure caused another outbound request before expiry");
+    assert.equal(gibsTileCacheStats().failures, 1);
+    assert.equal(gibsTileCacheStats().maxFailureTtlMs, 1);
+
+    now += 2;
+    assert.equal(gibsTileCacheStats().failures, 0, "an expired failure is still counted as active");
+    assert.equal(gibsTileCacheStats().maxFailureTtlMs, 0);
+    await measureLayer(layer, points, 0);
+    assert.equal(requests.length, 2, "an expired failure prevented the tile retry");
+    assert.equal(requests[1], requests[0], "the retry must fetch the same tile");
+    assert.equal(gibsTileCacheStats().failures, 1);
+    assert.equal(gibsTileCacheStats().maxFailureTtlMs, 60_000);
+  } finally {
+    globalThis.fetch = originalFetch;
+    Date.now = originalNow;
+  }
 });
 
 // ── 11. No fabricated figures survive in the economy registry ─────────────
@@ -464,5 +494,15 @@ ok("the prose audit reports no unsourced quantity in a description", () => {
     assert.ok(!corpus.includes(phrase), `the unsourced phrase "${phrase}" is still in the descriptions`);
   }
 });
+
+for (const { label, fn } of cases) {
+  try {
+    await fn();
+    checks++;
+  } catch (error) {
+    console.error(`✗ Satellite contract: ${label}`);
+    throw error;
+  }
+}
 
 console.log(`✓ Satellite contract: ${checks} checks passed — catalogue, colour maps, tile geometry, units, coverage, ranking and no unsourced figures`);

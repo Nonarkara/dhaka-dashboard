@@ -42,5 +42,6 @@ npm run verify:satellite
 
 node scripts/verify-snapshots-live.mjs
 node scripts/verify-people-live.mjs
+node scripts/verify-planning-live.mjs
 
 echo "==> Deploy complete: dhaka.nonarkara.org is live!"

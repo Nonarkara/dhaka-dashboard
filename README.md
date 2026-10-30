@@ -8,12 +8,13 @@ A 3D civic atlas and operational dashboard for Greater Metropolitan Dhaka where 
 
 ## 1. Capabilities & Lenses
 
-DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and environmental monitoring across 13 interactive lenses:
+DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and environmental monitoring across 14 interactive lenses:
 
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
 | **City in 3D** | OSM building extrusions at zoom 14+ in every 3D lens; local Parliament-area footprints preserve courtyards (mapped or estimated heights), plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
 | **River outlook** | Northeast GloFAS daily model reaches with ensemble quartiles and available-series maxima; Dhaka reference station registry has no connected observations or calibrated warnings | Bangladesh Water Development Board (BWDB) / FFWC |
+| **Population** | Dated WorldPop 2025 estimates in 1 km cells and 2,181 mapped school/healthcare objects; no census or capacity inference | WorldPop / OpenStreetMap |
 | **Economic engine** | Ready-Made Garment (RMG) export corridors, Savar DEPZ, Adamjee EPZ, Motijheel financial district, and wholesale hubs (Kawran Bazar, Islampur, Chawkbazar) | Export Promotion Bureau (EPB), Bangladesh Bank, DSE |
 | **Transit & Metro** | Dhaka Metro Rail (MRT Line 6) stations, Dhaka Elevated Expressway, Kamalapur central rail terminal, and Sadarghat launch terminal | DMTCL, DTCA, Bangladesh Railway, BIWTA |
 | **Air forecast** | Regional CAMS PM2.5 playback at approximately 45 km in native three-hour steps for the next 48 hours; city-center 72-hour timeline remains in the air desk | Copernicus CAMS / Open-Meteo |
@@ -38,13 +39,13 @@ Rivers likewise retain station geography and threshold references, but current l
 
 ## 3. Hydrology & River Ring
 
-Dhaka is an island city encircled by rivers. DHKx retains six reference station locations. The benchmarks below are unverified registry entries; current observations are not connected:
-- **Buriganga River at Dhaka (Mill Barrage)**: Danger Level 5.55 m MSL
-- **Turag River at Mirpur**: Danger Level 5.50 m MSL
-- **Balu River at Demra**: Danger Level 5.75 m MSL
-- **Shitalakshya River at Narayanganj**: Danger Level 5.50 m MSL
-- **Tongi Khal at Tongi**: Danger Level 6.08 m MSL
-- **Dhaleshwari River at Rekabi Bazar**: Danger Level 5.18 m MSL
+DHKx retains six legacy river-station reference locations; authoritative location/code/threshold matches and vertical datums remain unverified. The benchmarks below are unverified registry entries; current observations are not connected:
+- **Buriganga River at Dhaka (Mill Barrage)**: Danger Level 5.55 m (vertical datum unverified)
+- **Turag River at Mirpur**: Danger Level 5.50 m (vertical datum unverified)
+- **Balu River at Demra**: Danger Level 5.75 m (vertical datum unverified)
+- **Shitalakshya River at Narayanganj**: Danger Level 5.50 m (vertical datum unverified)
+- **Tongi Khal at Tongi**: Danger Level 6.08 m (vertical datum unverified)
+- **Dhaleshwari River at Rekabi Bazar**: Danger Level 5.18 m (vertical datum unverified)
 
 ---
 
@@ -75,6 +76,7 @@ The dashboard runs on a Cloudflare Worker serving a zero-bundle-overhead static 
 | `/api/atlas/collage` | GET | Seven instruments near sampled places; stored snapshot with age and sampling footprint |
 | `/api/atlas/watch` | GET | Real-time status indicators for flood, air, weather, and economy |
 | `/api/dhaka/rivers` | GET | Reference station registry; current readings unavailable |
+| `/api/dhaka/shelters` | GET | Dated DDM source-structure review; imported register and publication eligibility are separate from source counts/readiness |
 | `/api/dhaka/economy` | GET | Sourced macroeconomic indicators and EPZ industrial clusters |
 | `/api/dhaka/transit` | GET | MRT Line 6 stations, elevated expressway, and transit hubs |
 
@@ -114,3 +116,5 @@ npm run deploy:live
 ## 7. Institutional Attribution
 
 Built by **Dr Non Arkaraprasertkul**, Senior Expert in Smart City Promotion at the Digital Economy Promotion Agency (DEPA) of Thailand. Dedicated to sustainable delta urbanism, civic open data, and smart city twin comparative research across Southeast Asia and South Asia.
+
+Planning provenance/source review: [docs/DHAKA-PLANNING-PROVENANCE.md](docs/DHAKA-PLANNING-PROVENANCE.md). The study extent derives from the population grid, not municipal polygons. DDM embeds coordinates, but source points are unreviewed and no shelter records or pins have been imported.

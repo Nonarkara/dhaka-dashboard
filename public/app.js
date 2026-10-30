@@ -792,11 +792,12 @@
     let rowsHtml = "";
     if (type === "gauge") {
       rowsHtml = `
-        <div class="hud-row"><span class="hud-label">River:</span><span class="hud-value">${props.river || "Buriganga"}</span></div>
-        <div class="hud-row"><span class="hud-label">Station Code:</span><span class="hud-value">${props.station_id || "SW42"}</span></div>
-        <div class="hud-row"><span class="hud-label">Danger Level:</span><span class="hud-value">${props.danger_level_m} m MSL</span></div>
-        <div class="hud-row"><span class="hud-label">Current Reading:</span><span class="hud-value" style="color:var(--dim)">${tr("Unavailable · no connected gauge feed", "অনুপলব্ধ · পর্যবেক্ষণ সংযুক্ত নেই")}</span></div>
-        <div class="hud-row"><span class="hud-label">Status:</span><span class="hud-value">${tr("Reference station · not a live reading", "তথ্যসূত্র স্টেশন · সরাসরি পর্যবেক্ষণ নয়")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr('River','নদী')}:</span><span class="hud-value">${props.river || tr('Unknown','অজানা')}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr('Reference code','তথ্যসূত্র কোড')}:</span><span class="hud-value">${props.station_id || tr('Unknown','অজানা')}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr('Unverified threshold','যাচাইহীন বিপদসীমা')}:</span><span class="hud-value">${Number.isFinite(props.danger_level_m) ? props.danger_level_m+' m' : tr('Unknown','অজানা')}</span></div>
+        <p>${tr('Location, code match, threshold and vertical datum are unverified. Provider link is not evidence of a surveyed gauge location.','অবস্থান, কোডের মিল, বিপদসীমা ও উচ্চতার ভিত্তি যাচাই হয়নি। উৎসের লিংক দিয়ে গেজের জরিপকৃত অবস্থান প্রতিষ্ঠা হয় না।')}</p>
+        <div class="hud-row"><span class="hud-label">${tr('Current reading','বর্তমান পাঠ')}:</span><span class="hud-value" style="color:var(--dim)">${tr("Unavailable · no connected gauge feed", "অনুপলব্ধ · পর্যবেক্ষণ সংযুক্ত নেই")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr('Status','অবস্থা')}:</span><span class="hud-value">${tr("Reference station · not a live reading", "তথ্যসূত্র স্টেশন · সরাসরি পর্যবেক্ষণ নয়")}</span></div>
       `;
     } else if (type === "building") {
       const use = ({apartments:tr("Apartments","অ্যাপার্টমেন্ট"), retail:tr("Retail / markets","খুচরা / বাজার"), mosque:tr("Religious use","ধর্মীয় ব্যবহার"), education:tr("Education","শিক্ষা"), healthcare:tr("Healthcare","স্বাস্থ্যসেবা"), civic:tr("Civic / community","নাগরিক / সামাজিক"), commerce:tr("Commerce","বাণিজ্য"), homes:tr("Homes","আবাসন"), industry:tr("Industry / utilities","শিল্প / পরিষেবা"), unknown:tr("Use unknown","ব্যবহার অজানা")})[props.use_class] || tr("Use unknown","ব্যবহার অজানা");
