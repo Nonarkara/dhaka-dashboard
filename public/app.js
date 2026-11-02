@@ -1380,23 +1380,35 @@
 
   function renderCityWatch() {
     const ind = watchData?.indicators;
-    const unknown = tr("Unavailable", "অনুপলব্ধ");
-    const modeled = tr("Model", "মডেল");
+    const unknown = "—";
     const category = {Good:"ভালো", Moderate:"মাঝারি", "Unhealthy for Sensitive Groups":"সংবেদনশীলদের জন্য অস্বাস্থ্যকর", Unhealthy:"অস্বাস্থ্যকর", "Very Unhealthy":"অত্যন্ত অস্বাস্থ্যকর", Hazardous:"বিপজ্জনক"};
     const values = {
-      flood: unknown + tr(" · flood assessment", " · বন্যা মূল্যায়ন"),
-      air: Number.isFinite(ind?.airQuality?.us_aqi) ? `${modeled} · AQI ${ind.airQuality.us_aqi} · ${tr(ind.airQuality.category, category[ind.airQuality.category])}` : unknown,
-      wind: Number.isFinite(ind?.weather?.wind_speed_10m) ? `${modeled} · ${ind.weather.wind_speed_10m} km/h · ${ind.weather.wind_direction_10m}°` : unknown,
-      traffic: unknown + tr(" · dated bulletin", " · তারিখযুক্ত বুলেটিন"),
+      flood: { value: unknown, tier: "unavailable", title: tr("No calibrated flood assessment · BWDB / FFWC gauge feed not connected","ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়") },
+      air: { value: unknown, tier: "unavailable", title: tr("Air quality data unavailable","বায়ুমান তথ্য অনুপলব্ধ") },
+      wind: { value: unknown, tier: "unavailable", title: tr("Wind data unavailable","বাতুঁ তথ্য অনুপলব্ধ") },
+      traffic: { value: unknown, tier: "unavailable", title: tr("Economic data unavailable · no dated bulletin","অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই") },
     };
-    for (const [key, value] of Object.entries(values)) {
+    if (ind) {
+      if (Number.isFinite(ind.airQuality?.us_aqi)) {
+        values.air = { value: `AQI ${ind.airQuality.us_aqi}`, tier: ind.airQuality.status || "ok", title: `${ind.airQuality.source || ""} · ${ind.airQuality.category || ""} · ${ind.airQuality.observedAt || ""}` };
+      }
+      if (Number.isFinite(ind.weather?.wind_speed_10m)) {
+        values.wind = { value: `${ind.weather.wind_speed_10m} km/h`, tier: "ok", title: `Wind ${ind.weather.wind_direction_10m}° · ${ind.weather.observedAt || ""}` };
+      }
+      if (ind.floodRisk && ind.floodRisk.status !== "unavailable") {
+        values.flood = { value: ind.floodRisk.tier || "—", tier: ind.floodRisk.status, title: `${ind.floodRisk.source || ""} · ${ind.floodRisk.reasonCode || ""}` };
+      }
+      if (ind.economy && ind.economy.status !== "unavailable") {
+        values.traffic = { value: ind.economy.status, tier: ind.economy.status, title: `${ind.economy.source || ""} · ${ind.economy.reasonCode || ""}` };
+      }
+    }
+    for (const [key, v] of Object.entries(values)) {
       const el = $(`#atlas-watch-${key}-value`);
-      if (el) el.textContent = value;
+      if (el) el.textContent = v.value;
       const item = $(`#atlas-watch-${key}`);
       if (item) {
-        const feed = ind?.[({flood:"floodRisk",air:"airQuality",wind:"weather",traffic:"economy"})[key]];
-        item.dataset.tier = key === "flood" ? "unavailable" : feed?.status || "unavailable";
-        item.title = `${feed?.source || ""} · ${feed?.observedAt || feed?.reasonCode || "unavailable"}`;
+        item.dataset.tier = v.tier;
+        item.title = v.title;
       }
     }
   }

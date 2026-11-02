@@ -411,6 +411,11 @@ body {
 .atlas-watch-item[data-tier="warning"] strong { color: var(--amber); }
 .atlas-watch-item[data-tier="danger"] strong { color: var(--warn); }
 .atlas-watch-item[data-tier="ok"] strong { color: var(--ok); }
+.atlas-watch-item[data-tier="unavailable"] strong { color: var(--dim); }
+.atlas-watch-item[data-tier="warning"] .watch-symbol { color: var(--amber); }
+.atlas-watch-item[data-tier="danger"] .watch-symbol { color: var(--warn); }
+.atlas-watch-item[data-tier="ok"] .watch-symbol { color: var(--ok); }
+.atlas-watch-item[data-tier="unavailable"] .watch-symbol { color: var(--dim); }
 
 /* ── Floating Observation HUD ─────────────────────────────────────────────── */
 .atlas-observation-hud {
