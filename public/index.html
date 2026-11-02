@@ -37,50 +37,41 @@
           <option value="night">Night lights</option><option value="water">Flood inundation</option>
         </select>
       </label>
-      <div class="atlas-instruments" id="atlas-instruments" role="group" aria-label="National reference data"></div>
-      <nav class="atlas-header-nav" aria-label="Atlas controls">
-        <button type="button" id="language-toggle" class="atlas-btn" aria-label="Switch language">English</button>
-        <details class="atlas-menu" id="atlas-menu">
-          <summary class="atlas-menu-summary">Map</summary>
-          <div class="atlas-menu-body"><button type="button" class="atlas-btn" data-open="national-data-dialog">Bangladesh data</button>
-            <button type="button" class="atlas-btn" data-open="collage-dialog">Satellite samples by place</button>
-            <button type="button" id="language-toggle-menu" class="atlas-btn" aria-label="Switch language">English</button>        <label class="atlas-control-label">
-          <span>Map view</span>
-          <select id="atlas-view" class="atlas-select" aria-label="Map view">
-            <option value="3d" selected>3D city</option>
-            <option value="2d">2D map</option>
-          </select>
-        </label>
-
-        <label class="atlas-control-label">
-          <span>Basemap</span>
-          <select id="atlas-basemap" class="atlas-select" aria-label="Basemap">
-            <option value="esri" selected>Esri satellite</option>
-            <option value="osm">OpenStreetMap streets</option>
-          </select>
-        </label>
-
-
-            <button type="button" class="atlas-btn" data-open="quick-jump-dialog">Quick jump</button>
-            <button type="button" class="atlas-btn" data-open="flood-dialog">Rivers &amp; flood desk</button>
-            <button type="button" class="atlas-btn" data-open="air-dialog">Air quality &amp; smoke</button>
-            <button type="button" class="atlas-btn" data-open="economy-dialog">Macroeconomic engine</button>
-            <button type="button" class="atlas-btn" data-open="transit-dialog">Metro &amp; mobility</button>
-            <a href="/research">How it is built (Research &amp; Method) ↗</a>
-            <a href="/api/atlas/watch" target="_blank" rel="noopener">City watch API (JSON) ↗</a>
-            <button type="button" id="download-geojson-btn" class="atlas-btn">Download view (GeoJSON)</button>
-            
-            <label class="atlas-control-label" style="margin-top:8px;">
-              <span>Appearance</span>
-              <select id="atlas-theme" class="atlas-select" aria-label="Appearance">
-                <option value="dark" selected>Dark · delta night</option>
-                <option value="light">Light · city daylight</option>
-                <option value="contrast">High contrast</option>
-              </select>
-            </label>
-          </div>
-        </details>
-      </nav>
+      <button type="button" id="language-toggle" class="atlas-btn" aria-label="Switch language">EN</button>
+      <details class="atlas-menu" id="atlas-menu">
+        <summary class="atlas-menu-summary">মেনু</summary>
+        <div class="atlas-menu-body">
+          <button type="button" class="atlas-btn" data-open="national-data-dialog">বাংলাদেশের উপাত্ত</button>
+          <button type="button" class="atlas-btn" data-open="collage-dialog">স্থানভিত্তিক উপগ্রহের নমুনা</button>
+          <button type="button" class="atlas-btn" data-open="quick-jump-dialog">দ্রুত এলাকা দর্শন</button>
+          <button type="button" class="atlas-btn" data-open="flood-dialog">নদী ও বন্যা তথ্য</button>
+          <button type="button" class="atlas-btn" data-open="air-dialog">বায়ুমান ও ধোঁয়া</button>
+          <button type="button" class="atlas-btn" data-open="economy-dialog">সামষ্টিক অর্থনীতি</button>
+          <button type="button" class="atlas-btn" data-open="transit-dialog">মেট্রো ও পরিবহন</button>
+          <label class="atlas-control-label"><span>দৃশ্য</span>
+            <select id="atlas-view" class="atlas-select" aria-label="Map view">
+              <option value="3d" selected>3D city</option>
+              <option value="2d">2D map</option>
+            </select>
+          </label>
+          <label class="atlas-control-label"><span>ভিত্তি মানচিত্র</span>
+            <select id="atlas-basemap" class="atlas-select" aria-label="Basemap">
+              <option value="esri" selected>Esri satellite</option>
+              <option value="osm">OpenStreetMap streets</option>
+            </select>
+          </label>
+          <label class="atlas-control-label"><span>দৃশ্যমানতা</span>
+            <select id="atlas-theme" class="atlas-select" aria-label="Appearance">
+              <option value="dark" selected>Dark · delta night</option>
+              <option value="light">Light · city daylight</option>
+              <option value="contrast">High contrast</option>
+            </select>
+          </label>
+          <button type="button" id="download-geojson-btn" class="atlas-btn">ডাউনলোড দৃশ্য (জিওজেএসওएন)</button>
+          <a href="/research" target="_blank" rel="noopener">গবেষণা ও পদ্ধতি ↗</a>
+          <a href="/api/atlas/watch" target="_blank" rel="noopener">নগর পর্যবেক্ষণ এপিআই (জেএসওएন) ↗</a>
+        </div>
+      </details>
     </header>
 
     <div class="atlas-map-wrap">
@@ -103,27 +94,28 @@
       <aside class="atlas-observation-hud" id="atlas-observation-hud" hidden aria-label="Selected spatial feature details"></aside>
 
       <section class="atlas-watch" id="atlas-watch" aria-label="City watch">
-        <details class="atlas-watch-shell" id="atlas-watch-shell" open>
-          <summary>City watch</summary>
-          <div class="atlas-watch-grid">
-            <button type="button" class="atlas-watch-item" id="atlas-watch-flood" data-open="flood-dialog">
-              <small>Flood and rivers</small>
-              <strong id="atlas-watch-flood-value">Checking open data…</strong>
-            </button>
-            <button type="button" class="atlas-watch-item" id="atlas-watch-air" data-open="air-dialog">
-              <small>Air particles</small>
-              <strong id="atlas-watch-air-value">Checking open data…</strong>
-            </button>
-            <button type="button" class="atlas-watch-item" id="atlas-watch-wind" data-open="air-dialog">
-              <small>Wind and storms</small>
-              <strong id="atlas-watch-wind-value">Checking open data…</strong>
-            </button>
-            <button type="button" class="atlas-watch-item" id="atlas-watch-traffic" data-open="economy-dialog">
-              <small>Economic engine status</small>
-              <strong id="atlas-watch-traffic-value">Checking open data…</strong>
-            </button>
-          </div>
-        </details>
+        <div class="atlas-watch-grid">
+          <button type="button" class="atlas-watch-item" id="atlas-watch-flood" data-open="flood-dialog" aria-label="Flood and rivers">
+            <span class="watch-symbol">💧</span>
+            <span class="watch-label">নদী বন্যা</span>
+            <strong id="atlas-watch-flood-value">—</strong>
+          </button>
+          <button type="button" class="atlas-watch-item" id="atlas-watch-air" data-open="air-dialog" aria-label="Air quality">
+            <span class="watch-symbol">🌫</span>
+            <span class="watch-label">বায়ুমান</span>
+            <strong id="atlas-watch-air-value">—</strong>
+          </button>
+          <button type="button" class="atlas-watch-item" id="atlas-watch-wind" data-open="air-dialog" aria-label="Wind and storms">
+            <span class="watch-symbol">💨</span>
+            <span class="watch-label">বাতুঁ</span>
+            <strong id="atlas-watch-wind-value">—</strong>
+          </button>
+          <button type="button" class="atlas-watch-item" id="atlas-watch-traffic" data-open="economy-dialog" aria-label="Economic engine">
+            <span class="watch-symbol">💹</span>
+            <span class="watch-label">অর্থনীতি</span>
+            <strong id="atlas-watch-traffic-value">—</strong>
+          </button>
+        </div>
       </section>
     </div>
   </div>
