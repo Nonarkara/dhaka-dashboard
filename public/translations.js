@@ -2,6 +2,10 @@
 // Keys are the canonical English source strings.
 
 window.ATLAS_BN = {
+  "Flood": "বন্যা",
+  "Air": "বায়ু",
+  "Wind": "বাতাস",
+  "Economy": "অর্থনীতি",
   "Sampled places": "নমুনার স্থানসমূহ",
   "Satellite samples by place": "স্থানভিত্তিক উপগ্রহের নমুনা",
   "Seven instruments sampled near each place; these are not district averages or measures of domain performance. Dates and spatial scales differ.": "প্রতিটি স্থানের কাছে সাতটি যন্ত্রের নমুনা; এগুলো এলাকার গড় বা খাতের কর্মদক্ষতার পরিমাপ নয়। তারিখ ও স্থানিক মাপ আলাদা।",

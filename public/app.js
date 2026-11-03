@@ -842,7 +842,7 @@
         <button class="modal-close-btn" onclick="document.getElementById('atlas-observation-hud').hidden = true;">✕</button>
       </div>
       ${rowsHtml}
-      <p style="margin:8px 0 0;font-size:11.5px;color:var(--dim);">${desc}</p>
+      <p style="margin:8px 0 0;font-size:var(--text-micro);color:var(--dim);">${desc}</p>
     `;
     hud.hidden = false;
   }
@@ -1240,7 +1240,7 @@
             hud.hidden = false;
             hud.innerHTML = `<h3>${p.name}</h3>
               <div style="margin:4px 0;"><strong>${tr("24h precipitation forecast:","২৪ ঘণ্টার বৃষ্টিপাত পূর্বাভাস:")}</strong> ${Number(p.rain_24h_sum_mm).toFixed(1)} mm</div>
-              <div style="font-size:11.5px;color:var(--dim);">${tr("High-resolution precipitation catchment model for Greater Dhaka river drainage.","বৃহত্তর ঢাকার নদী নিষ্কাশনের জন্য উচ্চ-রেজোলিউশন বৃষ্টিপাত পূর্বাভাস মডেল।")}</div>
+              <div style="font-size:var(--text-micro);color:var(--dim);">${tr("High-resolution precipitation catchment model for Greater Dhaka river drainage.","বৃহত্তর ঢাকার নদী নিষ্কাশনের জন্য উচ্চ-রেজোলিউশন বৃষ্টিপাত পূর্বাভাস মডেল।")}</div>
               <button type="button" class="atlas-btn" style="margin-top:8px;width:100%;" onclick="document.getElementById('atlas-observation-hud').hidden=true">${tr("Close","বন্ধ করুন")}</button>`;
           });
         }
@@ -1388,15 +1388,24 @@
     const values = {
       flood: { value: unknown, tier: "unavailable", title: tr("No calibrated flood assessment · BWDB / FFWC gauge feed not connected","ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়") },
       air: { value: unknown, tier: "unavailable", title: tr("Air quality data unavailable","বায়ুমান তথ্য অনুপলব্ধ") },
-      wind: { value: unknown, tier: "unavailable", title: tr("Wind data unavailable","বাতুঁ তথ্য অনুপলব্ধ") },
+      wind: { value: unknown, tier: "unavailable", title: tr("Wind data unavailable","বাতাসের তথ্য অনুপলব্ধ") },
       traffic: { value: unknown, tier: "unavailable", title: tr("Economic data unavailable · no dated bulletin","অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই") },
     };
+    const num = n => new Intl.NumberFormat(document.documentElement.lang === "bn" ? "bn-BD" : "en-GB", { maximumFractionDigits: 1 }).format(n);
+    const model = tr("model", "মডেল");
+    let windTo = null;
     if (ind) {
-      if (Number.isFinite(ind.airQuality?.us_aqi)) {
-        values.air = { value: `AQI ${ind.airQuality.us_aqi}`, tier: ind.airQuality.status || "ok", title: `${ind.airQuality.source || ""} · ${ind.airQuality.category || ""} · ${ind.airQuality.observedAt || ""}` };
+      const aq = ind.airQuality;
+      if (Number.isFinite(aq?.us_aqi)) {
+        const cat = tr(aq.category || "", category[aq.category] || aq.category || "");
+        values.air = { value: `AQI ${num(aq.us_aqi)} · ${model}`, tier: ["ok", "warning", "danger"].includes(aq.status) ? aq.status : "neutral", title: `${tr("Modelled, not a station reading", "মডেল অনুমান, স্টেশনের পরিমাপ নয়")} · ${cat} · ${aq.source || ""} · ${aq.observedAt || ""}` };
       }
-      if (Number.isFinite(ind.weather?.wind_speed_10m)) {
-        values.wind = { value: `${ind.weather.wind_speed_10m} km/h`, tier: "ok", title: `Wind ${ind.weather.wind_direction_10m}° · ${ind.weather.observedAt || ""}` };
+      const w = ind.weather;
+      if (Number.isFinite(w?.wind_speed_10m)) {
+        // No validated wind hazard threshold exists, so wind is never coloured as "ok".
+        const from = Number.isFinite(w.wind_direction_10m) ? w.wind_direction_10m : null;
+        if (from !== null) windTo = (from + 180) % 360;
+        values.wind = { value: `${num(w.wind_speed_10m)} ${tr("km/h", "কিমি/ঘ")} · ${model}`, tier: "neutral", title: `${tr("Modelled wind at 10 m", "১০ মিটারে মডেল বাতাস")}${from !== null ? ` · ${tr("from", "দিক থেকে")} ${num(from)}°` : ""} · ${w.observedAt || ""}` };
       }
       if (ind.floodRisk && ind.floodRisk.status !== "unavailable") {
         values.flood = { value: ind.floodRisk.tier || "—", tier: ind.floodRisk.status, title: `${ind.floodRisk.source || ""} · ${ind.floodRisk.reasonCode || ""}` };
@@ -1413,6 +1422,12 @@
         item.dataset.tier = v.tier;
         item.title = v.title;
       }
+    }
+    // Arrow points where the wind blows to; hidden when direction is unknown.
+    const arrow = $("#atlas-watch-wind-symbol");
+    if (arrow) {
+      arrow.style.visibility = windTo === null ? "hidden" : "visible";
+      arrow.style.transform = windTo === null ? "" : `rotate(${windTo}deg)`;
     }
   }
 

@@ -96,23 +96,23 @@
       <section class="atlas-watch" id="atlas-watch" aria-label="City watch">
         <div class="atlas-watch-grid">
           <button type="button" class="atlas-watch-item" id="atlas-watch-flood" data-open="flood-dialog" aria-label="Flood and rivers">
-            <span class="watch-symbol">💧</span>
-            <span class="watch-label">নদী বন্যা</span>
+            <span class="watch-symbol" aria-hidden="true">≋</span>
+            <span class="watch-label">Flood</span>
             <strong id="atlas-watch-flood-value">—</strong>
           </button>
           <button type="button" class="atlas-watch-item" id="atlas-watch-air" data-open="air-dialog" aria-label="Air quality">
-            <span class="watch-symbol">🌫</span>
-            <span class="watch-label">বায়ুমান</span>
+            <span class="watch-symbol" aria-hidden="true">◍</span>
+            <span class="watch-label">Air</span>
             <strong id="atlas-watch-air-value">—</strong>
           </button>
           <button type="button" class="atlas-watch-item" id="atlas-watch-wind" data-open="air-dialog" aria-label="Wind and storms">
-            <span class="watch-symbol">💨</span>
-            <span class="watch-label">বাতুঁ</span>
+            <span class="watch-symbol" id="atlas-watch-wind-symbol" aria-hidden="true">↑</span>
+            <span class="watch-label">Wind</span>
             <strong id="atlas-watch-wind-value">—</strong>
           </button>
           <button type="button" class="atlas-watch-item" id="atlas-watch-traffic" data-open="economy-dialog" aria-label="Economic engine">
-            <span class="watch-symbol">💹</span>
-            <span class="watch-label">অর্থনীতি</span>
+            <span class="watch-symbol" aria-hidden="true">৳</span>
+            <span class="watch-label">Economy</span>
             <strong id="atlas-watch-traffic-value">—</strong>
           </button>
         </div>
@@ -131,7 +131,7 @@
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
-      <p style="margin-top:0;font-size:12px;color:var(--dim);">
+      <p style="margin-top:0;font-size:var(--text-body);color:var(--dim);">
         Seven instruments sampled near each place; these are not district averages or measures of domain performance. Dates and spatial scales differ.
       </p>
       <div class="collage-layout">
@@ -147,7 +147,7 @@
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
-      <p style="margin-top:0;font-size:12px;color:var(--dim);">Select an authored district to fly the camera into the neighborhood and read its spatial context.</p>
+      <p style="margin-top:0;font-size:var(--text-body);color:var(--dim);">Select an authored district to fly the camera into the neighborhood and read its spatial context.</p>
       <div class="jump-grid" id="quick-jump-grid"></div>
     </div>
   </dialog>
@@ -170,7 +170,7 @@
     <div class="modal-body">
       <div id="weather-detail-container"></div>
       <div id="air-timeline-container">Loading air quality timeline…</div>
-      <p style="font-size:11px;color:var(--dim);margin-top:12px;">
+      <p style="font-size:var(--text-micro);color:var(--dim);margin-top:12px;">
         Data from European Centre for Medium-Range Weather Forecasts (ECMWF) Copernicus Atmosphere Monitoring Service (CAMS) via Open-Meteo API. CAMS global: approximately 45 km; native 3-hour steps, updated every 12 hours.
       </p>
     </div>
@@ -182,7 +182,7 @@
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
-      <p style="margin-top:0;font-size:12px;color:var(--dim);">
+      <p style="margin-top:0;font-size:var(--text-body);color:var(--dim);">
         Indicator definitions only. No dated bulletin is connected; current numeric values are unavailable.
       </p>
       <div class="metric-grid" id="economy-indicators-grid">Loading economic indicators…</div>
@@ -197,7 +197,7 @@
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
-      <p style="margin-top:0;font-size:12px;color:var(--dim);">
+      <p style="margin-top:0;font-size:var(--text-body);color:var(--dim);">
         Reference network registry; routes, lengths and capacities below are unverified reference entries, not current operating status.
       </p>
       <table class="data-table">
