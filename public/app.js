@@ -19,6 +19,7 @@
   let economyData = null;
   let areasData = [];
   let loadingHidden = false;
+  let styleReady = false;            // style JSON parsed; tiles may still be arriving
   let bootAttempts = 0;
   let watchData = null;
   let parliamentSnapshot = null;
@@ -209,9 +210,11 @@
         await Promise.all([loadDataLayers(), loadParliamentBuildings()]);
       });
 
-      map.on("idle", hideLoading);
+      // Reveal the map on its first frame after the style is parsed; imagery fills in progressively.
+      // map.loaded() and map.isStyleLoaded() both wait for every pitched-horizon tile (13–22 s).
+      map.once("style.load", () => { styleReady = true; });
       map.on("render", () => {
-        if (map.loaded()) hideLoading();
+        if (styleReady) hideLoading();
       });
       map.on("error", (e) => {
         if (e.sourceId === "parliament-detail") { parliamentSourceReady = false; syncBuildingVisibility(); }
@@ -220,9 +223,9 @@
         if (status) { status.hidden = false; status.textContent = tr("A map source is unavailable. Visible reference layers remain usable.", "মানচিত্রের একটি উৎস অনুপলব্ধ। দৃশ্যমান তথ্যসূত্র স্তর ব্যবহারযোগ্য।"); }
       });
 
-      // Hard timeout failsafe so loading overlay NEVER gets stuck
+      // Failsafe only for a style that never loaded; slow tiles are not a failure.
       setTimeout(() => {
-        if (!loadingHidden) showMapFailure();
+        if (!loadingHidden && !styleReady) showMapFailure();
       }, 12000);
     } catch (e) {
       console.error("Map initialization error:", e);
