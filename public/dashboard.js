@@ -37,7 +37,7 @@
             <span class="provenance-dot ${ind.provenance}"></span>
             <span>${ind.source}${ind.period ? ` · ${tr("Period","তথ্যকাল")}: ${ind.period}` : ` · ${tr("No dated bulletin connected","তারিখযুক্ত বুলেটিন সংযুক্ত নেই")}`}</span>
           </div>
-          <p style="margin:4px 0 0;font-size:11px;color:var(--dim);">${(isBn && ind.note_bn) ? ind.note_bn : ind.note}</p>
+          <p style="margin:4px 0 0;font-size:var(--text-micro);color:var(--dim);">${(isBn && ind.note_bn) ? ind.note_bn : ind.note}</p>
         </div>
       `).join("");
 
@@ -188,17 +188,17 @@
         <p>${tr("Model valid time (Asia/Dhaka)", "মডেলের কার্যকর সময় (ঢাকা)")}: ${data.data.current?.time ?? tr("Unavailable", "অনুপলব্ধ")}</p>
         <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
           <strong>${tr("72-hour modeled PM2.5 · CAMS / Open-Meteo", "৭২ ঘণ্টার মডেলভিত্তিক পিএম২.৫ · CAMS / Open-Meteo")}</strong>
-          <span style="font-size:11px;color:var(--dim);">Current PM2.5: ${data.data.current?.pm2_5 ?? tr("Unavailable", "অনুপলব্ধ")} μg/m³ · US AQI: ${data.data.current?.us_aqi ?? tr("Unavailable", "অনুপলব্ধ")}</span>
+          <span style="font-size:var(--text-micro);color:var(--dim);">Current PM2.5: ${data.data.current?.pm2_5 ?? tr("Unavailable", "অনুপলব্ধ")} μg/m³ · US AQI: ${data.data.current?.us_aqi ?? tr("Unavailable", "অনুপলব্ধ")}</span>
         </div>
         <div class="aqi-timeline">${barsHtml}</div>
-        <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--dim);">
+        <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:var(--text-micro);color:var(--dim);">
           <span>NOW</span>
           <span>+24 HOURS</span>
           <span>+48 HOURS</span>
           <span>+72 HOURS</span>
         </div>
-        <div class="aqi-action-card" style="margin-top:8px;padding:6px 8px;background:var(--bg-raised);border:1px solid var(--line);font-size:11px;">
-          <strong style="text-transform:uppercase;letter-spacing:0.05em;font-family:var(--font-mono);font-size:10px;color:var(--dim);">${tr("Admin action guidance","প্রশাসনিক পদক্ষেপের দিকনির্দেশনা")}</strong>
+        <div class="aqi-action-card" style="margin-top:8px;padding:6px 8px;background:var(--bg-raised);border:1px solid var(--line);font-size:var(--text-micro);">
+          <strong style="text-transform:uppercase;letter-spacing:0.05em;font-family:var(--font-mono);font-size:var(--text-micro);color:var(--dim);">${tr("Admin action guidance","প্রশাসনিক পদক্ষেপের দিকনির্দেশনা")}</strong>
           <div style="margin-top:4px;">${aqiGuidance(data.data.current?.us_aqi)}</div>
         </div>
       `;
@@ -231,12 +231,12 @@
           </div>
           <div class="metric-card">
             <span class="metric-category">Wind Speed</span>
-            <span class="metric-value">${cur.wind_speed_10m} <span style="font-size:12px">km/h</span></span>
+            <span class="metric-value">${cur.wind_speed_10m} <span style="font-size:var(--text-body)">km/h</span></span>
             <small style="color:var(--dim)">Direction: ${cur.wind_direction_10m}°</small>
           </div>
           <div class="metric-card">
             <span class="metric-category">Surface Pressure</span>
-            <span class="metric-value">${cur.surface_pressure} <span style="font-size:12px">hPa</span></span>
+            <span class="metric-value">${cur.surface_pressure} <span style="font-size:var(--text-body)">hPa</span></span>
           </div>
         </div>
       `;

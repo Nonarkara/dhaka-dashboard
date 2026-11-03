@@ -29,6 +29,10 @@
 }
 
 :root {
+  /* Three type sizes per page (CLAUDE.md §11.7). Weight and colour carry the rest. */
+  --text-display: 24px;
+  --text-body: 13px;
+  --text-micro: 11px;
   --bg: #0d171d;
   --bg-raised: #122129;
   --bg-strong: #172a34;
@@ -89,7 +93,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
@@ -166,7 +170,7 @@ body {
   background: var(--accent);
   color: var(--accent-ink);
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: var(--text-body);
   font-weight: 700;
   padding: 2px 7px;
   letter-spacing: 0.05em;
@@ -175,7 +179,7 @@ body {
 
 .atlas-title {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: var(--text-body);
   font-weight: 600;
   margin: 0;
   letter-spacing: 0.02em;
@@ -196,7 +200,7 @@ body {
   align-items: center;
   gap: 6px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-micro);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--dim);
@@ -209,7 +213,7 @@ body {
   color: var(--ink);
   border: 1px solid var(--line);
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: var(--text-body);
   padding: 3px 8px;
   outline: none;
   cursor: pointer;
@@ -238,7 +242,7 @@ body {
   background: var(--bg-raised);
   border: 1px solid var(--line);
   padding: 3px 10px;
-  font-size: 12px;
+  font-size: var(--text-body);
   font-family: var(--font-mono);
   cursor: pointer;
   list-style: none;
@@ -261,7 +265,7 @@ body {
   width: 170px;
   min-width: 0;
   max-width: 200px;
-  font-size: 11px;
+  font-size: var(--text-micro);
   z-index: 100;
 }
 .atlas-menu-body a {
@@ -269,7 +273,7 @@ body {
   text-decoration: none;
   border-bottom: 1px solid var(--line);
   padding: 2px 0;
-  font-size: 10.5px;
+  font-size: var(--text-micro);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -299,7 +303,7 @@ body {
   border: none;
   padding: 5px 12px;
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: var(--text-micro);
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -326,7 +330,7 @@ body {
   padding: 4px 14px;
   background: var(--bg-raised);
   border-bottom: 1px solid var(--line);
-  font-size: 11px;
+  font-size: var(--text-micro);
   color: var(--dim);
   flex-shrink: 0;
   gap: 12px;
@@ -389,19 +393,19 @@ body {
   background: var(--bg-raised);
 }
 .watch-symbol {
-  font-size: 14px;
+  font-size: var(--text-body);
   line-height: 1;
 }
 .watch-label {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: var(--text-micro);
   text-transform: uppercase;
   color: var(--dim);
   letter-spacing: 0.05em;
   line-height: 1;
 }
 .atlas-watch-item strong {
-  font-size: 12px;
+  font-size: var(--text-body);
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -429,7 +433,7 @@ body {
   border: 1px solid var(--line-bright);
   padding: 8px;
   z-index: 22;
-  font-size: 11.5px;
+  font-size: var(--text-micro);
 }
 .hud-header {
   display: flex;
@@ -441,14 +445,14 @@ body {
 }
 .hud-title {
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 700;
   color: var(--ink);
   margin: 0;
 }
 .hud-badge {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--text-micro);
   padding: 1px 5px;
   background: var(--bg-strong);
   color: var(--dim);
@@ -461,7 +465,7 @@ body {
   padding: 3px 0;
   border-bottom: 1px dotted var(--line);
 }
-.hud-label { color: var(--dim); font-size: 11px; }
+.hud-label { color: var(--dim); font-size: var(--text-micro); }
 .hud-value { font-weight: 600; text-align: right; }
 
 /* ── Modals / Dialogs ─────────────────────────────────────────────────────── */
@@ -488,7 +492,7 @@ body {
 }
 .modal-title {
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 700;
   margin: 0;
 }
@@ -499,7 +503,7 @@ body {
   padding: 2px 8px;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-micro);
 }
 .modal-close-btn:hover { background: var(--accent); color: var(--accent-ink); }
 .modal-body {
@@ -512,7 +516,7 @@ body {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: var(--text-body);
   margin: 8px 0;
 }
 .data-table th,
@@ -524,7 +528,7 @@ body {
 .data-table th {
   background: var(--bg-strong);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-micro);
   text-transform: uppercase;
   color: var(--dim);
 }
@@ -550,7 +554,7 @@ body {
 .atlas-loading-screen.loaded { display: none !important; }
 .loading-logo {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: var(--text-display);
   font-weight: 700;
   background: var(--accent);
   color: var(--accent-ink);
@@ -559,7 +563,7 @@ body {
 }
 .loading-text {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-body);
   color: var(--dim);
 }
 
@@ -600,7 +604,7 @@ body {
   .atlas-header-nav > .atlas-menu { order: 1; }
   .atlas-select, .atlas-btn, .atlas-menu-summary { min-height: 36px; height: auto; }
   .atlas-menu-body { top: 40px; right: 8px; max-width: calc(100vw - 16px); }
-  .atlas-lenses button { height: 36px; font-size: 12px; }
+  .atlas-lenses button { height: 36px; font-size: var(--text-body); }
   .atlas-lens-story { display: block; padding: 5px 8px; }
   .atlas-lens-story strong { display: block; }
   .atlas-lens-story span { display: block; }
@@ -611,7 +615,7 @@ body {
   .modal-body { padding: 12px; }
   .modal-close-btn { min-width: 36px; min-height: 36px; }
 }
-.atlas-layer-status { position: absolute; top: 8px; left: 8px; right: 52px; z-index: 21; margin: 0; padding: 6px 8px; max-width: 65ch; background: var(--bg); border: 1px solid var(--line); font-size: 12px; }
+.atlas-layer-status { position: absolute; top: 8px; left: 8px; right: 52px; z-index: 21; margin: 0; padding: 6px 8px; max-width: 65ch; background: var(--bg); border: 1px solid var(--line); font-size: var(--text-body); }
 @media (max-width: 768px) {
   /* One row on a phone: wordmark, lens, clock, Map menu. The language
      control moves into the Map menu, because the header has no room for a
@@ -632,3 +636,7 @@ body {
   /* The header carries the language control when there is room for it. */
   #language-toggle-menu { display: none; }
 }
+
+/* Watch strip: glyphs take the tier colour; neutral = no validated threshold. */
+.watch-symbol { display: inline-block; }
+.atlas-watch-item[data-tier="neutral"] strong { color: var(--ink); }

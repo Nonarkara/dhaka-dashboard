@@ -47,4 +47,28 @@ if (!css.includes("border-radius: 0 !important") || !css.includes("box-shadow: n
   process.exit(1);
 }
 
+// 3. Three type sizes per page (CLAUDE.md §11.7): every size in project CSS, pages and
+// templates must be one of the three tokens. Vendor files are excluded.
+const typeFiles = ["style.css", "dhaka-design.css", "index.html", "research.html", ...readdirSync(join(root, "public")).filter(f => f.endsWith(".js"))];
+for (const file of typeFiles) {
+  const text = readFileSync(join(root, "public", file), "utf8");
+  const raw = text.match(/font(?:-size)?:\s*(?:\d{3}\s+)?\d+(?:\.\d+)?(?:px|rem|em)/g);
+  if (raw) {
+    console.error(`FAIL: ${file} sets a literal font size (${raw[0]}); use --text-display, --text-body or --text-micro`);
+    process.exit(1);
+  }
+}
+const tokens = new Set(css.match(/--text-(?:display|body|micro):\s*[^;]+/g) || []);
+if (tokens.size !== 3) {
+  console.error("FAIL: style.css must define exactly the three type tokens");
+  process.exit(1);
+}
+
+// 4. Watch strip uses text glyphs that take tier colour, never emoji.
+const indexHtml = readFileSync(join(root, "public", "index.html"), "utf8");
+if (/\p{Extended_Pictographic}/u.test(indexHtml.replace(/[✕↑↗→←↓≋◍৳▸▾]/g, ""))) {
+  console.error("FAIL: index.html contains emoji; use monochrome text glyphs");
+  process.exit(1);
+}
+
 console.log("✓ test-anti-slop-design.mjs passed: No AI slop or generic placeholders; sharp modernist geometry enforced.");
