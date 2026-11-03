@@ -493,3 +493,6 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
   .atlas-watch-item strong { overflow:visible; text-overflow:clip; }
 }
 .maplibregl-ctrl.maplibregl-ctrl-attrib, .maplibregl-ctrl-attrib a { font-size:var(--text-micro); }
+.atlas-menu-body .atlas-control-label { align-items:stretch; text-align:left; }
+/* Imagery credit must stay visible on phones: the watch strip sits above the attribution control. */
+@media (max-width: 768px) { .atlas-watch { bottom: 34px; } }

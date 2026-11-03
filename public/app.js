@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261102-1793611572-abefa79";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261103-1793724408-042817a";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -1383,7 +1383,7 @@
 
   function renderCityWatch() {
     const ind = watchData?.indicators;
-    const unknown = "—";
+    const unknown = tr("n/a", "অনুপলব্ধ"); // say it is unavailable; the tap opens the desk with the reason
     const category = {Good:"ভালো", Moderate:"মাঝারি", "Unhealthy for Sensitive Groups":"সংবেদনশীলদের জন্য অস্বাস্থ্যকর", Unhealthy:"অস্বাস্থ্যকর", "Very Unhealthy":"অত্যন্ত অস্বাস্থ্যকর", Hazardous:"বিপজ্জনক"};
     const values = {
       flood: { value: unknown, tier: "unavailable", title: tr("No calibrated flood assessment · BWDB / FFWC gauge feed not connected","ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়") },
