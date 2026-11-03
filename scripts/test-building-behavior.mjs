@@ -29,6 +29,7 @@ function app({offline=false,search=''}={}) {
   class MapStub {
     constructor(options){this.layers=new Map(options.style.layers.map(l=>[l.id,l]));this.sources=new Map();this.options=options;this.events=new Map();this.inside=true;this.zoom=16.7;this.ready=false;map=this;}
     on(type,...args){this.events.set(type,args.at(-1));}
+    once(type,...args){this.events.set(type,args.at(-1));}
     off(type){this.events.delete(type);}
     addControl(){}
     getLayer(id){return this.layers.get(id);}
