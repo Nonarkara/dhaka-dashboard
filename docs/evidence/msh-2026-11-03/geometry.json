@@ -1,0 +1,118 @@
+[
+ {
+  "w": 390,
+  "h": 844,
+  "lang": "bn",
+  "hiddenMs": 3088,
+  "header": {
+   "y": 0,
+   "h": 40,
+   "w": 390
+  },
+  "watch": {
+   "y": 749,
+   "h": 61,
+   "w": 374
+  },
+  "key": {
+   "y": 48,
+   "h": 66,
+   "w": 150
+  },
+  "failure": false,
+  "overflowX": false,
+  "fontSizes": [
+   "11px",
+   "13px",
+   "24px"
+  ],
+  "chromePct": 12
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "lang": "en",
+  "hiddenMs": 2525,
+  "header": {
+   "y": 0,
+   "h": 40,
+   "w": 390
+  },
+  "watch": {
+   "y": 759,
+   "h": 51,
+   "w": 374
+  },
+  "key": {
+   "y": 48,
+   "h": 66,
+   "w": 159
+  },
+  "failure": false,
+  "overflowX": false,
+  "fontSizes": [
+   "11px",
+   "13px",
+   "24px"
+  ],
+  "chromePct": 11
+ },
+ {
+  "w": 1024,
+  "h": 768,
+  "lang": "en",
+  "hiddenMs": 721,
+  "header": {
+   "y": 0,
+   "h": 40,
+   "w": 1024
+  },
+  "watch": {
+   "y": 735,
+   "h": 23,
+   "w": 502
+  },
+  "key": {
+   "y": 48,
+   "h": 66,
+   "w": 159
+  },
+  "failure": false,
+  "overflowX": false,
+  "fontSizes": [
+   "11px",
+   "13px",
+   "24px"
+  ],
+  "chromePct": 8
+ },
+ {
+  "w": 1440,
+  "h": 900,
+  "lang": "bn",
+  "hiddenMs": 738,
+  "header": {
+   "y": 0,
+   "h": 40,
+   "w": 1440
+  },
+  "watch": {
+   "y": 862,
+   "h": 28,
+   "w": 540
+  },
+  "key": {
+   "y": 48,
+   "h": 66,
+   "w": 150
+  },
+  "failure": false,
+  "overflowX": false,
+  "fontSizes": [
+   "11px",
+   "13px",
+   "24px"
+  ],
+  "chromePct": 8
+ }
+]
