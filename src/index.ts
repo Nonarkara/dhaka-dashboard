@@ -7,7 +7,7 @@ import { BUILD_ID, ATLAS_VERSION } from "./build-id.js";
 import { checkRateLimit } from "./rate-limit.js";
 import type { RateLimitEnv } from "./rate-limit.js";
 import { inspectGibsTile, workerInflate } from "./gibs-png.js";
-import { GIBS_CATALOGUE_CAPTURED, GIBS_CATALOGUE_LATEST } from "./gibs-catalogue.js";
+import { GIBS_CATALOGUE_CAPTURED } from "./gibs-catalogue.js";
 import { MACRO_INDICATORS, RIVER_STATIONS, AIR_STATIONS, DHAKA_STUDY_BOUNDARY, FLOOD_SCENARIO_TYPES, DDM_SHELTER_SOURCE, SHELTER_REGISTER, SHELTER_SCENARIO_TYPES } from "./dhaka-data.js";
 import { buildCollage, DOMAINS, type CollageResult, type CorridorPoint, type District } from "./collage.js";
 
@@ -64,6 +64,7 @@ function haversineDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
+  ttlMs?: number;
 }
 const memoryCache = new Map<string, CacheEntry<unknown>>();
 const pendingFeeds = new Map<string, Promise<{data:unknown;fromCache:boolean;error?:string}>>();
@@ -77,7 +78,7 @@ async function fetchWithCache<T>(
 ): Promise<{ data: T; fromCache: boolean; error?: string }> {
   const cached = memoryCache.get(cacheKey) as CacheEntry<T> | undefined;
   const now = Date.now();
-  if (cached && now - cached.timestamp < ttlMs) {
+  if (cached && now - cached.timestamp < Math.min(ttlMs,cached.ttlMs ?? ttlMs)) {
     try {
       validate?.(cached.data);
       return { data: cached.data, fromCache: true };
@@ -88,7 +89,8 @@ async function fetchWithCache<T>(
   const task=(async()=>{
     try {
       const data = await fetcher();
-      memoryCache.set(cacheKey, { data, timestamp: Date.now() });
+      const incomplete=Array.isArray(data)&&data.some(row=>row?.status==="unavailable");
+      memoryCache.set(cacheKey, { data, timestamp: Date.now(), ttlMs:incomplete?Math.min(ttlMs,60000):ttlMs });
       return { data, fromCache: false };
     } catch (err: unknown) {
       // Expired model output must not masquerade as a current reading.
@@ -260,17 +262,11 @@ async function gibsTileAvailable(spec: GibsLayerSpec, date: string | null): Prom
 // observation reports unavailable with a reason code — never a blank raster
 // presented as data.
 async function resolveGibsLayer(spec: GibsLayerSpec): Promise<GibsLayerReport> {
-  // Candidates newest-first: the last four days, plus the date the GIBS
-  // capabilities catalogue recorded for this layer, in case publication is
-  // slower than the four-day window. Every candidate is decoded before it is
-  // accepted — GIBS serves a blank placeholder for a date whose observation
-  // has not been ingested yet, and that placeholder is HTTP 200 and
-  // non-empty, so a status or byte check would accept it as data.
+  // Current raster availability uses the same four UTC dates as the client.
+  // A frozen catalogue date must never keep a retired observation current.
   const candidates = Array.from({ length: 4 }, (_, back) =>
     new Date(Date.now() - back * 86400000).toISOString().split("T")[0],
   );
-  const catalogueDate = GIBS_CATALOGUE_LATEST[spec.id];
-  if (catalogueDate && !candidates.includes(catalogueDate)) candidates.push(catalogueDate);
   const results = await Promise.all(
     candidates.map(async (date) => ({ date, ok: await gibsTileAvailable(spec, date) })),
   );
@@ -297,11 +293,11 @@ async function resolveGibsLayer(spec: GibsLayerSpec): Promise<GibsLayerReport> {
     name: spec.name,
     provider: spec.provider,
     kind: "gibs-raster",
-    template: gibsTemplate(spec, null),
+    template: null,
     endpoint: null,
     tile_level: spec.tileLevel,
     format: spec.format,
-    status: undated ? "ok" : "unavailable",
+    status: "unavailable",
     latest_date: null,
     reasonCode: undated ? "gibs-date-unresolved" : "gibs-no-observation",
   };
@@ -703,10 +699,12 @@ const worker = {
       );
 
       const anyOk = data.some((l) => l.status === "ok");
+      const allOk = data.length === GIBS_LAYERS.length + 1 && data.every(l=>l.status === "ok");
       return jsonResponse(
         {
-          status: anyOk ? "ok" : "unavailable",
-          reasonCode: anyOk ? null : error ? "upstream-unreachable" : "gibs-no-observation",
+          status: allOk ? "ok" : anyOk ? "partial" : "unavailable",
+          reasonCode: allOk ? null : anyOk ? "some-environment-layers-unavailable" : error ? "upstream-unreachable" : "gibs-no-observation",
+          timestamp: new Date().toISOString(),
           city: "Dhaka",
           provenance: "measured",
           date: new Date().toISOString().split("T")[0],

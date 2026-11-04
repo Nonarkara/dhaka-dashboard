@@ -15,7 +15,7 @@
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { tileHasData } from "./lib/png-decode.mjs";
+import { fetchTile, carriesData, verifyDeployedEnvironment } from "./lib/verify-gibs.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -55,41 +55,9 @@ function tileUrl(spec, date) {
   return `${GIBS_BASE}/${spec.id}/default/${t}GoogleMapsCompatible_Level${spec.level}/${spec.probe.z}/${spec.probe.y}/${spec.probe.x}.${spec.ext}`;
 }
 
-async function fetchTile(url) {
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(25000) });
-    if (!res.ok) return { ok: false, status: res.status, bytes: 0, type: null };
-    const buf = Buffer.from(await res.arrayBuffer());
-    return {
-      ok: buf.byteLength > 0,
-      status: res.status,
-      bytes: buf.byteLength,
-      type: res.headers.get("content-type"),
-      buf,
-    };
-  } catch (err) {
-    return { ok: false, status: 0, bytes: 0, type: null, error: String(err) };
-  }
-}
-
-// GIBS serves a fully blank placeholder tile for a date whose observation has
-// not been ingested yet — HTTP 200, non-empty, opaque, one uniform colour.
-// A status or byte check accepts it; only decoding it tells the truth.
-async function carriesData(tile) {
-  if (!tile.ok) return false;
-  if (tile.type && !tile.type.startsWith("image/")) return false;
-  if (tile.type && tile.type.includes("jpeg")) return true; // decoded in the browser, not here
-  try {
-    const verdict = await tileHasData(tile.buf);
-    return verdict.hasData;
-  } catch {
-    return false;
-  }
-}
-
 const failures = [];
 
-for (const spec of specs) {
+if (!apiBase) for (const spec of specs) {
   // The undated path is what the browser requests when no date is pinned.
   const latest = await fetchTile(tileUrl(spec, null));
   if (!latest.ok) {
@@ -133,26 +101,34 @@ for (const spec of specs) {
     );
   }
   console.log(
-    `  ✓ ${spec.id}: ${latest.bytes} bytes, ${latest.type}, observation ${dated ?? "none with data"}` +
+    `  ${dated ? '✓' : '✗'} ${spec.id}: ${latest.bytes} bytes, ${latest.type}, observation ${dated ?? "none with data"}` +
       (blanks.length ? ` (placeholder dates rejected: ${blanks.join(", ")})` : ""),
   );
 }
 
+let verifiedCount = 0;
+let degradedCount = 0;
 if (apiBase) {
   const url = `${apiBase.replace(/\/$/, "")}/api/atlas/environment`;
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
     const body = await res.json();
-    if (body.status !== "ok") {
-      failures.push(`deployed /api/atlas/environment status "${body.status}" (${body.reasonCode})`);
-    }
-    for (const layer of body.layers ?? []) {
-      if (layer.status !== "ok") {
-        failures.push(`deployed API layer ${layer.id} status "${layer.status}" (${layer.reasonCode})`);
-      } else {
-        console.log(`  ✓ deployed API ${layer.id}: ok, latest ${layer.latest_date ?? "unresolved"}`);
-      }
-    }
+    // Deploy mode verifies the contract the browser actually consumes. An
+    // undated 404 says nothing about the advertised dated observation. Each
+    // claimed observation must independently decode at the exact date, source,
+    // tile matrix and format named by the deployed API; another date cannot
+    // substitute for a broken URL. Unexpected/missing layers fail the gate.
+    const result = await verifyDeployedEnvironment(body, specs);
+    failures.push(...result.failures);
+    verifiedCount = result.verified.length;
+    degradedCount = result.degraded.length;
+    for (const layer of result.verified) console.log(`  ✓ ${layer.id}: independently decoded advertised ${layer.date}, ${layer.bytes} bytes`);
+    for (const layer of result.degraded) console.log(`  DEGRADED ${layer.id}: unavailable · ${layer.reasonCode} · latest_date=null; no healthy imagery claim`);
+    // A provider outage may be represented honestly. A false 'ok' or an API
+    // which hides that outage is a failure, not a tolerated degraded source.
+    if (![200,503].includes(res.status)) failures.push(`environment HTTP ${res.status}`);
+    if (res.status === 503 && body.status !== 'unavailable') failures.push('HTTP 503 contradicts available environment');
+    if (res.status === 200 && body.status === 'unavailable') failures.push('HTTP 200 contradicts unavailable environment');
   } catch (err) {
     failures.push(`deployed /api/atlas/environment unreachable: ${err}`);
   }
@@ -164,7 +140,6 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(
-  `✓ verify-gibs-live.mjs passed: ${specs.length} GIBS layers serve live imagery over Dhaka` +
-    (apiBase ? ` and the deployed API reports every layer ok.` : "."),
-);
+console.log(apiBase
+  ? `✓ Deployed imagery contract verified: ${verifiedCount} independently decoded dated GIBS layers; ${degradedCount} sources explicitly unavailable/degraded. This is contract verification, not an all-sources-healthy claim.`
+  : `✓ Upstream smoke passed: all ${specs.length} GIBS layers serve live imagery over Dhaka.`);

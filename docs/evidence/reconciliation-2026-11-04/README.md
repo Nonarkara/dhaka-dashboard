@@ -5,7 +5,7 @@
 - Every local topic branch was already an ancestor ofmain exceptlocal-backup5628c74. Its useful national-ledger grouping and9hidden indicator labels were recovered surgically. Cache/coverage/provenance code in that backup was superseded and was not cherry-picked.
 - Orphan commit6ed541c is an old stamp; orphan blobs include unresolved merge markers from the earlier cherry-pick. No additional independently useful lost feature was found.
 - October30uncommitted stamp survives as named Git stash `recovery: October30 deployed stamp awaiting closeout; superseded by November4 release`. Four original historical live receipts/screenshots were preserved in their dated evidence folder. Primary checkout was clean; no unique source work was overwritten.
-- Latest reported20suite count was inaccurate: package.json configured15before this audit,16after adding UI access behaviors.
+- Latest reported20suite count was inaccurate: package.json configured15before this audit,17after adding UI access and source-verifier behaviors.
 
 ## Confirmed changes
 17annual series+dailyFX now render even when compact header lacks the instrument band. Fractional units and device/server clock provenance are tested. API current values validate source time/offset/units/numbers; point rainfall requires24valid consecutive hours. Cold concurrent requests share acquisition. Source failure has explicit reason/time+Retry.
@@ -25,9 +25,13 @@ Watch category remains visible and accessible; all7dialogs are named. Menu Escap
 Builder/root coordinated separate repository, runtime and MSH specialists. Fresh release_adversarial_review authored none of the patches, ran focused behavioral suites, inspected actual pixels and confirmed two defects: attribution overlap and enlarged menu stacking/shrink. Both were repaired and re-reviewed PASS; final enlarged captures remove the last skip-link sliver. No remaining release blocker in reviewed scope.
 
 ## Falsifiers and scanner
-UI tests reject removed dialog names, hidden-opener focus return, missing→0table substitution, lost viewer language parameter, and omission of visible AQI category (original regression reproduced in temporary mutant). Current model/rainfall tests reject stale/future/null/negative/wrongunit/incomplete inputs and retain valid0. Geographic tests enforce explicit height and retaincourtyards.16suites+typecheck+localpreflight are release gates.
+UI tests reject removed dialog names, hidden-opener focus return, missing→0table substitution, lost viewer language parameter, and omission of visible AQI category (original regression reproduced in temporary mutant). Current model/rainfall tests reject stale/future/null/negative/wrongunit/incomplete inputs and retain valid0. Geographic tests enforce explicit height and retaincourtyards.17suites+typecheck+localpreflight are release gates.
 
 Scanner raw output is scanner.txt. It reportsSLOP numerically; it is not described as clean. Reviewed hits: purple carries named AQI bands, cream/terracotta is the protected Wada palette; uppercase metric labels and state borders carry data; img/lorem hits are negative/XSS test fixtures; heavy images are dated evidence outside public/and not shipped assets. Passive-voice REVIEW entries describe precise unavailable/validation boundaries and were not rewritten into claims. These are documented contextual exceptions, not a scan override.
 
 ## Limits
 No calibrated flood warning, shelter availability, geocoded access route or surveyed Parliament height has been established. Existing source APIs may be unavailable; null remains distinct from0. Current release proof is recorded in release.txt after canonical deployment, exact-byte/API and live browser verification.
+
+
+## Canonical source gate correction
+First deploy c3a0895 reached live bytes and API smoke, then the old satellite diagnostic blocked on undated paths while dated tiles existed; night imagery correctly reported unavailable. The repaired authenticated gate checks and decodes the exact dated templates advertised by theAPI (JPEGbounded1MP/16MB and PNGalpha/transparency), verifies registry/4UTCdayfreshness/coverage and reports genuine outages asDEGRADED. Strict standalone upstream diagnostic still fails unavailable sources. Environment mixed coverage reportspartial; frozen catalogue dates no longer keep retired observations current. Hidden transparentRGB variation and malformed signatures cannot become validdata. See new test-gibs-verifier suite and finalrelease receipt. Geographic HUD legacy landmark heights are explicitly unverified registry values, never surveyed heights.

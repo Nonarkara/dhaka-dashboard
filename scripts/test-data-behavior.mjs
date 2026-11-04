@@ -55,6 +55,12 @@ try {
     assert.equal(body.indicators.weather.wind_speed_10m,8);
     assert.equal(body.indicators.floodRisk.status,'unavailable');
   }
+  worker=loadWorker(async url=>String(url).includes('rainviewer')?Response.json({radar:{past:[{time:Math.floor(Date.now()/1000)}]}}):new Response('',{status:404}));
+  const partialEnvironment=(await read(worker,'/api/atlas/environment')).body;
+  assert.equal(partialEnvironment.status,'partial','one available feed cannot turn all environment sources healthy');
+  assert.equal(partialEnvironment.reasonCode,'some-environment-layers-unavailable');
+  assert.ok(partialEnvironment.timestamp);
+  assert.ok(partialEnvironment.layers.filter(l=>l.kind==='gibs-raster').every(l=>l.status==='unavailable'&&l.template===null&&l.latest_date===null&&l.reasonCode));
   let simultaneousCalls=0;
   worker=loadWorker(async()=>{simultaneousCalls++;await new Promise(resolve=>setTimeout(resolve,5));return Response.json(currentPayload());});
   await Promise.all([read(worker,'/api/atlas/weather'),read(worker,'/api/atlas/weather')]);

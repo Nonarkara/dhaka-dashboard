@@ -1,0 +1,20 @@
+  ✓ economy corridors carry measured radiance, not registry figures (measured=10 corridors=10)
+
+✓ All 13 API smoke checks passed successfully.
+✓ Live SHA-256 matches for HTML, client scripts, styles, translations and reference layers
+==> 7. Verifying live NASA GIBS satellite tiles...
+==> Running verify-gibs-live.mjs...
+  ✓ VIIRS_NOAA20_CorrectedReflectance_TrueColor: 4089 bytes, image/jpeg, observation 2026-11-03
+  ✗ MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: HTTP 404, 0 bytes
+    note: VIIRS_SNPP_DayNightBand undated "latest" path is a blank placeholder (GIBS has not ingested the newest observation)
+  ✓ VIIRS_SNPP_DayNightBand: 1611 bytes, image/png, observation none with data
+  ✗ VIIRS_Combined_Flood_1-Day: HTTP 404, 0 bytes
+  ✓ deployed API VIIRS_NOAA20_CorrectedReflectance_TrueColor: ok, latest 2026-11-02
+  ✓ deployed API MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: ok, latest 2026-11-01
+  ✓ deployed API VIIRS_Combined_Flood_1-Day: ok, latest 2026-11-03
+  ✓ deployed API rainviewer-radar: ok, latest 2026-11-04
+FAIL: live GIBS verification failed:
+  - MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: latest tile returned 404 — 0 bytes
+  - VIIRS_SNPP_DayNightBand: no dated observation with data in the last 4 days
+  - VIIRS_Combined_Flood_1-Day: latest tile returned 404 — 0 bytes
+  - deployed API layer VIIRS_SNPP_DayNightBand status "unavailable" (gibs-no-observation)

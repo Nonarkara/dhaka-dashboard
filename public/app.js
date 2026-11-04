@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261104-1793792958-8044dab";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261104-1793801376-c3a0895";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -585,7 +585,7 @@
       rowsHtml = `
         <div class="hud-row"><span class="hud-label">Year / Era:</span><span class="hud-value">${props.year || "Historic"}</span></div>
         <div class="hud-row"><span class="hud-label">Category:</span><span class="hud-value">${props.category}</span></div>
-        <div class="hud-row"><span class="hud-label">Height:</span><span class="hud-value">${Number.isFinite(props.height_m) ? props.height_m+" m" : tr("Unknown","অজানা")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Unverified registry height:","যাচাইহীন তালিকার উচ্চতা:")}</span><span class="hud-value">${Number.isFinite(props.height_m) ? props.height_m+" m" : tr("Unknown","অজানা")}</span></div>
       `;
     } else if (type === "station") {
       rowsHtml = `

@@ -51,6 +51,7 @@ interface PngImage {
   colorType: number;
   interlace: number;
   palette: Uint8Array | null;
+  transparency: Uint8Array | null;
   data: Uint8Array;
   channels: number;
   stride: number;
@@ -73,6 +74,7 @@ function parseChunks(bytes: Uint8Array): {
   colorType: number;
   interlace: number;
   palette: Uint8Array | null;
+  transparency: Uint8Array | null;
   idat: Uint8Array[];
 } {
   let offset = 8; // PNG signature
@@ -82,7 +84,9 @@ function parseChunks(bytes: Uint8Array): {
   let colorType = 6;
   let interlace = 0;
   let palette: Uint8Array | null = null;
+  let transparency: Uint8Array | null = null;
   const idat: Uint8Array[] = [];
+  let ended = false;
   while (offset + 8 <= bytes.length) {
     const length = readUint32(bytes, offset);
     const type = String.fromCharCode(
@@ -92,6 +96,8 @@ function parseChunks(bytes: Uint8Array): {
       bytes[offset + 7],
     );
     const start = offset + 8;
+    if (start + length + 4 > bytes.length) throw new Error("png: truncated chunk");
+    if (offset === 8 && (type !== "IHDR" || length !== 13)) throw new Error("png: invalid header");
     if (type === "IHDR") {
       width = readUint32(bytes, start);
       height = readUint32(bytes, start + 4);
@@ -100,21 +106,29 @@ function parseChunks(bytes: Uint8Array): {
       interlace = bytes[start + 12];
     } else if (type === "PLTE") {
       palette = bytes.subarray(start, start + length);
+    } else if (type === "tRNS") {
+      transparency = bytes.subarray(start, start + length);
     } else if (type === "IDAT") {
       idat.push(bytes.subarray(start, start + length));
     } else if (type === "IEND") {
+      if (length !== 0) throw new Error("png: invalid end");
+      ended = true;
       break;
     }
     offset = start + length + 4; // length + type + data + crc
   }
-  return { width, height, bitDepth, colorType, interlace, palette, idat };
+  if (!ended) throw new Error("png: missing end");
+  return { width, height, bitDepth, colorType, interlace, palette, transparency, idat };
 }
 
 async function decodePng(bytes: Uint8Array, inflate: Inflate): Promise<PngImage> {
+  const signature = [137,80,78,71,13,10,26,10];
+  if (bytes.length < 8 || signature.some((value, i) => bytes[i] !== value)) throw new Error("png: invalid signature");
   const header = parseChunks(bytes);
   if (!header.width || !header.height || !header.idat.length) {
     throw new Error("png: no image data");
   }
+  if (header.width * header.height > 1048576) throw new Error("png: oversized tile");
   if (header.interlace !== 0) throw new Error("png: interlaced");
   const channels = ({ 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 } as Record<number, number>)[header.colorType];
   if (!channels) throw new Error(`png: unsupported colour type ${header.colorType}`);
@@ -123,11 +137,13 @@ async function decodePng(bytes: Uint8Array, inflate: Inflate): Promise<PngImage>
   const raw = await inflate(concat(header.idat));
   const bpp = channels;
   const stride = header.width * channels;
+  if (raw.length !== header.height * (stride + 1)) throw new Error("png: incomplete scanlines");
   const out = new Uint8Array(header.height * stride);
   let pos = 0;
   let prev = new Uint8Array(stride);
   for (let y = 0; y < header.height; y++) {
     const filter = raw[pos++];
+    if (filter > 4) throw new Error("png: invalid scanline filter");
     const cur = new Uint8Array(stride);
     for (let i = 0; i < stride; i++) {
       const a = i >= bpp ? cur[i - bpp] : 0;
@@ -157,6 +173,7 @@ async function decodePng(bytes: Uint8Array, inflate: Inflate): Promise<PngImage>
     colorType: header.colorType,
     interlace: header.interlace,
     palette: header.palette,
+    transparency: header.transparency,
     data: out,
     channels,
     stride,
@@ -193,7 +210,7 @@ export async function inspectGibsTile(
   } catch {
     return { hasData: false, reason: "not-a-png" };
   }
-  const { width, height, colorType, palette, data, channels, stride } = img;
+  const { width, height, colorType, palette, transparency, data, channels, stride } = img;
   let min = 255;
   let max = 0;
   let seen = 0;
@@ -203,6 +220,8 @@ export async function inspectGibsTile(
       const base = row + x * channels;
       if (colorType === 3) {
         const idx = data[base];
+        // A tRNS palette entry supplies alpha; omitted entries are opaque.
+        if (transparency && idx < transparency.length && transparency[idx] <= 8) continue;
         const r = palette ? palette[idx * 3] : 255;
         const g = palette ? palette[idx * 3 + 1] : 255;
         const b = palette ? palette[idx * 3 + 2] : 255;
@@ -211,6 +230,11 @@ export async function inspectGibsTile(
         if (lum > max) max = lum;
         seen++;
       } else if (colorType === 2 || colorType === 6) {
+        if (colorType === 6 && data[base + 3] <= 8) continue;
+        if (colorType === 2 && transparency?.length === 6 &&
+          data[base] === ((transparency[0] << 8) | transparency[1]) &&
+          data[base + 1] === ((transparency[2] << 8) | transparency[3]) &&
+          data[base + 2] === ((transparency[4] << 8) | transparency[5])) continue;
         const lum = (data[base] + data[base + 1] + data[base + 2]) / 3;
         if (lum < min) min = lum;
         if (lum > max) max = lum;
@@ -223,6 +247,7 @@ export async function inspectGibsTile(
           seen++;
         }
       } else {
+        if (transparency?.length === 2 && data[base] === ((transparency[0] << 8) | transparency[1])) continue;
         const lum = data[base];
         if (lum < min) min = lum;
         if (lum > max) max = lum;

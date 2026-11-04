@@ -216,3 +216,6 @@ assert.equal(rainFeatures[0].properties.rain_24h_sum_mm,0,'real zero retained');
 assert.equal(rainFeatures[0].properties.validFrom,'2026-11-04T00:00Z');
 assert.equal(rainFeatures[0].properties.source,'Open-Meteo');
 console.log('✓ Rain map: missing values omitted, true zero retained, interval and source preserved for inspection');
+
+api.showInspectionHUD('landmark',{name:'Reference tower',height_m:35.7},null);
+assert.match(elements.get('atlas-observation-hud').innerHTML,/Unverified registry height/,'legacy landmark registry values must not read as surveyed heights');
