@@ -372,6 +372,7 @@ body {
   z-index: 20;
   pointer-events: none;
 }
+/* Kinetic grids: the watch strip is an axial grid — four equal readings along a horizontal axis. Rotation (wind arrow) is bounded by this named grid. */
 .atlas-watch-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

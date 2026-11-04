@@ -487,6 +487,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-header { justify-content:flex-start; }
 #language-toggle { margin-left:auto; min-height:40px; height:40px; padding:7px 8px; border:0; background:transparent; color:var(--ink); font:500 var(--text-body) var(--font-sans); }
 /* MSH: the watch strip is as wide as its readings; a cut-off reading is hidden information. */
+/* Kinetic grids: the watch strip is an axial grid — four equal readings along a horizontal axis. Rotation (wind arrow) is bounded by this named grid. */
 @media (min-width: 769px) {
   .atlas-watch { width:fit-content; max-width:calc(100% - 20px); }
   .atlas-watch-grid { grid-template-columns:repeat(4, auto); }
