@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Workers
+name: Validate and optionally release Dhaka
 
 on:
   push:
@@ -35,9 +35,6 @@ jobs:
       - name: Run test contract suite
         run: npm test
 
-      - name: Stamp build ID
-        run: node scripts/stamp-build-id.mjs
-
       - name: Check Cloudflare credentials
         id: cf_auth
         env:
@@ -45,15 +42,18 @@ jobs:
         run: |
           if [ -z "$CF_TOKEN" ]; then
             echo "has_token=false" >> $GITHUB_OUTPUT
+            echo "### Validation only — no deployment" >> "$GITHUB_STEP_SUMMARY"
+            echo "Checks passed; production was not deployed or verified by this run." >> "$GITHUB_STEP_SUMMARY"
             echo "::warning::CLOUDFLARE_API_TOKEN is not configured in repository secrets. Automated edge deployment skipped. Add CLOUDFLARE_API_TOKEN in GitHub Settings > Secrets and variables > Actions."
           else
             echo "has_token=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Deploy to Cloudflare Workers
+      - name: Canonical deploy and live verification
         if: steps.cf_auth.outputs.has_token == 'true'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: "74ad6bf8dfaaccf82de6f0847f7d2d54"
-          command: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          bash scripts/deploy-live.sh
+          echo "### Deployed and verified" >> "$GITHUB_STEP_SUMMARY"
+          echo "Canonical release gates and exact deployed bytes passed at https://dhaka.nonarkara.org." >> "$GITHUB_STEP_SUMMARY"

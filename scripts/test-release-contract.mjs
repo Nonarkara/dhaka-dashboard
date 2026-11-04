@@ -43,3 +43,8 @@ if (pkg.type !== "module") {
 }
 
 console.log("✓ test-release-contract.mjs passed: Wrangler and package contracts satisfied.");
+
+const workflow = readFileSync(join(root, '.github/workflows/deploy.yml'), 'utf8');
+if (!workflow.includes('bash scripts/deploy-live.sh') || !workflow.includes('Validation only — no deployment') || workflow.includes('command: deploy')) {
+  throw Error('CI must distinguish validation-only runs and use the canonical verified release path');
+}

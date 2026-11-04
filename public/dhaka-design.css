@@ -276,11 +276,11 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-header-nav { display:flex; margin-left:auto; gap:8px; align-items:center; }
 .atlas-header-nav > .atlas-btn,.atlas-menu-summary { min-height:40px; height:40px; padding:7px 8px; border:0; font:500 var(--text-body) var(--font-sans); background:transparent; color:var(--ink); cursor:pointer; }
 .atlas-menu { position:relative; }
-.atlas-menu-body { top:44px; right:0; width:150px; min-width:150px; max-width:150px; max-height:calc(100dvh - 62px); padding:6px; gap:4px; display:flex; flex-direction:column; background:var(--bg-raised); border:1px solid var(--line-bright); overflow-y:auto; overflow-x:hidden; z-index:100; }
+.atlas-menu-body { top:44px; right:0; width:max-content; min-width:0; max-width:calc(100vw - 16px); max-height:calc(100dvh - 62px); padding:10px; gap:4px; display:flex; flex-direction:column; background:var(--bg-raised); border:1px solid var(--line-bright); overflow-y:auto; overflow-x:hidden; z-index:100; }
 .atlas-menu-body .atlas-control-label { display:flex; flex-direction:column; gap:2px; margin:0 0 4px; }
 .atlas-menu-body .atlas-control-label > span { display:block; font-family:var(--font-mono); font-size:var(--text-micro); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--dim); }
 .atlas-menu-body select { min-width:0; width:100%; height:24px; min-height:24px; padding:1px 4px; font-size:var(--text-micro); background:var(--bg); border:1px solid var(--line); color:var(--ink); }
-.atlas-menu-body .atlas-btn { display:block; width:100%; min-height:24px; height:24px; padding:2px 5px; font-size:var(--text-micro); text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.atlas-menu-body .atlas-btn { display:block; width:100%; min-height:36px; height:auto; padding:4px 6px; font-size:var(--text-body); text-align:left; white-space:normal; overflow-wrap:anywhere; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
 .atlas-menu-body .atlas-btn:hover { background:var(--line); color:var(--accent); }
 .atlas-menu-body a { color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); padding:2px 0; font-size:var(--text-micro); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
 .atlas-menu-body a:hover { color:var(--accent); }
@@ -408,7 +408,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 }
 
 /* Audit: density must retain complete labels, readable type and usable targets. */
-.atlas-menu-body { width:260px; min-width:0; max-width:calc(100vw - 16px); padding:10px; }
+.atlas-menu-body { width:max-content; max-width:min(320px,calc(100vw - 16px)); }
 .atlas-menu-body .atlas-control-label > span { font-size:var(--text-body); text-transform:none; letter-spacing:0; }
 .atlas-menu-body select,.atlas-menu-body .atlas-btn { min-height:36px; height:auto; font-size:var(--text-body); white-space:normal; overflow:visible; text-overflow:clip; }
 .atlas-menu-body select { padding:4px 6px; }
@@ -487,7 +487,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-header { justify-content:flex-start; }
 #language-toggle { margin-left:auto; min-height:40px; height:40px; padding:7px 8px; border:0; background:transparent; color:var(--ink); font:500 var(--text-body) var(--font-sans); }
 /* MSH: the watch strip is as wide as its readings; a cut-off reading is hidden information. */
-/* Kinetic grids: the watch strip is an axial grid — four equal readings along a horizontal axis. Rotation (wind arrow) is bounded by this named grid. */
+/* Modular edge instruments keep the map dominant. The wind arrow encodes modeled wind direction; it is not rotated display typography. */
 @media (min-width: 769px) {
   .atlas-watch { width:fit-content; max-width:calc(100% - 20px); }
   .atlas-watch-grid { grid-template-columns:repeat(4, auto); }
@@ -495,5 +495,38 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 }
 .maplibregl-ctrl.maplibregl-ctrl-attrib, .maplibregl-ctrl-attrib a { font-size:var(--text-micro); }
 .atlas-menu-body .atlas-control-label { align-items:stretch; text-align:left; }
+.atlas-menu-body > * { flex-shrink:0; }
+.atlas-header:has(.atlas-menu[open]) { z-index:100; }
 /* Imagery credit must stay visible on phones: the watch strip sits above the attribution control. */
 @media (max-width: 768px) { .atlas-watch { bottom: 34px; } }
+
+/* Exact forecast values stay available without relying on bar hover or colour. */
+.air-data-table { margin-top:8px; }
+.air-data-table summary { min-height:36px; padding:6px 0; cursor:pointer; font-weight:600; }
+.air-data-table table { width:100%; border-collapse:collapse; font-size:var(--text-body); font-variant-numeric:tabular-nums; }
+.air-data-table caption { text-align:left; color:var(--dim); padding:4px 0; }
+.air-data-table th,.air-data-table td { text-align:left; padding:5px 4px; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+.air-data-table time { white-space:normal; }
+.air-chart-axis { display:flex; justify-content:space-between; gap:8px; font-size:var(--text-micro); color:var(--dim); }
+.air-chart-axis time { max-width:48%; }
+
+/* Values wrap as complete evidence: the AQI band is part of the reading. */
+.atlas-watch-item { flex-wrap:wrap; pointer-events:auto; }
+.atlas-watch-item strong { white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; text-align:right; }
+@media (max-width:768px) {
+  .atlas-watch-item { gap:3px 5px; }
+  .atlas-watch-item strong { flex:1 1 100%; }
+}
+
+/* Let enlarged text earn additional header rows instead of clipping a control. */
+.atlas-header { height:auto; min-height:40px; flex-wrap:wrap; padding-top:0; padding-bottom:0; }
+.atlas-lens-choice { flex:1 1 9ch; }
+.atlas-lens-choice select { min-height:40px; height:auto; padding-top:4px; padding-bottom:4px; }
+.atlas-menu-summary,#language-toggle { height:auto; min-height:40px; line-height:1.3; }
+.atlas-lens-choice { min-width:min(100%,calc(var(--text-body) * 10)); }
+
+/* Source attribution owns a separate bottom row at every viewport size. */
+.atlas-watch { bottom:calc(var(--map-credit-height, 24px) + 18px); }
+.maplibregl-ctrl-attrib { max-width:calc(100vw - 20px); overflow-wrap:anywhere; }
+.maplibregl-ctrl-attrib-inner { white-space:normal; }
+.maplibregl-ctrl-bottom-right { max-width:calc(100% - 20px); }

@@ -1,5 +1,5 @@
 // The instrument band — the narrow strip that carries the country's clock, the
-// live exchange rate and the national economic readings.
+// daily reference exchange rate and dated national readings.
 //
 // Three rules govern what may appear here:
 //
@@ -7,10 +7,8 @@
 //     is typed in by hand.
 //  2. A figure that cannot be read says so. It never shows a zero, and it
 //     never shows yesterday's number without its date.
-//  3. The clock is anchored to the server, not to the device. A device clock
-//     that is wrong would put a wrong time in the one place the city looks to
-//     for the time; the offset from the server is computed once and the tick
-//     runs from that.
+//  3. The clock names its basis: device time until a valid server response
+//     supplies an offset, and device time again when synchronization fails.
 //
 // The band is a band: one row, one message. The full set of readings lives in
 // the Bangladesh data panel, and this strip is the short version of it.
@@ -21,17 +19,34 @@
   const bn = () => document.documentElement.lang === 'bn';
   const tr = (en, be) => bn() ? be : en;
 
-  // The readings the band can carry, in the order they matter. The full
-  // ledger lives in the Bangladesh data panel; this is the short list.
+  // The ledger uses source-domain groups; the band below stays a short list.
+  const DOMAIN_ORDER = [
+    ['economy', 'Economy', 'অর্থনীতি'],
+    ['people', 'People', 'জনগণ'],
+    ['energy', 'Energy', 'জ্বালানি'],
+    ['mobility', 'Mobility', 'চলাচল'],
+    ['smart-living', 'Smart living', 'স্মার্ট জীবনযাপন'],
+    ['environment', 'Environment', 'পরিবেশ'],
+    ['governance', 'Governance', 'শাসন'],
+  ];
   const fields = [
-    ['gdp', 'GDP', 'জিডিপি'],
-    ['population', 'Population', 'জনসংখ্যা'],
-    ['inflation', 'CPI inflation', 'মূল্যস্ফীতি'],
-    ['remittance', 'Remittances', 'প্রবাসী আয়'],
-    ['exports', 'Exports', 'রপ্তানি'],
-    ['industry', 'Industry share', 'শিল্পখাতের অংশ'],
-    ['unemployment', 'Unemployment', 'বেকারত্ব'],
-    ['fx-period', 'Official FX annual average', 'সরকারি বার্ষিক গড় বিনিময় হার'],
+    ['gdp', 'GDP', 'জিডিপি', 'economy'],
+    ['population', 'Population', 'জনসংখ্যা', 'people'],
+    ['inflation', 'CPI inflation', 'মূল্যস্ফীতি', 'economy'],
+    ['remittance', 'Remittances', 'প্রবাসী আয়', 'economy'],
+    ['exports', 'Exports', 'রপ্তানি', 'economy'],
+    ['industry', 'Industry share', 'শিল্পখাতের অংশ', 'economy'],
+    ['unemployment', 'Unemployment', 'বেকারত্ব', 'people'],
+    ['fx-period', 'Official FX annual average', 'সরকারি বার্ষিক গড় বিনিময় হার', 'economy'],
+    ['literacy', 'Adult literacy rate', 'প্রাপ্তবয়স্কদের সাক্ষরতার হার', 'people'],
+    ['school-enrolment', 'Secondary school enrolment', 'মাধ্যমিক বিদ্যালয়ে ভর্তি', 'people'],
+    ['life-expectancy', 'Life expectancy at birth', 'জন্মের সময় প্রত্যাশিত আয়ু', 'smart-living'],
+    ['physicians', 'Physicians per 1,000 people', 'হাজার মানুষে চিকিৎসক', 'smart-living'],
+    ['urban-share', 'Urban population share', 'শহুরে জনগণের অনুপাত', 'mobility'],
+    ['electricity-access', 'Electricity access', 'বিদ্যুৎপ্রাপ্তির হার', 'energy'],
+    ['renewables', 'Renewable electricity share', 'নবায়নযোগ্য বিদ্যুতের অংশ', 'energy'],
+    ['co2-per-capita', 'CO₂ per person', 'জনপ্রতি কার্বন ডাই-অক্সাইড', 'environment'],
+    ['tax-revenue', 'Tax revenue', 'কর আদায়', 'governance'],
   ];
 
   /**
@@ -50,7 +65,7 @@
   ];
 
   let data, started = false;
-  let serverOffsetMs = 0;
+  let serverOffsetMs = null;
 
   function format(value, kind, compact = false) {
     if (typeof value !== 'number' || !Number.isFinite(value)) return null;
@@ -69,8 +84,8 @@
    * left in the wrong language in a Bengali interface is a hole.
    */
   const UNITS = {
-    en: { 'USD': 'USD', 'people': 'people', '% GDP': '% of GDP', 'BDT/USD': 'BDT/USD', '%': '%' },
-    bn: { 'USD': 'USD', 'people': 'জন', '% GDP': '% জিডিপি', 'BDT/USD': 'টাকা/ডলার', '%': '%' },
+    en: { 'USD': 'USD', 'people': 'people', '% GDP': '% of GDP', 'BDT/USD': 'BDT/USD', '%': '%', 'years': 'years', 'per 1,000': 'per 1,000 people', 't': 'tonnes' },
+    bn: { 'USD': 'USD', 'people': 'জন', '% GDP': '% জিডিপি', 'BDT/USD': 'টাকা/ডলার', '%': '%', 'years': 'বছর', 'per 1,000': 'প্রতি ১,০০০ জনে', 't': 'টন' },
   };
   const unitText = unit => (UNITS[bn() ? 'bn' : 'en'][unit]) ?? unit ?? '';
 
@@ -95,15 +110,14 @@
     unitEl.textContent = unit.slice(1).trim();
   }
 
-  /**
-   * The country's time, read from the server's clock.
-   *
-   * Bangladesh keeps a fixed UTC+6 with no daylight saving, so the offset
-   * never changes and the reading never needs a timezone database on the
-   * client.
-   */
+  // Bangladesh time is UTC+6; synchronization provenance stays visible.
+  function clockBasis() {
+    return serverOffsetMs === null
+      ? tr('Device clock · Bangladesh time · UTC+6', 'যন্ত্রের ঘড়ি · বাংলাদেশের সময় · UTC+6')
+      : tr('Server-synced clock · Bangladesh time · UTC+6', 'সার্ভারের সঙ্গে সমন্বিত ঘড়ি · বাংলাদেশের সময় · UTC+6');
+  }
   function countryTime() {
-    const now = new Date(Date.now() + serverOffsetMs);
+    const now = new Date(Date.now() + (serverOffsetMs ?? 0));
     return now.toLocaleTimeString(bn() ? 'bn-BD' : 'en-GB', {
       timeZone: 'Asia/Dhaka', hour12: false,
     });
@@ -130,11 +144,11 @@
   function renderBand(strip) {
     strip.textContent = '';
 
-    // The clock. Always present, always the server's time.
+    // Optional band clock; the national desk remains independently usable.
     const clockEl = make('time', '', 'instrument-clock');
     clockEl.setAttribute('role', 'timer');
     clockEl.setAttribute('aria-live', 'off');
-    clockEl.title = tr('Bangladesh time · UTC+6', 'বাংলাদেশের সময় · UTC+6');
+    clockEl.title = clockBasis();
     strip.appendChild(clockEl);
 
     for (const slot of BAND) {
@@ -152,8 +166,8 @@
           value.textContent = decimal(reading.rate);
           el.dataset.state = 'ok';
           el.title = tr(
-            `Live exchange rate · ${reading.source} · ${reading.period}`,
-            `লাভ বিনিময় হার · ${reading.source} · ${reading.period}`,
+            `Daily reference exchange rate · ${reading.source} · ${reading.period}`,
+            `দৈনিক তথ্যসূত্রের বিনিময় হার · ${reading.source} · ${reading.period}`,
           );
         } else {
           value.textContent = '—';
@@ -191,8 +205,8 @@
 
   function render() {
     const strip = $('#atlas-instruments'), desk = $('#atlas-national-data');
-    if (!strip || !desk) return;
-    renderBand(strip);
+    if (strip) renderBand(strip);
+    if (!desk) return;
 
     desk.textContent = '';
     const note = make('p', tr(
@@ -201,21 +215,21 @@
     ));
     desk.appendChild(note);
 
-    const localClock = make('p', tr('Bangladesh time · UTC+6: ', 'বাংলাদেশের সময় · UTC+6: '));
+    const localClock = make('p', `${clockBasis()}: `);
     localClock.appendChild(make('time', '', 'instrument-clock'));
     desk.appendChild(localClock);
 
     const rows = make('dl', '');
-    const show = (id, reading, isFx = false) => {
+    const show = (id, reading, isFx = false, into = rows) => {
       const dt = make('dt', isFx
         ? tr('Daily reference FX · BDT per USD', 'দৈনিক তথ্যসূত্রের বিনিময় হার · প্রতি ডলারে টাকা')
         : label(id));
       const dd = make('dd', '');
+      dd.dataset.series = id;
       const raw = isFx ? reading?.rate : reading?.value;
       const shown = reading?.status === 'ok' ? format(raw, isFx ? 'rate' : reading.format) : null;
       const unit = isFx ? 'BDT/USD' : reading?.unit;
-      const unitText = bn() ? ({ 'USD': 'মার্কিন ডলার', 'people': 'জন', '% GDP': '% জিডিপি', 'BDT/USD': 'টাকা/ডলার' })[unit] || unit || '' : unit || '';
-      dd.appendChild(make('strong', shown === null ? tr('Unavailable', 'অনুপলব্ধ') : `${shown} ${unitText}`));
+      dd.appendChild(make('strong', shown === null ? tr('Unavailable', 'অনুপলব্ধ') : `${shown} ${unitText(unit)}`));
       const valid = shown !== null && typeof reading?.period === 'string';
       const period = make('small', valid
         ? `${tr('Period', 'তথ্যকাল')}: ${reading.period} · ${tr('Retrieved', 'সংগৃহীত')}: ${reading.fetchedAt}`
@@ -226,26 +240,33 @@
       link.href = isFx ? 'https://github.com/fawazahmed0/exchange-api' : `https://data.worldbank.org/indicator/${reading?.indicator || ''}?locations=BD`;
       link.target = '_blank'; link.rel = 'noopener';
       dd.appendChild(link);
-      rows.append(dt, dd);
+      into.append(dt, dd);
     };
     show('daily-fx', data?.currency, true);
-    fields.forEach(([id]) => show(id, data?.macro?.find(r => r.id === id)));
     desk.appendChild(rows);
+    // Keep every series visible during partial and total outages as well.
+    for (const [domain, en, be] of DOMAIN_ORDER) {
+      desk.appendChild(make('h4', bn() ? be : en, 'desk-subhead'));
+      const group = make('dl', '');
+      group.dataset.domain = domain;
+      fields.filter(field => field[3] === domain).forEach(([id]) =>
+        show(id, data?.macro?.find(reading => reading.id === id), false, group));
+      desk.appendChild(group);
+    }
     clock();
   }
 
   async function load() {
     try {
       const res = await fetch('/api/atlas/instruments', { signal: AbortSignal.timeout(20000) });
+      if (!res.ok) throw Error('national-request-failed');
       const body = await res.json();
-      if (!Array.isArray(body.macro) || !body.timestamp) throw Error('invalid-national-response');
+      if (!Array.isArray(body.macro) || typeof body.timestamp !== 'string' || !Number.isFinite(Date.parse(body.timestamp))) throw Error('invalid-national-response');
       data = body;
-      // Anchor the clock to the server. The response carries the server's own
-      // reading of the time, so the difference between it and this device is
-      // the device's error, and correcting for it makes the band the one
-      // place in the atlas that is not a matter of opinion.
+      // A valid response timestamp permits a labeled synchronization offset.
       serverOffsetMs = new Date(body.timestamp).getTime() - Date.now();
     } catch {
+      serverOffsetMs = null;
       data = { macro: [], timestamp: new Date().toISOString() };
     }
     render();

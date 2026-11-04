@@ -1,4 +1,5 @@
 import { readSnapshot, collectSnapshot, sourceHealth, observationHistory, historicalSnapshot, type SnapshotEnv } from "./snapshots.js";
+import { validateCurrentModel, currentModelReason, validateRainfall24h } from "./current-model.js";
 import { getInstruments } from "./instruments.js";
 import { publicShelterRegister } from "./planning.js";
 import { getOutlook } from "./outlook.js";
@@ -65,26 +66,38 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 const memoryCache = new Map<string, CacheEntry<unknown>>();
+const pendingFeeds = new Map<string, Promise<{data:unknown;fromCache:boolean;error?:string}>>();
 
 async function fetchWithCache<T>(
   cacheKey: string,
   ttlMs: number,
   fetcher: () => Promise<T>,
   fallback: T,
+  validate?: (data: T) => void,
 ): Promise<{ data: T; fromCache: boolean; error?: string }> {
   const cached = memoryCache.get(cacheKey) as CacheEntry<T> | undefined;
   const now = Date.now();
   if (cached && now - cached.timestamp < ttlMs) {
-    return { data: cached.data, fromCache: true };
+    try {
+      validate?.(cached.data);
+      return { data: cached.data, fromCache: true };
+    } catch { memoryCache.delete(cacheKey); }
   }
-  try {
-    const data = await fetcher();
-    memoryCache.set(cacheKey, { data, timestamp: now });
-    return { data, fromCache: false };
-  } catch (err: unknown) {
-    // Expired model output must not masquerade as a current reading.
-    return { data: fallback, fromCache: false, error: String(err) };
-  }
+  const inFlight=pendingFeeds.get(cacheKey);
+  if(inFlight)return await inFlight as {data:T;fromCache:boolean;error?:string};
+  const task=(async()=>{
+    try {
+      const data = await fetcher();
+      memoryCache.set(cacheKey, { data, timestamp: Date.now() });
+      return { data, fromCache: false };
+    } catch (err: unknown) {
+      // Expired model output must not masquerade as a current reading.
+      return { data: fallback, fromCache: false, error: String(err) };
+    }
+  })();
+  pendingFeeds.set(cacheKey,task);
+  try {return await task;} finally {pendingFeeds.delete(cacheKey);}
+
 }
 
 /**
@@ -505,17 +518,18 @@ const worker = {
           );
           if (!res.ok) throw new Error(`Open-Meteo returned status ${res.status}`);
           const payload = await res.json() as { current?: Record<string, unknown> };
-          if (!payload.current || typeof payload.current.time !== "string") throw new Error("invalid-model-payload");
+          validateCurrentModel(payload, "weather");
           return payload;
         },
         null,
+        candidate => validateCurrentModel(candidate, "weather"),
       );
 
       if (!data) {
         return jsonResponse(
           {
             status: "unavailable",
-            reasonCode: "upstream-unreachable",
+            reasonCode: currentModelReason(error),
             message: "Open-Meteo weather endpoint could not be reached.",
             error,
             timestamp: new Date().toISOString(),
@@ -548,17 +562,18 @@ const worker = {
           );
           if (!res.ok) throw new Error(`Open-Meteo Air API returned ${res.status}`);
           const payload = await res.json() as { current?: Record<string, unknown> };
-          if (!payload.current || typeof payload.current.time !== "string") throw new Error("invalid-model-payload");
+          validateCurrentModel(payload, "air");
           return payload;
         },
         null,
+        candidate => validateCurrentModel(candidate, "air"),
       );
 
       if (!data) {
         return jsonResponse(
           {
             status: "unavailable",
-            reasonCode: "upstream-unreachable",
+            reasonCode: currentModelReason(error),
             message: "Air quality model service unreachable.",
             error,
             timestamp: new Date().toISOString(),
@@ -587,11 +602,11 @@ const worker = {
         20 * 60 * 1000,
         async () => {
           const points = [
-            { id: "buriganga", name: "Buriganga Catchment", lat: 23.7001, lng: 90.4150 },
-            { id: "turag", name: "Turag Basin", lat: 23.7980, lng: 90.3420 },
-            { id: "balu", name: "Balu Corridor", lat: 23.7140, lng: 90.5050 },
-            { id: "tongi", name: "Tongi North", lat: 23.8890, lng: 90.4010 },
-            { id: "savar", name: "Savar West", lat: 23.8583, lng: 90.2667 },
+            { id: "buriganga", name: "Buriganga query point", name_bn: "বুড়িগঙ্গা অনুসন্ধান বিন্দু", lat: 23.7001, lng: 90.4150 },
+            { id: "turag", name: "Turag query point", name_bn: "তুরাগ অনুসন্ধান বিন্দু", lat: 23.7980, lng: 90.3420 },
+            { id: "balu", name: "Balu Corridor", name_bn: "বালু অনুসন্ধান বিন্দু", lat: 23.7140, lng: 90.5050 },
+            { id: "tongi", name: "Tongi North", name_bn: "টঙ্গী উত্তর অনুসন্ধান বিন্দু", lat: 23.8890, lng: 90.4010 },
+            { id: "savar", name: "Savar West", name_bn: "সাভার পশ্চিম অনুসন্ধান বিন্দু", lat: 23.8583, lng: 90.2667 },
           ];
           const results = await Promise.all(
             points.map(async (p) => {
@@ -601,14 +616,10 @@ const worker = {
                   { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
                 );
                 if (!r.ok) throw new Error(`upstream-http-${r.status}`);
-                const j = (await r.json()) as { current?: { precipitation?: number }; hourly?: { precipitation?: number[] } };
-                if (!Number.isFinite(j.current?.precipitation) || !j.hourly?.precipitation?.length || !j.hourly.precipitation.every(Number.isFinite)) throw new Error("invalid-rainfall-payload");
-                return {
-                  ...p,
-                  status: "ok",
-                  current_mm: j.current!.precipitation,
-                  rain_24h_sum_mm: j.hourly!.precipitation!.reduce((a: number, b: number) => a + b, 0),
-                };
+                const j = (await r.json()) as {current?: {precipitation?:number}; current_units?:{precipitation?:string}};
+                const period=validateRainfall24h(j);
+                return {...p,status:"ok",provenance:"modeled",source:"Open-Meteo Weather API",spatialScope:"query_point",retrievedAt:new Date().toISOString(),...period,
+                  current_mm:j.current_units?.precipitation==='mm'&&typeof j.current?.precipitation==='number'&&Number.isFinite(j.current.precipitation)&&j.current.precipitation>=0?j.current.precipitation:null};
               } catch {
                 return { ...p, status: "unavailable", reasonCode: "upstream-or-invalid-rainfall", timestamp: new Date().toISOString(), current_mm: null, rain_24h_sum_mm: null };
               }
@@ -645,7 +656,7 @@ const worker = {
     // ── /api/atlas/wind ──────────────────────────────────────────────────────
     if (url.pathname === "/api/atlas/wind") {
       const cacheKey = "wind:dhaka-grid";
-      const { data } = await fetchWithCache(
+      const { data, error } = await fetchWithCache(
         cacheKey,
         30 * 60 * 1000,
         async () => {
@@ -655,16 +666,17 @@ const worker = {
           );
           if (!res.ok) throw new Error("Wind fetch failed");
           const payload = await res.json() as { current?: Record<string, unknown> };
-          if (!payload.current || typeof payload.current.time !== "string") throw new Error("invalid-model-payload");
+          validateCurrentModel(payload, "wind");
           return payload;
         },
         null,
+        candidate => validateCurrentModel(candidate, "wind"),
       );
 
       return jsonResponse({
         status: data ? "ok" : "unavailable",
         provenance: data ? "modeled" : "unavailable",
-        reasonCode: data ? null : "upstream-unreachable",
+        reasonCode: data ? null : currentModelReason(error),
         timestamp: new Date().toISOString(),
         source: "Open-Meteo · surface wind at 10 m (no 925 hPa field)",
         data,
@@ -804,13 +816,13 @@ const worker = {
       return jsonResponse({
         status: "partial", city: "Dhaka", timestamp: new Date().toISOString(),
         indicators: {
-          airQuality: typeof aqi === "number" ? {
+          airQuality: air.status === "ok" && typeof aqi === "number" && Number.isFinite(aqi) && aqi >= 0 ? {
             status: aqi > 150 ? "danger" : aqi > 100 ? "warning" : "ok",
             provenance: "modeled", us_aqi: aqi, observedAt: air.data?.current?.time,
             category: aqi <= 50 ? "Good" : aqi <= 100 ? "Moderate" : aqi <= 150 ? "Unhealthy for Sensitive Groups" : aqi <= 200 ? "Unhealthy" : aqi <= 300 ? "Very Unhealthy" : "Hazardous",
             source: air.source,
           } : missing("CAMS / Open-Meteo", air.reasonCode || "invalid-current-aqi"),
-          weather: typeof wind?.wind_speed_10m === "number" ? {
+          weather: weather.status === "ok" && typeof wind?.wind_speed_10m === "number" && Number.isFinite(wind.wind_speed_10m) && wind.wind_speed_10m >= 0 ? {
             status: "ok", provenance: "modeled", wind_speed_10m: wind.wind_speed_10m,
             wind_direction_10m: wind.wind_direction_10m, observedAt: wind.time, source: weather.source,
           } : missing("Open-Meteo", weather.reasonCode || "invalid-current-wind"),
@@ -837,11 +849,11 @@ const worker = {
         async () => {
           // Five geographic query points, not catchment-wide rainfall estimates.
           const points = [
-            { id: "buriganga", name: "Buriganga Catchment", lat: 23.7001, lng: 90.4150 },
-            { id: "turag", name: "Turag Basin", lat: 23.7980, lng: 90.3420 },
-            { id: "balu", name: "Balu Corridor", lat: 23.7140, lng: 90.5050 },
-            { id: "tongi", name: "Tongi North", lat: 23.8890, lng: 90.4010 },
-            { id: "savar", name: "Savar West", lat: 23.8583, lng: 90.2667 },
+            { id: "buriganga", name: "Buriganga query point", name_bn: "বুড়িগঙ্গা অনুসন্ধান বিন্দু", lat: 23.7001, lng: 90.4150 },
+            { id: "turag", name: "Turag query point", name_bn: "তুরাগ অনুসন্ধান বিন্দু", lat: 23.7980, lng: 90.3420 },
+            { id: "balu", name: "Balu Corridor", name_bn: "বালু অনুসন্ধান বিন্দু", lat: 23.7140, lng: 90.5050 },
+            { id: "tongi", name: "Tongi North", name_bn: "টঙ্গী উত্তর অনুসন্ধান বিন্দু", lat: 23.8890, lng: 90.4010 },
+            { id: "savar", name: "Savar West", name_bn: "সাভার পশ্চিম অনুসন্ধান বিন্দু", lat: 23.8583, lng: 90.2667 },
           ];
           const rainfall = await Promise.all(
             points.map(async (p) => {
@@ -851,20 +863,9 @@ const worker = {
                   { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
                 );
                 if (!r.ok) throw new Error(`upstream-http-${r.status}`);
-                const j = (await r.json()) as { hourly?: { time?: string[]; precipitation?: unknown[] }; hourly_units?: { precipitation?: string } };
-                const times = j.hourly?.time;
-                const values = j.hourly?.precipitation;
-                if (j.hourly_units?.precipitation !== "mm" || !Array.isArray(times) || times.length !== 24 ||
-                    !Array.isArray(values) || values.length !== 24 ||
-                    values.some(v => typeof v !== "number" || !Number.isFinite(v) || v < 0)) throw new Error("invalid-rainfall-payload");
-                // Open-Meteo precipitation timestamps mark the preceding-hour sum.
-                const dates = times.map(t => typeof t === "string" ? Date.parse(`${t}+06:00`) : NaN);
-                if (dates.some((t, i) => !Number.isFinite(t) || (i > 0 && t - dates[i - 1] !== 3600000)) ||
-                    Math.abs(dates[0] - Date.now()) > 3600000) throw new Error("invalid-rainfall-period");
+                const j = await r.json();
                 return { ...p, status: "ok" as const, provenance: "modeled", source: "Open-Meteo Weather API",
-                  retrievedAt: new Date().toISOString(), validFrom: new Date(dates[0] - 3600000).toISOString(),
-                  validTo: new Date(dates[23]).toISOString(), unit: "mm",
-                  rain_24h_sum_mm: (values as number[]).reduce((a, b) => a + b, 0) };
+                  retrievedAt: new Date().toISOString(), ...validateRainfall24h(j) };
 
               } catch (error) {
                 const message = error instanceof Error ? error.message : "";

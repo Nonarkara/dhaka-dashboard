@@ -8,8 +8,46 @@
   const $$ = sel => Array.from(document.querySelectorAll(sel));
 
   const tr = (en, bn) => document.documentElement.lang === "bn" ? bn : en;
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  async function readFeedResponse(response) {
+    const data = await response.json();
+    if (!response.ok || data.status === 'unavailable') {
+      throw Object.assign(new Error('Feed unavailable'), {
+        reasonCode: data.reasonCode || `http-${response.status}`,
+        timestamp: data.timestamp,
+      });
+    }
+    return data;
+  }
+
+  function markFeedReady(container) {
+    container.dataset.status = 'ok';
+    delete container.dataset.reasonCode;
+    container.dataset.checkedAt = new Date().toISOString();
+  }
+
+  function renderFeedFailure(container, error, en, bn, retry) {
+    const reasonCode = typeof error?.reasonCode === 'string' ? error.reasonCode.slice(0, 200)
+      : ['TimeoutError', 'AbortError'].includes(error?.name) ? 'request-timeout' : 'feed-unreachable-or-invalid';
+    const timestamp = Number.isFinite(Date.parse(error?.timestamp)) ? error.timestamp : new Date().toISOString();
+    container.dataset.status = 'unavailable';
+    container.dataset.reasonCode = reasonCode;
+    container.dataset.checkedAt = timestamp;
+    container.innerHTML = `<p>${tr(en, bn)}</p><p><code>${escapeHtml(reasonCode)}</code> · <time>${escapeHtml(timestamp)}</time></p><button type="button" class="atlas-btn" data-feed-retry>${tr('Retry', 'আবার চেষ্টা')}</button>`;
+    container.querySelector('[data-feed-retry]')?.addEventListener('click', event => {
+      event.currentTarget.disabled = true;
+      event.currentTarget.textContent = tr('Checking source…', 'উৎস যাচাই হচ্ছে…');
+      return retry();
+    });
+  }
 
   async function loadDashboardFeeds() {
+    const referenceLink = $('#parliament-reference-link');
+    if (referenceLink) {
+      referenceLink.textContent = tr('Parliament design reference ↗', 'সংসদের নকশার রেফারেন্স ↗');
+      referenceLink.href = `/parliament-reference.html?lang=${document.documentElement.lang === 'bn' ? 'bn' : 'en'}`;
+    }
     loadEconomy();
     loadRivers();
     loadAirQuality();
@@ -21,10 +59,11 @@
     if (!container) return;
     try {
       const res = await fetch("/api/dhaka/economy", { signal: AbortSignal.timeout(15000) });
-      if (!res.ok) throw new Error("Economy API unavailable");
-      const data = await res.json();
+      const data = await readFeedResponse(res);
+      if (!Array.isArray(data.indicators)) throw new Error('Missing indicators');
       const isBn = document.documentElement.lang === "bn";
 
+      markFeedReady(container);
       container.innerHTML = data.indicators.map(ind => `
         <div class="metric-card">
           <span class="metric-category">${ind.category}</span>
@@ -67,7 +106,7 @@
         }).join("") : `<p class="collage-unavailable">${tr("No corridor could be measured.", "কোনো করিডোর মাপা যায়নি।")}</p>`;
       }
     } catch (err) {
-      container.innerHTML = `<p style="color:var(--warn);padding:8px;">Economic indicators feed unavailable.</p>`;
+      renderFeedFailure(container, err, 'Economic indicators feed unavailable.', 'অর্থনৈতিক সূচকের তথ্য অনুপলব্ধ।', loadEconomy);
       const corridorBox = $("#economy-corridors-grid");
       if (corridorBox) corridorBox.innerHTML = `<p class="collage-unavailable">${tr("Corridor signals unavailable.", "করিডোরের সংকেত অনুপলব্ধ।")}</p>`;
     }
@@ -167,43 +206,55 @@
     if (!container) return;
     try {
       const res = await fetch("/api/atlas/air-quality", { signal: AbortSignal.timeout(15000) });
-      if (!res.ok) throw new Error("Air Quality API unavailable");
-      const data = await res.json();
+      const data = await readFeedResponse(res);
       const hourly = data.data?.hourly;
       if (!hourly?.pm2_5?.length) throw new Error("Missing hourly PM2.5");
 
-      const barsHtml = hourly.pm2_5.slice(0, 72).map((val, idx) => {
+      const samples = hourly.pm2_5.slice(0, 72).map((value, idx) => ({ value, aqi: hourly.us_aqi?.[idx], time: hourly.time?.[idx] }));
+      const displayTime = time => {
+        // Upstream sends local wall-clock strings with its declared timezone.
+        // Do not parse them in the visitor's timezone and silently move the hour.
+        const match = typeof time === 'string' && /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})(?::\d{2})?$/.exec(time);
+        return match ? `${match[1]} ${match[2]}` : tr('Unavailable', 'অনুপলব্ধ');
+      };
+      const displayNumber = value => Number.isFinite(value)
+        ? new Intl.NumberFormat(document.documentElement.lang === 'bn' ? 'bn-BD' : 'en-GB', { maximumFractionDigits: 2 }).format(value)
+        : tr('Unavailable', 'অনুপলব্ধ');
+      const barsHtml = samples.map(({ value: val, aqi, time }) => {
         if (!Number.isFinite(val)) return `<div class="aqi-bar missing" title="${tr("Unavailable", "অনুপলব্ধ")}"></div>`;
         const height = Math.min(100, Math.max(8, (val / 200) * 80));
-        const aqi = hourly.us_aqi?.[idx];
         const aqiClass = !Number.isFinite(aqi) ? "missing" : aqi <= 50 ? "good" : aqi <= 100 ? "moderate" : aqi <= 150 ? "sensitive" : aqi <= 200 ? "unhealthy" : aqi <= 300 ? "very-unhealthy" : "hazardous";
-
-        const hourStr = hourly.time?.[idx]?.split("T")?.[1] || "";
         return `
-          <div class="aqi-bar" style="height:${height}px;" data-aqi-class="${aqiClass}" title="Hour: ${hourStr} · PM2.5: ${val} μg/m³"></div>
+          <div class="aqi-bar" style="height:${height}px;" data-aqi-class="${aqiClass}" title="${escapeHtml(displayTime(time))} · PM2.5: ${displayNumber(val)} μg/m³"></div>
         `;
       }).join("");
+      const rowsHtml = samples.map(({ value, aqi, time }) => `<tr><th scope="row">${escapeHtml(displayTime(time))}</th><td>${displayNumber(value)}</td><td>${displayNumber(aqi)}</td></tr>`).join('');
 
+      markFeedReady(container);
       container.innerHTML = `
         <p>${tr("Model valid time (Asia/Dhaka)", "মডেলের কার্যকর সময় (ঢাকা)")}: ${data.data.current?.time ?? tr("Unavailable", "অনুপলব্ধ")}</p>
         <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
           <strong>${tr("72-hour modeled PM2.5 · CAMS / Open-Meteo", "৭২ ঘণ্টার মডেলভিত্তিক পিএম২.৫ · CAMS / Open-Meteo")}</strong>
           <span style="font-size:var(--text-micro);color:var(--dim);">Current PM2.5: ${data.data.current?.pm2_5 ?? tr("Unavailable", "অনুপলব্ধ")} μg/m³ · US AQI: ${data.data.current?.us_aqi ?? tr("Unavailable", "অনুপলব্ধ")}</span>
         </div>
-        <div class="aqi-timeline">${barsHtml}</div>
-        <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:var(--text-micro);color:var(--dim);">
-          <span>NOW</span>
-          <span>+24 HOURS</span>
-          <span>+48 HOURS</span>
-          <span>+72 HOURS</span>
+        <div class="aqi-timeline" aria-hidden="true">${barsHtml}</div>
+        <div class="air-chart-axis">
+          <time>${escapeHtml(displayTime(samples[0]?.time))}</time>
+          <time>${escapeHtml(displayTime(samples.at(-1)?.time))}</time>
         </div>
+        <details class="air-data-table"><summary>${tr('Hourly values and dates', 'ঘণ্টাভিত্তিক মান ও তারিখ')}</summary>
+          <table><caption>${tr('Modeled values · Asia/Dhaka · missing values remain unavailable.', 'মডেলভিত্তিক মান · ঢাকা · অনুপস্থিত মান অনুপলব্ধ থাকে।')}</caption>
+            <thead><tr><th scope="col">${tr('Valid time', 'কার্যকর সময়')}</th><th scope="col">PM2.5 · μg/m³</th><th scope="col">${tr('US AQI', 'মার্কিন একিউআই')}</th></tr></thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </details>
         <div class="aqi-action-card" style="margin-top:8px;padding:6px 8px;background:var(--bg-raised);border:1px solid var(--line);font-size:var(--text-micro);">
           <strong style="text-transform:uppercase;letter-spacing:0.05em;font-family:var(--font-mono);font-size:var(--text-micro);color:var(--dim);">${tr("Admin action guidance","প্রশাসনিক পদক্ষেপের দিকনির্দেশনা")}</strong>
           <div style="margin-top:4px;">${aqiGuidance(data.data.current?.us_aqi)}</div>
         </div>
       `;
     } catch (err) {
-      container.innerHTML = `<p style="color:var(--warn);padding:8px;">Air quality timeline feed unavailable.</p>`;
+      renderFeedFailure(container, err, 'Air quality timeline feed unavailable.', 'বায়ুমানের সময়রেখার তথ্য অনুপলব্ধ।', loadAirQuality);
     }
   }
 
@@ -212,11 +263,11 @@
     if (!container) return;
     try {
       const res = await fetch("/api/atlas/weather", { signal: AbortSignal.timeout(15000) });
-      if (!res.ok) throw new Error("Weather API unavailable");
-      const data = await res.json();
+      const data = await readFeedResponse(res);
       const cur = data.data?.current;
       if (!cur) throw new Error("Missing current weather");
 
+      markFeedReady(container);
       container.innerHTML = `
         <p>${tr("Modeled weather · Open-Meteo · Asia/Dhaka", "মডেলভিত্তিক আবহাওয়া · Open-Meteo · ঢাকা")}: ${cur.time}</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;margin-bottom:12px;">
@@ -241,22 +292,50 @@
         </div>
       `;
     } catch (err) {
-      container.innerHTML = `<p style="color:var(--warn);padding:8px;">Weather forecast feed unavailable.</p>`;
+      renderFeedFailure(container, err, 'Weather forecast feed unavailable.', 'আবহাওয়ার পূর্বাভাসের তথ্য অনুপলব্ধ।', loadWeather);
     }
   }
 
-  function bootDashboard() {
+  function wireDialogControls() {
+    const menu = $('#atlas-menu');
+    const summary = menu?.querySelector('summary');
+    const menuBody = menu?.querySelector('.atlas-menu-body');
+    const fitMenuToViewport = () => {
+      if (!menu?.open || !menuBody) return;
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      menuBody.style.maxHeight = `${Math.max(0, Math.floor(viewportHeight - menuBody.getBoundingClientRect().top - 8))}px`;
+    };
+    menu?.addEventListener('toggle', fitMenuToViewport);
+    window.addEventListener('resize', fitMenuToViewport);
+    window.visualViewport?.addEventListener('resize', fitMenuToViewport);
+    window.addEventListener('atlas:language', fitMenuToViewport);
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !menu?.open) return;
+      menu.open = false;
+      summary?.focus();
+      event.preventDefault();
+    });
+    document.addEventListener('pointerdown', event => {
+      if (!menu?.open || menu.contains(event.target)) return;
+      const focusWasInMenu = menu.contains(document.activeElement);
+      menu.open = false;
+      if (focusWasInMenu) summary?.focus();
+    });
     $$("[data-open]").forEach(btn => {
       btn.addEventListener("click", () => {
         const targetId = btn.getAttribute("data-open");
         const modal = document.getElementById(targetId);
         if (modal && typeof modal.showModal === "function") {
-          const menu = document.getElementById("atlas-menu");
+          modal._atlasReturnFocus = menu?.contains(btn) ? summary : btn;
           if (menu) menu.open = false;
           modal.showModal();
         }
       });
     });
+    $$('dialog').forEach(dialog => dialog.addEventListener('close', () => {
+      dialog._atlasReturnFocus?.focus();
+      dialog._atlasReturnFocus = null;
+    }));
 
     $$(".modal-close-btn").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -264,6 +343,10 @@
         if (dialog) dialog.close();
       });
     });
+  }
+
+  function bootDashboard() {
+    wireDialogControls();
 
     $("#download-geojson-btn")?.addEventListener("click", () => {
       window.location.href = "/api/atlas/export";

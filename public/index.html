@@ -39,37 +39,38 @@
       </label>
       <button type="button" id="language-toggle" class="atlas-btn" aria-label="Switch language">EN</button>
       <details class="atlas-menu" id="atlas-menu">
-        <summary class="atlas-menu-summary">মেনু</summary>
+        <summary class="atlas-menu-summary">Map menu</summary>
         <div class="atlas-menu-body">
-          <button type="button" class="atlas-btn" data-open="national-data-dialog">বাংলাদেশের উপাত্ত</button>
-          <button type="button" class="atlas-btn" data-open="collage-dialog">স্থানভিত্তিক উপগ্রহের নমুনা</button>
-          <button type="button" class="atlas-btn" data-open="quick-jump-dialog">দ্রুত এলাকা দর্শন</button>
-          <button type="button" class="atlas-btn" data-open="flood-dialog">নদী ও বন্যা তথ্য</button>
-          <button type="button" class="atlas-btn" data-open="air-dialog">বায়ুমান ও ধোঁয়া</button>
-          <button type="button" class="atlas-btn" data-open="economy-dialog">সামষ্টিক অর্থনীতি</button>
-          <button type="button" class="atlas-btn" data-open="transit-dialog">মেট্রো ও পরিবহন</button>
-          <label class="atlas-control-label"><span>দৃশ্য</span>
+          <button type="button" class="atlas-btn" data-open="national-data-dialog">Bangladesh data</button>
+          <button type="button" class="atlas-btn" data-open="collage-dialog">Satellite samples by place</button>
+          <button type="button" class="atlas-btn" data-open="quick-jump-dialog">Quick jump</button>
+          <button type="button" class="atlas-btn" data-open="flood-dialog">Rivers &amp; flood desk</button>
+          <button type="button" class="atlas-btn" data-open="air-dialog">Air quality &amp; smoke</button>
+          <button type="button" class="atlas-btn" data-open="economy-dialog">Macroeconomic engine</button>
+          <button type="button" class="atlas-btn" data-open="transit-dialog">Metro &amp; mobility</button>
+          <label class="atlas-control-label"><span>Map view</span>
             <select id="atlas-view" class="atlas-select" aria-label="Map view">
               <option value="3d" selected>3D city</option>
               <option value="2d">2D map</option>
             </select>
           </label>
-          <label class="atlas-control-label"><span>ভিত্তি মানচিত্র</span>
+          <label class="atlas-control-label"><span>Basemap</span>
             <select id="atlas-basemap" class="atlas-select" aria-label="Basemap">
               <option value="esri" selected>Esri satellite</option>
               <option value="osm">OpenStreetMap streets</option>
             </select>
           </label>
-          <label class="atlas-control-label"><span>দৃশ্যমানতা</span>
+          <label class="atlas-control-label"><span>Appearance</span>
             <select id="atlas-theme" class="atlas-select" aria-label="Appearance">
               <option value="dark" selected>Dark · delta night</option>
               <option value="light">Light · city daylight</option>
               <option value="contrast">High contrast</option>
             </select>
           </label>
-          <button type="button" id="download-geojson-btn" class="atlas-btn">ডাউনলোড দৃশ্য (জিওজেএসওएন)</button>
-          <a href="/research" target="_blank" rel="noopener">গবেষণা ও পদ্ধতি ↗</a>
-          <a href="/api/atlas/watch" target="_blank" rel="noopener">নগর পর্যবেক্ষণ এপিআই (জেএসওएন) ↗</a>
+          <button type="button" id="download-geojson-btn" class="atlas-btn">Download view (GeoJSON)</button>
+          <a id="parliament-reference-link" href="/parliament-reference.html" data-language-fixed>সংসদের নকশার রেফারেন্স ↗</a>
+          <a href="/research" target="_blank" rel="noopener">How it is built (Research &amp; Method) ↗</a>
+          <a href="/api/atlas/watch" target="_blank" rel="noopener">City watch API (JSON) ↗</a>
         </div>
       </details>
     </header>
@@ -121,13 +122,13 @@
   </div>
 
   <!-- Dialogs / Modals -->
-  <dialog id="national-data-dialog" class="dashboard-modal">
-    <div class="modal-header"><h3 class="modal-title">Bangladesh data</h3><button class="modal-close-btn" type="button" aria-label="Close">✕</button></div>
+  <dialog id="national-data-dialog" class="dashboard-modal" aria-labelledby="national-data-dialog-title">
+    <div class="modal-header"><h3 class="modal-title" id="national-data-dialog-title">Bangladesh data</h3><button class="modal-close-btn" type="button" aria-label="Close">✕</button></div>
     <div class="modal-body" id="atlas-national-data"></div>
   </dialog>
-  <dialog id="collage-dialog" class="dashboard-modal">
+  <dialog id="collage-dialog" class="dashboard-modal" aria-labelledby="collage-dialog-title">
     <div class="modal-header">
-      <h3 class="modal-title">Satellite samples by place</h3>
+      <h3 class="modal-title" id="collage-dialog-title">Satellite samples by place</h3>
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
@@ -141,9 +142,9 @@
     </div>
   </dialog>
 
-  <dialog id="quick-jump-dialog" class="dashboard-modal">
+  <dialog id="quick-jump-dialog" class="dashboard-modal" aria-labelledby="quick-jump-dialog-title">
     <div class="modal-header">
-      <h3 class="modal-title">Quick jump to Dhaka districts</h3>
+      <h3 class="modal-title" id="quick-jump-dialog-title">Quick jump to Dhaka districts</h3>
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
@@ -152,9 +153,9 @@
     </div>
   </dialog>
 
-  <dialog id="flood-dialog" class="dashboard-modal">
+  <dialog id="flood-dialog" class="dashboard-modal" aria-labelledby="flood-dialog-title">
     <div class="modal-header">
-      <h3 class="modal-title">Rivers &amp; Flood Desk (BWDB / FFWC)</h3>
+      <h3 class="modal-title" id="flood-dialog-title">Rivers &amp; Flood Desk (BWDB / FFWC)</h3>
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
@@ -162,9 +163,9 @@
     </div>
   </dialog>
 
-  <dialog id="air-dialog" class="dashboard-modal">
+  <dialog id="air-dialog" class="dashboard-modal" aria-labelledby="air-dialog-title">
     <div class="modal-header">
-      <h3 class="modal-title">Air Quality &amp; Winter Smoke Timeline (CAMS / Open-Meteo)</h3>
+      <h3 class="modal-title" id="air-dialog-title">Air Quality &amp; Winter Smoke Timeline (CAMS / Open-Meteo)</h3>
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
@@ -176,9 +177,9 @@
     </div>
   </dialog>
 
-  <dialog id="economy-dialog" class="dashboard-modal">
+  <dialog id="economy-dialog" class="dashboard-modal" aria-labelledby="economy-dialog-title">
     <div class="modal-header">
-      <h3 class="modal-title">Macroeconomic &amp; Industrial Engine Desk</h3>
+      <h3 class="modal-title" id="economy-dialog-title">Macroeconomic &amp; Industrial Engine Desk</h3>
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
@@ -191,9 +192,9 @@
     </div>
   </dialog>
 
-  <dialog id="transit-dialog" class="dashboard-modal">
+  <dialog id="transit-dialog" class="dashboard-modal" aria-labelledby="transit-dialog-title">
     <div class="modal-header">
-      <h3 class="modal-title">Dhaka Metro Rail &amp; Mobility Network</h3>
+      <h3 class="modal-title" id="transit-dialog-title">Dhaka Metro Rail &amp; Mobility Network</h3>
       <button class="modal-close-btn" type="button" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">

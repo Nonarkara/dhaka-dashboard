@@ -12,7 +12,7 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
-| **City in 3D** | OSM building extrusions at zoom 14+ in every 3D lens; local Parliament-area footprints preserve courtyards (mapped or estimated heights), plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
+| **City in 3D** | OSM building footprints at zoom 14+ in every 3D lens; local Parliament detail preserves courtyards and eight explicit source heights; unknown heights stay flat, plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
 | **River outlook** | Northeast GloFAS daily model reaches with ensemble quartiles and available-series maxima; Dhaka reference station registry has no connected observations or calibrated warnings | Bangladesh Water Development Board (BWDB) / FFWC |
 | **Population** | Dated WorldPop 2025 estimates in 1 km cells and 2,181 mapped school/healthcare objects; no census or capacity inference | WorldPop / OpenStreetMap |
 | **Economic engine** | Ready-Made Garment (RMG) export corridors, Savar DEPZ, Adamjee EPZ, Motijheel financial district, and wholesale hubs (Kawran Bazar, Islampur, Chawkbazar) | Export Promotion Bureau (EPB), Bangladesh Bank, DSE |
@@ -20,7 +20,7 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 | **Air forecast** | Regional CAMS PM2.5 playback at approximately 45 km in native three-hour steps for the next 48 hours; city-center 72-hour timeline remains in the air desk | Copernicus CAMS / Open-Meteo |
 | **Brick kilns & smoke** | Explicit unavailable state until FIRMS retrieval is configured; surface wind only, no 925 hPa field | NASA FIRMS (VIIRS NOAA-20 375m), ECMWF |
 | **Architectural heritage** | Mughal, colonial, and modern masterworks: Lalbagh Fort (1678), Ahsan Manzil (1872), Louis Kahn's Jatiya Sangsad Bhaban (1982), Curzon Hall (1904) | Directorate of Archaeology, Survey of Bangladesh |
-| **Rain · next 24 h** | Catchment-level precipitation accumulation forecasts across the Greater Dhaka river basin | Open-Meteo High-Resolution Precipitation Models |
+| **Rain · next 24 h** | Validated 24-hour precipitation totals at five query points; not catchment averages or flood risk | Open-Meteo High-Resolution Precipitation Models |
 | **Rain radar** | Live Doppler radar precipitation loop over the Bengal Delta | RainViewer Doppler Radar Mosaic |
 | **Satellite clouds** | Daily true-color atmospheric cloud reflectance | NASA GIBS / NOAA-20 VIIRS True Color |
 | **Night lights** | Nighttime radiance and urban electrification patterns | NASA GIBS / Suomi NPP VIIRS Black Marble (VNP46A2) |
@@ -118,3 +118,14 @@ npm run deploy:live
 Built by **Dr Non Arkaraprasertkul**, Senior Expert in Smart City Promotion at the Digital Economy Promotion Agency (DEPA) of Thailand. Dedicated to sustainable delta urbanism, civic open data, and smart city twin comparative research across Southeast Asia and South Asia.
 
 Planning provenance/source review: [docs/DHAKA-PLANNING-PROVENANCE.md](docs/DHAKA-PLANNING-PROVENANCE.md). The study extent derives from the population grid, not municipal polygons. DDM embeds coordinates, but source points are unreviewed and no shelter records or pins have been imported.
+
+
+## Reconciliation · 4 November 2026
+
+All 17 dated national World Bank series and daily reference FX are available from the Bangladesh data desk in seven domains. The compact header does not need a separate instruments strip for this desk to work. Fractional rates retain decimals; failure of server-time synchronization is labelled as a device clock.
+
+Current weather/air/wind validate source time, UTC offset, units and finite admissible values before caching. Rainfall requires24consecutive nonnegative hourly millimetre observations with a valid current interval. Its map points do not establish catchment coverage. Flood/shelter operational assessments remain unavailable.
+
+The inherited geometric Parliament sketch is preserved at `/parliament-reference.html` as a bilingual, manually turnable nongeographic design study. The map retains all4,076dated OSM footprints and14courtyard rings; eight explicit source heights extrude, while4,068unknown heights remain flat. Provider-derived streamed `render_height` is not treated as an explicit source height.
+
+Repository recovery and release proof: `docs/evidence/reconciliation-2026-11-04/`. CI without Cloudflare credentials reports validation only; authenticated release uses the same canonical `scripts/deploy-live.sh` gates as local shipping. There are16configured npm test suites, counted from package.json; previous20-suite summaries were inaccurate.

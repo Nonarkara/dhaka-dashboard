@@ -49,15 +49,16 @@ def number(value):
 features=[]; consumed=set()
 def feature(kind, e, t, geometry):
     height=number(t.get('height')); levels=number(t.get('building:levels'))
-    base=number(t.get('min_height')) or (number(t.get('building:min_level')) or 0)*3
+    base=number(t.get('min_height')) or 0
     usable_height=height is not None and height>base
-    method='osm-height-tag' if usable_height else 'levels-times-3m' if levels else 'unmapped-height-6m-estimate'
-    height=height if usable_height else max((levels or 0)*3,base+6)
+    method='osm-height-tag' if usable_height else 'unknown'
+    height=height if usable_height else None
+    if height is None: base=0
     props={
       'osm_id':kind+'/'+e.attrib['id'], 'name':t.get('name:en',t.get('name','Mapped building')),
       'name_bn':t.get('name:bn',t.get('name','')), 'building':t.get('building','yes'),
       'height_m':height,'min_height_m':base,'height_method':method,
-      'height_tier':'reference' if method=='osm-height-tag' else 'modeled',
+      'height_tier':'reference' if method=='osm-height-tag' else 'unavailable',
       'source_url':'https://www.openstreetmap.org/'+kind+'/'+e.attrib['id'],
       'osm_modified_at':e.attrib['timestamp'], 'provenance':'reference',
     }
@@ -97,7 +98,7 @@ result={
     'input_sha256':{Path(p).name:hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in sys.argv[1:]},
     'license':'ODbL-1.0','license_url':'https://www.openstreetmap.org/copyright',
     'retrieved_at':datetime.datetime.fromtimestamp(Path(sys.argv[1]).stat().st_mtime,datetime.timezone.utc).isoformat(),
-    'height_note':'Mapped heights when tagged; otherwise OSM levels x 3 m or 6 m estimate. Not an architectural survey.',
+    'height_note':'Only explicit OSM height tags are extruded; unknown heights stay flat. Floors are retained as tags, not converted to metres. Not an architectural survey.',
     'geometry_note':'Actual mapped building footprints, including multipolygon courtyards. No generated replacement shapes.'},
   'features':features}
 output=Path(__file__).resolve().parent.parent/'public/data/parliament-buildings.geojson'

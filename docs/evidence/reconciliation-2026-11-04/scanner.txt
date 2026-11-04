@@ -1,0 +1,109 @@
+non-slop scan .  ·  73 files  ·  style: (none)
+
+public/dhaka-design.css
+  P1        default-purple       L123  2 uses
+            Tailwind indigo/violet/purple as the accent (#6366f1, #8b5cf6, bg-indigo-600…)
+            fix: Pick the accent from the subject (a flag, a material, a map layer) and give it one job.
+  P1        cream-terracotta     L444  #f3eedf + #dd4027
+            Cream ground + terracotta accent: the second-order 'tasteful' default
+            fix: If it isn't your brand, derive ground and accent from the subject.
+  P2        eyebrow-caps         L24  4 eyebrow labels
+            Tracked all-caps eyebrow labels used as template chrome (≥3)
+            fix: Drop the label or make it carry real information in sentence case.
+  P2        accent-border-card   L151  border-left: 3px solid
+            Coloured left-border 'accent' cards (≥2)
+            fix: Drop the stripe; if it encodes a state, say the state in words too.
+
+public/dashboard.js
+  P1        default-purple       L199  2 uses
+            Tailwind indigo/violet/purple as the accent (#6366f1, #8b5cf6, bg-indigo-600…)
+            fix: Pick the accent from the subject (a flag, a material, a map layer) and give it one job.
+  REVIEW    agentless-passive    L141  No shelter availability is established.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+public/app.js
+  REVIEW    agentless-passive    L1053  ${tr("Surface wind: ","ভূপৃষ্ঠের বাতাস: ")}${windSpeed} km/h ${tr("from ","দিক: ")}${windDir}° (${cardinal}) · ${tr("Modeled surface wind only; smoke transport is not established",
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+public/forecast.js
+  REVIEW    agentless-passive    L125  Local warning thresholds, crop stage, terrain and embankment conditions have not been validated.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+scripts/test-instruments-behavior.mjs
+  REVIEW    agentless-passive    L61  daily FX plus every national series is rendered
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+scripts/test-people-behavior.mjs
+  P1        img-alt              L42  1 image(s)
+            Images without alt (use alt="" for decoration)
+            fix: Describe what the image says, in the page's language; alt="" if decorative.
+  REVIEW    agentless-passive    L96  mixed version bytes must be rejected
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+scripts/test-satellite-contract.mjs
+  REVIEW    agentless-passive    L40  id} is not published at level ${layer.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+  REVIEW    agentless-passive    L44  id} is not published as PNG
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+  REVIEW    agentless-passive    L278  a tie was reported as a win: ${partialReading.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+scripts/test-snapshots.mjs
+  REVIEW    agentless-passive    L45  // A partial but substantial snapshot is published; missing values remain null.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+src/dhaka-data.ts
+  REVIEW    agentless-passive    L63  Population-grid study extent only; no DNCC/DSCC boundary match has been established.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+  REVIEW    agentless-passive    L66  Study boundary must be reviewed against official DNCC/DSCC limits before planning use.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+src/index.ts
+  REVIEW    agentless-passive    L652  No authenticated FIRMS retrieval is configured.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+  REVIEW    agentless-passive    L757  Parameter q is required
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+  REVIEW    agentless-passive    L982  No records are imported and no shelter pins are published pending location and publication review.
+            Passive with no actor (the outcome is stated, the cause is not)
+            do not rewrite. Do not rewrite this automatically. Quote the sentence, ask who did it, and if the reader needs to know, name them. The passive is a camera angle: it is only a question when the cause is missing. When the actor is the reader ('your request was sent') the sentence stays.
+
+scripts/test-anti-slop-design.mjs
+  P1        placeholder-content  L13  lorem ipsum
+            Placeholder people, media or text (Lorem ipsum, John Doe, Acme, picsum, pravatar, Unsplash random)
+            fix: Use real content early, including long labels and missing data.
+
+scripts/test-building-behavior.mjs
+  P1        img-alt              L181  2 image(s)
+            Images without alt (use alt="" for decoration)
+            fix: Describe what the image says, in the page's language; alt="" if decorative.
+
+scripts/test-ui-access-behavior.mjs
+  P1        img-alt              L98  2 image(s)
+            Images without alt (use alt="" for decoration)
+            fix: Describe what the image says, in the page's language; alt="" if decorative.
+
+docs/evidence/msh-2026-11-03/1024x768-en.jpg
+  P2        heavy-image            674 KB
+            Image over 500 KB shipped as-is
+            fix: Resize to the largest displayed size and serve AVIF/WebP; set width/height.
+
+docs/evidence/msh-2026-11-03/1440x900-bn.jpg
+  P2        heavy-image            589 KB
+            Image over 500 KB shipped as-is
+            fix: Resize to the largest displayed size and serve AVIF/WebP; set width/height.
+
+Verdict: SLOP  points 11 (distinct rules: P0 0 · P1 4 · P2 3)  ·  allowed 0  ·  review 14 (sentences to read; not scored, not rewritten)
+SLOP = ≥8 points, a P0 stacked with another P0/P1, or P0/P1 hits in ≥3 categories. REVIEW = 3–7. A screen, not a judge: render it and get a second reviewer.

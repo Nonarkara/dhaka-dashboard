@@ -24,8 +24,6 @@
   let watchData = null;
   let parliamentSnapshot = null;
   let parliamentSourceReady = false;
-  let parliamentModel = null;        // Three.js scene with loaded GLB, or null
-  let parliamentModelCredits = null; // { creator, creatorUrl, sourceUrl, license, ... }
   const tr = (en, bn) => document.documentElement.lang === "bn" ? bn : en;
 
   const $ = sel => document.querySelector(sel);
@@ -88,10 +86,10 @@
       desc_bn: "লালবাগ কেল্লা, আহসান মঞ্জিল, লুই কানের সংসদ ভবন, কার্জন হল ও তারা মসজিদ।"
     },
     rain: {
-      title: "Catchment Rainfall Forecast · 24h",
-      title_bn: "ক্যাচমেন্ট বৃষ্টিপাত পূর্বাভাস · ২৪ ঘণ্টা",
-      desc: "High-resolution 24-hour precipitation accumulation across Greater Dhaka river basins.",
-      desc_bn: "বৃহত্তর ঢাকার নদী অববাহিকায় পরবর্তী ২৪ ঘণ্টার বৃষ্টিপাত পূর্বাভাস।"
+      title: "Point Rainfall Forecast · 24h",
+      title_bn: "স্থানভিত্তিক বৃষ্টিপাত পূর্বাভাস · ২৪ ঘণ্টা",
+      desc: "Modeled 24-hour precipitation totals at five query points. Not catchment averages or flood warnings.",
+      desc_bn: "পাঁচটি অনুসন্ধানের স্থানে মডেলভিত্তিক ২৪ ঘণ্টার বৃষ্টিপাত। অববাহিকার গড় বা বন্যার সতর্কবার্তা নয়।"
     },
     radar: {
       title: "RainViewer Doppler Radar Loop",
@@ -177,10 +175,12 @@
       ]
     };
 
+    styleSpec.layers.push({id:"city-footprints",type:"fill",source:"buildings","source-layer":"building",minzoom:14,
+      paint:{"fill-color":window.DhakaDesign?.paint || "#b4b0a3","fill-opacity":0.65}});
     styleSpec.layers.push({
       id: "city-buildings", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 14,
       filter: ["!", ["has", "hide_3d"]],
-      paint: buildingPaint("render_height", "render_min_height")
+      paint: buildingPaint("source_height_unavailable", "source_base_unavailable")
     });
 
     try {
@@ -197,10 +197,24 @@
         attributionControl: true
       });
 
+      for (const event of ['dragstart','zoomstart','rotatestart','pitchstart']) map.on(event, e => { if (e?.originalEvent) stopMapMotion(); });
+      map.getCanvas?.().addEventListener?.('pointerdown', stopMapMotion);
+      map.getCanvas?.().addEventListener?.('wheel', stopMapMotion, {passive:true});
+      map.getCanvas?.().addEventListener?.('keydown', stopMapMotion);
       map.on("move", syncBuildingVisibility);
       map.on("moveend", syncBuildingVisibility);
       map.on("zoomend", syncBuildingVisibility);
       map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+      // Attribution is a source instrument with its own row, including wrapped phone credits.
+      if (typeof ResizeObserver !== "undefined") {
+        const credit=document.querySelector('.maplibregl-ctrl-attrib');
+        const wrap=document.querySelector('.atlas-map-wrap');
+        if (credit && wrap) {
+          const reserve=()=>wrap.style.setProperty('--map-credit-height',`${Math.ceil(credit.getBoundingClientRect().height)}px`);
+          new ResizeObserver(reserve).observe(credit); reserve();
+        }
+      }
+
 
       // Dismiss overlay when map renders or on error
       map.on("load", async () => {
@@ -242,8 +256,8 @@
     const base = ["max", 0, ["to-number", ["get", baseKey], 0]];
     return {
       "fill-extrusion-color": window.DhakaDesign?.paint || "#b4b0a3",
-      "fill-extrusion-height": ["case", [">", ["to-number", ["get", heightKey], 0], base], ["to-number", ["get", heightKey], 0], ["+", base, 6]],
-      "fill-extrusion-base": base,
+      "fill-extrusion-height": ["case", [">", ["to-number", ["get", heightKey], 0], base], ["to-number", ["get", heightKey], 0], 0],
+      "fill-extrusion-base": ["case", [">", ["to-number", ["get", heightKey], 0], base], base, 0],
       "fill-extrusion-opacity": 0.9
     };
   }
@@ -261,10 +275,9 @@
       useSnapshot = bounds.getWest() > west + guard && bounds.getSouth() > south + guard
         && bounds.getEast() < east - guard && bounds.getNorth() < north - guard;
     }
-    // The model replaces only Parliament itself; nearby mapped blocks stay visible.
+    // Source footprints remain visible in both views; only tagged heights extrude.
     const parliamentVisible = is3D && useSnapshot;
-    if (parliamentModel) parliamentModel.visible = parliamentVisible;
-    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["parliament-buildings", parliamentVisible]]) {
+    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
       const visibility = visible ? "visible" : "none";
       if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
     }
@@ -272,11 +285,9 @@
     if (desc) {
       const story = LENS_STORIES[currentLens] || LENS_STORIES.city;
       const base = tr(story.desc, story.desc_bn);
-      const note = is3D ? parliamentModel
-        ? tr("3D: schematic Parliament model; mapped OSM blocks around it.", "৩ডি: সংসদের ধারণামূলক মডেল; চারপাশে OSM ভবন।")
-        : useSnapshot
-        ? tr("3D: dated OSM detail; heights mapped or estimated.", "৩ডি: তারিখযুক্ত OSM বিস্তারিত; উচ্চতা নথিভুক্ত বা আনুমানিক।")
-        : tr("3D: OSM blocks; heights mapped or estimated.", "৩ডি: OSM ভবন; উচ্চতা নথিভুক্ত বা আনুমানিক।") : "";
+      const note = is3D ? useSnapshot
+        ? tr("3D: explicit OSM heights only; unknown heights stay flat.", "৩ডি: শুধু OSM-এ নথিভুক্ত উচ্চতা; অজানা উচ্চতা সমতল থাকে।")
+        : tr("OSM footprints; streamed tiles do not expose source height tags.", "OSM ভবনের সীমারেখা; স্ট্রিম করা টাইলে উৎসের উচ্চতা নেই।") : "";
       const text = base + (note ? " " + note : "");
       if (desc.textContent !== text) desc.textContent = text;
     }
@@ -296,21 +307,21 @@
           parliamentSourceReady = true;
           map.off("sourcedata", onData);
           syncBuildingVisibility();
-          await tryLoadParliamentModel();
         }
       };
       map.on("sourcedata", onData);
       map.addSource("parliament-detail", { type: "geojson", data,
         attribution: `© OpenStreetMap · detail ${data.metadata.retrieved_at.slice(0, 10)} · ODbL` });
+      map.addLayer({id:"parliament-footprints",type:"fill",source:"parliament-detail",minzoom:14,layout:{visibility:"none"},
+        paint:{"fill-color":window.DhakaDesign?.paint || "#b4b0a3","fill-opacity":0.65}},"city-buildings");
       map.addLayer({ id: "parliament-buildings", type: "fill-extrusion", source: "parliament-detail", minzoom: 14,
         layout: { visibility: "none" }, paint: buildingPaint("height_m", "min_height_m") }, "city-buildings");
       // The source can finish before the layer is attached.
       if (map.isSourceLoaded("parliament-detail")) {
         parliamentSourceReady = true;
         syncBuildingVisibility();
-        await tryLoadParliamentModel();
       }
-      map.on("click", "parliament-buildings", event => {
+      map.on("click", "parliament-footprints", event => {
         if (event.features?.[0]) showInspectionHUD("building", event.features[0].properties);
       });
     } catch (error) {
@@ -320,251 +331,8 @@
     }
   }
 
-  // ── Parliament 3D model (Louis Kahn's Jatiya Sangsad Bhaban) ───────────────
-  // Procedural Kahn-style Parliament built with Three.js primitives — no
-  // external model file, no third-party license, self-attributed to Dr Non /
-  // DEPA. Kahn's architecture is geometric (circular chamber, surrounding
-  // blocks, terraced roofs) and maps cleanly to cylinders, boxes, and planes.
-  // When present it replaces the OSM footprint extrusion inside the Parliament
-  // coverage area. Otherwise the OSM extrusion (heights mapped or estimated)
-  // remains in use.
-
-  async function loadThreeJS() {
-    return import("/vendor/three-0.168.0/three.module.js");
-  }
-
-  const PARLIAMENT_COLORS = {
-    concrete: 0xbfb9a9,    // pale parchment-concrete
-    concreteDark: 0x9a9282,
-    roof: 0x8c8272,
-    shadow: 0x5d574e,
-    water: 0x257da4,
-  };
-
-  // Build a geometric Parliament complex: central circular assembly hall
-  // surrounded by perimeter office blocks, terraced roofs, and a reflecting
-  // pool. Returns a Three.js Group positioned at the Parliament centroid.
-  function buildParliamentModel(THREE) {
-    const group = new THREE.Group();
-
-    // Materials
-    const matConcrete = new THREE.MeshStandardMaterial({
-      color: PARLIAMENT_COLORS.concrete,
-      roughness: 0.85,
-      metalness: 0.05,
-    });
-    const matConcreteDark = new THREE.MeshStandardMaterial({
-      color: PARLIAMENT_COLORS.concreteDark,
-      roughness: 0.85,
-      metalness: 0.05,
-    });
-    const matRoof = new THREE.MeshStandardMaterial({
-      color: PARLIAMENT_COLORS.roof,
-      roughness: 0.9,
-      metalness: 0.02,
-    });
-    const matWater = new THREE.MeshStandardMaterial({
-      color: PARLIAMENT_COLORS.water,
-      roughness: 0.3,
-      metalness: 0.1,
-      transparent: true,
-      opacity: 0.85,
-    });
-
-    // ── Central circular assembly hall (Kahn's core form) ──
-    const hallRadius = 42;
-    const hallHeight = 38;
-    const hall = new THREE.Mesh(
-      new THREE.CylinderGeometry(hallRadius, hallRadius, hallHeight, 32),
-      matConcrete
-    );
-    hall.position.y = hallHeight / 2;
-    group.add(hall);
-
-    // Hall roof overhang (Kahn's deep canopies)
-    const roof = new THREE.Mesh(
-      new THREE.CylinderGeometry(hallRadius + 14, hallRadius + 14, 6, 32),
-      matRoof
-    );
-    roof.position.y = hallHeight + 3;
-    group.add(roof);
-
-    // ── Surrounding perimeter blocks (octagonal offices/chambers) ──
-    const blockCount = 12;
-    const blockRadius = hallRadius + 28;
-    const blockDepth = 26;
-    const blockHeight = 22;
-    for (let i = 0; i < blockCount; i++) {
-      const angle = (i / blockCount) * Math.PI * 2;
-      const x = Math.cos(angle) * blockRadius;
-      const z = Math.sin(angle) * blockRadius;
-      const block = new THREE.Mesh(
-        new THREE.BoxGeometry(blockDepth, blockHeight, blockDepth),
-        matConcreteDark
-      );
-      block.position.set(x, blockHeight / 2, z);
-      block.rotation.y = angle + Math.PI / 4;
-      group.add(block);
-
-      // Block roof
-      const blockRoof = new THREE.Mesh(
-        new THREE.BoxGeometry(blockDepth + 4, 4, blockDepth + 4),
-        matRoof
-      );
-      blockRoof.position.set(x, blockHeight + 2, z);
-      blockRoof.rotation.y = angle + Math.PI / 4;
-      group.add(blockRoof);
-    }
-
-    // ── Reflecting pool around the complex ──
-    const poolRadius = blockRadius + 40;
-    const pool = new THREE.Mesh(
-      new THREE.CylinderGeometry(poolRadius, poolRadius, 1, 64),
-      matWater
-    );
-    pool.position.set(0, 0.05, 0);
-    group.add(pool);
-
-    // ── Connecting bridges / walkways ──
-    const walkwayRad = blockRadius + 8;
-    for (let i = 0; i < blockCount; i += 3) {
-      const angle = (i / blockCount) * Math.PI * 2;
-      const x = Math.cos(angle) * walkwayRad;
-      const z = Math.sin(angle) * walkwayRad;
-      const w = new THREE.Mesh(
-        new THREE.BoxGeometry(6, 1, 34),
-        matConcreteDark
-      );
-      w.position.set(x, 3, z);
-      w.rotation.y = angle;
-      group.add(w);
-    }
-
-    // ── Light steps up to hall ──
-    const steps = new THREE.Group();
-    for (let s = 0; s < 6; s++) {
-      const step = new THREE.Mesh(
-        new THREE.BoxGeometry(hallRadius * 2 - s * 10, 2, hallRadius * 2 - s * 10),
-        matConcreteDark
-      );
-      step.position.set(0, s * 2 + 1, 0);
-      steps.add(step);
-    }
-    group.add(steps);
-
-    return group;
-  }
-
-  // MapLibre custom layer rendering the procedural Parliament model at a fixed
-  // geographic position using Three.js and the map's WebGL context.
-  class ParliamentModelLayer {
-    constructor(lng, lat, THREE, model) {
-      this.id = "parliament-model";
-      this.type = "custom";
-      this.renderingMode = "3d";
-      this.visible = false;
-      this.lng = lng;
-      this.lat = lat;
-      this.THREE = THREE;
-      this.model = model;
-      this.renderer = null;
-      this.camera = null;
-      this.ready = false;
-    }
-
-    onAdd(map, gl) {
-      this.map = map;
-      this.gl = gl;
-      const size = map.getCanvas().getBoundingClientRect();
-
-      this.renderer = new this.THREE.WebGLRenderer({
-        context: gl,
-        canvas: map.getCanvas(),
-        antialias: true,
-        premultipliedAlpha: false,
-      });
-      this.renderer.autoClear = false;
-
-      // Lighting matches map sun: intensity 0.55, position [1.3, 110, 45]
-      const scene = new this.THREE.Scene();
-      const ambient = new this.THREE.AmbientLight(0xffffff, 0.45);
-      scene.add(ambient);
-      const dir = new this.THREE.DirectionalLight(0xffffff, 0.75);
-      dir.position.set(1.3, 110, 45);
-      scene.add(dir);
-
-      this.scene = scene;
-      this.camera = new this.THREE.Camera();
-      this.scene.add(this.model);
-      this.ready = true;
-      map.triggerRepaint();
-    }
-
-    render(gl, args) {
-      if (!this.ready || !this.renderer || !this.visible) return;
-      const matrix = args?.defaultProjectionData?.mainMatrix;
-      if (!matrix || matrix.length !== 16) return;
-      const origin = window.maplibregl.MercatorCoordinate.fromLngLat([this.lng,this.lat],0);
-      const scale = origin.meterInMercatorCoordinateUnits();
-      const local = new this.THREE.Matrix4()
-        .makeTranslation(origin.x,origin.y,origin.z)
-        .scale(new this.THREE.Vector3(scale,-scale,scale))
-        .multiply(new this.THREE.Matrix4().makeRotationX(Math.PI/2));
-      this.camera.projectionMatrix.fromArray(matrix).multiply(local);
-      this.renderer.resetState();
-      this.renderer.render(this.scene,this.camera);
-    }
-  }
-
-  // Find Parliament centroid from footprint geometry
-  function parliamentCentroid(features) {
-    const parliament = features.find((f) => f.id === "relation/18085267");
-    if (!parliament) return null;
-    const rings =
-      parliament.geometry.type === "MultiPolygon"
-        ? parliament.geometry.coordinates[0]
-        : parliament.geometry.coordinates[0];
-    let sumX = 0,
-      sumY = 0,
-      count = 0;
-    for (const ring of rings) {
-      for (const [lon, lat] of ring) {
-        sumX += lon;
-        sumY += lat;
-        count++;
-      }
-    }
-    return { lng: sumX / count, lat: sumY / count };
-  }
-
-  async function tryLoadParliamentModel() {
-    if (!parliamentSourceReady || !parliamentSnapshot || parliamentModel) return;
-
-    const THREE = await loadThreeJS().catch((err) => {
-      console.warn("Three.js unavailable; Parliament model skipped:", err);
-      return null;
-    });
-    if (!THREE || parliamentModel) return;
-
-    const centroid = parliamentCentroid(parliamentSnapshot.features);
-    if (!centroid) return;
-
-    const model = buildParliamentModel(THREE);
-    parliamentModel = new ParliamentModelLayer(
-      centroid.lng,
-      centroid.lat,
-      THREE,
-      model
-    );
-
-    // Hide OSM Parliament extrusion; model layer draws instead
-    const layer = map.getLayer("parliament-buildings");
-    if (layer) {
-      map.addLayer(parliamentModel, "parliament-buildings");
-      map.setFilter("parliament-buildings", ["!=",["get","osm_id"],"relation/18085267"]);
-      syncBuildingVisibility();
-    }
-  }
+  // The inherited procedural sketch lives at /parliament-reference.html.
+  // It has no traceable dimensions and must never replace mapped geometry.
 
   async function loadDataLayers() {
     // 1. Landmarks
@@ -806,18 +574,18 @@
       const use = ({apartments:tr("Apartments","অ্যাপার্টমেন্ট"), retail:tr("Retail / markets","খুচরা / বাজার"), mosque:tr("Religious use","ধর্মীয় ব্যবহার"), education:tr("Education","শিক্ষা"), healthcare:tr("Healthcare","স্বাস্থ্যসেবা"), civic:tr("Civic / community","নাগরিক / সামাজিক"), commerce:tr("Commerce","বাণিজ্য"), homes:tr("Homes","আবাসন"), industry:tr("Industry / utilities","শিল্প / পরিষেবা"), unknown:tr("Use unknown","ব্যবহার অজানা")})[props.use_class] || tr("Use unknown","ব্যবহার অজানা");
       rowsHtml = `
         <div class="hud-row"><span class="hud-label">${tr("Mapped use", "নথিভুক্ত ব্যবহার")}</span><span class="hud-value">${use}</span></div>
-        <div class="hud-row"><span class="hud-label">${tr("Block height", "ভবনের উচ্চতা")}</span><span class="hud-value">${props.height_m} m</span></div>
-        <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${props.height_method === "levels-times-3m" ? tr("OSM levels × 3 m (estimate)", "OSM তলা × ৩ মিটার (আনুমানিক)") : props.height_method === "osm-height-tag" ? tr("OSM height tag", "OSM উচ্চতার তথ্য") : tr("6 m estimate; no mapped height", "৬ মিটার আনুমানিক; উচ্চতার তথ্য নেই")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Block height", "ভবনের উচ্চতা")}</span><span class="hud-value">${Number.isFinite(props.height_m) ? props.height_m+" m" : tr("Unknown · flat footprint","অজানা · সমতল সীমারেখা")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${props.height_method === "osm-height-tag" ? tr("OSM height tag", "OSM উচ্চতার তথ্য") : tr("No source height; levels are not metres", "উৎসে উচ্চতা নেই; তলার সংখ্যা মিটার নয়")}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Snapshot", "উপাত্ত সংগ্রহ")}</span><span class="hud-value">${parliamentSnapshot.metadata.retrieved_at.slice(0, 10)}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Source", "উৎস")}</span><span class="hud-value">${props.osm_id} · ODbL</span></div>
-        ${parliamentModel ? `<div class="hud-row"><span class="hud-label">${tr("3D model", "৩ডি মডেল")}</span><span class="hud-value">${tr("Procedural Kahn model · Dr Non Arkaraprasertkul / DEPA", "প্রক্রিয়াজাত কাহ্ন মডেল · ডক্টর নন আরকপ্রসাদকুল / ডিইপিএ")}</span></div>` : ""}
+
         <p>${tr("Mapped footprint massing; not a surveyed architectural model.", "মানচিত্রভিত্তিক ভবনের রূপ; জরিপকৃত স্থাপত্য মডেল নয়।")}</p>
       `;
     } else if (type === "landmark") {
       rowsHtml = `
         <div class="hud-row"><span class="hud-label">Year / Era:</span><span class="hud-value">${props.year || "Historic"}</span></div>
         <div class="hud-row"><span class="hud-label">Category:</span><span class="hud-value">${props.category}</span></div>
-        <div class="hud-row"><span class="hud-label">Height:</span><span class="hud-value">${props.height_m || "15"} m</span></div>
+        <div class="hud-row"><span class="hud-label">Height:</span><span class="hud-value">${Number.isFinite(props.height_m) ? props.height_m+" m" : tr("Unknown","অজানা")}</span></div>
       `;
     } else if (type === "station") {
       rowsHtml = `
@@ -848,6 +616,15 @@
   }
 
   let radarTimer = null;
+  let radarToggle = null;
+  const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+  function pauseRadar() {
+    clearInterval(radarTimer);
+    radarTimer = null;
+    if (radarToggle) { radarToggle.textContent = tr('Play radar','রাডার চালান'); radarToggle.disabled = reducedMotion(); }
+  }
+  function stopMapMotion() { pauseRadar(); window.AtlasForecast?.pause(); map?.stop?.(); }
+
   let dynamicLayers = [];
   let dynamicClickHandlers = [];
   function onDynamicClick(id, handler) {
@@ -1011,10 +788,8 @@
   function clearDynamicLayers() {
     for (const {id, handler} of dynamicClickHandlers) map?.off("click", id, handler);
     dynamicClickHandlers = [];
-    if (radarTimer) {
-      clearInterval(radarTimer);
-      radarTimer = null;
-    }
+    pauseRadar();
+    radarToggle = null;
     if (activeOverlayLayer && map?.getLayer(activeOverlayLayer)) {
       map.removeLayer(activeOverlayLayer);
       map.removeSource(activeOverlayLayer);
@@ -1028,6 +803,7 @@
   }
 
   function applyLens(lensId, { moveCamera = lensId !== currentLens } = {}) {
+    stopMapMotion();
     currentLens = lensId;
     const token = ++lensToken;
     if ($("#atlas-lens")) $("#atlas-lens").value = lensId;
@@ -1055,8 +831,8 @@
         zoom: vp.zoom,
         pitch: is3D ? vp.pitch : 0,
         bearing: is3D ? vp.bearing : 0,
-        essential: true,
-        duration: 1600
+        essential: false,
+        duration: 250
       });
     }
 
@@ -1165,26 +941,40 @@
           if (map.getSource("rain-radar")) map.removeSource("rain-radar");
           addRasterOverlay("rain-radar", tileUrl, 7);
           const tStr = new Date(fr.time * 1000).toLocaleTimeString(isBn ? "bn-BD" : "en-GB", { timeZone: "Asia/Dhaka", hour: "2-digit", minute: "2-digit" });
-          if (status) status.textContent = `${tr("Doppler radar loop · frame ", "ডপলার রাডার লুপ · ধাপ ")}${i + 1}/${frames.length} · ${tStr} BST`;
+          if (status) {
+            const label = status.querySelector?.('output');
+            if (label) label.textContent = `${tr("Radar frame ", "রাডার ধাপ ")}${i + 1}/${frames.length} · ${tStr} BST`;
+          }
+        }
+        if (status) {
+          status.innerHTML = `<output></output> <button id="radar-play" class="atlas-btn" type="button">${tr('Play radar','রাডার চালান')}</button>`;
+          radarToggle = status.querySelector?.('#radar-play');
+          if (radarToggle) radarToggle.onclick = () => {
+            if (radarTimer) { pauseRadar(); return; }
+            if (document.hidden || reducedMotion() || frames.length < 2) return;
+            radarToggle.textContent = tr('Pause radar','রাডার থামান');
+            radarTimer = setInterval(() => {
+              if (currentLens !== 'radar' || document.hidden || reducedMotion()) { pauseRadar(); return; }
+              fIdx = (fIdx + 1) % frames.length;
+              showRadarFrame(fIdx);
+            }, 1200);
+          };
+          if (radarToggle && reducedMotion()) {
+            radarToggle.disabled = true;
+            radarToggle.title = tr('Animation disabled by reduced-motion preference','কম গতির পছন্দ অনুযায়ী অ্যানিমেশন বন্ধ');
+          }
         }
         showRadarFrame(fIdx);
-        if (frames.length > 1) {
-          radarTimer = setInterval(() => {
-            if (currentLens !== "radar") { clearInterval(radarTimer); return; }
-            fIdx = (fIdx + 1) % frames.length;
-            showRadarFrame(fIdx);
-          }, 1200);
-        }
       } else if (lens === "rain") {
         const res = await fetch("/api/atlas/rainfall", { signal: AbortSignal.timeout(15000) });
         const data = await res.json();
         if (currentLens !== lens) return;
         if (!res.ok || data.status !== "ok" || !data.catchments?.length) throw new Error(data.reasonCode || "feed-unavailable");
-        if (status) status.textContent = tr("Modeled rainfall · next 24 h: ", "মডেলভিত্তিক বৃষ্টি · পরের ২৪ ঘণ্টা: ") + data.catchments.map(p => `${p.name}: ${p.rain_24h_sum_mm?.toFixed(1)} mm`).join(" · ");
+        if (status) status.textContent = tr("Modeled rainfall · next 24 h: ", "মডেলভিত্তিক বৃষ্টি · পরের ২৪ ঘণ্টা: ") + data.catchments.map(p => `${isBn ? p.name_bn || p.name : p.name}: ${p.rain_24h_sum_mm?.toFixed(1)} mm`).join(" · ");
         const geojson = {
           type: "FeatureCollection",
-          features: data.catchments.map(c => {
-            const rain = Number(c.rain_24h_sum_mm || 0);
+          features: data.catchments.filter(c => c.status === "ok" && Number.isFinite(c.rain_24h_sum_mm)).map(c => {
+            const rain = c.rain_24h_sum_mm;
             const color = rain > 25 ? "#dd4027" : (rain > 10 ? "#e2953b" : (rain > 2 ? "#0093a5" : "#547076"));
             const name = isBn ? (c.name_bn || c.name) : c.name;
             return {
@@ -1195,6 +985,8 @@
                 name,
                 rain_24h_sum_mm: rain,
                 current_mm: c.current_mm,
+                validFrom: c.validFrom, validTo: c.validTo, retrievedAt: c.retrievedAt,
+                source: c.source, latitude: c.lat, longitude: c.lng,
                 color,
                 label: `${name}\n${rain.toFixed(1)} mm`
               }
@@ -1238,9 +1030,13 @@
             const hud = $("#atlas-observation-hud");
             if (!hud) return;
             hud.hidden = false;
-            hud.innerHTML = `<h3>${p.name}</h3>
+            const text = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            hud.innerHTML = `<h3>${text(p.name)}</h3>
               <div style="margin:4px 0;"><strong>${tr("24h precipitation forecast:","২৪ ঘণ্টার বৃষ্টিপাত পূর্বাভাস:")}</strong> ${Number(p.rain_24h_sum_mm).toFixed(1)} mm</div>
-              <div style="font-size:var(--text-micro);color:var(--dim);">${tr("High-resolution precipitation catchment model for Greater Dhaka river drainage.","বৃহত্তর ঢাকার নদী নিষ্কাশনের জন্য উচ্চ-রেজোলিউশন বৃষ্টিপাত পূর্বাভাস মডেল।")}</div>
+              <div style="font-size:var(--text-micro);color:var(--dim);">${tr("Query-point model total; not a catchment average or flood warning.","অনুসন্ধানের স্থানের মডেলের মোট; অববাহিকার গড় বা বন্যার সতর্কবার্তা নয়।")}</div>
+              <p>${tr('Valid interval (UTC)','প্রযোজ্য সময় (UTC)')}: ${text(p.validFrom)} – ${text(p.validTo)}</p>
+              <p>${tr('Source / retrieved','উৎস / সংগৃহীত')}: ${text(p.source)} · ${text(p.retrievedAt)}</p>
+              <p>${tr('Query coordinates','অনুসন্ধানের স্থানাঙ্ক')}: ${text(p.latitude)}, ${text(p.longitude)}</p>
               <button type="button" class="atlas-btn" style="margin-top:8px;width:100%;" onclick="document.getElementById('atlas-observation-hud').hidden=true">${tr("Close","বন্ধ করুন")}</button>`;
           });
         }
@@ -1292,6 +1088,9 @@
   }
 
   function wireUIEvents() {
+    document.addEventListener?.('visibilitychange', () => { if (document.hidden) stopMapMotion(); });
+    window.addEventListener('pagehide', stopMapMotion);
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', stopMapMotion);
     $("#atlas-lens")?.addEventListener("change", e => applyLens(e.target.value));
     $$(".atlas-lenses button").forEach(btn => {
       btn.addEventListener("click", () => applyLens(btn.dataset.lens));
@@ -1312,7 +1111,7 @@
         map.easeTo({
           pitch: is3D ? 50 : 0,
           bearing: is3D ? 15 : 0,
-          duration: 1000
+          duration: 250
         });
       }
     });
@@ -1344,7 +1143,7 @@
             center: [Number(first.lon), Number(first.lat)],
             zoom: 15,
             pitch: 50,
-            duration: 1500
+            duration: 250
           });
         }
       }
@@ -1353,7 +1152,7 @@
     }
   }
 
-  function flyToArea(area, duration = 1500) {
+  function flyToArea(area, duration = 250) {
     if (!map) return;
     const is3D = $("#atlas-view")?.value !== "2d";
     const zoom = (area.zoom || 15) + (area.id === "parliament" ? Math.max(0, Math.log2(map.getContainer().clientWidth / 768)) : 0);
@@ -1398,7 +1197,7 @@
       const aq = ind.airQuality;
       if (Number.isFinite(aq?.us_aqi)) {
         const cat = tr(aq.category || "", category[aq.category] || aq.category || "");
-        values.air = { value: `AQI ${num(aq.us_aqi)} · ${model}`, tier: ["ok", "warning", "danger"].includes(aq.status) ? aq.status : "neutral", title: `${tr("Modelled, not a station reading", "মডেল অনুমান, স্টেশনের পরিমাপ নয়")} · ${cat} · ${aq.source || ""} · ${aq.observedAt || ""}` };
+        values.air = { value: `AQI ${num(aq.us_aqi)} · ${model} · ${cat}`, tier: ["ok", "warning", "danger"].includes(aq.status) ? aq.status : "neutral", title: `${tr("Modelled, not a station reading", "মডেল অনুমান, স্টেশনের পরিমাপ নয়")} · ${cat} · ${aq.source || ""} · ${aq.observedAt || ""}` };
       }
       const w = ind.weather;
       if (Number.isFinite(w?.wind_speed_10m)) {
@@ -1421,6 +1220,12 @@
       if (item) {
         item.dataset.tier = v.tier;
         item.title = v.title;
+        item.setAttribute("data-language-fixed", "");
+        const labels = {flood:tr("Flood","বন্যা"),air:tr("Air","বায়ু"),wind:tr("Wind","বাতাস"),traffic:tr("Economy","অর্থনীতি")};
+        const label = labels[key];
+        const labelNode = item.querySelector(".watch-label");
+        if (labelNode) labelNode.textContent = label;
+        item.setAttribute("aria-label", `${label}: ${v.value} · ${v.title}`);
       }
     }
     // Arrow points where the wind blows to; hidden when direction is unknown.
@@ -1451,7 +1256,7 @@
         map.addSource('sample-footprint',{type:'geojson',data});
         map.addLayer({id:'sample-footprint',type:'line',source:'sample-footprint',paint:{'line-color':'#d9583b','line-width':3,'line-dasharray':[2,1]}});
       }
-      map.fitBounds([[west,south],[east,north]], {padding:60,maxZoom:16,duration:800});
+      map.fitBounds([[west,south],[east,north]], {padding:60,maxZoom:16,duration:250});
     });
 
     wireUIEvents();

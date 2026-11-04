@@ -62,9 +62,18 @@ console.log('✓ Actual player: early selection, failed-first-load retry focus, 
 assert.equal(handlers.filter(h=>h.layer==='outlook-cells').length,1,'click handler is attached once across lens switches');
 const floodModel={...model,unit:'m³/s',frames:[0,1].map(i=>({validAt:`2026-10-${28+i}T00:00:00Z`,cells:[{id:'reach1',place:'Sunamganj',latitude:25.075,longitude:91.375,value:0,p25:0,p75:0,seriesMaximum:0,seriesMaximumValidAt:'2026-10-28T00:00:00Z',usableDays:2,totalDays:2}]}))};
 const active=playerWin.AtlasForecast.activate('rivers');requests.shift()({ok:true,json:async()=>floodModel});await active;
-handlers[0].fn({features:[{properties:{id:'reach1'}}]});
+handlers.find(h=>h.layer==='outlook-cells').fn({features:[{properties:{id:'reach1'}}]});
 assert.equal(element('atlas-observation-hud').hidden,false);
 assert.match(element('atlas-observation-hud').innerHTML,/0.0–0.0/);
 assert.doesNotMatch(element('forecast-harvest-card').textContent,/safe|defer|Emergency/);
 element('forecast-range').oninput({target:{value:'1'}});assert.equal(element('atlas-observation-hud').hidden,true,'scrub closes stale inspection');
 console.log('✓ Warning regression: seven-day maxima, zero, missing reaches, neutral warning status, one click handler and stale inspection closure');
+
+// User input and hidden-page exit must leave playback paused until requested.
+element('forecast-play').onclick();assert.equal(ticks.size,1);
+handlers.find(h=>h.event==='dragstart').layer({originalEvent:{}});assert.equal(ticks.size,0,'manual map drag pauses forecast');
+element('forecast-play').onclick();doc.hidden=true;events.visibilitychange();assert.equal(ticks.size,0,'hidden page pauses');
+doc.hidden=false;assert.equal(ticks.size,0,'return never restarts motion');
+element('forecast-play').onclick();events.pagehide();assert.equal(ticks.size,0,'page exit pauses');
+playerWin.matchMedia=()=>({matches:true});element('forecast-play').onclick();assert.equal(ticks.size,0,'reduced motion prevents playback');
+console.log('✓ Motion lifecycle: explicit play, manual input, hidden page, exit and reduced motion');

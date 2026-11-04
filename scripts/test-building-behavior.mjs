@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-import * as Three from '../public/vendor/three-0.168.0/three.module.js';
 const read=path=>readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
 const detail=JSON.parse(read('public/data/parliament-buildings.geojson'));
 const parliament=detail.features.find(f=>f.id==='relation/18085267');
@@ -9,12 +8,14 @@ assert.ok(parliament);
 assert.equal(parliament.geometry.type,'MultiPolygon');
 assert.ok(parliament.geometry.coordinates.reduce((n,p)=>n+p.length-1,0)>=10,'courtyards retained');
 assert.ok(!detail.features.some(f=>f.id==='way/24448328'),'no duplicate member outline');
-assert.equal(parliament.properties.height_method,'levels-times-3m');
-assert.equal(parliament.properties.height_m,24);
+assert.equal(parliament.properties.height_method,'unknown');
+assert.equal(parliament.properties.height_m,null);
+assert.equal(parliament.properties.levels,8,'source floor count retained without metre conversion');
 assert.ok(detail.features.length>3000 && detail.features.length<15000);
 assert.equal(new Set(detail.features.map(f=>f.id)).size,detail.features.length);
 for(const f of detail.features) {
-  assert.ok(f.properties.height_m>f.properties.min_height_m);
+  assert.ok(f.properties.height_m===null || f.properties.height_method==='osm-height-tag' && f.properties.height_m>f.properties.min_height_m);
+  if(f.properties.height_m===null)assert.equal(f.properties.height_tier,'unavailable');
   assert.ok(f.properties.source_url && f.properties.osm_modified_at);
   const polygons=f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates;
   for(const polygon of polygons) for(const ring of polygon) {
@@ -23,8 +24,10 @@ for(const f of detail.features) {
     assert.ok(ring.every(p=>p.length===2 && p.every(Number.isFinite)));
   }
 }
-function app({offline=false,search=''}={}) {
-  const elements=new Map(['atlas-view','atlas-lens-title','atlas-lens-description','atlas-layer-status','atlas-observation-hud'].map(id=>[id,{value:'3d',textContent:'',hidden:true,classList:{remove(){}},addEventListener(){}}]));
+function app({offline=false,search='',rainfall=null}={}) {
+  const elements=new Map(['atlas-view','atlas-lens-title','atlas-lens-description','atlas-layer-status','atlas-observation-hud','radar-play','radar-output'].map(id=>[id,{value:'3d',textContent:'',hidden:true,classList:{remove(){}},addEventListener(){}}]));
+  elements.get('atlas-layer-status').querySelector=s=>elements.get(s==='#radar-play'?'radar-play':'radar-output');
+  const ticks=new Map(), events={};let tickId=0;
   let map;
   class MapStub {
     constructor(options){this.layers=new Map(options.style.layers.map(l=>[l.id,l]));this.sources=new Map();this.options=options;this.events=new Map();this.inside=true;this.zoom=16.7;this.ready=false;map=this;}
@@ -49,7 +52,7 @@ function app({offline=false,search=''}={}) {
     getBounds(){const [w,s,e,n]=detail.bbox;return {getWest:()=>this.inside?w+.002:w-.1,getSouth:()=>s+.002,getEast:()=>e-.002,getNorth:()=>n-.002};}
     flyTo(options){this.camera=options;}
   }
-  const window={maplibregl:{Map:MapStub,NavigationControl:class{}},location:{search},addEventListener(){}};
+  const window={maplibregl:{Map:MapStub,NavigationControl:class{}},location:{search},addEventListener:(event,fn)=>events[event]=fn};
   // GIBS serves a blank placeholder tile for a date whose observation has not
   // been ingested: HTTP 200, non-empty, opaque, one uniform colour. The stub
   // below reproduces that so the client is forced to decode the tile rather
@@ -65,8 +68,8 @@ function app({offline=false,search=''}={}) {
   };}}
   const context={
     window,
-    document:{documentElement:{lang:'en'},querySelector:s=>elements.get(s.slice(1))||null,querySelectorAll:()=>[]},
-    URLSearchParams,AbortSignal,console:{warn(){}},setTimeout(){},setInterval(){},
+    document:{documentElement:{lang:'en'},hidden:false,querySelector:s=>elements.get(s.slice(1))||null,querySelectorAll:()=>[],addEventListener:(event,fn)=>events[event]=fn},
+    URLSearchParams,AbortSignal,console:{warn(){}},setTimeout(){},setInterval(fn){ticks.set(++tickId,fn);return tickId;},clearInterval(id){ticks.delete(id);},
     OffscreenCanvas:FakeCanvas,
     createImageBitmap:async blob=>({width:4,height:4,blank:!!blob.blank,close(){}}),
     fetch:async url=>{
@@ -74,14 +77,14 @@ function app({offline=false,search=''}={}) {
       const blank=isBlank(url);
       return {ok:true,status:200,headers:{get:()=>blank?'1611':'59778'},
         blob:async()=>({size:blank?1611:59778,blank}),
-        json:async()=>url.includes('parliament-buildings')?detail:url.includes('dhaka-areas')?JSON.parse(read('public/dhaka-areas.json')):{status:'unavailable'}};
+        json:async()=>url.includes('/api/atlas/rainfall')&&rainfall?rainfall:url.includes('rainviewer')?{host:'https://tilecache.rainviewer.com',radar:{past:[{path:'/radar/1',time:1700000000},{path:'/radar/2',time:1700000300}]}}:url.includes('parliament-buildings')?detail:url.includes('dhaka-areas')?JSON.parse(read('public/dhaka-areas.json')):{status:'unavailable'}};
     },
   };
   let source=read('public/app.js');
-  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadDataLayers,loadParliamentBuildings,flyToArea,buildingPaint,showInspectionHUD,ParliamentModelLayer,attachModelForTest:model=>{parliamentModel=model;}};})();';
+  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadDataLayers,loadParliamentBuildings,flyToArea,buildingPaint,showInspectionHUD,loadLensEvidence,pauseRadar,wireUIEvents};})();';
   vm.runInNewContext(source,context);
   window.test.initMap();
-  return {api:window.test,map,elements,maplibre:window.maplibregl};
+  return {api:window.test,map,elements,maplibre:window.maplibregl,ticks,events,window,document:context.document};
 }
 let {api,map,elements,maplibre}=app();
 for(const lens of ['city','heritage','rivers','transit','economy','air','haze','rain','radar','cloud','night','water']) {
@@ -157,9 +160,9 @@ function evaluate(e,props) {
   throw new Error(op);
 }
 const paint=api.buildingPaint('render_height','render_min_height');
-for(const height of [undefined,null,0,-1])assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:height}),6);
+for(const height of [undefined,null,0,-1])assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:height}),0);
 assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:35.7}),35.7);
-assert.equal(evaluate(paint['fill-extrusion-height'],{render_min_height:10}),16);
+assert.equal(evaluate(paint['fill-extrusion-height'],{render_min_height:10}),0);
 console.log(`✓ Building behavior: ${detail.features.length} real footprints, Parliament courtyards, all lenses, exclusive detail switch, pan/offline/2D fallback and authored camera`);
 
 ({api,map}=app());
@@ -184,25 +187,32 @@ assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('SW42'),'mis
 assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('m MSL'),'unverified datum must not look surveyed');
 assert.ok(elements.get('atlas-observation-hud').innerHTML.includes('vertical datum are unverified'));
 
-// Actual Three.js matrices accept the MapLibre6 render input without .elements.set.
-let renders=0;
-const renderer=class {resetState(){} render(){renders++;}};
-const model=new Three.Group();
-const renderCase=app();
-const layer=new renderCase.api.ParliamentModelLayer(90.378,23.762,{...Three,WebGLRenderer:renderer},model);
-const identity=new Three.Matrix4().elements;
-const layerMap={getCanvas:()=>({getBoundingClientRect:()=>({width:390,height:844})}),triggerRepaint(){}};
-// The context's maplibregl object is shared with the actual closure.
-// Mercator conversion is injected as the map library API, not copied camera internals.
-// Expose the map library only inside this test harness.
-renderCase.maplibre.MercatorCoordinate={fromLngLat:()=>({x:0.75,y:0.5,z:0,meterInMercatorCoordinateUnits:()=>1e-8})};
-layer.onAdd(layerMap,{});layer.visible=true;layer.render({}, {defaultProjectionData:{mainMatrix:identity}});
-assert.equal(renders,1);assert.ok(layer.camera.projectionMatrix.elements.every(Number.isFinite));assert.equal(layer.renderingMode,'3d');
-layer.visible=false;layer.render({}, {defaultProjectionData:{mainMatrix:identity}});assert.equal(renders,1,'2D or out-of-coverage model rendered');
-console.log('✓ Parliament custom render: MapLibre6 matrix, actual Three.js array storage, shared canvas and visibility');
+// Preserve the authored sketch without placing invented dimensions on the map.
+const client=read('public/app.js');
+assert.ok(!client.includes('new ParliamentModelLayer'));
+assert.ok(!client.includes('buildParliamentModel'));
+assert.ok(read('public/parliament-reference.js').includes('function buildParliamentModel'));
+assert.ok(read('public/parliament-reference.html').includes('no surveyed source'));
+assert.ok(!read('public/parliament-reference.js').includes('requestAnimationFrame'),'static design study has no autoplay loop');
+api.showInspectionHUD('landmark',{});assert.ok(!elements.get('atlas-observation-hud').innerHTML.includes('15 m'));
+console.log('✓ Geographic truth: unknown source heights flat, explicit tags retained, sketch separated from map, no invented landmark height');
 
-renderCase.map.ready=true;
-await renderCase.api.loadParliamentBuildings();
-renderCase.api.attachModelForTest(layer);renderCase.api.syncBuildingVisibility();
-assert.equal(renderCase.map.getLayoutProperty('parliament-buildings','visibility'),'visible','model hid all nearby mapped buildings');
-renderCase.elements.get('atlas-view').value='2d';renderCase.api.syncBuildingVisibility();assert.equal(layer.visible,false);
+const radarCase=app();radarCase.api.wireUIEvents();
+radarCase.api.applyLens('radar');await new Promise(r=>setTimeout(r,0));
+assert.equal(radarCase.ticks.size,0,'radar starts paused');
+radarCase.elements.get('radar-play').onclick();assert.equal(radarCase.ticks.size,1,'explicit play starts radar');
+radarCase.map.events.get('dragstart')({originalEvent:{}});assert.equal(radarCase.ticks.size,0,'manual input stops radar');
+radarCase.elements.get('radar-play').onclick();radarCase.document.hidden=true;radarCase.events.visibilitychange();assert.equal(radarCase.ticks.size,0,'hidden page stops radar');
+radarCase.document.hidden=false;assert.equal(radarCase.ticks.size,0,'visible page stays paused');
+radarCase.elements.get('radar-play').onclick();radarCase.api.applyLens('city');assert.equal(radarCase.ticks.size,0,'task change stops radar');
+radarCase.api.applyLens('radar');await new Promise(r=>setTimeout(r,0));radarCase.window.matchMedia=()=>({matches:true});radarCase.elements.get('radar-play').onclick();assert.equal(radarCase.ticks.size,0,'reduced motion suppresses radar');
+console.log('✓ Radar motion: paused start, explicit play, map input, hidden page, task change and reduced motion');
+
+const rainCase=app({rainfall:{status:'ok',catchments:[{id:'x',name:'Query',lat:23.7,lng:90.4,status:'ok',rain_24h_sum_mm:0,validFrom:'2026-11-04T00:00Z',validTo:'2026-11-05T00:00Z',retrievedAt:'2026-11-04T01:00Z',source:'Open-Meteo'},{id:'missing',status:'ok',rain_24h_sum_mm:null}]}});
+rainCase.api.applyLens('rain');await new Promise(r=>setTimeout(r,0));
+const rainFeatures=rainCase.map.getSource('catchment-rain').data.features;
+assert.equal(rainFeatures.length,1,'missing rainfall is never drawn as zero');
+assert.equal(rainFeatures[0].properties.rain_24h_sum_mm,0,'real zero retained');
+assert.equal(rainFeatures[0].properties.validFrom,'2026-11-04T00:00Z');
+assert.equal(rainFeatures[0].properties.source,'Open-Meteo');
+console.log('✓ Rain map: missing values omitted, true zero retained, interval and source preserved for inspection');

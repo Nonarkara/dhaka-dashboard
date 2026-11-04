@@ -58,3 +58,9 @@ if (readFileSync(appJs)) {
 }
 
 console.log(`[stamp-build-id] wrote ${stamp} into build-id.ts, index.html, research.html, app.js`);
+
+// The retained design-reference viewer is released with the same asset epoch.
+const referenceHtml=join(root,"public","parliament-reference.html");
+let reference=readFileSync(referenceHtml,"utf8");
+reference=reference.replace(/(src|href)="\/(style\.css|dhaka-design\.css|theme\.js|parliament-reference\.(?:js|css))(?:\?v=[^"]*)?"/g,(_,attr,file)=>`${attr}="/${file}?v=${stamp}"`);
+writeFileSync(referenceHtml,reference,"utf8");

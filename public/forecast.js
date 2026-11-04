@@ -3,6 +3,7 @@
   let map, lens, data, index = 0, timer, generation = 0, watchWasOpen, priorMinZoom, focusedLens;
   const tr = (en,bn) => document.documentElement.lang === 'bn' ? bn : en;
   const panel = () => document.getElementById('forecast-player');
+  const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
   const colors = ['#547076','#c5a56e','#dd4027','#8e4665'];
   const color = v => colors[v < 15 ? 0 : v < 35 ? 1 : v < 75 ? 2 : 3];
 
@@ -10,7 +11,7 @@
     clearInterval(timer);
     timer = null;
     const b = document.getElementById('forecast-play');
-    if (b) b.textContent = tr('Play','চালান');
+    if (b) { b.textContent = tr('Play','চালান'); b.disabled = reducedMotion(); }
   }
 
   function clear() {
@@ -126,13 +127,16 @@
         <a href="https://ffwc.gov.bd" target="_blank" rel="noopener">${tr('Official FFWC water level & warning bulletins ↗','সরকারি FFWC পানি সমতল ও সতর্কবার্তা ↗')}</a>` : ''}
       </details>`;
 
+    document.getElementById('forecast-play').disabled = reducedMotion();
+    document.getElementById('forecast-play').title = reducedMotion() ? tr('Use the time slider with reduced motion','কম গতির জন্য সময়ের স্লাইডার ব্যবহার করুন') : '';
     document.getElementById('forecast-play').onclick = () => {
       if (timer) { pause(); return; }
+      if (document.hidden || reducedMotion()) return;
       if (index === data.frames.length-1) index = 0;
       document.getElementById('forecast-play').textContent = tr('Pause','থামান');
       frame();
       timer = setInterval(() => {
-        if (document.hidden) { pause(); return; }
+        if (document.hidden || reducedMotion()) { pause(); return; }
         if (index >= data.frames.length-1) { pause(); return; }
         index++;
         frame();
@@ -206,10 +210,13 @@
   }
 
   document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+  window.addEventListener('pagehide', pause);
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', pause);
   window.addEventListener('atlas:language', () => { pause(); if (data) render(); });
   window.AtlasForecast = {
     attach(m) {
       map = m;
+      for (const event of ['dragstart','zoomstart','rotatestart','pitchstart']) map.on?.(event, e => { if (e?.originalEvent) pause(); });
       map.on?.('click', 'outlook-cells', inspectReach);
       const watch = document.getElementById("atlas-watch");
       if (watch) {
@@ -219,6 +226,6 @@
       }
       if (lens) activate(lens);
     },
-    activate
+    activate, pause
   };
 })();

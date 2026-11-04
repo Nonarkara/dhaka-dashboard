@@ -15,14 +15,14 @@ export const MACRO_SPECS = [
   // Capacities and education.
   {id:'literacy',label:'Adult literacy rate',label_bn:'প্রাপ্তবয়স্কদের সাক্ষরতার হার',unit:'%',indicator:'SE.ADT.LITR.ZS',format:'pct',domain:'people'},
   {id:'school-enrolment',label:'Secondary school enrolment',label_bn:'মাধ্যমিক বিদ্যালয়ে ভর্তি',unit:'%',indicator:'SE.SEC.ENRR',format:'pct',domain:'people'},
-  {id:'life-expectancy',label:'Life expectancy at birth',label_bn:'জন্মের সময় আয়ুক্ষমাপ',unit:'years',indicator:'SP.DYN.LE00.IN',format:'count',domain:'smart-living'},
-  {id:'physicians',label:'Physicians per 1,000 people',label_bn:'হাজার মানুষে চিকিৎসক',unit:'per 1,000',indicator:'SH.MED.PHYS.ZS',format:'count',domain:'smart-living'},
+  {id:'life-expectancy',label:'Life expectancy at birth',label_bn:'জন্মের সময় প্রত্যাশিত আয়ু',unit:'years',indicator:'SP.DYN.LE00.IN',format:'decimal',domain:'smart-living'},
+  {id:'physicians',label:'Physicians per 1,000 people',label_bn:'হাজার মানুষে চিকিৎসক',unit:'per 1,000',indicator:'SH.MED.PHYS.ZS',format:'decimal',domain:'smart-living'},
   {id:'urban-share',label:'Urban population share',label_bn:'শহুরে জনগণের অনুপাত',unit:'%',indicator:'SP.URB.TOTL.IN.ZS',format:'pct',domain:'mobility'},
   // Energy.
-  {id:'electricity-access',label:'Electricity access',label_bn:'বিদ্যুৎ সরবরাহ',unit:'%',indicator:'EG.ELC.ACCS.ZS',format:'pct',domain:'energy'},
+  {id:'electricity-access',label:'Electricity access',label_bn:'বিদ্যুৎপ্রাপ্তির হার',unit:'%',indicator:'EG.ELC.ACCS.ZS',format:'pct',domain:'energy'},
   {id:'renewables',label:'Renewable electricity share',label_bn:'নবায়নযোগ্য বিদ্যুতের অংশ',unit:'%',indicator:'EG.ELC.RNEW.ZS',format:'pct',domain:'energy'},
   // Environment.
-  {id:'co2-per-capita',label:'CO₂ per person',label_bn:'জনপ্রতি কার্বন ডাই-অক্সাইড',unit:'t',indicator:'EN.GHG.CO2.PC.CE.AR5',format:'count',domain:'environment'},
+  {id:'co2-per-capita',label:'CO₂ per person',label_bn:'জনপ্রতি কার্বন ডাই-অক্সাইড',unit:'t',indicator:'EN.GHG.CO2.PC.CE.AR5',format:'decimal',domain:'environment'},
   // Governance.
   {id:'tax-revenue',label:'Tax revenue',label_bn:'কর আদায়',unit:'% GDP',indicator:'GC.TAX.TOTL.GD.ZS',format:'pct',domain:'governance'},
 ] as const;
