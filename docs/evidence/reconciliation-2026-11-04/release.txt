@@ -1,0 +1,22 @@
+Canonical command: bash scripts/deploy-live.sh
+Result: exit 0, Deploy complete
+Source commit: a357d0b
+Build: dhaka-atlas-20261104-1793802349-a357d0b
+Worker version: 21307c7a-1ab3-453d-ac5f-b9bdde0bc229
+Configured npm suites: 18
+TypeScript/localpreflight/exactSHA/API smoke: passed
+Runtime npm audit: 0 known vulnerabilities in production dependencies
+Independent review: PASS after source/geometry/gate repairs
+Live browser: Bengali390national18readings, English1440air72rows, sourcecredits, language/menufocus, actualParliamentreference turn/back verified
+
+✓ Live SHA-256 matches for HTML, client scripts, styles, translations and reference layers
+  ✓ VIIRS_NOAA20_CorrectedReflectance_TrueColor: independently decoded advertised 2026-11-04, 4089 bytes
+  ✓ MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: independently decoded advertised 2026-11-03, 12134 bytes
+  ✓ VIIRS_Combined_Flood_1-Day: independently decoded advertised 2026-11-02, 2990 bytes
+  DEGRADED VIIRS_SNPP_DayNightBand: unavailable · gibs-no-observation · latest_date=null; no healthy imagery claim
+✓ Deployed imagery contract verified: 3 independently decoded dated GIBS layers; 1 sources explicitly unavailable/degraded. This is contract verification, not an all-sources-healthy claim.
+✓ Live satellite verification: 94/98 measurements, 94 domain readings
+✓ Persistent snapshot 1bed2118-6fe1-4b46-9e6f-6fe7ea71aaaa: 94/98 readings; original solar period, sampling, history and source health; no visitor acquisition. Read 881ms including history checks.
+✓ Live population reference: 1280 cells and 2181 dated OSM objects; hashes, category counts, unknown cells, source provenance and corrected questions.
+✓ Live planning: population-grid extent; six unverified station references; 1950 source records/5 within-extent source points, zero imported records/pins; fixed source retrieval time and Bengali metadata.
+==> Deploy complete: dhaka.nonarkara.org is live!

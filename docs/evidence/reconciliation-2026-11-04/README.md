@@ -38,3 +38,7 @@ First deploy c3a0895 reached live bytes and API smoke, then the old satellite di
 
 
 The expanded byte gate caught research.html at an earlier edge revision immediately after the seconddeployment; the same path later matched. Exact-byte verification now uses bounded same-URL convergence (15attempts,2secondpauses), never cache-busting query keys or acceptance of a mismatch. A third canonical run establishes the finalresult. test-asset-convergence distinguishes transient stale bytes from a permanent mismatch/404, bringing the configured suite count to18.
+
+
+## Final live closeout
+Canonical `bash scripts/deploy-live.sh` completed with exit0 on builddhaka-atlas-20261104-1793802349-a357d0b, Worker21307c7a-1ab3-453d-ac5f-b9bdde0bc229. All18configuredsuites, typecheck, localpreflight, expanded exactassetSHA,13APIsmokes, datedimagerycontract,94/98persistentreadings, population and planning gates passed. ThreeGIBSlayers independentlydecoded; nightimagery explicitlyDEGRADED(gibs-no-observation). This is not an all-sources-healthy claim. Live postrelease shots use live-* filenames. Original rawprovider standalone diagnostic remainsstrict. Runtime dependency audit found0knownproductionvulnerabilities. Release stamp/receipts are committed after the mandatorypoststamp npmtest; no furtherruntimechange follows deployment.
