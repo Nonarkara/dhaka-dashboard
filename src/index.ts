@@ -40,8 +40,18 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   headers.set("access-control-allow-methods", "GET, HEAD, OPTIONS");
   headers.set("access-control-allow-headers", "Range, Content-Type, Accept");
   headers.set("strict-transport-security", "max-age=31536000");
+  // An unavailable answer is not an answer. A shared cache that is allowed to
+  // keep it for five minutes — and to serve it stale for ten more — keeps
+  // serving a dead upstream long after it recovers. A failure is stored by
+  // nobody.
+  const status = init.status ?? 200;
+  const bodyStatus = (body as { status?: unknown } | null | undefined)?.status;
+  const failed = status >= 400 || bodyStatus === "unavailable";
   if (!headers.has("cache-control")) {
-    headers.set("cache-control", "public, max-age=60, s-maxage=300, stale-while-revalidate=600");
+    headers.set(
+      "cache-control",
+      failed ? "no-store" : "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+    );
   }
   return new Response(JSON.stringify(body), { ...init, headers });
 }
@@ -69,6 +79,31 @@ interface CacheEntry<T> {
 const memoryCache = new Map<string, CacheEntry<unknown>>();
 const pendingFeeds = new Map<string, Promise<{data:unknown;fromCache:boolean;error?:string}>>();
 
+/**
+ * Does this payload contain a reading that could not be made?
+ *
+ * The check has to understand every shape the feeds return. An array of rows
+ * is one shape; an object carrying a `status`, or an object carrying a list
+ * of rows, is another. A check that only understands the first one will
+ * happily remember an outage for the full cache lifetime — which is how a
+ * transient upstream failure becomes a permanent "unavailable".
+ */
+function containsUnavailableReading(data: unknown): boolean {
+  if (Array.isArray(data)) {
+    return data.some(row => (row as { status?: unknown } | null)?.status === "unavailable");
+  }
+  if (!data || typeof data !== "object") return false;
+  const record = data as { status?: unknown; features?: unknown; stations?: unknown };
+  if (record.status === "unavailable") return true;
+  for (const key of ["features", "stations"] as const) {
+    const rows = record[key];
+    if (Array.isArray(rows)) {
+      if (rows.some(row => (row as { status?: unknown } | null)?.status === "unavailable")) return true;
+    }
+  }
+  return false;
+}
+
 async function fetchWithCache<T>(
   cacheKey: string,
   ttlMs: number,
@@ -89,7 +124,7 @@ async function fetchWithCache<T>(
   const task=(async()=>{
     try {
       const data = await fetcher();
-      const incomplete=Array.isArray(data)&&data.some(row=>row?.status==="unavailable");
+      const incomplete=containsUnavailableReading(data);
       memoryCache.set(cacheKey, { data, timestamp: Date.now(), ttlMs:incomplete?Math.min(ttlMs,60000):ttlMs });
       return { data, fromCache: false };
     } catch (err: unknown) {
@@ -136,7 +171,13 @@ async function buildCollectedCollage(env: Env): Promise<CollageResult> {
       if (economyRes.ok) {
         const geo = (await economyRes.json()) as {
           features?: Array<{
-            properties?: { name?: string; sector?: string; category?: string };
+            properties?: {
+            name?: string;
+            name_bn?: string;
+            sector?: string;
+            sector_bn?: string;
+            category?: string;
+          };
             geometry?: { type?: string; coordinates?: unknown };
           }>;
         };
@@ -151,7 +192,9 @@ async function buildCollectedCollage(env: Env): Promise<CollageResult> {
           corridorPoints.push({
             id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
             name,
+            name_bn: feature.properties?.name_bn ?? null,
             sector: feature.properties?.sector ?? feature.properties?.category ?? "Industrial and commercial cluster",
+            sector_bn: feature.properties?.sector_bn ?? null,
             lat,
             lng,
           });
@@ -350,874 +393,929 @@ const worker = {
     console.log(`snapshot collector: ${result}`);
   },
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        headers: {
-          "access-control-allow-origin": "*",
-          "access-control-allow-methods": "GET, HEAD, OPTIONS",
-          "access-control-allow-headers": "Range, Content-Type, Accept",
+    // Every handler answers in the same contract: JSON, a machine-readable
+    // reason, and a time. An unguarded throw used to escape as a non-JSON
+    // runtime error page, which the client could only report as an
+    // unreachable feed, with no reason at all.
+    try {
+      return await handleRequest(request, env);
+    } catch (error) {
+      return jsonResponse(
+        {
+          status: "unavailable",
+          reasonCode: "handler-failed",
+          message: error instanceof Error ? error.message : "unknown error",
+          timestamp: new Date().toISOString(),
         },
-      });
+        { status: 500 },
+      );
     }
+  },
+};
 
-    // Rate limit API routes
-    if (url.pathname.startsWith("/api/")) {
-      const verdict = await checkRateLimit(request, env, RATE_LIMIT_CONFIG);
-      if (!verdict.allowed) {
-        return jsonResponse(
-          {
-            status: "unavailable",
-            reasonCode: "rate-limited",
-            message: `Rate limit of ${RATE_LIMIT_CONFIG.limit} requests per minute exceeded.`,
-            retryAfter: verdict.retryAfter,
-            mode: verdict.mode,
-            timestamp: new Date().toISOString(),
-          },
-          {
-            status: 429,
-            headers: { "retry-after": String(verdict.retryAfter) },
-          },
-        );
-      }
+async function handleRequest(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, HEAD, OPTIONS",
+        "access-control-allow-headers": "Range, Content-Type, Accept",
+      },
+    });
+  }
+
+  // Rate limit API routes
+  if (url.pathname.startsWith("/api/")) {
+    const verdict = await checkRateLimit(request, env, RATE_LIMIT_CONFIG);
+    if (!verdict.allowed) {
+      return jsonResponse(
+        {
+          status: "unavailable",
+          reasonCode: "rate-limited",
+          message: `Rate limit of ${RATE_LIMIT_CONFIG.limit} requests per minute exceeded.`,
+          retryAfter: verdict.retryAfter,
+          mode: verdict.mode,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          status: 429,
+          headers: { "retry-after": String(verdict.retryAfter) },
+        },
+      );
     }
+  }
 
-    // ── /api/health ──────────────────────────────────────────────────────────
-    if (url.pathname === "/api/health") {
+  // ── /api/health ──────────────────────────────────────────────────────────
+  if (url.pathname === "/api/health") {
+    return jsonResponse({
+      status: "ok",
+      city: "Dhaka",
+      country: "Bangladesh",
+      domain: "dhaka.nonarkara.org",
+      version: ATLAS_VERSION,
+      buildId: BUILD_ID,
+      timestamp: new Date().toISOString(),
+      provenance: "measured",
+    });
+  }
+
+  // ── /api/atlas/areas ─────────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/areas") {
+    const areasUrl = new URL("/dhaka-areas.json", request.url);
+    const res = await env.ASSETS.fetch(areasUrl.toString());
+    if (res.ok) {
+      const areas = await res.json();
       return jsonResponse({
         status: "ok",
         city: "Dhaka",
-        country: "Bangladesh",
-        domain: "dhaka.nonarkara.org",
-        version: ATLAS_VERSION,
-        buildId: BUILD_ID,
-        timestamp: new Date().toISOString(),
-        provenance: "measured",
+        areas,
+        count: Array.isArray(areas) ? areas.length : 0,
+        provenance: "reference",
       });
     }
+    return jsonResponse(
+      { status: "unavailable", reasonCode: "assets-missing", provenance: "unavailable" },
+      { status: 503 },
+    );
+  }
 
-    // ── /api/atlas/areas ─────────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/areas") {
-      const areasUrl = new URL("/dhaka-areas.json", request.url);
-      const res = await env.ASSETS.fetch(areasUrl.toString());
-      if (res.ok) {
-        const areas = await res.json();
-        return jsonResponse({
-          status: "ok",
-          city: "Dhaka",
-          areas,
-          count: Array.isArray(areas) ? areas.length : 0,
-          provenance: "reference",
-        });
-      }
+  // ── /api/atlas/districts ─────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/districts") {
+    return jsonResponse({
+      status: "ok",
+      city: "Dhaka",
+      corporations: [
+        {
+          id: "dncc",
+          name: "Dhaka North City Corporation (DNCC)",
+          name_bn: "ঢাকা উত্তর সিটি কর্পোরেশন",
+          wards: 54,
+          zones: 10,
+          area_sq_km: 196.22,
+        },
+        {
+          id: "dscc",
+          name: "Dhaka South City Corporation (DSCC)",
+          name_bn: "ঢাকা দক্ষিণ সিটি কর্পোরেশন",
+          wards: 75,
+          zones: 10,
+          area_sq_km: 109.25,
+        },
+      ],
+      divisions: [
+        { id: "old-dhaka", name: "Old Dhaka", thanas: ["Kotwali", "Lalbagh", "Sutrapur", "Bangshal", "Chawkbazar"] },
+        { id: "central-dhaka", name: "Central Commercial", thanas: ["Motijheel", "Paltan", "Ramna", "Shahbagh", "Tejgaon"] },
+        { id: "north-dhaka", name: "Northern Metropolis", thanas: ["Gulshan", "Banani", "Uttara", "Mirpur", "Cantonment"] },
+        { id: "industrial-belt", name: "Industrial Periphery", thanas: ["Savar", "Ashulia", "Gazipur Sadar", "Keraniganj", "Narayanganj Sadar"] },
+      ],
+      provenance: "reference",
+    });
+  }
+
+  // ── /api/atlas/at-this-point ─────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/at-this-point") {
+    const latParam = Number.parseFloat(url.searchParams.get("lat") || "");
+    const lngParam = Number.parseFloat(url.searchParams.get("lng") || "");
+    if (!Number.isFinite(latParam) || !Number.isFinite(lngParam)) {
       return jsonResponse(
-        { status: "unavailable", reasonCode: "assets-missing", provenance: "unavailable" },
+        { status: "unavailable", reasonCode: "invalid-coordinates", message: "lat and lng must be valid numbers" },
+        { status: 400 },
+      );
+    }
+    // A coordinate outside the world is not a place. Without this bound the
+    // endpoint happily named a "nearest station" for latitude 999.
+    if (latParam < -90 || latParam > 90 || lngParam < -180 || lngParam > 180) {
+      return jsonResponse(
+        {
+          status: "unavailable",
+          reasonCode: "coordinates-out-of-range",
+          message: "lat must be within -90..90 and lng within -180..180",
+        },
+        { status: 400 },
+      );
+    }
+
+    let nearestAir = AIR_STATIONS[0];
+    let minAirDist = haversineDistanceKm(latParam, lngParam, nearestAir.lat, nearestAir.lng);
+    for (const st of AIR_STATIONS) {
+      const d = haversineDistanceKm(latParam, lngParam, st.lat, st.lng);
+      if (d < minAirDist) {
+        minAirDist = d;
+        nearestAir = st;
+      }
+    }
+
+    let nearestRiver = RIVER_STATIONS[0];
+    let minRiverDist = haversineDistanceKm(latParam, lngParam, nearestRiver.lat, nearestRiver.lng);
+    for (const st of RIVER_STATIONS) {
+      const d = haversineDistanceKm(latParam, lngParam, st.lat, st.lng);
+      if (d < minRiverDist) {
+        minRiverDist = d;
+        nearestRiver = st;
+      }
+    }
+
+    return jsonResponse({
+      status: "ok",
+      query: { lat: latParam, lng: lngParam },
+      insideBbox:
+        latParam >= CITY_BBOX.minLat &&
+        latParam <= CITY_BBOX.maxLat &&
+        lngParam >= CITY_BBOX.minLon &&
+        lngParam <= CITY_BBOX.maxLon,
+      nearestAirStation: {
+        ...nearestAir,
+        distance_km: Number(minAirDist.toFixed(2)),
+      },
+      nearestRiverStation: {
+        ...nearestRiver,
+        distance_km: Number(minRiverDist.toFixed(2)),
+      },
+      provenance: "reference",
+    });
+  }
+
+  // ── /api/atlas/weather ───────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/weather") {
+    const cacheKey = "weather:dhaka";
+    const { data, error } = await fetchWithCache(
+      cacheKey,
+      15 * 60 * 1000, // 15 mins
+      async () => {
+        const res = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure&hourly=temperature_2m,precipitation_probability,rain&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=Asia%2FDhaka&forecast_days=3`,
+          { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0 (dhaka.nonarkara.org)" } },
+        );
+        if (!res.ok) throw new Error(`Open-Meteo returned status ${res.status}`);
+        const payload = await res.json() as { current?: Record<string, unknown> };
+        validateCurrentModel(payload, "weather");
+        return payload;
+      },
+      null,
+      candidate => validateCurrentModel(candidate, "weather"),
+    );
+
+    if (!data) {
+      return jsonResponse(
+        {
+          status: "unavailable",
+          reasonCode: currentModelReason(error),
+          message: "Open-Meteo weather endpoint could not be reached.",
+          error,
+          timestamp: new Date().toISOString(),
+          provenance: "unavailable",
+        },
         { status: 503 },
       );
     }
 
-    // ── /api/atlas/districts ─────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/districts") {
-      return jsonResponse({
-        status: "ok",
-        city: "Dhaka",
-        corporations: [
-          {
-            id: "dncc",
-            name: "Dhaka North City Corporation (DNCC)",
-            name_bn: "ঢাকা উত্তর সিটি কর্পোরেশন",
-            wards: 54,
-            zones: 10,
-            area_sq_km: 196.22,
-          },
-          {
-            id: "dscc",
-            name: "Dhaka South City Corporation (DSCC)",
-            name_bn: "ঢাকা দক্ষিণ সিটি কর্পোরেশন",
-            wards: 75,
-            zones: 10,
-            area_sq_km: 109.25,
-          },
-        ],
-        divisions: [
-          { id: "old-dhaka", name: "Old Dhaka", thanas: ["Kotwali", "Lalbagh", "Sutrapur", "Bangshal", "Chawkbazar"] },
-          { id: "central-dhaka", name: "Central Commercial", thanas: ["Motijheel", "Paltan", "Ramna", "Shahbagh", "Tejgaon"] },
-          { id: "north-dhaka", name: "Northern Metropolis", thanas: ["Gulshan", "Banani", "Uttara", "Mirpur", "Cantonment"] },
-          { id: "industrial-belt", name: "Industrial Periphery", thanas: ["Savar", "Ashulia", "Gazipur Sadar", "Keraniganj", "Narayanganj Sadar"] },
-        ],
-        provenance: "reference",
-      });
-    }
+    return jsonResponse({
+      status: "ok",
+      city: "Dhaka",
+      source: "Open-Meteo Weather API",
+      source_url: "https://open-meteo.com/en/docs",
+      provenance: "modeled",
+      data,
+    });
+  }
 
-    // ── /api/atlas/at-this-point ─────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/at-this-point") {
-      const latParam = Number.parseFloat(url.searchParams.get("lat") || "");
-      const lngParam = Number.parseFloat(url.searchParams.get("lng") || "");
-      if (!Number.isFinite(latParam) || !Number.isFinite(lngParam)) {
-        return jsonResponse(
-          { status: "unavailable", reasonCode: "invalid-coordinates", message: "lat and lng must be valid numbers" },
-          { status: 400 },
+  // ── /api/atlas/air-quality ───────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/air-quality") {
+    const cacheKey = "air-quality:dhaka";
+    const { data, error } = await fetchWithCache(
+      cacheKey,
+      20 * 60 * 1000, // 20 mins
+      async () => {
+        const res = await fetch(
+          `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,us_aqi&hourly=pm2_5,pm10,us_aqi&timezone=Asia%2FDhaka&forecast_hours=72`,
+          { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0 (dhaka.nonarkara.org)" } },
         );
-      }
+        if (!res.ok) throw new Error(`Open-Meteo Air API returned ${res.status}`);
+        const payload = await res.json() as { current?: Record<string, unknown> };
+        validateCurrentModel(payload, "air");
+        return payload;
+      },
+      null,
+      candidate => validateCurrentModel(candidate, "air"),
+    );
 
-      let nearestAir = AIR_STATIONS[0];
-      let minAirDist = haversineDistanceKm(latParam, lngParam, nearestAir.lat, nearestAir.lng);
-      for (const st of AIR_STATIONS) {
-        const d = haversineDistanceKm(latParam, lngParam, st.lat, st.lng);
-        if (d < minAirDist) {
-          minAirDist = d;
-          nearestAir = st;
-        }
-      }
-
-      let nearestRiver = RIVER_STATIONS[0];
-      let minRiverDist = haversineDistanceKm(latParam, lngParam, nearestRiver.lat, nearestRiver.lng);
-      for (const st of RIVER_STATIONS) {
-        const d = haversineDistanceKm(latParam, lngParam, st.lat, st.lng);
-        if (d < minRiverDist) {
-          minRiverDist = d;
-          nearestRiver = st;
-        }
-      }
-
-      return jsonResponse({
-        status: "ok",
-        query: { lat: latParam, lng: lngParam },
-        insideBbox:
-          latParam >= CITY_BBOX.minLat &&
-          latParam <= CITY_BBOX.maxLat &&
-          lngParam >= CITY_BBOX.minLon &&
-          lngParam <= CITY_BBOX.maxLon,
-        nearestAirStation: {
-          ...nearestAir,
-          distance_km: Number(minAirDist.toFixed(2)),
+    if (!data) {
+      return jsonResponse(
+        {
+          status: "unavailable",
+          reasonCode: currentModelReason(error),
+          message: "Air quality model service unreachable.",
+          error,
+          timestamp: new Date().toISOString(),
+          provenance: "unavailable",
         },
-        nearestRiverStation: {
-          ...nearestRiver,
-          distance_km: Number(minRiverDist.toFixed(2)),
-        },
-        provenance: "reference",
-      });
+        { status: 503 },
+      );
     }
 
-    // ── /api/atlas/weather ───────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/weather") {
-      const cacheKey = "weather:dhaka";
-      const { data, error } = await fetchWithCache(
-        cacheKey,
-        15 * 60 * 1000, // 15 mins
-        async () => {
-          const res = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure&hourly=temperature_2m,precipitation_probability,rain&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=Asia%2FDhaka&forecast_days=3`,
-            { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0 (dhaka.nonarkara.org)" } },
-          );
-          if (!res.ok) throw new Error(`Open-Meteo returned status ${res.status}`);
-          const payload = await res.json() as { current?: Record<string, unknown> };
-          validateCurrentModel(payload, "weather");
-          return payload;
-        },
-        null,
-        candidate => validateCurrentModel(candidate, "weather"),
-      );
+    return jsonResponse({
+      status: "ok",
+      city: "Dhaka",
+      source: "Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo",
+      source_url: "https://air-quality-api.open-meteo.com",
+      provenance: "modeled",
+      stations: AIR_STATIONS,
+      data,
+    });
+  }
 
-      if (!data) {
-        return jsonResponse(
-          {
-            status: "unavailable",
-            reasonCode: currentModelReason(error),
-            message: "Open-Meteo weather endpoint could not be reached.",
-            error,
-            timestamp: new Date().toISOString(),
-            provenance: "unavailable",
-          },
-          { status: 503 },
+  // ── /api/atlas/rainfall ──────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/rainfall") {
+    const cacheKey = "rainfall:catchments";
+    const { data, error } = await fetchWithCache(
+      cacheKey,
+      20 * 60 * 1000,
+      async () => {
+        const points = [
+          { id: "buriganga", name: "Buriganga query point", name_bn: "বুড়িগঙ্গা অনুসন্ধান বিন্দু", lat: 23.7001, lng: 90.4150 },
+          { id: "turag", name: "Turag query point", name_bn: "তুরাগ অনুসন্ধান বিন্দু", lat: 23.7980, lng: 90.3420 },
+          { id: "balu", name: "Balu Corridor", name_bn: "বালু অনুসন্ধান বিন্দু", lat: 23.7140, lng: 90.5050 },
+          { id: "tongi", name: "Tongi North", name_bn: "টঙ্গী উত্তর অনুসন্ধান বিন্দু", lat: 23.8890, lng: 90.4010 },
+          { id: "savar", name: "Savar West", name_bn: "সাভার পশ্চিম অনুসন্ধান বিন্দু", lat: 23.8583, lng: 90.2667 },
+        ];
+        const results = await Promise.all(
+          points.map(async (p) => {
+            try {
+              const r = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&current=precipitation,rain&hourly=precipitation,rain&forecast_hours=24&timezone=Asia%2FDhaka`,
+                { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
+              );
+              if (!r.ok) throw new Error(`upstream-http-${r.status}`);
+              const j = (await r.json()) as {current?: {precipitation?:number}; current_units?:{precipitation?:string}};
+              const period=validateRainfall24h(j);
+              return {...p,status:"ok",provenance:"modeled",source:"Open-Meteo Weather API",spatialScope:"query_point",retrievedAt:new Date().toISOString(),...period,
+                current_mm:j.current_units?.precipitation==='mm'&&typeof j.current?.precipitation==='number'&&Number.isFinite(j.current.precipitation)&&j.current.precipitation>=0?j.current.precipitation:null};
+            } catch {
+              return { ...p, status: "unavailable", reasonCode: "upstream-or-invalid-rainfall", timestamp: new Date().toISOString(), current_mm: null, rain_24h_sum_mm: null };
+            }
+          }),
         );
-      }
+        return results;
+      },
+      [],
+    );
 
-      return jsonResponse({
-        status: "ok",
-        city: "Dhaka",
-        source: "Open-Meteo Weather API",
-        source_url: "https://open-meteo.com/en/docs",
-        provenance: "modeled",
-        data,
-      });
-    }
+    return jsonResponse({
+      status: data.length && data.every(p => p.status === "ok") ? "ok" : "unavailable",
+      timestamp: new Date().toISOString(),
+      reasonCode: data.length && data.every(p => p.status === "ok") ? null : "rainfall-incomplete",
+      city: "Dhaka",
+      source: "Open-Meteo High-Resolution Precipitation Models",
+      provenance: "modeled",
+      catchments: data,
+      error: error || null,
+    });
+  }
 
-    // ── /api/atlas/air-quality ───────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/air-quality") {
-      const cacheKey = "air-quality:dhaka";
-      const { data, error } = await fetchWithCache(
-        cacheKey,
-        20 * 60 * 1000, // 20 mins
-        async () => {
-          const res = await fetch(
-            `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,us_aqi&hourly=pm2_5,pm10,us_aqi&timezone=Asia%2FDhaka&forecast_hours=72`,
-            { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0 (dhaka.nonarkara.org)" } },
-          );
-          if (!res.ok) throw new Error(`Open-Meteo Air API returned ${res.status}`);
-          const payload = await res.json() as { current?: Record<string, unknown> };
-          validateCurrentModel(payload, "air");
-          return payload;
-        },
-        null,
-        candidate => validateCurrentModel(candidate, "air"),
-      );
+  // ── /api/atlas/fires ─────────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/fires") {
+    return jsonResponse({
+      status: "unavailable", provenance: "unavailable",
+      reasonCode: "firms-feed-not-configured", timestamp: new Date().toISOString(),
+      source: "NASA FIRMS", source_url: "https://firms.modaps.eosdis.nasa.gov",
+      brick_kiln_hotspots_detected: null,
+      note: "No authenticated FIRMS retrieval is configured. Thermal anomalies alone cannot identify brick kilns.",
+    }, { status: 503 });
+  }
 
-      if (!data) {
-        return jsonResponse(
-          {
-            status: "unavailable",
-            reasonCode: currentModelReason(error),
-            message: "Air quality model service unreachable.",
-            error,
-            timestamp: new Date().toISOString(),
-            provenance: "unavailable",
-          },
-          { status: 503 },
+  // ── /api/atlas/wind ──────────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/wind") {
+    const cacheKey = "wind:dhaka-grid";
+    const { data, error } = await fetchWithCache(
+      cacheKey,
+      30 * 60 * 1000,
+      async () => {
+        const res = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=wind_speed_10m,wind_direction_10m&timezone=Asia%2FDhaka&forecast_hours=12`,
+          { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
         );
-      }
+        if (!res.ok) throw new Error("Wind fetch failed");
+        const payload = await res.json() as { current?: Record<string, unknown> };
+        validateCurrentModel(payload, "wind");
+        return payload;
+      },
+      null,
+      candidate => validateCurrentModel(candidate, "wind"),
+    );
 
-      return jsonResponse({
-        status: "ok",
-        city: "Dhaka",
-        source: "Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo",
-        source_url: "https://air-quality-api.open-meteo.com",
-        provenance: "modeled",
-        stations: AIR_STATIONS,
-        data,
-      });
-    }
+    return jsonResponse({
+      status: data ? "ok" : "unavailable",
+      provenance: data ? "modeled" : "unavailable",
+      reasonCode: data ? null : currentModelReason(error),
+      timestamp: new Date().toISOString(),
+      source: "Open-Meteo · surface wind at 10 m (no 925 hPa field)",
+      data,
+    }, { status: data ? 200 : 503 });
+  }
 
-    // ── /api/atlas/rainfall ──────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/rainfall") {
-      const cacheKey = "rainfall:catchments";
-      const { data, error } = await fetchWithCache(
-        cacheKey,
-        20 * 60 * 1000,
-        async () => {
-          const points = [
-            { id: "buriganga", name: "Buriganga query point", name_bn: "বুড়িগঙ্গা অনুসন্ধান বিন্দু", lat: 23.7001, lng: 90.4150 },
-            { id: "turag", name: "Turag query point", name_bn: "তুরাগ অনুসন্ধান বিন্দু", lat: 23.7980, lng: 90.3420 },
-            { id: "balu", name: "Balu Corridor", name_bn: "বালু অনুসন্ধান বিন্দু", lat: 23.7140, lng: 90.5050 },
-            { id: "tongi", name: "Tongi North", name_bn: "টঙ্গী উত্তর অনুসন্ধান বিন্দু", lat: 23.8890, lng: 90.4010 },
-            { id: "savar", name: "Savar West", name_bn: "সাভার পশ্চিম অনুসন্ধান বিন্দু", lat: 23.8583, lng: 90.2667 },
-          ];
-          const results = await Promise.all(
-            points.map(async (p) => {
-              try {
-                const r = await fetch(
-                  `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&current=precipitation,rain&hourly=precipitation,rain&forecast_hours=24&timezone=Asia%2FDhaka`,
-                  { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
-                );
-                if (!r.ok) throw new Error(`upstream-http-${r.status}`);
-                const j = (await r.json()) as {current?: {precipitation?:number}; current_units?:{precipitation?:string}};
-                const period=validateRainfall24h(j);
-                return {...p,status:"ok",provenance:"modeled",source:"Open-Meteo Weather API",spatialScope:"query_point",retrievedAt:new Date().toISOString(),...period,
-                  current_mm:j.current_units?.precipitation==='mm'&&typeof j.current?.precipitation==='number'&&Number.isFinite(j.current.precipitation)&&j.current.precipitation>=0?j.current.precipitation:null};
-              } catch {
-                return { ...p, status: "unavailable", reasonCode: "upstream-or-invalid-rainfall", timestamp: new Date().toISOString(), current_mm: null, rain_24h_sum_mm: null };
-              }
-            }),
-          );
-          return results;
-        },
-        [],
-      );
+  // National statistics: values retain their reporting periods and source age.
+  if (url.pathname === "/api/atlas/instruments") {
+    const data=await getInstruments();
+    return jsonResponse(data,{status:data.status==='unavailable'?503:200,headers:{'cache-control':'no-store'}});
+  }
 
-      return jsonResponse({
-        status: data.length && data.every(p => p.status === "ok") ? "ok" : "unavailable",
+  // ── /api/atlas/environment ───────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/environment") {
+    const { data, error } = await fetchWithCache<GibsLayerReport[]>(
+      "gibs:environment",
+      30 * 60 * 1000,
+      async () => {
+        const gibs = await Promise.all(GIBS_LAYERS.map((spec) => resolveGibsLayer(spec)));
+        const radar = await resolveRadarLayer();
+        return [...gibs, radar];
+      },
+      [],
+    );
+
+    const anyOk = data.some((l) => l.status === "ok");
+    const allOk = data.length === GIBS_LAYERS.length + 1 && data.every(l=>l.status === "ok");
+    return jsonResponse(
+      {
+        status: allOk ? "ok" : anyOk ? "partial" : "unavailable",
+        reasonCode: allOk ? null : anyOk ? "some-environment-layers-unavailable" : error ? "upstream-unreachable" : "gibs-no-observation",
         timestamp: new Date().toISOString(),
-        reasonCode: data.length && data.every(p => p.status === "ok") ? null : "rainfall-incomplete",
         city: "Dhaka",
-        source: "Open-Meteo High-Resolution Precipitation Models",
-        provenance: "modeled",
-        catchments: data,
-        error: error || null,
+        provenance: "measured",
+        date: new Date().toISOString().split("T")[0],
+        source: "NASA GIBS WMTS · epsg3857/best · observation date resolved per layer by decoding the tile",
+        catalogue_captured: GIBS_CATALOGUE_CAPTURED,
+        layers: data,
+      },
+      { status: anyOk ? 200 : 503 },
+    );
+  }
+
+  // ── /api/atlas/earthquake ────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/earthquake") {
+    const cacheKey = "earthquake:bengal";
+    interface UsgsResponse { features?: unknown[] }
+    const { data, error } = await fetchWithCache<UsgsResponse | null>(
+      cacheKey,
+      30 * 60 * 1000,
+      async () => {
+        const res = await fetch(
+          "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=3.0&minlatitude=20.5&maxlatitude=27.0&minlongitude=88.0&maxlongitude=93.0&limit=5",
+          { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
+        );
+        if (!res.ok) throw new Error("USGS query failed");
+        const payload = (await res.json()) as UsgsResponse;
+        // The shape is checked before the payload is believed. A response
+        // that is not a GeoJSON FeatureCollection is an upstream fault, not
+        // an earthquake count of zero.
+        if (!payload || !Array.isArray(payload.features)) {
+          throw new Error("USGS payload shape invalid");
+        }
+        return payload;
+      },
+      null,
+    );
+
+    const unavailable = !data || !Array.isArray(data.features);
+    return jsonResponse({
+      status: unavailable ? "unavailable" : "ok",
+      timestamp: new Date().toISOString(),
+      reasonCode: unavailable ? (error ? "upstream-unreachable" : "upstream-payload-invalid") : null,
+      region: "Bengal Basin & Dauki Fault Seismic Zone",
+      provenance: "measured",
+      source: "USGS Earthquake Hazards Program",
+      source_url: "https://earthquake.usgs.gov",
+      events: unavailable ? null : data.features,
+      error: error || null,
+    }, { status: unavailable ? 503 : 200 });
+  }
+
+  // ── /api/atlas/search ────────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/search") {
+    const q = url.searchParams.get("q")?.trim();
+    if (!q) {
+      return jsonResponse(
+        { status: "unavailable", reasonCode: "empty-query", message: "Parameter q is required" },
+        { status: 400 },
+      );
+    }
+    try {
+      const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        q + ", Dhaka, Bangladesh",
+      )}&format=json&viewbox=${CITY_BBOX.minLon},${CITY_BBOX.maxLat},${CITY_BBOX.maxLon},${CITY_BBOX.minLat}&bounded=1&limit=5`;
+      const res = await fetch(nominatimUrl, {
+        headers: { "user-agent": "DhakaAtlasBot/1.0 (dhaka.nonarkara.org; research)" },
+      });
+      if (!res.ok) throw new Error(`Nominatim error ${res.status}`);
+      const places = await res.json();
+      return jsonResponse({
+        status: "ok",
+        query: q,
+        provenance: "reference",
+        results: places,
+      });
+    } catch (err: unknown) {
+      return jsonResponse(
+        { status: "unavailable", reasonCode: "geocoder-failure", error: String(err) },
+        { status: 503 },
+      );
+    }
+  }
+
+  // ── /api/atlas/export ────────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/export") {
+    const landmarksUrl = new URL("/dhaka-landmarks.geojson", request.url);
+    const res = await env.ASSETS.fetch(landmarksUrl.toString());
+    if (res.ok) {
+      const geojson = await res.json();
+      return jsonResponse(geojson, {
+        headers: {
+          "content-disposition": 'attachment; filename="dhaka-atlas-export.geojson"',
+        },
       });
     }
+    return jsonResponse({ status: "unavailable", reasonCode: "export-missing" }, { status: 503 });
+  }
 
-    // ── /api/atlas/fires ─────────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/fires") {
+  // ── /api/atlas/watch ─────────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/watch") {
+    const read = async (path: string) => {
+      const response = await worker.fetch(new Request(new URL(path, request.url), { headers: request.headers }), env);
+      return await response.json() as { status: string; provenance: string; reasonCode?: string; source?: string; data?: { current?: { time?: string; us_aqi?: number; wind_speed_10m?: number; wind_direction_10m?: number } } };
+    };
+    const [air, weather] = await Promise.all([
+      read("/api/atlas/air-quality"),
+      read("/api/atlas/weather"),
+    ]);
+    const aqi = air.data?.current?.us_aqi;
+    const wind = weather.data?.current;
+    const missing = (source: string, reasonCode: string) => ({
+      status: "unavailable", provenance: "unavailable", reasonCode, source,
+      timestamp: new Date().toISOString(), observedAt: null,
+    });
+    // Rainfall alone does not establish river flood risk or a safe state.
+    return jsonResponse({
+      status: "partial", city: "Dhaka", timestamp: new Date().toISOString(),
+      indicators: {
+        airQuality: air.status === "ok" && typeof aqi === "number" && Number.isFinite(aqi) && aqi >= 0 ? {
+          status: aqi > 150 ? "danger" : aqi > 100 ? "warning" : "ok",
+          provenance: "modeled", us_aqi: aqi, observedAt: air.data?.current?.time,
+          category: aqi <= 50 ? "Good" : aqi <= 100 ? "Moderate" : aqi <= 150 ? "Unhealthy for Sensitive Groups" : aqi <= 200 ? "Unhealthy" : aqi <= 300 ? "Very Unhealthy" : "Hazardous",
+          source: air.source,
+        } : missing("CAMS / Open-Meteo", air.reasonCode || "invalid-current-aqi"),
+        weather: weather.status === "ok" && typeof wind?.wind_speed_10m === "number" && Number.isFinite(wind.wind_speed_10m) && wind.wind_speed_10m >= 0 ? {
+          status: "ok", provenance: "modeled", wind_speed_10m: wind.wind_speed_10m,
+          wind_direction_10m: wind.wind_direction_10m, observedAt: wind.time, source: weather.source,
+        } : missing("Open-Meteo", weather.reasonCode || "invalid-current-wind"),
+        floodRisk: missing("BWDB / FFWC", "validated-flood-assessment-not-connected"),
+        economy: missing("Bangladesh Bank / DSE", "dated-bulletin-not-connected"),
+      },
+    });
+  }
+
+  if (url.pathname === "/api/atlas/outlook") {
+    const kind = url.searchParams.get("kind");
+    if (kind !== "air" && kind !== "flood") return jsonResponse({status:"unavailable",reasonCode:"invalid-outlook-kind",timestamp:new Date().toISOString()}, {status:400});
+    const data = await getOutlook(kind) as {status:string};
+    return jsonResponse(data, {status:data.status === "ok" ? 200 : 503,headers:{"cache-control":"public, max-age=60"}});
+  }
+
+  // ── /api/dhaka/rivers ────────────────────────────────────────────────────
+  // Preserve point rainfall forecasts; no calibrated flood assessment exists.
+  if (url.pathname === "/api/dhaka/rivers") {
+    const cacheKey = "rivers:rainfall-reference-v2";
+    const { data, error } = await fetchWithCache(
+      cacheKey,
+      20 * 60 * 1000,
+      async () => {
+        // Five geographic query points, not catchment-wide rainfall estimates.
+        const points = [
+          { id: "buriganga", name: "Buriganga query point", name_bn: "বুড়িগঙ্গা অনুসন্ধান বিন্দু", lat: 23.7001, lng: 90.4150 },
+          { id: "turag", name: "Turag query point", name_bn: "তুরাগ অনুসন্ধান বিন্দু", lat: 23.7980, lng: 90.3420 },
+          { id: "balu", name: "Balu Corridor", name_bn: "বালু অনুসন্ধান বিন্দু", lat: 23.7140, lng: 90.5050 },
+          { id: "tongi", name: "Tongi North", name_bn: "টঙ্গী উত্তর অনুসন্ধান বিন্দু", lat: 23.8890, lng: 90.4010 },
+          { id: "savar", name: "Savar West", name_bn: "সাভার পশ্চিম অনুসন্ধান বিন্দু", lat: 23.8583, lng: 90.2667 },
+        ];
+        const rainfall = await Promise.all(
+          points.map(async (p) => {
+            try {
+              const r = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&current=precipitation,rain&hourly=precipitation,rain&forecast_hours=24&timezone=Asia%2FDhaka`,
+                { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
+              );
+              if (!r.ok) throw new Error(`upstream-http-${r.status}`);
+              const j = await r.json();
+              return { ...p, status: "ok" as const, provenance: "modeled", source: "Open-Meteo Weather API",
+                retrievedAt: new Date().toISOString(), ...validateRainfall24h(j) };
+
+            } catch (error) {
+              const message = error instanceof Error ? error.message : "";
+              const reasonCode = message === "upstream-http-429" ? "provider-rate-limited" : message.startsWith("invalid-rainfall") ? message : "upstream-unreachable";
+              return { ...p, status: "unavailable" as const, reasonCode, retrievedAt: new Date().toISOString(), validFrom: null, validTo: null, unit: "mm", rain_24h_sum_mm: null };
+            }
+          }),
+        );
+        const rainById = new Map(rainfall.map(p => [p.id, p]));
+
+        // Map catchment ids to river station ids
+        const catchmentToStation: Record<string, string> = {
+          buriganga: "buriganga-mill-barrage",
+          turag: "turag-mirpur",
+          balu: "balu-demra",
+          tongi: "tongi-khal-tongi",
+          savar: "dhaleshwari-rekabi-bazar",
+        };
+
+        const stations = RIVER_STATIONS.map(st => {
+          const rain = rainById.get(Object.keys(catchmentToStation).find(k => catchmentToStation[k] === st.id) || "");
+          const rain24h = rain?.rain_24h_sum_mm ?? null;
+          const rainfall = {
+            status: rain?.status ?? "unavailable", provenance: rain?.status === "ok" ? "modeled" : "unavailable",
+            reasonCode: rain?.status === "ok" ? null : rain?.reasonCode ?? "rainfall-query-not-mapped",
+            value: rain24h, unit: "mm", source: "Open-Meteo Weather API", sourceUrl: "https://open-meteo.com/en/docs",
+            retrievedAt: rain?.retrievedAt ?? null, validFrom: rain?.validFrom ?? null, validTo: rain?.validTo ?? null,
+            query: rain ? { latitude: rain.lat, longitude: rain.lng, name: rain.name } : null,
+            spatialScope: "query-point-not-catchment", stationMatchStatus: "unvalidated",
+          };
+
+          return {
+            ...st,
+            current_level_m: null, // no live gauge feed
+            trend: "unavailable",
+            status: "unavailable",
+            readingsStatus: "unavailable",
+            reasonCode: "river-observations-not-connected",
+            rainfall,
+            floodRisk: {
+              status: "unavailable", provenance: "unavailable", tier: null,
+              reasonCode: "validated-flood-assessment-not-connected",
+              timestamp: new Date().toISOString(),
+              note: "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected.",
+            },
+          };
+        });
+
+        const anyRain = rainfall.some(r => r.status === "ok");
+
+        return {
+          status: anyRain ? "partial" : "unavailable",
+          provenance: anyRain ? "modeled" : "unavailable",
+          readingsStatus: "unavailable",
+          reasonCode: anyRain ? null : "river-observations-not-connected",
+          observedAt: null,
+          timestamp: new Date().toISOString(),
+          stations,
+          studyBoundary: DHAKA_STUDY_BOUNDARY,
+          scenarioTypes: FLOOD_SCENARIO_TYPES,
+          summary: {
+            assessed: 0, unavailable: stations.length,
+            rainfallAvailable: stations.filter(s => s.rainfall.status === "ok").length,
+            rainfallUnavailable: stations.filter(s => s.rainfall.status !== "ok").length,
+          },
+          note: "Registry danger levels are unverified reference values. Point rainfall forecasts do not establish river levels, catchment saturation or flood warnings. Scenario types are classifications only; none establishes a warning, evacuation route or shelter assignment.",
+        };
+      },
+      null,
+    );
+
+    if (!data) {
       return jsonResponse({
-        status: "unavailable", provenance: "unavailable",
-        reasonCode: "firms-feed-not-configured", timestamp: new Date().toISOString(),
-        source: "NASA FIRMS", source_url: "https://firms.modaps.eosdis.nasa.gov",
-        brick_kiln_hotspots_detected: null,
-        note: "No authenticated FIRMS retrieval is configured. Thermal anomalies alone cannot identify brick kilns.",
+        status: "unavailable",
+        reasonCode: "upstream-unreachable",
+        provenance: "unavailable",
+        observedAt: null,
+        readingsStatus: "unavailable",
+        stations: RIVER_STATIONS.map(s => ({ ...s, rainfall: { status: "unavailable", value: null, unit: "mm", reasonCode: "upstream-unreachable", retrievedAt: new Date().toISOString() }, floodRisk: { status: "unavailable", tier: null, reasonCode: "validated-flood-assessment-not-connected", timestamp: new Date().toISOString() } })),
+        studyBoundary: DHAKA_STUDY_BOUNDARY,
+        scenarioTypes: FLOOD_SCENARIO_TYPES,
+        timestamp: new Date().toISOString(),
+        error: error || null,
       }, { status: 503 });
     }
 
-    // ── /api/atlas/wind ──────────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/wind") {
-      const cacheKey = "wind:dhaka-grid";
-      const { data, error } = await fetchWithCache(
-        cacheKey,
-        30 * 60 * 1000,
-        async () => {
-          const res = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${CITY_CENTER.lat}&longitude=${CITY_CENTER.lng}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=wind_speed_10m,wind_direction_10m&timezone=Asia%2FDhaka&forecast_hours=12`,
-            { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
-          );
-          if (!res.ok) throw new Error("Wind fetch failed");
-          const payload = await res.json() as { current?: Record<string, unknown> };
-          validateCurrentModel(payload, "wind");
-          return payload;
-        },
-        null,
-        candidate => validateCurrentModel(candidate, "wind"),
-      );
+    return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200 });
+  }
 
-      return jsonResponse({
-        status: data ? "ok" : "unavailable",
-        provenance: data ? "modeled" : "unavailable",
-        reasonCode: data ? null : currentModelReason(error),
-        timestamp: new Date().toISOString(),
-        source: "Open-Meteo · surface wind at 10 m (no 925 hPa field)",
-        data,
-      }, { status: data ? 200 : 503 });
-    }
+  // ── /api/dhaka/shelters ────────────────────────────────────────────────────
+  // DDM shelter register: reviewable inventory only. No shelter pin is
+  // created without source geometry or a reviewed building-level match.
+  // Operational readiness, capacity and accessibility are separate from the
+  // source listing. DDM source page is publicly accessible; reuse terms
+  // pending review — not treated as open data.
+  if (url.pathname === "/api/dhaka/shelters") {
+    const register=publicShelterRegister(SHELTER_REGISTER);
+    return jsonResponse({
+      status: "unreviewed",
+      city: "Dhaka",
+      provenance: "reference",
+      reasonCode: "shelter-register-pending-review",
+      timestamp: new Date().toISOString(),
+      retrievedAt: DDM_SHELTER_SOURCE.retrievedAt,
+      observedAt: null,
+      source: DDM_SHELTER_SOURCE,
+      register,
+      registerCount: register.length,
+      mappableCount: register.filter(s => s.mappable).length,
+      studyBoundary: DHAKA_STUDY_BOUNDARY,
+      inventoryStatus: "not-imported",
+      readinessStatus: "not-derived-from-listing",
+      scenarioTypes: SHELTER_SCENARIO_TYPES,
+      note: "The DDM page embeds structured coordinates. Source-structure counts do not establish individual location accuracy, municipal coverage or operational readiness. No records are imported and no shelter pins are published pending location and publication review.",
+      note_bn: "DDM পাতায় কাঠামোবদ্ধ স্থানাঙ্ক রয়েছে। উৎসের রেকর্ডের সংখ্যা দিয়ে প্রতিটি অবস্থানের নির্ভুলতা, পৌর এলাকার আওতা বা কার্যকর প্রস্তুতি প্রতিষ্ঠিত হয় না। অবস্থান ও প্রকাশের পর্যালোচনা না হওয়া পর্যন্ত কোনো রেকর্ড আমদানি বা আশ্রয়কেন্দ্রের চিহ্ন প্রকাশ করা হয়নি।",
+    }, { headers: { "cache-control": "no-store" } });
+  }
 
-    // National statistics: values retain their reporting periods and source age.
-    if (url.pathname === "/api/atlas/instruments") {
-      const data=await getInstruments();
-      return jsonResponse(data,{status:data.status==='unavailable'?503:200,headers:{'cache-control':'no-store'}});
-    }
+  // ── /api/dhaka/ffwc ────────────────────────────────────────────────────
+  // FFWC station observations and forecasts. The official FFWC API advertises
+  // current water levels, warnings and short-term forecasts, but requires
+  // registration for developer documentation and was unreachable from this
+  // environment. The endpoint structure below follows the recommended data
+  // contract; it returns unavailable until a live payload can be validated.
+  // River observations remain river observations — they are not interpolated
+  // into street flood depths or evacuation instructions.
+  if (url.pathname === "/api/dhaka/ffwc") {
+    return jsonResponse({
+      status: "unavailable",
+      city: "Dhaka",
+      provenance: "unavailable",
+      reasonCode: "ffwc-api-not-validated",
+      retrievedAt: new Date().toISOString(),
+      source: {
+        name: "Bangladesh Water Development Board / Flood Forecasting & Warning Centre",
+        name_bn: "বাংলাদেশ পানি উন্নয়ন বোর্ড / বন্যা পূর্বাভাস ও সতর্কতা কেন্দ্র",
+        sourceUrl: "https://api3.ffwc.gov.bd/",
+        note: "API documentation requires registration. Live payload, timestamps, units and station geometry not yet validated.",
+        note_bn: "এপিআই নথিপত্রের জন্য নিবন্ধন প্রয়োজন। লাইভ পেলোড, সময়স্ট্যাম্প, একক ও স্টেশন জ্যামিতি এখনও যাচাই করা হয়নি।",
+      },
+      stations: RIVER_STATIONS.map(st => ({
+        ...st,
+        current_level_m: null,
+        trend: "unavailable",
+        status: "unavailable",
+        readingsStatus: "unavailable",
+        reasonCode: "ffwc-api-not-validated",
+        observation: null,
+        forecast: null,
+      })),
+      timestamp: new Date().toISOString(),
+      note: "No live FFWC gauge feed connected. Station registry entries remain unverified reference values until the API is tested and calibrated.",
+      note_bn: "কোনো সরাসরি এফডব্লুসি গেজ পাঠন সংযুক্ত নয়। স্টেশন নিবন্ধন নিবন্ধ পর্যালোচনা এবং ক্যালিব্রেশন না হওয়া পর্যন্ত রেফারেন্স মান থাকে।",
+    }, { headers: { "cache-control": "no-store" } });
+  }
 
-    // ── /api/atlas/environment ───────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/environment") {
-      const { data, error } = await fetchWithCache<GibsLayerReport[]>(
-        "gibs:environment",
-        30 * 60 * 1000,
-        async () => {
-          const gibs = await Promise.all(GIBS_LAYERS.map((spec) => resolveGibsLayer(spec)));
-          const radar = await resolveRadarLayer();
-          return [...gibs, radar];
-        },
-        [],
-      );
+  // ── /api/dhaka/economy ───────────────────────────────────────────────────
+  // Combines Bangladesh-specific reference indicators (RMG, DSEX, EPZs) with
+  // dated World Bank WDI observations where they overlap (CPI, remittance,
+  // exports, FX rate). Corridor workforce/export figures are unsourced
+  // constants and remain labeled reference-only.
+  if (url.pathname === "/api/dhaka/economy") {
+    const instruments = await getInstruments();
+    const wbById = new Map(instruments.macro.map((m: any) => [m.id, m]));
 
-      const anyOk = data.some((l) => l.status === "ok");
-      const allOk = data.length === GIBS_LAYERS.length + 1 && data.every(l=>l.status === "ok");
-      return jsonResponse(
-        {
-          status: allOk ? "ok" : anyOk ? "partial" : "unavailable",
-          reasonCode: allOk ? null : anyOk ? "some-environment-layers-unavailable" : error ? "upstream-unreachable" : "gibs-no-observation",
-          timestamp: new Date().toISOString(),
-          city: "Dhaka",
-          provenance: "measured",
-          date: new Date().toISOString().split("T")[0],
-          source: "NASA GIBS WMTS · epsg3857/best · observation date resolved per layer by decoding the tile",
-          catalogue_captured: GIBS_CATALOGUE_CAPTURED,
-          layers: data,
-        },
-        { status: anyOk ? 200 : 503 },
-      );
-    }
-
-    // ── /api/atlas/earthquake ────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/earthquake") {
-      const cacheKey = "earthquake:bengal";
-      interface UsgsResponse { features?: unknown[] }
-      const { data, error } = await fetchWithCache<UsgsResponse | null>(
-        cacheKey,
-        30 * 60 * 1000,
-        async () => {
-          const res = await fetch(
-            "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=3.0&minlatitude=20.5&maxlatitude=27.0&minlongitude=88.0&maxlongitude=93.0&limit=5",
-            { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
-          );
-          if (!res.ok) throw new Error("USGS query failed");
-          return (await res.json()) as UsgsResponse;
-        },
-        null,
-      );
-
-      return jsonResponse({
-        status: data ? "ok" : "unavailable",
-        timestamp: new Date().toISOString(),
-        reasonCode: data ? null : "upstream-unreachable",
-        region: "Bengal Basin & Dauki Fault Seismic Zone",
-        provenance: "measured",
-        source: "USGS Earthquake Hazards Program",
-        source_url: "https://earthquake.usgs.gov",
-        events: data?.features ?? null,
-        error: error || null,
-      });
-    }
-
-    // ── /api/atlas/search ────────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/search") {
-      const q = url.searchParams.get("q")?.trim();
-      if (!q) {
-        return jsonResponse(
-          { status: "unavailable", reasonCode: "empty-query", message: "Parameter q is required" },
-          { status: 400 },
-        );
+    const indicators = MACRO_INDICATORS.map(ind => {
+      const wb = (wbById.get({
+        "worker-remittance": "remittance",
+        "cpi-inflation-general": "inflation",
+        "usd-bdt-rate": "fx-period",
+      }[ind.id] || "") as any);
+      if (wb && wb.status === "ok" && wb.value !== null) {
+        return {
+          ...ind,
+          value: wb.value,
+          period: wb.period,
+          provenance: "reference" as const,
+          source: "World Bank WDI · " + ind.source,
+          source_url: wb.sourceUrl || ind.source_url,
+          note: ind.note + ` (World Bank ${wb.period})`,
+          note_bn: ind.note_bn,
+        };
       }
-      try {
-        const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-          q + ", Dhaka, Bangladesh",
-        )}&format=json&viewbox=${CITY_BBOX.minLon},${CITY_BBOX.maxLat},${CITY_BBOX.maxLon},${CITY_BBOX.minLat}&bounded=1&limit=5`;
-        const res = await fetch(nominatimUrl, {
-          headers: { "user-agent": "DhakaAtlasBot/1.0 (dhaka.nonarkara.org; research)" },
-        });
-        if (!res.ok) throw new Error(`Nominatim error ${res.status}`);
-        const places = await res.json();
-        return jsonResponse({
-          status: "ok",
-          query: q,
-          provenance: "reference",
-          results: places,
-        });
-      } catch (err: unknown) {
-        return jsonResponse(
-          { status: "unavailable", reasonCode: "geocoder-failure", error: String(err) },
-          { status: 503 },
-        );
-      }
+      return ind;
+    });
+
+    // The corridors carry measured night-time radiance, not registry
+    // figures. Workforce, export value and daily turnover were hardcoded
+    // constants with no upstream and no date — they looked like data and
+    // were invented. The satellite cannot count workers either, but it can
+    // measure how much light a corridor leaves on, on a stated night, at a
+    // stated resolution, and that is a fact with a source.
+    //
+    // The measurement is shared with the collage, which measures the
+    // corridors and the districts in the same pass and caches the result.
+    const collage = await getCollage(env, request);
+    const corridors = collage?.corridors ?? [];
+
+    const anyOk = instruments.status !== "unavailable";
+    // An empty corridor list is not a city with no corridors. It is a
+    // measurement that did not happen, and it says so.
+    const corridorsReason = corridors.length ? null : "no-corridors-measured";
+    return jsonResponse({
+      status: anyOk ? "ok" : "unavailable",
+      city: "Dhaka",
+      country: "Bangladesh",
+      provenance: instruments.status === "ok" ? "reference" : "unavailable",
+      statusReason: anyOk ? "World Bank WDI annual series connected; Bangladesh-specific indicators remain reference registry." : "No dated bulletin connected.",
+      reasonCode: anyOk ? null : "dated-bulletin-not-connected",
+      corridorsReasonCode: corridorsReason,
+      observedAt: instruments.timestamp,
+      indicators,
+      corridors,
+      timestamp: new Date().toISOString(),
+      fx: instruments.currency,
+    }, { status: anyOk ? 200 : 503 });
+  }
+
+  // ── /api/atlas/collage ───────────────────────────────────────────────────
+  // The collage: one acquisition per satellite signal, measured over every
+  // district, then read against the rest of the city so a number becomes a
+  // finding. Cached for two hours, because the underlying acquisitions
+  // change on a daily-to-16-day cycle and re-measuring on every request
+  // would hammer GIBS for no new information.
+  if (url.pathname === "/api/atlas/people") {
+    try {
+      const response = await env.ASSETS.fetch(new URL('/data/people-manifest.json', request.url));
+      if (!response.ok) throw Error('manifest-unavailable');
+      const manifest = await response.json() as {status?: string};
+      if (manifest.status !== 'reference') throw Error('invalid-manifest');
+      return jsonResponse(manifest, {headers:{'cache-control':'no-store'}});
+    } catch {
+      return jsonResponse({status: 'unavailable', reasonCode: 'reference-manifest-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
     }
+  }
 
-    // ── /api/atlas/export ────────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/export") {
-      const landmarksUrl = new URL("/dhaka-landmarks.geojson", request.url);
-      const res = await env.ASSETS.fetch(landmarksUrl.toString());
-      if (res.ok) {
-        const geojson = await res.json();
-        return jsonResponse(geojson, {
-          headers: {
-            "content-disposition": 'attachment; filename="dhaka-atlas-export.geojson"',
-          },
-        });
-      }
-      return jsonResponse({ status: "unavailable", reasonCode: "export-missing" }, { status: 503 });
+  // ── /api/dhaka/population ───────────────────────────────────────────────
+  // WorldPop 2025 R2025A gridded population model, aggregated into 1 km cells.
+  // Modeled estimate — not census, not current residents, not capacity.
+  if (url.pathname === "/api/dhaka/population") {
+    const cacheKey = "population:grid-v1";
+    const { data, error } = await fetchWithCache(
+      cacheKey,
+      24 * 60 * 60 * 1000,
+      async () => {
+        const res = await env.ASSETS.fetch(new URL('/data/people-grid.json', request.url));
+        if (!res.ok) throw Error('population-grid-unavailable');
+        return res.json();
+      },
+      null,
+    );
+    if (!data) {
+      return jsonResponse({status: 'unavailable', reasonCode: 'population-grid-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
     }
-
-    // ── /api/atlas/watch ─────────────────────────────────────────────────────
-    if (url.pathname === "/api/atlas/watch") {
-      const read = async (path: string) => {
-        const response = await worker.fetch(new Request(new URL(path, request.url), { headers: request.headers }), env);
-        return await response.json() as { status: string; provenance: string; reasonCode?: string; source?: string; data?: { current?: { time?: string; us_aqi?: number; wind_speed_10m?: number; wind_direction_10m?: number } } };
-      };
-      const [air, weather] = await Promise.all([
-        read("/api/atlas/air-quality"),
-        read("/api/atlas/weather"),
-      ]);
-      const aqi = air.data?.current?.us_aqi;
-      const wind = weather.data?.current;
-      const missing = (source: string, reasonCode: string) => ({
-        status: "unavailable", provenance: "unavailable", reasonCode, source,
-        timestamp: new Date().toISOString(), observedAt: null,
-      });
-      // Rainfall alone does not establish river flood risk or a safe state.
-      return jsonResponse({
-        status: "partial", city: "Dhaka", timestamp: new Date().toISOString(),
-        indicators: {
-          airQuality: air.status === "ok" && typeof aqi === "number" && Number.isFinite(aqi) && aqi >= 0 ? {
-            status: aqi > 150 ? "danger" : aqi > 100 ? "warning" : "ok",
-            provenance: "modeled", us_aqi: aqi, observedAt: air.data?.current?.time,
-            category: aqi <= 50 ? "Good" : aqi <= 100 ? "Moderate" : aqi <= 150 ? "Unhealthy for Sensitive Groups" : aqi <= 200 ? "Unhealthy" : aqi <= 300 ? "Very Unhealthy" : "Hazardous",
-            source: air.source,
-          } : missing("CAMS / Open-Meteo", air.reasonCode || "invalid-current-aqi"),
-          weather: weather.status === "ok" && typeof wind?.wind_speed_10m === "number" && Number.isFinite(wind.wind_speed_10m) && wind.wind_speed_10m >= 0 ? {
-            status: "ok", provenance: "modeled", wind_speed_10m: wind.wind_speed_10m,
-            wind_direction_10m: wind.wind_direction_10m, observedAt: wind.time, source: weather.source,
-          } : missing("Open-Meteo", weather.reasonCode || "invalid-current-wind"),
-          floodRisk: missing("BWDB / FFWC", "validated-flood-assessment-not-connected"),
-          economy: missing("Bangladesh Bank / DSE", "dated-bulletin-not-connected"),
-        },
-      });
+    const grid = data as { columns?: string[]; cells?: unknown[][] };
+    // The shape is checked before the count is published. A grid file of the
+    // wrong shape must not be reported as a city of zero cells.
+    if (!Array.isArray(grid.cells) || !Array.isArray(grid.columns)) {
+      return jsonResponse({status: 'unavailable', reasonCode: 'population-grid-invalid', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
     }
+    return jsonResponse({
+      status: 'reference',
+      provenance: 'modeled',
+      source: 'WorldPop Global Demographic Data R2025A v1',
+      sourceUrl: 'https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2025/BGD/v1/100m/constrained/bgd_pop_2025_CN_100m_R2025A_v1.tif',
+      doi: '10.5258/SOTON/WP00839',
+      license: 'CC BY 4.0',
+      year: 2025,
+      note: 'Modeled estimate for 2025, not census or current residents. Nodata remains unknown; valid-pixel share is not accuracy or confidence.',
+      note_bn: '২০২৫ সালের মডেলভিত্তিক অনুমান, জনগণনা বা বর্তমান বাসিন্দা নয়। নোডাটা অজানা আছে; বৈধ-পিক্সেল শেয়ার নির্ভুলতা বা বিশ্বাস নয়।',
+      cells: grid.cells.length,
+      grid: grid.columns,
+      data: grid.cells,
+    }, {headers: {'cache-control': 'public, max-age=86400, stale-while-revalidate=604800'}});
+  }
 
-    if (url.pathname === "/api/atlas/outlook") {
-      const kind = url.searchParams.get("kind");
-      if (kind !== "air" && kind !== "flood") return jsonResponse({status:"unavailable",reasonCode:"invalid-outlook-kind",timestamp:new Date().toISOString()}, {status:400});
-      const data = await getOutlook(kind) as {status:string};
-      return jsonResponse(data, {status:data.status === "ok" ? 200 : 503,headers:{"cache-control":"public, max-age=60"}});
+  // ── /api/dhaka/facilities ───────────────────────────────────────────────
+  // Dated OSM school, hospital and clinic objects from Geofabrik Bangladesh extract.
+  // Mapped objects only — no capacity, opening status or service catchments.
+  if (url.pathname === "/api/dhaka/facilities") {
+    const cacheKey = "facilities:osm-v1";
+    const { data, error } = await fetchWithCache(
+      cacheKey,
+      24 * 60 * 60 * 1000,
+      async () => {
+        const res = await env.ASSETS.fetch(new URL('/data/facilities.geojson', request.url));
+        if (!res.ok) throw Error('facilities-grid-unavailable');
+        return res.json();
+      },
+      null,
+    );
+    if (!data) {
+      return jsonResponse({status: 'unavailable', reasonCode: 'facilities-grid-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
     }
-
-    // ── /api/dhaka/rivers ────────────────────────────────────────────────────
-    // Preserve point rainfall forecasts; no calibrated flood assessment exists.
-    if (url.pathname === "/api/dhaka/rivers") {
-      const cacheKey = "rivers:rainfall-reference-v2";
-      const { data, error } = await fetchWithCache(
-        cacheKey,
-        20 * 60 * 1000,
-        async () => {
-          // Five geographic query points, not catchment-wide rainfall estimates.
-          const points = [
-            { id: "buriganga", name: "Buriganga query point", name_bn: "বুড়িগঙ্গা অনুসন্ধান বিন্দু", lat: 23.7001, lng: 90.4150 },
-            { id: "turag", name: "Turag query point", name_bn: "তুরাগ অনুসন্ধান বিন্দু", lat: 23.7980, lng: 90.3420 },
-            { id: "balu", name: "Balu Corridor", name_bn: "বালু অনুসন্ধান বিন্দু", lat: 23.7140, lng: 90.5050 },
-            { id: "tongi", name: "Tongi North", name_bn: "টঙ্গী উত্তর অনুসন্ধান বিন্দু", lat: 23.8890, lng: 90.4010 },
-            { id: "savar", name: "Savar West", name_bn: "সাভার পশ্চিম অনুসন্ধান বিন্দু", lat: 23.8583, lng: 90.2667 },
-          ];
-          const rainfall = await Promise.all(
-            points.map(async (p) => {
-              try {
-                const r = await fetch(
-                  `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&current=precipitation,rain&hourly=precipitation,rain&forecast_hours=24&timezone=Asia%2FDhaka`,
-                  { signal: AbortSignal.timeout(10000), headers: { "user-agent": "dhaka-3d-atlas/1.0" } },
-                );
-                if (!r.ok) throw new Error(`upstream-http-${r.status}`);
-                const j = await r.json();
-                return { ...p, status: "ok" as const, provenance: "modeled", source: "Open-Meteo Weather API",
-                  retrievedAt: new Date().toISOString(), ...validateRainfall24h(j) };
-
-              } catch (error) {
-                const message = error instanceof Error ? error.message : "";
-                const reasonCode = message === "upstream-http-429" ? "provider-rate-limited" : message.startsWith("invalid-rainfall") ? message : "upstream-unreachable";
-                return { ...p, status: "unavailable" as const, reasonCode, retrievedAt: new Date().toISOString(), validFrom: null, validTo: null, unit: "mm", rain_24h_sum_mm: null };
-              }
-            }),
-          );
-          const rainById = new Map(rainfall.map(p => [p.id, p]));
-
-          // Map catchment ids to river station ids
-          const catchmentToStation: Record<string, string> = {
-            buriganga: "buriganga-mill-barrage",
-            turag: "turag-mirpur",
-            balu: "balu-demra",
-            tongi: "tongi-khal-tongi",
-            savar: "dhaleshwari-rekabi-bazar",
-          };
-
-          const stations = RIVER_STATIONS.map(st => {
-            const rain = rainById.get(Object.keys(catchmentToStation).find(k => catchmentToStation[k] === st.id) || "");
-            const rain24h = rain?.rain_24h_sum_mm ?? null;
-            const rainfall = {
-              status: rain?.status ?? "unavailable", provenance: rain?.status === "ok" ? "modeled" : "unavailable",
-              reasonCode: rain?.status === "ok" ? null : rain?.reasonCode ?? "rainfall-query-not-mapped",
-              value: rain24h, unit: "mm", source: "Open-Meteo Weather API", sourceUrl: "https://open-meteo.com/en/docs",
-              retrievedAt: rain?.retrievedAt ?? null, validFrom: rain?.validFrom ?? null, validTo: rain?.validTo ?? null,
-              query: rain ? { latitude: rain.lat, longitude: rain.lng, name: rain.name } : null,
-              spatialScope: "query-point-not-catchment", stationMatchStatus: "unvalidated",
-            };
-
-            return {
-              ...st,
-              current_level_m: null, // no live gauge feed
-              trend: "unavailable",
-              status: "unavailable",
-              readingsStatus: "unavailable",
-              reasonCode: "river-observations-not-connected",
-              rainfall,
-              floodRisk: {
-                status: "unavailable", provenance: "unavailable", tier: null,
-                reasonCode: "validated-flood-assessment-not-connected",
-                timestamp: new Date().toISOString(),
-                note: "Point rainfall is not a calibrated river flood assessment. Gauge observations and validated warning thresholds are not connected.",
-              },
-            };
-          });
-
-          const anyRain = rainfall.some(r => r.status === "ok");
-
-          return {
-            status: anyRain ? "partial" : "unavailable",
-            provenance: anyRain ? "modeled" : "unavailable",
-            readingsStatus: "unavailable",
-            reasonCode: anyRain ? null : "river-observations-not-connected",
-            observedAt: null,
-            timestamp: new Date().toISOString(),
-            stations,
-            studyBoundary: DHAKA_STUDY_BOUNDARY,
-            scenarioTypes: FLOOD_SCENARIO_TYPES,
-            summary: {
-              assessed: 0, unavailable: stations.length,
-              rainfallAvailable: stations.filter(s => s.rainfall.status === "ok").length,
-              rainfallUnavailable: stations.filter(s => s.rainfall.status !== "ok").length,
-            },
-            note: "Registry danger levels are unverified reference values. Point rainfall forecasts do not establish river levels, catchment saturation or flood warnings. Scenario types are classifications only; none establishes a warning, evacuation route or shelter assignment.",
-          };
-        },
-        null,
-      );
-
-      if (!data) {
-        return jsonResponse({
-          status: "unavailable",
-          reasonCode: "upstream-unreachable",
-          provenance: "unavailable",
-          observedAt: null,
-          readingsStatus: "unavailable",
-          stations: RIVER_STATIONS.map(s => ({ ...s, rainfall: { status: "unavailable", value: null, unit: "mm", reasonCode: "upstream-unreachable", retrievedAt: new Date().toISOString() }, floodRisk: { status: "unavailable", tier: null, reasonCode: "validated-flood-assessment-not-connected", timestamp: new Date().toISOString() } })),
-          studyBoundary: DHAKA_STUDY_BOUNDARY,
-          scenarioTypes: FLOOD_SCENARIO_TYPES,
-          timestamp: new Date().toISOString(),
-          error: error || null,
-        }, { status: 503 });
-      }
-
-      return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200 });
+    const geo = data as { features?: unknown[] };
+    // The shape is checked before the count is published. A file of the wrong
+    // shape must not be reported as a country of zero facilities.
+    if (!Array.isArray(geo.features)) {
+      return jsonResponse({status: 'unavailable', reasonCode: 'facilities-grid-invalid', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
     }
+    const featureCount = geo.features.length;
+    return jsonResponse({
+      status: 'reference',
+      provenance: 'community_mapped',
+      source: 'OpenStreetMap contributors via Geofabrik Bangladesh extract (261028)',
+      sourceUrl: 'https://download.geofabrik.de/asia/bangladesh-261028.osm.pbf',
+      license: 'ODbL 1.0',
+      observedAt: '2026-10-28T21:21:02Z',
+      note: 'Mapped school, hospital and clinic objects only. Campus objects may duplicate institutions. Incomplete mapping; no capacity, opening status or service catchments. Ways and relations use bounding-box centres.',
+      note_bn: 'শুধুমাত্র স্কুল, হাসপাতাল ও ক্লিনিক অবজেক্টের মানচিত্র। ক্যাম্পাস অবজেক্ট প্রতিষ্ঠান ডুপ্লিকেট করতে পারে। অসম্পূর্ণ মানচিত্রণ; ক্ষমতা, খোলার অবস্থা বা সেবা কভারেজ নেই। ওয়ে ও রিলেশন বাউন্ডিং-বক্স সেন্টার ব্যবহার করে।',
+      objects: featureCount,
+      data: geo,
+    }, {headers: {'cache-control': 'public, max-age=86400, stale-while-revalidate=604800'}});
+  }
 
-    // ── /api/dhaka/shelters ────────────────────────────────────────────────────
-    // DDM shelter register: reviewable inventory only. No shelter pin is
-    // created without source geometry or a reviewed building-level match.
-    // Operational readiness, capacity and accessibility are separate from the
-    // source listing. DDM source page is publicly accessible; reuse terms
-    // pending review — not treated as open data.
-    if (url.pathname === "/api/dhaka/shelters") {
-      const register=publicShelterRegister(SHELTER_REGISTER);
-      return jsonResponse({
-        status: "unreviewed",
-        city: "Dhaka",
-        provenance: "reference",
-        reasonCode: "shelter-register-pending-review",
-        timestamp: new Date().toISOString(),
-        retrievedAt: DDM_SHELTER_SOURCE.retrievedAt,
-        observedAt: null,
-        source: DDM_SHELTER_SOURCE,
-        register,
-        registerCount: register.length,
-        mappableCount: register.filter(s => s.mappable).length,
-        studyBoundary: DHAKA_STUDY_BOUNDARY,
-        inventoryStatus: "not-imported",
-        readinessStatus: "not-derived-from-listing",
-        scenarioTypes: SHELTER_SCENARIO_TYPES,
-        note: "The DDM page embeds structured coordinates. Source-structure counts do not establish individual location accuracy, municipal coverage or operational readiness. No records are imported and no shelter pins are published pending location and publication review.",
-        note_bn: "DDM পাতায় কাঠামোবদ্ধ স্থানাঙ্ক রয়েছে। উৎসের রেকর্ডের সংখ্যা দিয়ে প্রতিটি অবস্থানের নির্ভুলতা, পৌর এলাকার আওতা বা কার্যকর প্রস্তুতি প্রতিষ্ঠিত হয় না। অবস্থান ও প্রকাশের পর্যালোচনা না হওয়া পর্যন্ত কোনো রেকর্ড আমদানি বা আশ্রয়কেন্দ্রের চিহ্ন প্রকাশ করা হয়নি।",
-      }, { headers: { "cache-control": "no-store" } });
+  if (url.pathname === "/api/atlas/sources") {
+    return jsonResponse(await sourceHealth(env), {headers:{"cache-control":"no-store"}});
+  }
+  if (url.pathname === "/api/atlas/history") {
+    const snapshot = url.searchParams.get("snapshot");
+    if (snapshot) {
+      if (!/^[a-f0-9-]{36}$/.test(snapshot)) return jsonResponse({status:"unavailable",reasonCode:"invalid-snapshot-id",timestamp:new Date().toISOString()},{status:400});
+      return jsonResponse(await historicalSnapshot(env,snapshot), {headers:{"cache-control":"no-store"}});
     }
-
-    // ── /api/dhaka/ffwc ────────────────────────────────────────────────────
-    // FFWC station observations and forecasts. The official FFWC API advertises
-    // current water levels, warnings and short-term forecasts, but requires
-    // registration for developer documentation and was unreachable from this
-    // environment. The endpoint structure below follows the recommended data
-    // contract; it returns unavailable until a live payload can be validated.
-    // River observations remain river observations — they are not interpolated
-    // into street flood depths or evacuation instructions.
-    if (url.pathname === "/api/dhaka/ffwc") {
+    const place = url.searchParams.get("place"), signal = url.searchParams.get("signal");
+    if ((place && !/^[a-z0-9-]{1,80}$/.test(place)) || (signal && !/^[A-Za-z0-9_-]{1,120}$/.test(signal)) || !!place !== !!signal) {
+      return jsonResponse({status:"unavailable",reasonCode:"invalid-history-query",timestamp:new Date().toISOString()}, {status:400});
+    }
+    return jsonResponse(await observationHistory(env,place,signal), {headers:{"cache-control":"no-store"}});
+  }
+  if (url.pathname === "/api/atlas/collage") {
+    const data = await getCollage(env, request);
+    if (!data) {
       return jsonResponse({
         status: "unavailable",
-        city: "Dhaka",
+        reasonCode: "published-snapshot-unavailable",
         provenance: "unavailable",
-        reasonCode: "ffwc-api-not-validated",
-        retrievedAt: new Date().toISOString(),
-        source: {
-          name: "Bangladesh Water Development Board / Flood Forecasting & Warning Centre",
-          name_bn: "বাংলাদেশ পানি উন্নয়ন বোর্ড / বন্যা পূর্বাভাস ও সতর্কতা কেন্দ্র",
-          sourceUrl: "https://api3.ffwc.gov.bd/",
-          note: "API documentation requires registration. Live payload, timestamps, units and station geometry not yet validated.",
-          note_bn: "এপিআই নথিপত্রের জন্য নিবন্ধন প্রয়োজন। লাইভ পেলোড, সময়STAMP, একক ও স্টেশন জ্যামিতি এখনও যাচাই করা হয়নি।",
-        },
-        stations: RIVER_STATIONS.map(st => ({
-          ...st,
-          current_level_m: null,
-          trend: "unavailable",
-          status: "unavailable",
-          readingsStatus: "unavailable",
-          reasonCode: "ffwc-api-not-validated",
-          observation: null,
-          forecast: null,
-        })),
         timestamp: new Date().toISOString(),
-        note: "No live FFWC gauge feed connected. Station registry entries remain unverified reference values until the API is tested and calibrated.",
-        note_bn: "কোনো সরাসরি এফডব্লুসি গেজ পাঠন সংযুক্ত নয়। স্টেশন নিবন্ধন নিবন্ধ পর্যালোচনা এবং ক্যালিব্রেশন না হওয়া পর্যন্ত রেফারেন্স মান থাকে।",
-      }, { headers: { "cache-control": "no-store" } });
-    }
-
-    // ── /api/dhaka/economy ───────────────────────────────────────────────────
-    // Combines Bangladesh-specific reference indicators (RMG, DSEX, EPZs) with
-    // dated World Bank WDI observations where they overlap (CPI, remittance,
-    // exports, FX rate). Corridor workforce/export figures are unsourced
-    // constants and remain labeled reference-only.
-    if (url.pathname === "/api/dhaka/economy") {
-      const instruments = await getInstruments();
-      const wbById = new Map(instruments.macro.map((m: any) => [m.id, m]));
-
-      const indicators = MACRO_INDICATORS.map(ind => {
-        const wb = (wbById.get({
-          "worker-remittance": "remittance",
-          "cpi-inflation-general": "inflation",
-          "usd-bdt-rate": "fx-period",
-        }[ind.id] || "") as any);
-        if (wb && wb.status === "ok" && wb.value !== null) {
-          return {
-            ...ind,
-            value: wb.value,
-            period: wb.period,
-            provenance: "reference" as const,
-            source: "World Bank WDI · " + ind.source,
-            source_url: wb.sourceUrl || ind.source_url,
-            note: ind.note + ` (World Bank ${wb.period})`,
-            note_bn: ind.note_bn,
-          };
-        }
-        return ind;
-      });
-
-      // The corridors carry measured night-time radiance, not registry
-      // figures. Workforce, export value and daily turnover were hardcoded
-      // constants with no upstream and no date — they looked like data and
-      // were invented. The satellite cannot count workers either, but it can
-      // measure how much light a corridor leaves on, on a stated night, at a
-      // stated resolution, and that is a fact with a source.
-      //
-      // The measurement is shared with the collage, which measures the
-      // corridors and the districts in the same pass and caches the result.
-      const collage = await getCollage(env, request);
-      const corridors = collage?.corridors ?? [];
-
-      const anyOk = instruments.status !== "unavailable";
-      return jsonResponse({
-        status: anyOk ? "ok" : "unavailable",
         city: "Dhaka",
-        country: "Bangladesh",
-        provenance: instruments.status === "ok" ? "reference" : "unavailable",
-        statusReason: anyOk ? "World Bank WDI annual series connected; Bangladesh-specific indicators remain reference registry." : "No dated bulletin connected.",
-        reasonCode: anyOk ? null : "dated-bulletin-not-connected",
-        observedAt: instruments.timestamp,
-        indicators,
-        corridors,
-        timestamp: new Date().toISOString(),
-        fx: instruments.currency,
-      }, { status: anyOk ? 200 : 503 });
+        domains: DOMAINS,
+        districts: [],
+        corridors: [],
+        measured: 0,
+        total: 0,
+      }, { status: 503 });
     }
+    return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200, headers:{"cache-control":"no-store"} });
+  }
 
-    // ── /api/atlas/collage ───────────────────────────────────────────────────
-    // The collage: one acquisition per satellite signal, measured over every
-    // district, then read against the rest of the city so a number becomes a
-    // finding. Cached for two hours, because the underlying acquisitions
-    // change on a daily-to-16-day cycle and re-measuring on every request
-    // would hammer GIBS for no new information.
-    if (url.pathname === "/api/atlas/people") {
-      try {
-        const response = await env.ASSETS.fetch(new URL('/data/people-manifest.json', request.url));
-        if (!response.ok) throw Error('manifest-unavailable');
-        const manifest = await response.json() as {status?: string};
-        if (manifest.status !== 'reference') throw Error('invalid-manifest');
-        return jsonResponse(manifest, {headers:{'cache-control':'no-store'}});
-      } catch {
-        return jsonResponse({status: 'unavailable', reasonCode: 'reference-manifest-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
-      }
-    }
-
-    // ── /api/dhaka/population ───────────────────────────────────────────────
-    // WorldPop 2025 R2025A gridded population model, aggregated into 1 km cells.
-    // Modeled estimate — not census, not current residents, not capacity.
-    if (url.pathname === "/api/dhaka/population") {
-      const cacheKey = "population:grid-v1";
-      const { data, error } = await fetchWithCache(
-        cacheKey,
-        24 * 60 * 60 * 1000,
-        async () => {
-          const res = await env.ASSETS.fetch(new URL('/data/people-grid.json', request.url));
-          if (!res.ok) throw Error('population-grid-unavailable');
-          return res.json();
-        },
-        null,
-      );
-      if (!data) {
-        return jsonResponse({status: 'unavailable', reasonCode: 'population-grid-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
-      }
-      const grid = data as { columns?: string[]; cells?: unknown[][] };
+  // ── /api/dhaka/transit ───────────────────────────────────────────────────
+  if (url.pathname === "/api/dhaka/transit") {
+    const transitUrl = new URL("/dhaka-mrt.geojson", request.url);
+    const res = await env.ASSETS.fetch(transitUrl.toString());
+    if (res.ok) {
+      const transit = await res.json();
       return jsonResponse({
-        status: 'reference',
-        provenance: 'modeled',
-        source: 'WorldPop Global Demographic Data R2025A v1',
-        sourceUrl: 'https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2025/BGD/v1/100m/constrained/bgd_pop_2025_CN_100m_R2025A_v1.tif',
-        doi: '10.5258/SOTON/WP00839',
-        license: 'CC BY 4.0',
-        year: 2025,
-        note: 'Modeled estimate for 2025, not census or current residents. Nodata remains unknown; valid-pixel share is not accuracy or confidence.',
-        note_bn: '২০২৫ সালের মডেলভিত্তিক অনুমান, জনগণনা বা বর্তমান বাসিন্দা নয়। নোডাটা অজানা আছে; বৈধ-পিক্সেল শেয়ার নির্ভুলতা বা বিশ্বাস নয়।',
-        cells: grid.cells?.length ?? 0,
-        grid: grid.columns,
-        data: grid.cells,
-      }, {headers: {'cache-control': 'public, max-age=86400, stale-while-revalidate=604800'}});
+        status: "ok",
+        city: "Dhaka",
+        provenance: "reference",
+        transit,
+      });
     }
+    return jsonResponse({ status: "unavailable", reasonCode: "transit-missing" }, { status: 503 });
+  }
 
-    // ── /api/dhaka/facilities ───────────────────────────────────────────────
-    // Dated OSM school, hospital and clinic objects from Geofabrik Bangladesh extract.
-    // Mapped objects only — no capacity, opening status or service catchments.
-    if (url.pathname === "/api/dhaka/facilities") {
-      const cacheKey = "facilities:osm-v1";
-      const { data, error } = await fetchWithCache(
-        cacheKey,
-        24 * 60 * 60 * 1000,
-        async () => {
-          const res = await env.ASSETS.fetch(new URL('/data/facilities.geojson', request.url));
-          if (!res.ok) throw Error('facilities-grid-unavailable');
-          return res.json();
-        },
-        null,
-      );
-      if (!data) {
-        return jsonResponse({status: 'unavailable', reasonCode: 'facilities-grid-unavailable', timestamp: new Date().toISOString()}, {status: 503, headers:{'cache-control':'no-store'}});
-      }
-      const geo = data as { features?: unknown[] };
-      const featureCount = geo.features?.length ?? 0;
-      return jsonResponse({
-        status: 'reference',
-        provenance: 'community_mapped',
-        source: 'OpenStreetMap contributors via Geofabrik Bangladesh extract (261028)',
-        sourceUrl: 'https://download.geofabrik.de/asia/bangladesh-261028.osm.pbf',
-        license: 'ODbL 1.0',
-        observedAt: '2026-10-28T21:21:02Z',
-        note: 'Mapped school, hospital and clinic objects only. Campus objects may duplicate institutions. Incomplete mapping; no capacity, opening status or service catchments. Ways and relations use bounding-box centres.',
-        note_bn: 'শুধুমাত্র স্কুল, হাসপাতাল ও ক্লিনিক অবজেক্টের মানচিত্র। ক্যাম্পাস অবজেক্ট প্রতিষ্ঠান ডুপ্লিকেট করতে পারে। অসম্পূর্ণ মানচিত্রণ; ক্ষমতা, খোলার θέση বা সেবা কভারেজ নেই। ওয়ে ও রিলেশন বাউন্ডিং-বক্স সেন্টার ব্যবহার করে।',
-        objects: featureCount,
-        data: geo,
-      }, {headers: {'cache-control': 'public, max-age=86400, stale-while-revalidate=604800'}});
-    }
+  // ── Fallback to static assets ───────────────────────────────────────────
+  return env.ASSETS.fetch(request);
+}
 
-    if (url.pathname === "/api/atlas/sources") {
-      return jsonResponse(await sourceHealth(env), {headers:{"cache-control":"no-store"}});
-    }
-    if (url.pathname === "/api/atlas/history") {
-      const snapshot = url.searchParams.get("snapshot");
-      if (snapshot) {
-        if (!/^[a-f0-9-]{36}$/.test(snapshot)) return jsonResponse({status:"unavailable",reasonCode:"invalid-snapshot-id",timestamp:new Date().toISOString()},{status:400});
-        return jsonResponse(await historicalSnapshot(env,snapshot), {headers:{"cache-control":"no-store"}});
-      }
-      const place = url.searchParams.get("place"), signal = url.searchParams.get("signal");
-      if ((place && !/^[a-z0-9-]{1,80}$/.test(place)) || (signal && !/^[A-Za-z0-9_-]{1,120}$/.test(signal)) || !!place !== !!signal) {
-        return jsonResponse({status:"unavailable",reasonCode:"invalid-history-query",timestamp:new Date().toISOString()}, {status:400});
-      }
-      return jsonResponse(await observationHistory(env,place,signal), {headers:{"cache-control":"no-store"}});
-    }
-    if (url.pathname === "/api/atlas/collage") {
-      const data = await getCollage(env, request);
-      if (!data) {
-        return jsonResponse({
-          status: "unavailable",
-          reasonCode: "published-snapshot-unavailable",
-          provenance: "unavailable",
-          timestamp: new Date().toISOString(),
-          city: "Dhaka",
-          domains: DOMAINS,
-          districts: [],
-          corridors: [],
-          measured: 0,
-          total: 0,
-        }, { status: 503 });
-      }
-      return jsonResponse(data, { status: data.status === "unavailable" ? 503 : 200, headers:{"cache-control":"no-store"} });
-    }
-
-    // ── /api/dhaka/transit ───────────────────────────────────────────────────
-    if (url.pathname === "/api/dhaka/transit") {
-      const transitUrl = new URL("/dhaka-mrt.geojson", request.url);
-      const res = await env.ASSETS.fetch(transitUrl.toString());
-      if (res.ok) {
-        const transit = await res.json();
-        return jsonResponse({
-          status: "ok",
-          city: "Dhaka",
-          provenance: "reference",
-          transit,
-        });
-      }
-      return jsonResponse({ status: "unavailable", reasonCode: "transit-missing" }, { status: 503 });
-    }
-
-    // ── Fallback to static assets ───────────────────────────────────────────
-    return env.ASSETS.fetch(request);
-  },
-};
 
 export default worker;

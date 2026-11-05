@@ -9,7 +9,14 @@
   if (query === 'en' || query === 'bn') language = query;
   if (!['bn', 'en'].includes(language)) language = 'bn';
 
-  const phrases = Object.keys(catalog).sort((a, b) => b.length - a.length);
+  // Only a multi-word phrase may be substituted inside a longer sentence.
+  // A lone common word may be translated when it IS the whole label, never
+  // when it is one word inside a longer English phrase: "Air Quality" must
+  // not become "বায়ু Quality", and "Dhaka Stock Exchange" must not become
+  // "ঢাকা Stock Exchange". A hybrid is worse than an untranslated word.
+  const phrases = Object.keys(catalog)
+    .filter(key => /\s/.test(key))
+    .sort((a, b) => b.length - a.length);
   const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const parts = phrases.length > 0
     ? new RegExp('(?<![\\p{L}\\p{N}])(?:' + phrases.map(escape).join('|') + ')(?![\\p{L}\\p{N}])', 'gu')

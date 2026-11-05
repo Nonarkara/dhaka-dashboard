@@ -149,22 +149,26 @@
     },
     {
       "type": "Feature",
-      "properties": { "id": "term-gabtoli", "name": "Gabtoli Inter-District Bus Terminal", "name_bn": "গাবতলী বাস টার্মিনাল", "type": "bus_terminal", "role": "North and Western Bangladesh routes" },
+      "properties": { "id": "term-gabtoli", "name": "Gabtoli Inter-District Bus Terminal", "name_bn": "গাবতলী বাস টার্মিনাল", "type": "bus_terminal", "role": "North and Western Bangladesh routes",
+          "role_bn": "উত্তর ও পশ্চিম বাংলাদেশের রুট" },
       "geometry": { "type": "Point", "coordinates": [90.3470, 23.7855] }
     },
     {
       "type": "Feature",
-      "properties": { "id": "term-mohakhali", "name": "Mohakhali Inter-District Bus Terminal", "name_bn": "মহাখালী বাস টার্মিনাল", "type": "bus_terminal", "role": "Mymensingh, Tangail, Sylhet routes" },
+      "properties": { "id": "term-mohakhali", "name": "Mohakhali Inter-District Bus Terminal", "name_bn": "মহাখালী বাস টার্মিনাল", "type": "bus_terminal", "role": "Mymensingh, Tangail, Sylhet routes",
+          "role_bn": "ময়মনসিংহ, টাঙ্গাইল, সিলেটের রুট" },
       "geometry": { "type": "Point", "coordinates": [90.4005, 23.7770] }
     },
     {
       "type": "Feature",
-      "properties": { "id": "term-sayedabad", "name": "Sayedabad Inter-District Bus Terminal", "name_bn": "সায়েদাবাদ বাস টার্মিনাল", "type": "bus_terminal", "role": "Chattogram, Sylhet, Barishal routes" },
+      "properties": { "id": "term-sayedabad", "name": "Sayedabad Inter-District Bus Terminal", "name_bn": "সায়েদাবাদ বাস টার্মিনাল", "type": "bus_terminal", "role": "Chattogram, Sylhet, Barishal routes",
+          "role_bn": "চট্টগ্রাম, সিলেট, বরিশালের রুট" },
       "geometry": { "type": "Point", "coordinates": [90.4300, 23.7160] }
     },
     {
       "type": "Feature",
-      "properties": { "id": "term-airport-rail", "name": "Dhaka Airport Railway Station", "name_bn": "বিমানবন্দর রেলওয়ে স্টেশন", "type": "railway_station", "role": "Intercity train stop and airport connector" },
+      "properties": { "id": "term-airport-rail", "name": "Dhaka Airport Railway Station", "name_bn": "বিমানবন্দর রেলওয়ে স্টেশন", "type": "railway_station", "role": "Intercity train stop and airport connector",
+          "role_bn": "আন্তঃশহরে ট্রেনের থামা ও বিমানবন্দর সংযোগ" },
       "geometry": { "type": "Point", "coordinates": [90.4070, 23.8510] }
     }
   ]

@@ -1,0 +1,567 @@
+{
+  "auditedAt": "2026-11-04T14:48:49.828Z",
+  "url": "https://dhaka.nonarkara.org",
+  "viewports": [
+    "390x844",
+    "1024x768",
+    "1440x900"
+  ],
+  "languages": [
+    "en",
+    "bn"
+  ],
+  "rows": [
+    {
+      "width": 390,
+      "height": 844,
+      "lang": "en",
+      "overflow": false,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 41,
+        "bottom": 41
+      },
+      "map": {
+        "x": 0,
+        "y": 41,
+        "width": 390,
+        "height": 803,
+        "bottom": 844
+      },
+      "watch": {
+        "x": 8,
+        "y": 689,
+        "width": 374,
+        "height": 113,
+        "bottom": 802
+      },
+      "key": {
+        "x": 8,
+        "y": 49,
+        "width": 159,
+        "height": 66,
+        "bottom": 115
+      },
+      "credit": null,
+      "creditText": "",
+      "splashVisible": true,
+      "chromeCostPct": 4.86,
+      "taskVisible": {
+        "lens": true,
+        "watch": true,
+        "map": true,
+        "allInFirstScreen": true
+      },
+      "unobscuredRatio": null,
+      "readings": [
+        {
+          "text": "≋\nFLOOD\nn/a",
+          "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+          "tier": "unavailable",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "◍\nAIR\nAQI 141 · model · Unhealthy for Sensitive Groups",
+          "label": "Air: AQI 141 · model · Unhealthy for Sensitive Groups · Modelled, not a station reading · Unhealthy for Sensitive Groups · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-04T20:00",
+          "tier": "warning",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "↑\nWIND\n7.1 km/h · model",
+          "label": "Wind: 7.1 km/h · model · Modelled wind at 10 m · from 315° · 2026-11-04T20:30",
+          "tier": "neutral",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "৳\nECONOMY\nn/a",
+          "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+          "tier": "unavailable",
+          "clipped": false,
+          "visible": true
+        }
+      ],
+      "typeSizes": [
+        null,
+        null,
+        null
+      ],
+      "typeSizeCount": 3,
+      "preservation": {
+        "lenses": 14,
+        "watchItems": 4,
+        "parliamentLink": true,
+        "mapControls": 1,
+        "footerCredit": false
+      },
+      "consoleErrors": [],
+      "url": "https://dhaka.nonarkara.org/?lang=en",
+      "ready": false,
+      "screenshot": "docs/evidence/msh-2026-11-05/390-en.png"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "lang": "bn",
+      "overflow": false,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 41,
+        "bottom": 41
+      },
+      "map": {
+        "x": 0,
+        "y": 41,
+        "width": 390,
+        "height": 803,
+        "bottom": 844
+      },
+      "watch": {
+        "x": 8,
+        "y": 689,
+        "width": 374,
+        "height": 113,
+        "bottom": 802
+      },
+      "key": {
+        "x": 8,
+        "y": 49,
+        "width": 150,
+        "height": 66,
+        "bottom": 115
+      },
+      "credit": null,
+      "creditText": "",
+      "splashVisible": true,
+      "chromeCostPct": 4.86,
+      "taskVisible": {
+        "lens": true,
+        "watch": true,
+        "map": true,
+        "allInFirstScreen": true
+      },
+      "unobscuredRatio": null,
+      "readings": [
+        {
+          "text": "≋\nবন্যা\nঅনুপলব্ধ",
+          "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+          "tier": "unavailable",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "◍\nবায়ু\nAQI ১৪১ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর",
+          "label": "বায়ু: AQI ১৪১ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-04T20:00",
+          "tier": "warning",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "↑\nবাতাস\n৭.১ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭.১ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৩১৫° · 2026-11-04T20:30",
+          "tier": "neutral",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ",
+          "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+          "tier": "unavailable",
+          "clipped": true,
+          "visible": true
+        }
+      ],
+      "typeSizes": [
+        null,
+        null,
+        null
+      ],
+      "typeSizeCount": 3,
+      "preservation": {
+        "lenses": 14,
+        "watchItems": 4,
+        "parliamentLink": true,
+        "mapControls": 1,
+        "footerCredit": false
+      },
+      "consoleErrors": [],
+      "url": "https://dhaka.nonarkara.org/?lang=bn",
+      "ready": false,
+      "screenshot": "docs/evidence/msh-2026-11-05/390-bn.png"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "lang": "en",
+      "overflow": false,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 41,
+        "bottom": 41
+      },
+      "map": {
+        "x": 0,
+        "y": 41,
+        "width": 1024,
+        "height": 727,
+        "bottom": 768
+      },
+      "watch": {
+        "x": 158,
+        "y": 703,
+        "width": 708,
+        "height": 23,
+        "bottom": 726
+      },
+      "key": {
+        "x": 8,
+        "y": 49,
+        "width": 159,
+        "height": 66,
+        "bottom": 115
+      },
+      "credit": null,
+      "creditText": "",
+      "splashVisible": true,
+      "chromeCostPct": 5.34,
+      "taskVisible": {
+        "lens": true,
+        "watch": true,
+        "map": true,
+        "allInFirstScreen": true
+      },
+      "unobscuredRatio": null,
+      "readings": [
+        {
+          "text": "≋\nFLOOD\nn/a",
+          "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+          "tier": "unavailable",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "◍\nAIR\nAQI 141 · model · Unhealthy for Sensitive Groups",
+          "label": "Air: AQI 141 · model · Unhealthy for Sensitive Groups · Modelled, not a station reading · Unhealthy for Sensitive Groups · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-04T20:00",
+          "tier": "warning",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "↑\nWIND\n7.1 km/h · model",
+          "label": "Wind: 7.1 km/h · model · Modelled wind at 10 m · from 315° · 2026-11-04T20:30",
+          "tier": "neutral",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "৳\nECONOMY\nn/a",
+          "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+          "tier": "unavailable",
+          "clipped": false,
+          "visible": true
+        }
+      ],
+      "typeSizes": [
+        null,
+        null,
+        null
+      ],
+      "typeSizeCount": 3,
+      "preservation": {
+        "lenses": 14,
+        "watchItems": 4,
+        "parliamentLink": true,
+        "mapControls": 1,
+        "footerCredit": false
+      },
+      "consoleErrors": [],
+      "url": "https://dhaka.nonarkara.org/?lang=en",
+      "ready": false,
+      "screenshot": "docs/evidence/msh-2026-11-05/1024-en.png"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "lang": "bn",
+      "overflow": false,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1024,
+        "height": 41,
+        "bottom": 41
+      },
+      "map": {
+        "x": 0,
+        "y": 41,
+        "width": 1024,
+        "height": 727,
+        "bottom": 768
+      },
+      "watch": {
+        "x": 160,
+        "y": 698,
+        "width": 704,
+        "height": 28,
+        "bottom": 726
+      },
+      "key": {
+        "x": 8,
+        "y": 49,
+        "width": 150,
+        "height": 66,
+        "bottom": 115
+      },
+      "credit": null,
+      "creditText": "",
+      "splashVisible": true,
+      "chromeCostPct": 5.34,
+      "taskVisible": {
+        "lens": true,
+        "watch": true,
+        "map": true,
+        "allInFirstScreen": true
+      },
+      "unobscuredRatio": null,
+      "readings": [
+        {
+          "text": "≋\nবন্যা\nঅনুপলব্ধ",
+          "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+          "tier": "unavailable",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "◍\nবায়ু\nAQI ১৪১ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর",
+          "label": "বায়ু: AQI ১৪১ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-04T20:00",
+          "tier": "warning",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "↑\nবাতাস\n৭ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৩১৬° · 2026-11-04T20:45",
+          "tier": "neutral",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ",
+          "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+          "tier": "unavailable",
+          "clipped": true,
+          "visible": true
+        }
+      ],
+      "typeSizes": [
+        null,
+        null,
+        null
+      ],
+      "typeSizeCount": 3,
+      "preservation": {
+        "lenses": 14,
+        "watchItems": 4,
+        "parliamentLink": true,
+        "mapControls": 1,
+        "footerCredit": false
+      },
+      "consoleErrors": [],
+      "url": "https://dhaka.nonarkara.org/?lang=bn",
+      "ready": false,
+      "screenshot": "docs/evidence/msh-2026-11-05/1024-bn.png"
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "lang": "en",
+      "overflow": false,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 41,
+        "bottom": 41
+      },
+      "map": {
+        "x": 0,
+        "y": 41,
+        "width": 1440,
+        "height": 859,
+        "bottom": 900
+      },
+      "watch": {
+        "x": 372,
+        "y": 835,
+        "width": 697,
+        "height": 23,
+        "bottom": 858
+      },
+      "key": {
+        "x": 8,
+        "y": 49,
+        "width": 159,
+        "height": 66,
+        "bottom": 115
+      },
+      "credit": null,
+      "creditText": "",
+      "splashVisible": true,
+      "chromeCostPct": 4.56,
+      "taskVisible": {
+        "lens": true,
+        "watch": true,
+        "map": true,
+        "allInFirstScreen": true
+      },
+      "unobscuredRatio": null,
+      "readings": [
+        {
+          "text": "≋\nFLOOD\nn/a",
+          "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+          "tier": "unavailable",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "◍\nAIR\nAQI 141 · model · Unhealthy for Sensitive Groups",
+          "label": "Air: AQI 141 · model · Unhealthy for Sensitive Groups · Modelled, not a station reading · Unhealthy for Sensitive Groups · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-04T20:00",
+          "tier": "warning",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "↑\nWIND\n7 km/h · model",
+          "label": "Wind: 7 km/h · model · Modelled wind at 10 m · from 316° · 2026-11-04T20:45",
+          "tier": "neutral",
+          "clipped": false,
+          "visible": true
+        },
+        {
+          "text": "৳\nECONOMY\nn/a",
+          "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+          "tier": "unavailable",
+          "clipped": false,
+          "visible": true
+        }
+      ],
+      "typeSizes": [
+        null,
+        null,
+        null
+      ],
+      "typeSizeCount": 3,
+      "preservation": {
+        "lenses": 14,
+        "watchItems": 4,
+        "parliamentLink": true,
+        "mapControls": 1,
+        "footerCredit": false
+      },
+      "consoleErrors": [],
+      "url": "https://dhaka.nonarkara.org/?lang=en",
+      "ready": false,
+      "screenshot": "docs/evidence/msh-2026-11-05/1440-en.png"
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "lang": "bn",
+      "overflow": false,
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 41,
+        "bottom": 41
+      },
+      "map": {
+        "x": 0,
+        "y": 41,
+        "width": 1440,
+        "height": 859,
+        "bottom": 900
+      },
+      "watch": {
+        "x": 368,
+        "y": 830,
+        "width": 704,
+        "height": 28,
+        "bottom": 858
+      },
+      "key": {
+        "x": 8,
+        "y": 49,
+        "width": 150,
+        "height": 66,
+        "bottom": 115
+      },
+      "credit": null,
+      "creditText": "",
+      "splashVisible": true,
+      "chromeCostPct": 4.56,
+      "taskVisible": {
+        "lens": true,
+        "watch": true,
+        "map": true,
+        "allInFirstScreen": true
+      },
+      "unobscuredRatio": null,
+      "readings": [
+        {
+          "text": "≋\nবন্যা\nঅনুপলব্ধ",
+          "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+          "tier": "unavailable",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "◍\nবায়ু\nAQI ১৪১ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর",
+          "label": "বায়ু: AQI ১৪১ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-04T20:00",
+          "tier": "warning",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "↑\nবাতাস\n৭ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৩১৬° · 2026-11-04T20:45",
+          "tier": "neutral",
+          "clipped": true,
+          "visible": true
+        },
+        {
+          "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ",
+          "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+          "tier": "unavailable",
+          "clipped": true,
+          "visible": true
+        }
+      ],
+      "typeSizes": [
+        null,
+        null,
+        null
+      ],
+      "typeSizeCount": 3,
+      "preservation": {
+        "lenses": 14,
+        "watchItems": 4,
+        "parliamentLink": true,
+        "mapControls": 1,
+        "footerCredit": false
+      },
+      "consoleErrors": [],
+      "url": "https://dhaka.nonarkara.org/?lang=bn",
+      "ready": false,
+      "screenshot": "docs/evidence/msh-2026-11-05/1440-bn.png"
+    }
+  ]
+}

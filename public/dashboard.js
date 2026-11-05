@@ -52,6 +52,108 @@
     loadRivers();
     loadAirQuality();
     loadWeather();
+    loadTransitRegistry();
+  }
+
+  // ── The transit desk ────────────────────────────────────────────────────
+  // The desk is rendered from the network registry, never from a hand-typed
+  // table. A hand-typed table claimed sixteen stations while the registry
+  // carried seventeen, and named a Sadarghat terminal the registry does
+  // not hold. Every number and every name here now comes from the same
+  // source the map draws.
+  const TRANSIT_TYPES = {
+    rapid_transit: { en: 'Elevated Electric Rail', bn: 'উন্নত বৈদ্যুতিক রেল' },
+    expressway: { en: 'Grade-separated Expressway', bn: 'আলাদা স্তরে এক্সপ্রেসওয়ে' },
+    metro_station: { en: 'Metro station', bn: 'মেট্রো স্টেশন' },
+    bus_terminal: { en: 'Bus terminal', bn: 'বাস টার্মিনাল' },
+    railway_station: { en: 'Railway station', bn: 'রেলওয়ে স্টেশন' },
+  };
+
+  async function loadTransitRegistry() {
+    const body = $('#transit-registry');
+    if (!body) return;
+    const list = $('#transit-stations-list');
+    try {
+      const response = await fetch('/api/dhaka/transit');
+      const data = await readFeedResponse(response);
+      const features = Array.isArray(data.transit?.features) ? data.transit.features : [];
+      if (!features.length) throw Object.assign(new Error('Empty registry'), { reasonCode: 'transit-registry-empty' });
+
+      const isBn = document.documentElement.lang === 'bn';
+      const nameOf = f => escapeHtml(isBn && f.properties?.name_bn ? f.properties.name_bn : (f.properties?.name || ''));
+      const of = type => features.filter(f => f.properties?.type === type);
+      const stations = of('metro_station');
+      const busTerminals = of('bus_terminal');
+      const railStations = of('railway_station');
+      const num = n => new Intl.NumberFormat(isBn ? 'bn-BD' : 'en-GB').format(n);
+
+      const badge = `<span class="hud-badge" style="background:var(--bg-strong)">${tr('Reference only', 'শুধু তথ্যসূত্র')}</span>`;
+      const rows = [];
+
+      const rail = of('rapid_transit')[0];
+      if (rail) {
+        const p = rail.properties;
+        const length = Number.isFinite(p.length_km) ? `${num(p.length_km)} km` : '—';
+        rows.push(`<tr>
+            <td><strong>${nameOf(rail)}</strong>${p.operator ? `<br><small style="color:var(--dim)">${escapeHtml(p.operator)}</small>` : ''}</td>
+            <td>${tr(TRANSIT_TYPES.rapid_transit.en, TRANSIT_TYPES.rapid_transit.bn)}</td>
+            <td>${length} · ${num(stations.length)} ${tr('Stations', 'স্টেশন')}</td>
+            <td>${badge}</td>
+          </tr>`);
+      }
+
+      const expressway = of('expressway')[0];
+      if (expressway) {
+        const p = expressway.properties;
+        const length = Number.isFinite(p.length_km) ? `${num(p.length_km)} km` : '—';
+        rows.push(`<tr>
+            <td><strong>${nameOf(expressway)}</strong>${p.operator ? `<br><small style="color:var(--dim)">${escapeHtml(p.operator)}</small>` : ''}</td>
+            <td>${tr(TRANSIT_TYPES.expressway.en, TRANSIT_TYPES.expressway.bn)}</td>
+            <td>${length}</td>
+            <td>${badge}</td>
+          </tr>`);
+      }
+
+      if (busTerminals.length) {
+        rows.push(`<tr>
+            <td><strong>${num(busTerminals.length)} ${tr('Bus terminals', 'বাস টার্মিনাল')}</strong><br><small style="color:var(--dim)">${busTerminals.map(nameOf).join(' · ')}</small></td>
+            <td>${tr(TRANSIT_TYPES.bus_terminal.en, TRANSIT_TYPES.bus_terminal.bn)}</td>
+            <td>${num(busTerminals.length)}</td>
+            <td>${badge}</td>
+          </tr>`);
+      }
+
+      if (railStations.length) {
+        rows.push(`<tr>
+            <td><strong>${railStations.map(nameOf).join(' · ')}</strong>${railStations[0].properties?.role_bn ? `<br><small style="color:var(--dim)">${escapeHtml(isBn ? railStations[0].properties.role_bn : (railStations[0].properties.role || ''))}</small>` : ''}</td>
+            <td>${tr(TRANSIT_TYPES.railway_station.en, TRANSIT_TYPES.railway_station.bn)}</td>
+            <td>${num(railStations.length)}</td>
+            <td>${badge}</td>
+          </tr>`);
+      }
+
+      body.innerHTML = rows.join('');
+      body.dataset.status = 'ok';
+
+      if (list) {
+        const items = $('#transit-stations-items');
+        const summary = $('#transit-stations-summary');
+        if (summary) summary.textContent = `${tr('Stations', 'স্টেশন')} (${num(stations.length)})`;
+        if (items) {
+          items.innerHTML = stations.map(f => {
+            const p = f.properties;
+            const code = p.code ? ` <code>${escapeHtml(p.code)}</code>` : '';
+            return `<li>${nameOf(f)}${code}</li>`;
+          }).join('');
+        }
+        list.hidden = stations.length === 0;
+      }
+    } catch (err) {
+      body.dataset.status = 'unavailable';
+      body.dataset.reasonCode = err?.reasonCode || 'transit-registry-unavailable';
+      body.innerHTML = `<tr><td colspan="4">${tr('Transit registry unavailable.', 'পরিবহন তথ্যসূত্র অনুপলব্ধ।')}</td></tr>`;
+      if (list) list.hidden = true;
+    }
   }
 
   async function loadEconomy() {
@@ -93,22 +195,41 @@
           const rate = measured
             ? new Intl.NumberFormat(isBn ? "bn-BD" : "en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c.night_radiance_nw)
             : tr("Not measurable", "মাপা যায়নি");
+          // The registry carries both scripts, so a Bengali reader is not
+          // left reading corridor names in English.
+          const name = isBn && c.name_bn ? c.name_bn : c.name;
+          const sector = isBn && c.sector_bn ? c.sector_bn : c.sector;
           return `
             <article class="collage-card" data-state="${measured ? "ok" : "unavailable"}">
-              <h4>${c.name}</h4>
+              <h4>${escapeHtml(name)}</h4>
               <p class="collage-reading">${measured ? `${rate} nW/(cm² sr)` : tr("Not measurable", "মাপা যায়নি")}</p>
               <div class="collage-basis">
-                <span>${c.sector}</span>
+                <span>${escapeHtml(sector)}</span>
                 ${measured ? `<span>${c.observation_date}</span>` : `<span>${c.reasonCode}</span>`}
                 ${c.city_rank ? `<span>${tr(`rank ${c.city_rank} of ${corridors.length}`, `${corridors.length}টির মধ্যে ${c.city_rank} নম্বর`)}</span>` : ''}
               </div>
             </article>`;
         }).join("") : `<p class="collage-unavailable">${tr("No corridor could be measured.", "কোনো করিডোর মাপা যায়নি।")}</p>`;
       }
+      // The heading must not claim every corridor was measured. The number
+      // that was measured is stated beside it.
+      const corridorHead = $("#economy-corridors-head");
+      if (corridorHead) {
+        const corridors = Array.isArray(data.corridors) ? data.corridors : [];
+        const measuredCount = corridors.filter(c => c.status === "ok" && c.night_radiance_nw !== null).length;
+        corridorHead.textContent = measuredCount === corridors.length && corridors.length
+          ? tr("Industrial corridors · measured night radiance", "শিল্প করিডোর · মাপা রাতের আলোক্ষেত্র")
+          : tr(
+              `Industrial corridors · ${measuredCount} of ${corridors.length} measured for night radiance`,
+              `শিল্প করিডোর · রাতের আলোক্ষেত্রে ${corridors.length}টির মধ্যে ${measuredCount}টি মাপা`,
+            );
+      }
     } catch (err) {
       renderFeedFailure(container, err, 'Economic indicators feed unavailable.', 'অর্থনৈতিক সূচকের তথ্য অনুপলব্ধ।', loadEconomy);
       const corridorBox = $("#economy-corridors-grid");
       if (corridorBox) corridorBox.innerHTML = `<p class="collage-unavailable">${tr("Corridor signals unavailable.", "করিডোরের সংকেত অনুপলব্ধ।")}</p>`;
+      const corridorHead = $("#economy-corridors-head");
+      if (corridorHead) corridorHead.textContent = tr("Industrial corridors · unavailable", "শিল্প করিডোর · অনুপলব্ধ");
     }
   }
 
@@ -330,8 +451,18 @@
           if (menu) menu.open = false;
           modal.showModal();
         }
+        // The transit desk reads the network registry when it is opened, so
+        // the table it shows is the registry and not a copy of it.
+        if (targetId === "transit-dialog") loadTransitRegistry();
       });
     });
+    const transitDialog = document.getElementById("transit-dialog");
+    if (transitDialog) {
+      transitDialog.addEventListener("close", () => {
+        transitDialog._atlasReturnFocus?.focus();
+        transitDialog._atlasReturnFocus = null;
+      });
+    }
     $$('dialog').forEach(dialog => dialog.addEventListener('close', () => {
       dialog._atlasReturnFocus?.focus();
       dialog._atlasReturnFocus = null;

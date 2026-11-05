@@ -162,7 +162,9 @@ async function collectSolarResource(lat: number, lng: number): Promise<SolarRead
       monthly: null,
       reasonCode,
     };
-    cache.set(key, {reading, expires: Date.now() + 5 * 60000});
+    // A failure is not kept. The comment above says why: the next request
+    // must try again rather than live with a stale failure. Caching it here
+    // made a five-minute POWER outage survive the outage.
     return reading;
   }
 }

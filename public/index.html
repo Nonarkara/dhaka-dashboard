@@ -31,6 +31,7 @@
           <option value="city">City in 3D</option><option value="rivers">River outlook</option>
           <option value="air">Air forecast</option><option value="people">Population</option><option value="economy">Economic engine</option>
           <option value="transit">Transit &amp; Metro</option><option value="heritage">Architectural heritage</option>
+          <option value="walk">Street level</option>
           <option value="haze">Brick kilns &amp; smoke</option><option value="rain">Rain · next 24 h</option>
           <option value="radar">Rain radar</option><option value="cloud">Satellite clouds</option>
           <option value="aerosol">Satellite aerosol (AOD)</option>
@@ -82,6 +83,18 @@
     </details>
 
       <details id="people-key" class="people-key" hidden></details>
+
+      <!-- The walkthrough. Only shown by the Street level lens. -->
+      <section class="atlas-walk" id="atlas-walk" hidden aria-label="Street-level walkthrough">
+        <p class="atlas-walk-counts" id="atlas-walk-counts" role="status">—</p>
+        <a class="atlas-walk-scout" id="atlas-walk-scout" href="https://tools.oyasumi-gamedev.com/rokehan/" target="_blank" rel="noopener noreferrer">Open the street scene render ↗</a>
+        <details class="atlas-walk-more">
+          <summary id="atlas-walk-summary">How this is measured</summary>
+          <p id="atlas-walk-note">Massing is drawn from the map provider's computed heights, not surveyed ones.</p>
+          <p class="atlas-walk-legend"><span class="atlas-walk-swatch" aria-hidden="true"></span><span id="atlas-walk-legend-text">Illustrative massing — height from the map provider, not surveyed</span></p>
+          <p id="atlas-walk-credit">Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · elevation Terrain Tiles. Opened in a new tab.</p>
+        </details>
+      </section>
 </aside>
       <section id="forecast-player" class="forecast-player" hidden aria-label="Forecast playback"></section>
       <div id="atlas-map" class="atlas-map" aria-label="3D Map of Dhaka"></div>
@@ -210,33 +223,14 @@
             <th>Status</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td><strong>MRT Line 6 (Metro Rail)</strong><br><small style="color:var(--dim)">Uttara North to Kamalapur</small></td>
-            <td>Elevated Electric Rail</td>
-            <td>21.26 km · 16 Stations</td>
-            <td><span class="hud-badge" style="background:var(--bg-strong)">Reference only</span></td>
-          </tr>
-          <tr>
-            <td><strong>Dhaka Elevated Expressway</strong><br><small style="color:var(--dim)">Kawla (Airport) to Farmgate</small></td>
-            <td>Grade-separated Expressway</td>
-            <td>19.73 km (Phase 1)</td>
-            <td><span class="hud-badge" style="background:var(--bg-strong)">Reference only</span></td>
-          </tr>
-          <tr>
-            <td><strong>Sadarghat Launch Terminal</strong><br><small style="color:var(--dim)">Buriganga River Passenger Port</small></td>
-            <td>Inland River Port</td>
-            <td>200+ launches daily</td>
-            <td><span class="hud-badge" style="background:var(--bg-strong)">Reference only</span></td>
-          </tr>
-          <tr>
-            <td><strong>Kamalapur Railway Station</strong><br><small style="color:var(--dim)">Central Bangladesh Railway hub</small></td>
-            <td>National Heavy Rail</td>
-            <td>Primary passenger terminus</td>
-            <td><span class="hud-badge" style="background:var(--bg-strong)">Reference only</span></td>
-          </tr>
+        <tbody id="transit-registry">
+          <tr><td colspan="4">Loading transit registry…</td></tr>
         </tbody>
       </table>
+      <details id="transit-stations-list" hidden>
+        <summary id="transit-stations-summary">Stations</summary>
+        <ul id="transit-stations-items" class="atlas-plain-list"></ul>
+      </details>
     </div>
   </dialog>
 

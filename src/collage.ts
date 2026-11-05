@@ -114,7 +114,10 @@ export interface CollageResult {
 export interface CorridorReading {
   id: string;
   name: string;
+  /** The Bengali name of the same corridor, so the desk is not half a language. */
+  name_bn: string | null;
   sector: string;
+  sector_bn: string | null;
   lat: number;
   lng: number;
   night_radiance_nw: number | null;
@@ -132,7 +135,9 @@ export interface CorridorReading {
 export interface CorridorPoint {
   id: string;
   name: string;
+  name_bn?: string | null;
   sector: string;
+  sector_bn?: string | null;
   lat: number;
   lng: number;
 }
@@ -657,7 +662,9 @@ async function measureCorridors(points: CorridorPoint[]): Promise<CorridorReadin
     return {
       id: p.id,
       name: p.name,
+      name_bn: p.name_bn ?? null,
       sector: p.sector,
+      sector_bn: p.sector_bn ?? null,
       lat: p.lat,
       lng: p.lng,
       night_radiance_nw: m?.status === "ok" ? m.value : null,
@@ -666,7 +673,11 @@ async function measureCorridors(points: CorridorPoint[]): Promise<CorridorReadin
       resolution_m: m?.resolutionM ?? null,
       city_rank: null,
       status: m?.status ?? "unavailable",
-      reasonCode: m?.reasonCode ?? "corridor-not-measured",
+      // A reason code explains why a reading is missing. A corridor that was
+      // measured has no reason to be missing, so it carries none. Writing
+      // "corridor-not-measured" onto a measured corridor stamped a
+      // contradiction onto every row of the economy desk.
+      reasonCode: m?.status === "ok" ? null : m?.reasonCode ?? "corridor-not-measured",
       provenance: "mixed",
       note: "Night-time radiance measured by VIIRS Day/Night Band over the corridor centre.",
     };

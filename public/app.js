@@ -120,6 +120,12 @@
       title_bn: "উপগ্রহ পর্যবেক্ষিত বন্যা প্লাবন",
       desc: "Daily NASA VIIRS combined flood detection, 1-day window, for the Bengal Delta.",
       desc_bn: "দৈনিক নাসা ভিআইআইআরএস যৌথ বন্যা শনাক্তকরণ, ১ দিনের জানালা — বাংলাদেশ বদ্বীপ।"
+    },
+    walk: {
+      title: "Street level",
+      title_bn: "রাস্তার ধরনে",
+      desc: "Eye-level view of the mapped street. Massing uses the map provider's computed heights, which are not surveyed; the count of buildings in view is stated below.",
+      desc_bn: "মানচিত্রের রাস্তার চোখ-বিন্দুর উচ্চতায় দৃশ্য। ভবনের গঠন মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতা থেকে এসেছে, জরিপকৃত নয়; দৃশ্যমান ভবনের সংখ্যা নিচে দেওয়া আছে।"
     }
   };
 
@@ -182,6 +188,21 @@
       filter: ["!", ["has", "hide_3d"]],
       paint: buildingPaint("source_height_unavailable", "source_base_unavailable")
     });
+    // The street-level massing. The streamed tile carries no surveyed
+    // height, only the provider's computed render_height — so this layer is
+    // drawn as an explicitly illustrative massing, never as a measured
+    // building. It stays hidden until the Street level lens asks for it.
+    styleSpec.layers.push({
+      id: "walk-massing", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 16,
+      filter: ["!", ["has", "hide_3d"]],
+      layout: { visibility: "none" },
+      paint: {
+        "fill-extrusion-color": "#c9c5b8",
+        "fill-extrusion-height": ["to-number", ["get", "render_height"], 0],
+        "fill-extrusion-base": ["to-number", ["get", "render_min_height"], 0],
+        "fill-extrusion-opacity": 0.82
+      }
+    });
 
     try {
       map = new maplibregl.Map({
@@ -191,7 +212,7 @@
         zoom: 12.5,
         pitch: 50,
         bearing: 15,
-        maxPitch: 75,
+        maxPitch: 85,
         minZoom: 9,
         renderWorldCopies: false,
         attributionControl: true
@@ -204,6 +225,11 @@
       map.on("move", syncBuildingVisibility);
       map.on("moveend", syncBuildingVisibility);
       map.on("zoomend", syncBuildingVisibility);
+      // The walkthrough counts what the screen actually holds, and offers
+      // the street scene for exactly where the reader is standing. Both
+      // are re-read when the map settles, not when a request was made.
+      map.on("idle", () => { if (currentLens === "walk") renderWalkPanel(); });
+      map.on("moveend", () => { if (currentLens === "walk") renderWalkPanel(); });
       map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
       // Attribution is a source instrument with its own row, including wrapped phone credits.
       if (typeof ResizeObserver !== "undefined") {
@@ -782,7 +808,11 @@
     haze: { center: [90.35, 23.85], zoom: 11.5, pitch: 45, bearing: -15 },
     cloud: { center: [90.41, 23.81], zoom: 9, pitch: 0, bearing: 0 },
     night: { center: [90.41, 23.81], zoom: 10.5, pitch: 30, bearing: 0 },
-    water: { center: [90.6, 24.2], zoom: 8.5, pitch: 20, bearing: 0 }
+    water: { center: [90.6, 24.2], zoom: 8.5, pitch: 20, bearing: 0 },
+    // Eye level. MapLibre caps the pitch at 85°, which is as close to a
+    // standing pedestrian as a map camera gets: the street runs to the
+    // horizon and the walls close in on both sides.
+    walk: { center: [90.4072, 23.7118], zoom: 18.4, pitch: 85, bearing: 205 }
   };
 
   function clearDynamicLayers() {
@@ -800,6 +830,107 @@
       if (map?.getSource(id)) map.removeSource(id);
     }
     dynamicLayers = [];
+  }
+
+  // ── The walkthrough ────────────────────────────────────────────────────
+  // The atlas streams OpenFreeMap tiles. That tile carries no surveyed
+  // building height — only the provider's computed render_height — so at
+  // street level a truthful map would show a flat ground and nothing else.
+  // The walkthrough therefore draws that height as an explicitly
+  // ILLUSTRATIVE massing, in a material of its own, and states how many
+  // buildings in view rest on a provider number rather than on a survey.
+  //
+  // It also hands the reader one click to a far more detailed street
+  // scene: Location Scout builds the same coordinates from the same OSM
+  // data, at eye level, with drawn facades. No code is taken from it; the
+  // link carries the coordinates and the credit.
+  const SCOUT_BASE = "https://tools.oyasumi-gamedev.com/rokehan/";
+
+  function walkNumber(n) {
+    return new Intl.NumberFormat(document.documentElement.lang === "bn" ? "bn-BD" : "en-GB", { maximumFractionDigits: 0 }).format(n);
+  }
+
+  function streetScoutUrl() {
+    if (!map) return SCOUT_BASE;
+    const c = map.getCenter();
+    let nearest = null;
+    let nearestD = Infinity;
+    for (const a of areasData || []) {
+      const d = (a.lat - c.lat) ** 2 + (a.lng - c.lng) ** 2;
+      if (d < nearestD) { nearestD = d; nearest = a; }
+    }
+    const isBn = document.documentElement.lang === "bn";
+    const name = nearest ? (isBn && nearest.name_bn ? nearest.name_bn : nearest.name) : "Dhaka";
+    const params = new URLSearchParams({
+      ll: `${c.lat.toFixed(6)},${c.lng.toFixed(6)}`,
+      s: "100",
+      far: "1",
+      tod: "day",
+      n: name
+    });
+    return `${SCOUT_BASE}#${params.toString()}`;
+  }
+
+  function measureStreetLevel() {
+    if (!map || typeof map.querySourceFeatures !== "function") return null;
+    let features = [];
+    try {
+      features = map.querySourceFeatures("buildings", { sourceLayer: "building" }) || [];
+    } catch {
+      return null;
+    }
+    let total = 0;
+    let withProviderHeight = 0;
+    for (const f of features) {
+      const p = f.properties || {};
+      if (p.hide_3d) continue;
+      total += 1;
+      if (Number(p.render_height || 0) > 0) withProviderHeight += 1;
+    }
+    return { total, withProviderHeight };
+  }
+
+  function renderWalkPanel() {
+    const panel = $("#atlas-walk");
+    if (!panel) return;
+    const isWalk = currentLens === "walk";
+    panel.hidden = !isWalk;
+    if (!isWalk) return;
+    const isBn = document.documentElement.lang === "bn";
+
+    const counts = measureStreetLevel();
+    const countsEl = $("#atlas-walk-counts");
+    if (countsEl) {
+      countsEl.textContent = !counts
+        ? (isBn ? "ভবনের সংখ্যা গণনা করা যায়নি।" : "Building count unavailable.")
+        : isBn
+          ? `${walkNumber(counts.total)}টি ভবন দৃশ্যমান · ${walkNumber(counts.withProviderHeight)}টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়`
+          : `${walkNumber(counts.total)} buildings in view · ${walkNumber(counts.withProviderHeight)} carry a provider-computed height, not a survey`;
+    }
+
+    const summary = $("#atlas-walk-summary");
+    if (summary) summary.textContent = isBn ? "কীভাবে মাপা হয়েছে" : "How this is measured";
+
+    const note = $("#atlas-walk-note");
+    if (note) note.textContent = isBn
+      ? "ভবনের গঠন মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতা থেকে আঁকা; জরিপকৃত উচ্চতা থেকে নয়।"
+      : "Massing is drawn from the map provider's computed heights, not surveyed ones.";
+
+    const legend = $("#atlas-walk-legend-text");
+    if (legend) legend.textContent = isBn
+      ? "চিত্রায় উচ্চতা — মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়"
+      : "Illustrative massing — height from the map provider, not surveyed";
+
+    const scout = $("#atlas-walk-scout");
+    if (scout) {
+      scout.href = streetScoutUrl();
+      scout.textContent = isBn ? "রাস্তার দৃশ্য রেন্ডার খুলুন ↗" : "Open the street scene render ↗";
+    }
+
+    const credit = $("#atlas-walk-credit");
+    if (credit) credit.textContent = isBn
+      ? "রাস্তার দৃশ্য রেন্ডার: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · উচ্চতা Terrain Tiles। নতুন ট্যাবে খোলে।"
+      : "Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · elevation Terrain Tiles. Opened in a new tab.";
   }
 
   function applyLens(lensId, { moveCamera = lensId !== currentLens } = {}) {
@@ -858,6 +989,12 @@
     if (map.getLayer("economy-hubs")) {
       map.setLayoutProperty("economy-hubs", "visibility", (lensId === "economy" || lensId === "city") ? "visible" : "none");
     }
+    // The street-level massing belongs to the walkthrough and to nothing
+    // else. Every other lens must see the city as the atlas draws it.
+    if (map.getLayer("walk-massing")) {
+      map.setLayoutProperty("walk-massing", "visibility", lensId === "walk" ? "visible" : "none");
+    }
+    renderWalkPanel();
     // Night-time radiance only reads as night over a dark ground. Dim the
     // daylight basemap for that lens and restore it for every other one.
     for (const basemapId of ["basemap-esri", "basemap-osm"]) {
