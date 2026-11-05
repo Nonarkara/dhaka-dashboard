@@ -1,2 +1,2 @@
-export const BUILD_ID = "dhaka-atlas-20261104-1793802349-a357d0b";
+export const BUILD_ID = "dhaka-atlas-20261105-1793856554-c222ef8";
 export const ATLAS_VERSION = "1.0.0";
