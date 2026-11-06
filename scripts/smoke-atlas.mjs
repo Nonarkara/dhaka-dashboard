@@ -16,7 +16,15 @@ if (!indexHtml.includes("DHKx") || !indexHtml.includes("Dhaka")) {
   process.exit(1);
 }
 
-if (!researchHtml.includes("Methodology") || !researchHtml.includes("Provenance")) {
+const researchEvidence = [
+  'data-en="How a number is born"',
+  'data-en="Data source register"',
+  'data-en="Honesty contracts"',
+  'NASA GIBS',
+  'provenance',
+  'unavailable',
+];
+if (researchEvidence.some((section) => !researchHtml.includes(section))) {
   console.error("FAIL: research.html missing methodology text");
   process.exit(1);
 }
