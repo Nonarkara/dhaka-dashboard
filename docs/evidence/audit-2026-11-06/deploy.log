@@ -1,0 +1,301 @@
+==> 1. Checking types...
+
+> dhaka-dashboard@1.0.0 typecheck
+> tsc --noEmit
+
+==> 2. Verifying local files and datasets...
+
+> dhaka-dashboard@1.0.0 verify
+> node scripts/verify-local.mjs
+
+==> Running verify-local.mjs preflight checks...
+  ✓ public/dhaka-areas.json: valid JSON
+  ✓ public/dhaka-landmarks.geojson: valid GeoJSON with 16 features
+  ✓ public/dhaka-rivers.geojson: valid GeoJSON with 15 features
+  ✓ public/dhaka-mrt.geojson: valid GeoJSON with 23 features
+  ✓ public/data/parliament-buildings.geojson: valid GeoJSON with 4076 features
+  ✓ public/dhaka-economy.geojson: valid GeoJSON with 10 features
+✓ verify-local.mjs passed: all files and datasets present and valid.
+==> 3. Running test contract suite...
+
+> dhaka-dashboard@1.0.0 test
+> node scripts/test-release-contract.mjs && node scripts/test-client-contract.mjs && node scripts/test-theme-contract.mjs && node scripts/test-environment-contract.mjs && node scripts/test-i18n-contract.mjs && node scripts/test-i18n-coverage.mjs && node scripts/test-dhaka-contract.mjs && node scripts/test-anti-slop-design.mjs && node scripts/test-data-behavior.mjs && node scripts/test-building-behavior.mjs && node scripts/test-outlook-behavior.mjs && node scripts/test-instruments-behavior.mjs && node --import ./scripts/lib/ts-resolver.mjs scripts/test-satellite-contract.mjs && node scripts/test-walk-paper-contract.mjs && node --import ./scripts/lib/ts-resolver.mjs scripts/test-snapshots.mjs && node --import ./scripts/lib/ts-resolver.mjs scripts/test-people-behavior.mjs && node --import ./scripts/lib/ts-resolver.mjs scripts/test-planning-contract.mjs && node scripts/test-ui-access-behavior.mjs && node scripts/test-walkthrough-contract.mjs && node scripts/test-api-truthfulness.mjs && node scripts/test-gibs-verifier.mjs && node scripts/test-asset-convergence.mjs && node scripts/test-walk-behavior.mjs
+
+==> Running test-release-contract.mjs...
+✓ test-release-contract.mjs passed: Wrangler and package contracts satisfied.
+==> Running test-client-contract.mjs...
+✓ test-client-contract.mjs passed: DOM and accessibility contracts verified.
+==> Running test-theme-contract.mjs...
+✓ test-theme-contract.mjs passed: Wada Sanzo palette and theme definitions verified.
+==> Running test-environment-contract.mjs...
+✓ test-environment-contract.mjs passed: 4 GIBS layers verified against the GIBS capabilities catalogue (1330 layers, captured 2026-10-28); 3 environmental endpoints present.
+==> Running test-i18n-contract.mjs...
+  Checking 382 Bengali translation entries...
+✓ test-i18n-contract.mjs passed: 100% translation key validity verified.
+✓ Bilingual: 382 catalog keys, no mixed-script values, 310 multi-word phrases, 47 static strings left in Latin
+  Latin-only strings (must be proper nouns, units or URLs):
+    public/index.html: "External scene: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap. Opens in a new tab."
+    public/index.html: "DHKx"
+    public/research.html: "DHKx · Architecture of a Civic Satellite Atlas"
+    public/research.html: "English"
+    public/research.html: "Five planes of the Dhaka civic satellite atlas"
+    public/research.html: "A left-to-right grid. Observation feeds Measurement, which feeds Collection, which feeds Edge, which feeds Presentation. Each plane is marked by one coloured block: green for observation, coral for measurement, amber for collection, blue for edge, and paper white for presentation. Hairline rules divide the grid into unequal compartments."
+    public/research.html: "OBSERVATION"
+    public/research.html: "7 satellite instruments"
+    public/research.html: "+ official statistics"
+    public/research.html: "free, no key, global"
+    public/research.html: "MEASUREMENT"
+    public/research.html: "pixel → index"
+    public/research.html: "→ colour map"
+    public/research.html: "→ physical unit"
+    public/research.html: "COLLECTION"
+    public/research.html: "cron every 15 min"
+    public/research.html: "every upstream response"
+    public/research.html: "EDGE"
+    public/research.html: "Worker · 27 routes"
+    public/research.html: "provenance envelope"
+    public/research.html: "rate limit · cache"
+    public/research.html: "R2 archive · D1 snapshot"
+    public/research.html: "PRESENTATION"
+    public/research.html: "MapLibre client"
+    public/research.html: "17 lenses"
+    public/research.html: "thin instrument band"
+    public/research.html: "FREE UPSTREAM"
+    public/research.html: "NO AUTH · NO KEY"
+    public/research.html: "DETERMINISTIC"
+    public/research.html: "CATALOGUE-CHECKED"
+    public/research.html: "PUBLISHED ON A CLOCK"
+    public/research.html: "NOT ON VISIT"
+    public/research.html: "BENGALI FIRST"
+    public/research.html: "FLAT GEOMETRY"
+    public/research.html: "NASA GIBS"
+    public/research.html: "NASA POWER"
+    public/research.html: "World Bank"
+    public/research.html: "Open-Meteo"
+    public/research.html: "BWDB"
+    public/research.html: "OpenFreeMap / OSM"
+    …and 7 more
+==> Running test-dhaka-contract.mjs...
+  MRT Line 6 stations verified: 17
+✓ test-dhaka-contract.mjs passed: Rivers, Macro indicators, and Metro networks verified.
+==> Running test-anti-slop-design.mjs...
+✓ test-anti-slop-design.mjs passed: No AI slop or generic placeholders; sharp modernist geometry enforced.
+✓ Data behavior: upstream failure, malformed payload, null readings and six AQI boundaries
+✓ Building behavior: 4076 real footprints, Parliament courtyards, all lenses, exclusive detail switch, pan/offline/2D fallback and authored camera
+✓ Camera lifecycle: authored Parliament and manual same-lens views survive evidence/language refresh
+✓ Inspection security: untrusted map labels render as text
+✓ Geographic truth: unknown source heights flat, explicit tags retained, sketch separated from map, no invented landmark height
+✓ Radar motion: paused start, explicit play, map input, hidden page, task change and reduced motion
+✓ Rain map: missing values omitted, true zero retained, interval and source preserved for inspection
+✓ Outlook behavior: native steps, valid horizon, duplicate cells, real zero vs missing, units, ensemble quartiles, offline envelope and mapped-use classification
+✓ Actual player: early selection, failed-first-load retry focus, paused start, play/pause, scrub missing frame, response race and watch restoration
+✓ Warning regression: seven-day maxima, zero, missing reaches, neutral warning status, one click handler and stale inspection closure
+✓ Motion lifecycle: explicit play, manual input, hidden page, exit and reduced motion
+✓ National data: correct population scale, Bengali digits, null/zero, country/indicator/date validation, daily FX freshness, partial outages and single-flight cache
+✓ National ledger rendering: 17 series + daily FX, seven bilingual groups, fractional units, source periods, partial/offline rows and daily-reference wording
+✓ National desk works without removed header band; clock basis names device time until valid synchronization and after failure
+✓ Satellite contract: 16 checks passed — catalogue, colour maps, tile geometry, units, coverage, ranking and no unsourced figures
+✓ Walk and paper contract: 13 checks passed — camera ownership, stated limits, bilingual itinerary, bilingual paper and flat diagram geometry
+snapshot collector: not-due-or-running
+✓ Snapshot persistence: cold reads, zero, failed/reduced/partial runs, R2/D1 faults, lease race, history, stale/future/schema rejection and spatial/solar metadata
+✓ People reference: 1280 cells, 2181 objects; hashes, counts, unknown/zero, async cancellation, retry, filter/language, keyboard inspection, source escaping and API failure
+✓ Planning provenance: true grid extent, unverified stations, bilingual metadata, DDM structure/privacy, stable retrieval dates, pin eligibility and visible empty/error/review states
+✓ UI behavior: seven named dialogs, menu dismissal/focus return, 72 dated bilingual table values and recoverable source failure.
+✓ Watch behavior: visible AQI category, complete accessible evidence, Bengali/English rerender.
+✓ Transit runtime: bilingual 17-station reference/extension labels, timed requests, visible dated failures, retry recovery and stale-response rejection.
+✓ Map exploration: explicit source heights, rendered-ID dedup, unknown count, bilingual qualification/map-centre link and preserved transit/bookmark controls.
+✓ Exploration conservation: provider values remain flat, explicit source heights extrude, moving target updates the link, native footprints persist.
+✓ API truthfulness: failures are not cached or published, a measured corridor is not stamped missing, out-of-range coordinates are refused, a crash answers in JSON
+✓ Runtime API: valid export preserves all layers; malformed/empty/missing layers are partial or unavailable; throws and invalid coordinates are JSON refusals.
+✓ Worker GIBS: decoded JPEG variation, blank/corrupt/type mismatch refusal, exact decoded date and60-second no-stale availability.
+✓ GIBS verifier: exact advertised date, decoded PNG/JPEG, blanks/404/type mismatch, source registry, degraded null/reason and mixed-source status
+✓ Shared GIBS decoder: transparent RGBA and palette variance excluded, opaque zero/variation preserved
+✓ PNG transport validation: real signature, complete chunks/scanlines and supported filters
+✓ Asset convergence: transient stale bytes recover at exact URL; permanent mismatch/404 still block release.
+✓ Walk behavior: direction, explicit-input lifecycle, delayed attach, reduced motion, bookmark context, independent camera model and unavailable fit
+==> Applying observation schema...
+
+ ⛅️ wrangler 4.149.0 (update available 4.158.0)
+───────────────────────────────────────────────
+Resource location: remote 
+
+✅ No migrations to apply!
+==> 4. Stamping deterministic build ID...
+[stamp-build-id] wrote dhaka-atlas-20261106-1793960499-a029aed into build-id.ts, index.html, research.html, app.js
+==> 5. Deploying to Cloudflare Workers (dhaka.nonarkara.org)...
+
+ ⛅️ wrangler 4.149.0 (update available 4.158.0)
+───────────────────────────────────────────────
+🌀 Building list of assets...
+✨ Read 59 files from the assets directory /Users/nonarkara/.codex/worktrees/flood-correction/Dhaka/public
+🌀 Starting asset upload...
+🌀 Found 4 new or modified static assets to upload. Proceeding with upload...
++ /parliament-reference.html
++ /research.html
++ /index.html
++ /app.js
+Uploaded 1 of 4 assets
+Uploaded 3 of 4 assets
+Uploaded 4 of 4 assets
+✨ Success! Uploaded 4 files (48 already uploaded) (1.73 sec)
+
+Total Upload: 250.51 KiB / gzip: 57.13 KiB
+Worker Startup Time: 2 ms
+Your Worker has access to the following bindings:
+Binding                                           Resource         
+env.OBSERVATION_DB (dhaka-observations)           D1 Database      
+env.OBSERVATION_ARCHIVE (dhaka-observations)      R2 Bucket        
+env.RATE_LIMITER (600 requests/60s)               Rate Limit       
+env.ASSETS                                        Assets           
+
+Uploaded dhaka-dashboard (6.72 sec)
+Deployed dhaka-dashboard triggers (2.19 sec)
+  https://dhaka-dashboard.drnon.workers.dev
+  dhaka.nonarkara.org (custom domain)
+  schedule: */15 * * * *
+Current Version ID: 4553db11-3d0b-44ee-a15d-06344a0d5203
+==> 6. Verifying live deployment...
+
+> dhaka-dashboard@1.0.0 smoke
+> node scripts/smoke-atlas.mjs
+
+==> Running smoke-atlas.mjs static page checks...
+✓ smoke-atlas.mjs passed: Static app entry points verified.
+
+> dhaka-dashboard@1.0.0 smoke:api
+> node scripts/smoke-atlas-api.mjs
+
+==> DHKx 3D Atlas API smoke · https://dhaka.nonarkara.org
+  ✓ health check answers with build ID and status ok (status=200 buildId=dhaka-atlas-20261106-1793960499-a029aed)
+  ✓ areas returns 14 curated districts (status=200 count=14)
+  ✓ districts returns city corporations (DNCC and DSCC) (status=200)
+  ✓ at-this-point resolves Motijheel (status=200)
+  ✓ rivers returns 6 BWDB gauge stations (status=200 stations=6)
+  ✓ economy returns macroeconomic indicators (status=200 count=8)
+  ✓ city watch strip answers with flood and air indicators (status=200)
+  ✓ instruments answer with a live rate and dated national series (status=200 macro=17 fx=124.51615379)
+  ✓ every national reading carries its reporting period 
+  ✓ collage returns measured satellite signals for the districts (status=200 districts=14 measured=98)
+  ✓ every measured signal carries a unit, a date and a resolution 
+  ✓ the collage reads its domains in English and Bengali (readings=98)
+  ✓ economy corridors carry measured radiance, not registry figures (measured=10 corridors=10)
+
+✓ All 13 API smoke checks passed successfully.
+✓ Live SHA-256 matches for HTML, client scripts, styles, translations and reference layers
+==> 7. Verifying live NASA GIBS satellite tiles...
+==> Running verify-gibs-live.mjs...
+  ✓ VIIRS_NOAA20_CorrectedReflectance_TrueColor: independently decoded advertised 2026-11-05, 6793 bytes
+  ✓ MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: independently decoded advertised 2026-11-05, 18454 bytes
+  ✓ VIIRS_Combined_Flood_1-Day: independently decoded advertised 2026-11-05, 2616 bytes
+  DEGRADED VIIRS_SNPP_DayNightBand: unavailable · gibs-no-observation · latest_date=null; no healthy imagery claim
+✓ Deployed imagery contract verified: 3 independently decoded dated GIBS layers; 1 sources explicitly unavailable/degraded. This is contract verification, not an all-sources-healthy claim.
+==> 8. Verifying the live satellite collage...
+
+> dhaka-dashboard@1.0.0 verify:satellite
+> node --import ./scripts/lib/ts-resolver.mjs scripts/verify-satellite-live.mjs
+
+Measuring 14 districts over 6 satellite signals…
+status ok · 98/98 measurements · 0.5s
+  old-dhaka        Night radiance           29.822 nW/(cm² sr) · 2026-11-01 · 560 m
+  old-dhaka        Daytime surface heat     304.316 K · 2026-11-06 · 1120 m
+  old-dhaka        Night-time surface heat  296.66 K · 2026-11-05 · 1120 m
+  old-dhaka        Aerosol optical depth    0.051 1 · 2026-10-26 · 1120 m
+  old-dhaka        Vegetation index         0.231 1 · 2026-09-30 · 280 m
+  old-dhaka        Built-up ground          100 % of ground · static 2010 · 35 m
+  old-dhaka        Solar resource           4.5031 kWh/m²/day · static null · null m
+  motijheel        Night radiance           36.628 nW/(cm² sr) · 2026-11-01 · 560 m
+  motijheel        Daytime surface heat     303.908 K · 2026-11-06 · 1120 m
+  motijheel        Night-time surface heat  296.42 K · 2026-11-05 · 1120 m
+  motijheel        Aerosol optical depth    0.068 1 · 2026-10-26 · 1120 m
+  motijheel        Vegetation index         0.276 1 · 2026-09-30 · 280 m
+  motijheel        Built-up ground          100 % of ground · static 2010 · 35 m
+  motijheel        Solar resource           4.5031 kWh/m²/day · static null · null m
+  parliament       Night radiance           36.18 nW/(cm² sr) · 2026-11-01 · 560 m
+  parliament       Daytime surface heat     303.788 K · 2026-11-06 · 1119 m
+  parliament       Night-time surface heat  296.492 K · 2026-11-05 · 1119 m
+  parliament       Aerosol optical depth    0.092 1 · 2026-10-26 · 1119 m
+  parliament       Vegetation index         0.474 1 · 2026-09-30 · 280 m
+  parliament       Built-up ground          100 % of ground · static 2010 · 35 m
+  parliament       Solar resource           4.5031 kWh/m²/day · static null · null m
+  hatirjheel       Night radiance           32.668 nW/(cm² sr) · 2026-11-01 · 560 m
+  hatirjheel       Daytime surface heat     303.62 K · 2026-11-06 · 1119 m
+  hatirjheel       Night-time surface heat  294.62 K · 2026-11-05 · 1119 m
+  hatirjheel       Aerosol optical depth    0.108 1 · 2026-10-26 · 1119 m
+  hatirjheel       Vegetation index         0.317 1 · 2026-09-30 · 280 m
+  hatirjheel       Built-up ground          98.22 % of ground · static 2010 · 35 m
+  hatirjheel       Solar resource           4.5031 kWh/m²/day · static null · null m
+  gulshan          Night radiance           33.5 nW/(cm² sr) · 2026-11-01 · 560 m
+  gulshan          Daytime surface heat     304.1 K · 2026-11-06 · 1119 m
+  gulshan          Night-time surface heat  294.428 K · 2026-11-05 · 1119 m
+  gulshan          Aerosol optical depth    0.101 1 · 2026-10-26 · 1119 m
+  gulshan          Vegetation index         0.408 1 · 2026-09-30 · 280 m
+  gulshan          Built-up ground          100 % of ground · static 2010 · 35 m
+  gulshan          Solar resource           4.5031 kWh/m²/day · static null · null m
+  kawran-bazar     Night radiance           36.324 nW/(cm² sr) · 2026-11-01 · 560 m
+  kawran-bazar     Daytime surface heat     303.764 K · 2026-11-06 · 1119 m
+  kawran-bazar     Night-time surface heat  296.324 K · 2026-11-05 · 1119 m
+  kawran-bazar     Aerosol optical depth    0.077 1 · 2026-10-26 · 1119 m
+  kawran-bazar     Vegetation index         0.286 1 · 2026-09-30 · 280 m
+  kawran-bazar     Built-up ground          100 % of ground · static 2010 · 35 m
+  kawran-bazar     Solar resource           4.5031 kWh/m²/day · static null · null m
+  sadarghat        Night radiance           20.654 nW/(cm² sr) · 2026-11-01 · 560 m
+  sadarghat        Daytime surface heat     304.7 K · 2026-11-06 · 1120 m
+  sadarghat        Night-time surface heat  296.228 K · 2026-11-05 · 1120 m
+  sadarghat        Aerosol optical depth    0.056 1 · 2026-10-26 · 1120 m
+  sadarghat        Vegetation index         0.225 1 · 2026-09-30 · 280 m
+  sadarghat        Built-up ground          76.44 % of ground · static 2010 · 35 m
+  sadarghat        Solar resource           4.5031 kWh/m²/day · static null · null m
+  savar-ashulia    Night radiance           8.344 nW/(cm² sr) · 2026-11-01 · 559 m
+  savar-ashulia    Daytime surface heat     304.724 K · 2026-11-06 · 1118 m
+  savar-ashulia    Night-time surface heat  297.524 K · 2026-11-05 · 1118 m
+  savar-ashulia    Aerosol optical depth    0.18 1 · 2026-10-26 · 1118 m
+  savar-ashulia    Vegetation index         0.63 1 · 2026-09-30 · 280 m
+  savar-ashulia    Built-up ground          45.78 % of ground · static 2010 · 35 m
+  savar-ashulia    Solar resource           4.5031 kWh/m²/day · static null · null m
+  uttara           Night radiance           22.916 nW/(cm² sr) · 2026-11-01 · 559 m
+  uttara           Daytime surface heat     305.708 K · 2026-11-06 · 1118 m
+  uttara           Night-time surface heat  297.212 K · 2026-11-05 · 1118 m
+  uttara           Aerosol optical depth    0.12 1 · 2026-10-26 · 1118 m
+  uttara           Vegetation index         0.31 1 · 2026-09-30 · 280 m
+  uttara           Built-up ground          71.11 % of ground · static 2010 · 35 m
+  uttara           Solar resource           4.5031 kWh/m²/day · static null · null m
+  mirpur           Night radiance           31.972 nW/(cm² sr) · 2026-11-01 · 559 m
+  mirpur           Daytime surface heat     304.676 K · 2026-11-06 · 1119 m
+  mirpur           Night-time surface heat  297.284 K · 2026-11-05 · 1119 m
+  mirpur           Aerosol optical depth    0.086 1 · 2026-10-26 · 1119 m
+  mirpur           Vegetation index         0.274 1 · 2026-09-30 · 280 m
+  mirpur           Built-up ground          100 % of ground · static 2010 · 35 m
+  mirpur           Solar resource           4.5031 kWh/m²/day · static null · null m
+  dhanmondi        Night radiance           35.776 nW/(cm² sr) · 2026-11-01 · 560 m
+  dhanmondi        Daytime surface heat     303.836 K · 2026-11-06 · 1119 m
+  dhanmondi        Night-time surface heat  296.756 K · 2026-11-05 · 1119 m
+  dhanmondi        Aerosol optical depth    0.08 1 · 2026-10-26 · 1119 m
+  dhanmondi        Vegetation index         0.27 1 · 2026-09-30 · 280 m
+  dhanmondi        Built-up ground          100 % of ground · static 2010 · 35 m
+  dhanmondi        Solar resource           4.5031 kWh/m²/day · static null · null m
+  tejgaon          Night radiance           34.65 nW/(cm² sr) · 2026-11-01 · 560 m
+  tejgaon          Daytime surface heat     303.668 K · 2026-11-06 · 1119 m
+  tejgaon          Night-time surface heat  295.46 K · 2026-11-05 · 1119 m
+  tejgaon          Aerosol optical depth    0.091 1 · 2026-10-26 · 1119 m
+  tejgaon          Vegetation index         0.338 1 · 2026-09-30 · 280 m
+  tejgaon          Built-up ground          100 % of ground · static 2010 · 35 m
+  tejgaon          Solar resource           4.5031 kWh/m²/day · static null · null m
+  chawkbazar       Night radiance           32.556 nW/(cm² sr) · 2026-11-01 · 560 m
+  chawkbazar       Daytime surface heat     304.148 K · 2026-11-06 · 1120 m
+  chawkbazar       Night-time surface heat  297.14 K · 2026-11-05 · 1120 m
+  chawkbazar       Aerosol optical depth    0.048 1 · 2026-10-26 · 1120 m
+  chawkbazar       Vegetation index         0.275 1 · 2026-09-30 · 280 m
+  chawkbazar       Built-up ground          100 % of ground · static 2010 · 35 m
+  chawkbazar       Solar resource           4.5031 kWh/m²/day · static null · null m
+  narayanganj      Night radiance           19.928 nW/(cm² sr) · 2026-11-01 · 560 m
+  narayanganj      Daytime surface heat     302.924 K · 2026-11-06 · 1121 m
+  narayanganj      Night-time surface heat  293.263 K · 2026-11-05 · 1121 m
+  narayanganj      Aerosol optical depth    0.207 1 · 2026-10-26 · 1121 m
+  narayanganj      Vegetation index         0.295 1 · 2026-09-30 · 280 m
+  narayanganj      Built-up ground          100 % of ground · static 2010 · 35 m
+  narayanganj      Solar resource           4.5031 kWh/m²/day · static null · null m
+✓ Live satellite verification: 98/98 measurements, 98 domain readings
+✓ Persistent snapshot bed76518-6b61-4d43-b6b6-94896ad4a9c7: 98/98 readings; original solar period, sampling, history and source health; no visitor acquisition. Read 1113ms including history checks.
+✓ Live population reference: 1280 cells and 2181 dated OSM objects; hashes, category counts, unknown cells, source provenance and corrected questions.
+✓ Live planning: population-grid extent; six unverified station references; 1950 source records/5 within-extent source points, zero imported records/pins; fixed source retrieval time and Bengali metadata.
+==> Deploy complete: dhaka.nonarkara.org is live!
