@@ -87,6 +87,16 @@
       <!-- The walkthrough. Only shown by the Street level lens. -->
       <section class="atlas-walk" id="atlas-walk" hidden aria-label="Street-level walkthrough">
         <p class="atlas-walk-counts" id="atlas-walk-counts" role="status">—</p>
+        <p class="atlas-walk-status" id="atlas-walk-status" role="status">—</p>
+        <p class="atlas-walk-keys" id="atlas-walk-keys"></p>
+        <div class="atlas-walk-nav">
+          <button type="button" id="atlas-walk-prev" class="atlas-walk-step">← Previous stop</button>
+          <button type="button" id="atlas-walk-next" class="atlas-walk-step">Next stop →</button>
+        </div>
+        <details class="atlas-walk-itinerary">
+          <summary id="atlas-walk-itinerary-summary">Walk itinerary</summary>
+          <nav class="atlas-walk-route" id="atlas-walk-route" aria-label="Walk itinerary"></nav>
+        </details>
         <a class="atlas-walk-scout" id="atlas-walk-scout" href="https://tools.oyasumi-gamedev.com/rokehan/" target="_blank" rel="noopener noreferrer">Open the street scene render ↗</a>
         <details class="atlas-walk-more">
           <summary id="atlas-walk-summary">How this is measured</summary>
@@ -240,6 +250,7 @@
   <script src="/people.js?v=dhaka-atlas-20261105-1793856554-c222ef8" defer></script>
   <script src="/instruments.js?v=dhaka-atlas-20261105-1793856554-c222ef8" defer></script>
   <script src="/collage.js?v=dhaka-atlas-20261105-1793856554-c222ef8" defer></script>
+  <script src="/walk.js?v=dhaka-atlas-20261105-1793856554-c222ef8" defer></script>
   <script src="/app.js?v=dhaka-atlas-20261105-1793856554-c222ef8" defer></script>
   <script src="/dashboard.js?v=dhaka-atlas-20261105-1793856554-c222ef8" defer></script>
 </body>

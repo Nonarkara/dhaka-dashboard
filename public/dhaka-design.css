@@ -302,6 +302,45 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-walk-legend { display:flex; gap:5px; align-items:flex-start; }
 .atlas-walk-swatch { width:9px; height:9px; flex-shrink:0; margin-top:2px; border:1px solid var(--dim); background:#c9c5b8; }
 #atlas-walk-credit { color:var(--dim); }
+/* The walkthrough's own panel: where you are, how to move, and the
+   itinerary with the measurement under each stop. */
+.atlas-walk-status { margin:0; padding:0 6px 2px; color:var(--dim); font-variant-numeric:tabular-nums; }
+.atlas-walk-keys { margin:0; padding:0 6px 4px; color:var(--dim); font-family:var(--font-mono); }
+.atlas-walk-keys kbd {
+  font-family:var(--font-mono);
+  border:1px solid var(--line);
+  padding:0 3px;
+  color:var(--ink);
+}
+.atlas-walk-route { display:flex; flex-direction:column; border-top:1px solid var(--line); margin:0 6px 4px; }
+/* The itinerary folds away: six stops open would take more of a phone
+   screen than the street they describe. The two step buttons keep the
+   itinerary reachable without opening it. */
+.atlas-walk-itinerary { border-top:1px solid var(--line); }
+.atlas-walk-itinerary summary { cursor:pointer; min-height:24px; padding:3px 6px; font-weight:600; }
+.atlas-walk-itinerary .atlas-walk-route { border-top:0; margin:0 6px 4px; }
+.atlas-walk-nav { display:flex; gap:6px; padding:0 6px 4px; }
+.atlas-walk-step {
+  flex:1 1 0; min-width:0;
+  padding:4px 6px;
+  background:var(--bg); color:var(--ink);
+  border:1px solid var(--line);
+  font:500 var(--text-micro) var(--font-sans); cursor:pointer;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.atlas-walk-step:hover,.atlas-walk-step:focus-visible { border-color:var(--accent); color:var(--accent); }
+.atlas-walk-stop {
+  display:block; width:100%; text-align:left;
+  padding:5px 6px;
+  background:var(--bg); border:0; border-bottom:1px solid var(--line); border-left:3px solid transparent;
+  color:var(--ink); cursor:pointer; font:inherit;
+}
+.atlas-walk-stop:last-child { border-bottom:0; }
+.atlas-walk-stop:hover { background:var(--bg-raised); }
+.atlas-walk-stop[aria-pressed="true"] { background:var(--bg-raised); border-left-color:var(--accent); }
+.atlas-walk-stop strong { display:block; font-size:var(--text-micro); font-weight:600; }
+.atlas-walk-stop small { display:block; font-size:var(--text-micro); color:var(--dim); line-height:1.3; margin-top:1px; }
+
 .building-swatches { display:flex; flex-direction:column; gap:2px; padding:3px 6px; }
 .building-swatches span { display:flex; align-items:center; gap:5px; font-size:var(--text-micro); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .building-swatches i { width:9px; height:9px; border:1px solid var(--dim); flex-shrink:0; }
@@ -446,6 +485,10 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-walk-more summary { min-height:36px; padding:6px 8px; font-size:var(--text-body); }
 .atlas-walk-more p { font-size:var(--text-body); line-height:1.4; margin:6px 8px; }
 .atlas-walk-swatch { width:12px; height:12px; }
+.atlas-walk-itinerary summary { min-height:36px; padding:6px 8px; font-size:var(--text-body); }
+.atlas-walk-itinerary .atlas-walk-route { margin:0 8px 5px; }
+.atlas-walk-nav { padding:0 8px 5px; gap:8px; }
+.atlas-walk-step { min-height:36px; padding:7px 8px; font-size:var(--text-body); }
 
 /* Reference evidence stays folded until requested; the map keeps its height. */
 .people-key[hidden] { display:none; }

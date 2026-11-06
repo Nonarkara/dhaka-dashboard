@@ -8,15 +8,16 @@ A 3D civic atlas and operational dashboard for Greater Metropolitan Dhaka where 
 
 ## 1. Capabilities & Lenses
 
-DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and environmental monitoring across 14 interactive lenses:
+DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and environmental monitoring across 15 interactive lenses:
 
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
 | **City in 3D** | OSM building footprints at zoom 14+ in every 3D lens; local Parliament detail preserves courtyards and eight explicit source heights; unknown heights stay flat, plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
+| **Street level** | Eye-level view of the mapped street. The massing is drawn from the map provider's computed heights, which are **not surveyed**; the panel states how many buildings in view rest on that number. One click opens a detailed street scene render for the reader's own coordinates | OpenStreetMap / OpenFreeMap (provider `render_height`); street scene render by Location Scout (oyasumi-gamedev.com) |
 | **River outlook** | Northeast GloFAS daily model reaches with ensemble quartiles and available-series maxima; Dhaka reference station registry has no connected observations or calibrated warnings | Bangladesh Water Development Board (BWDB) / FFWC |
 | **Population** | Dated WorldPop 2025 estimates in 1 km cells and 2,181 mapped school/healthcare objects; no census or capacity inference | WorldPop / OpenStreetMap |
 | **Economic engine** | Ready-Made Garment (RMG) export corridors, Savar DEPZ, Adamjee EPZ, Motijheel financial district, and wholesale hubs (Kawran Bazar, Islampur, Chawkbazar) | Export Promotion Bureau (EPB), Bangladesh Bank, DSE |
-| **Transit & Metro** | Dhaka Metro Rail (MRT Line 6) stations, Dhaka Elevated Expressway, Kamalapur central rail terminal, and Sadarghat launch terminal | DMTCL, DTCA, Bangladesh Railway, BIWTA |
+| **Transit & Metro** | The network registry read live by the Metro desk: MRT Line 6 alignment with its 17 stations, Dhaka Elevated Expressway, three inter-district bus terminals (Gabtoli, Mohakhali, Sayedabad) and Dhaka Airport railway station. Sadarghat launch terminal and Kamalapur remain mapped landmarks | DMTCL, DTCA, Bangladesh Railway, BIWTA |
 | **Air forecast** | Regional CAMS PM2.5 playback at approximately 45 km in native three-hour steps for the next 48 hours; city-center 72-hour timeline remains in the air desk | Copernicus CAMS / Open-Meteo |
 | **Brick kilns & smoke** | Explicit unavailable state until FIRMS retrieval is configured; surface wind only, no 925 hPa field | NASA FIRMS (VIIRS NOAA-20 375m), ECMWF |
 | **Architectural heritage** | Mughal, colonial, and modern masterworks: Lalbagh Fort (1678), Ahsan Manzil (1872), Louis Kahn's Jatiya Sangsad Bhaban (1982), Curzon Hall (1904) | Directorate of Archaeology, Survey of Bangladesh |
@@ -76,6 +77,9 @@ The dashboard runs on a Cloudflare Worker serving a zero-bundle-overhead static 
 | `/api/atlas/collage` | GET | Seven instruments near sampled places; stored snapshot with age and sampling footprint |
 | `/api/atlas/watch` | GET | Real-time status indicators for flood, air, weather, and economy |
 | `/api/dhaka/rivers` | GET | Reference station registry; current readings unavailable |
+| `/api/dhaka/population` | GET | WorldPop 2025 population grid in 1 km cells; modeled, not census |
+| `/api/dhaka/facilities` | GET | Dated OSM school, hospital and clinic objects; not capacity or service coverage |
+| `/api/dhaka/ffwc` | GET | Flood Forecasting & Warning Centre source record and station registry; live gauge feed not validated |
 | `/api/dhaka/shelters` | GET | Dated DDM source-structure review; imported register and publication eligibility are separate from source counts/readiness |
 | `/api/dhaka/economy` | GET | Sourced macroeconomic indicators and EPZ industrial clusters |
 | `/api/dhaka/transit` | GET | MRT Line 6 stations, elevated expressway, and transit hubs |

@@ -70,6 +70,14 @@ assert.match(app, /Illustrative massing/, 'the legend must name the massing as i
 
 // The count must come from what the screen holds, not from a constant.
 assert.match(app, /querySourceFeatures\(\s*"buildings"/, 'the count must be read from the map source');
+// An empty feature list means the tiles have not arrived, not that the
+// street has no buildings. A zero there would be a false reading.
+assert.match(app, /counts\.total > 0/, 'the count must never print a zero it did not measure');
+assert.match(app, /Building count unavailable\./, 'an unmeasured count must say so');
+// Solid walls. A translucent block standing on a filled footprint
+// double-draws the ground and turns the street into mud.
+assert.match(layer[0], /"fill-extrusion-opacity":\s*1\b/, 'the street walls must be solid');
+assert.match(layer[0], /buildingPaint\("render_height",\s*"render_min_height"\)/, 'the massing must reuse the atlas palette for colour');
 
 // ── 5. The link out carries the reader's own coordinates and the credit ───
 assert.match(app, /SCOUT_BASE\s*=\s*"https:\/\/tools\.oyasumi-gamedev\.com\/rokehan\/"/, 'the street scene link must be well formed');

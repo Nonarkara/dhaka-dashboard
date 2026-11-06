@@ -110,4 +110,19 @@ assert.match(
   'an empty corridor list must carry its reason',
 );
 
+// ── The documented surface must be the real surface ───────────────────────
+// Three endpoints were served but never written down, so nobody knew they
+// existed. The table in the README is now bound to the routes in the worker
+// in both directions.
+const readme = readFileSync('README.md', 'utf8');
+const routes = [...worker.matchAll(/url\.pathname === "(\/api\/[^"]+)"/g)].map(m => m[1]);
+assert.ok(routes.length >= 20, `the worker should serve a real API, found ${routes.length} routes`);
+for (const route of routes) {
+  assert.ok(readme.includes(route), `README must document ${route}`);
+}
+const documented = [...readme.matchAll(/`(\/api\/[^`?]+)/g)].map(m => m[1]);
+for (const route of documented) {
+  assert.ok(routes.includes(route), `README documents ${route}, which the worker does not serve`);
+}
+
 console.log('✓ API truthfulness: failures are not cached or published, a measured corridor is not stamped missing, out-of-range coordinates are refused, a crash answers in JSON');

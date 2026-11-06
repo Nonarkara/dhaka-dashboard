@@ -24,6 +24,9 @@ const argOf = (name, fallback) => {
 
 const BASE = argOf('--url', 'https://dhaka.nonarkara.org').replace(/\/$/, '');
 const OUT = argOf('--out', '');
+// Which lens to audit. The walkthrough lens is its own surface with its own
+// chrome, and it needs its own measurement rather than the city lens's.
+const LENS = argOf('--lens', 'city');
 const SHOTS = !args.includes('--no-screenshots');
 
 const VIEWPORTS = [
@@ -97,11 +100,24 @@ const MEASURE = `(() => {
     width: window.innerWidth,
     height: window.innerHeight,
     lang: document.documentElement.lang,
+    lens: document.getElementById('atlas-lens')?.value || null,
     overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     header, map, watch, key, credit,
     creditText: credit ? (document.querySelector('.maplibregl-ctrl-attrib')?.innerText || '').trim() : '',
     splashVisible: !!splash && getComputedStyle(splash).display !== 'none',
     chromeCostPct: header ? +(header.height / window.innerHeight * 100).toFixed(2) : null,
+    walk: (() => {
+      const panel = document.getElementById('atlas-walk');
+      if (!panel) return null;
+      const counts = document.getElementById('atlas-walk-counts');
+      const link = document.getElementById('atlas-walk-scout');
+      return {
+        panelVisible: !panel.hidden,
+        panelRect: (() => { const r = panel.getBoundingClientRect(); return { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height), bottom: Math.round(r.bottom) }; })(),
+        counts: counts ? counts.textContent.trim() : null,
+        linkHref: link ? link.getAttribute('href') : null,
+      };
+    })(),
     taskVisible: {
       lens: visible('#atlas-lens'),
       watch: !!watch && watch.bottom <= window.innerHeight + 1,
@@ -190,6 +206,19 @@ async function main() {
         await session.send('Page.navigate', { url });
         await loaded.catch(() => {});
 
+        // Select the lens under audit. The picker is the atlas's own control
+        // for it, so driving the picker drives the product.
+        if (LENS && LENS !== 'city') {
+          await session.evaluate(`(() => {
+            const select = document.getElementById('atlas-lens');
+            if (!select) return false;
+            select.value = ${JSON.stringify(LENS)};
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+          })()`);
+          await sleep(1500);
+        }
+
         // The splash lifts on the first styled frame and the watch fills from
         // the API. Wait for both, so the measurement is of a live surface and
         // not of a skeleton.
@@ -201,7 +230,8 @@ async function main() {
         }
 
         await session.evaluate('document.fonts ? document.fonts.ready.then(() => true) : true');
-        await sleep(1200);
+        // A street-level lens pulls a z18 tile the city lens never asks for.
+        await sleep(LENS && LENS !== 'city' ? 4000 : 1200);
 
         const row = await session.evaluate(MEASURE);
         row.url = url;
@@ -211,15 +241,16 @@ async function main() {
 
         if (SHOTS) {
           const shot = await session.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
-          const file = `${outDir}/${viewport.width}-${lang}.png`;
+          const file = `${outDir}/${LENS}-${viewport.width}-${lang}.png`;
           writeFileSync(file, Buffer.from(shot.data, 'base64'));
           row.screenshot = file;
         }
 
         const flag = row.ready ? 'ready' : 'NOT-READY';
         console.log(
-          `  ${viewport.width}x${viewport.height} ${lang}: chrome ${row.chromeCostPct}% · ` +
-          `watch ${row.watch?.height}px · map ${row.unobscuredRatio} · ${row.typeSizeCount} sizes · ${flag}`,
+          `  ${LENS} ${viewport.width}x${viewport.height} ${lang}: chrome ${row.chromeCostPct}% · ` +
+          `watch ${row.watch?.height}px · map ${row.unobscuredRatio} · ${row.typeSizeCount} sizes · ${flag}` +
+          (row.walk?.panelVisible ? ` · walk panel ${row.walk.panelRect.height}px` : ''),
         );
       }
     }
@@ -232,6 +263,7 @@ async function main() {
     url: BASE,
     viewports: VIEWPORTS.map(v => `${v.width}x${v.height}`),
     languages: LANGUAGES,
+    lens: LENS,
     rows,
   };
   writeFileSync(`${outDir}/geometry.json`, `${JSON.stringify(rows, null, 2)}\n`);

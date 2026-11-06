@@ -1,0 +1,668 @@
+[
+  {
+    "width": 390,
+    "height": 844,
+    "lang": "en",
+    "lens": "walk",
+    "overflow": false,
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 41,
+      "bottom": 41
+    },
+    "map": {
+      "x": 0,
+      "y": 41,
+      "width": 390,
+      "height": 803,
+      "bottom": 844
+    },
+    "watch": {
+      "x": 8,
+      "y": 669,
+      "width": 374,
+      "height": 113,
+      "bottom": 782
+    },
+    "key": {
+      "x": 8,
+      "y": 49,
+      "width": 290,
+      "height": 202,
+      "bottom": 251
+    },
+    "credit": {
+      "x": 30,
+      "y": 790,
+      "width": 350,
+      "height": 44,
+      "bottom": 834
+    },
+    "creditText": "Esri, Maxar, Earthstar Geographics | © OpenStreetMap · OpenFreeMap / OpenMapTiles | MapLibre",
+    "splashVisible": false,
+    "chromeCostPct": 4.86,
+    "walk": {
+      "panelVisible": true,
+      "panelRect": {
+        "x": 10,
+        "y": 114,
+        "width": 287,
+        "height": 136,
+        "bottom": 250
+      },
+      "counts": "131 buildings in view · 127 carry a provider-computed height, not a survey",
+      "linkHref": "https://tools.oyasumi-gamedev.com/rokehan/#ll=23.711800%2C90.407200&s=100&far=1&tod=day&n=Dhaka"
+    },
+    "taskVisible": {
+      "lens": true,
+      "watch": true,
+      "map": true,
+      "allInFirstScreen": true
+    },
+    "unobscuredRatio": 0.6288,
+    "readings": [
+      {
+        "text": "≋\nFLOOD\nn/a",
+        "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+        "tier": "unavailable",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "◍\nAIR\nAQI 113 · model · Unhealthy for Sensitive Groups",
+        "label": "Air: AQI 113 · model · Unhealthy for Sensitive Groups · Modelled, not a station reading · Unhealthy for Sensitive Groups · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-05T12:00",
+        "tier": "warning",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "↑\nWIND\n9.7 km/h · model",
+        "label": "Wind: 9.7 km/h · model · Modelled wind at 10 m · from 320° · 2026-11-05T12:15",
+        "tier": "neutral",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "৳\nECONOMY\nn/a",
+        "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+        "tier": "unavailable",
+        "clipped": false,
+        "visible": true
+      }
+    ],
+    "typeSizes": [
+      null,
+      null,
+      null
+    ],
+    "typeSizeCount": 3,
+    "preservation": {
+      "lenses": 15,
+      "watchItems": 4,
+      "parliamentLink": true,
+      "mapControls": 2,
+      "footerCredit": true
+    },
+    "consoleErrors": [],
+    "url": "https://dhaka.nonarkara.org/?lang=en",
+    "ready": true,
+    "screenshot": "docs/evidence/msh-2026-11-05-walk/walk-390-en.png"
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "lang": "bn",
+    "lens": "walk",
+    "overflow": false,
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 41,
+      "bottom": 41
+    },
+    "map": {
+      "x": 0,
+      "y": 41,
+      "width": 390,
+      "height": 803,
+      "bottom": 844
+    },
+    "watch": {
+      "x": 8,
+      "y": 669,
+      "width": 374,
+      "height": 113,
+      "bottom": 782
+    },
+    "key": {
+      "x": 8,
+      "y": 49,
+      "width": 290,
+      "height": 204,
+      "bottom": 253
+    },
+    "credit": {
+      "x": 30,
+      "y": 790,
+      "width": 350,
+      "height": 44,
+      "bottom": 834
+    },
+    "creditText": "Esri, Maxar, Earthstar Geographics | © OpenStreetMap · OpenFreeMap / OpenMapTiles | MapLibre",
+    "splashVisible": false,
+    "chromeCostPct": 4.86,
+    "walk": {
+      "panelVisible": true,
+      "panelRect": {
+        "x": 10,
+        "y": 114,
+        "width": 287,
+        "height": 138,
+        "bottom": 252
+      },
+      "counts": "১৩১টি ভবন দৃশ্যমান · ১২৭টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়",
+      "linkHref": "https://tools.oyasumi-gamedev.com/rokehan/#ll=23.711800%2C90.407200&s=100&far=1&tod=day&n=%E0%A6%AA%E0%A7%81%E0%A6%B0%E0%A6%BE%E0%A6%A8+%E0%A6%A2%E0%A6%BE%E0%A6%95%E0%A6%BE"
+    },
+    "taskVisible": {
+      "lens": true,
+      "watch": true,
+      "map": true,
+      "allInFirstScreen": true
+    },
+    "unobscuredRatio": 0.627,
+    "readings": [
+      {
+        "text": "≋\nবন্যা\nঅনুপলব্ধ",
+        "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+        "tier": "unavailable",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "◍\nবায়ু\nAQI ১১৩ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর",
+        "label": "বায়ু: AQI ১১৩ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-05T12:00",
+        "tier": "warning",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "↑\nবাতাস\n৯.৭ কিমি/ঘ · মডেল",
+        "label": "বাতাস: ৯.৭ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৩২০° · 2026-11-05T12:15",
+        "tier": "neutral",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ",
+        "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+        "tier": "unavailable",
+        "clipped": true,
+        "visible": true
+      }
+    ],
+    "typeSizes": [
+      null,
+      null,
+      null
+    ],
+    "typeSizeCount": 3,
+    "preservation": {
+      "lenses": 15,
+      "watchItems": 4,
+      "parliamentLink": true,
+      "mapControls": 2,
+      "footerCredit": true
+    },
+    "consoleErrors": [],
+    "url": "https://dhaka.nonarkara.org/?lang=bn",
+    "ready": true,
+    "screenshot": "docs/evidence/msh-2026-11-05-walk/walk-390-bn.png"
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "lang": "en",
+    "lens": "walk",
+    "overflow": false,
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 41,
+      "bottom": 41
+    },
+    "map": {
+      "x": 0,
+      "y": 41,
+      "width": 1024,
+      "height": 727,
+      "bottom": 768
+    },
+    "watch": {
+      "x": 159,
+      "y": 703,
+      "width": 707,
+      "height": 23,
+      "bottom": 726
+    },
+    "key": {
+      "x": 8,
+      "y": 49,
+      "width": 290,
+      "height": 202,
+      "bottom": 251
+    },
+    "credit": {
+      "x": 493,
+      "y": 734,
+      "width": 521,
+      "height": 24,
+      "bottom": 758
+    },
+    "creditText": "Esri, Maxar, Earthstar Geographics | © OpenStreetMap · OpenFreeMap / OpenMapTiles | MapLibre",
+    "splashVisible": false,
+    "chromeCostPct": 5.34,
+    "walk": {
+      "panelVisible": true,
+      "panelRect": {
+        "x": 10,
+        "y": 114,
+        "width": 287,
+        "height": 136,
+        "bottom": 250
+      },
+      "counts": "147 buildings in view · 143 carry a provider-computed height, not a survey",
+      "linkHref": "https://tools.oyasumi-gamedev.com/rokehan/#ll=23.711800%2C90.407200&s=100&far=1&tod=day&n=Dhaka"
+    },
+    "taskVisible": {
+      "lens": true,
+      "watch": true,
+      "map": true,
+      "allInFirstScreen": true
+    },
+    "unobscuredRatio": 0.8827,
+    "readings": [
+      {
+        "text": "≋\nFLOOD\nn/a",
+        "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+        "tier": "unavailable",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "◍\nAIR\nAQI 113 · model · Unhealthy for Sensitive Groups",
+        "label": "Air: AQI 113 · model · Unhealthy for Sensitive Groups · Modelled, not a station reading · Unhealthy for Sensitive Groups · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-05T12:00",
+        "tier": "warning",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "↑\nWIND\n9.7 km/h · model",
+        "label": "Wind: 9.7 km/h · model · Modelled wind at 10 m · from 320° · 2026-11-05T12:15",
+        "tier": "neutral",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "৳\nECONOMY\nn/a",
+        "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+        "tier": "unavailable",
+        "clipped": false,
+        "visible": true
+      }
+    ],
+    "typeSizes": [
+      null,
+      null,
+      null
+    ],
+    "typeSizeCount": 3,
+    "preservation": {
+      "lenses": 15,
+      "watchItems": 4,
+      "parliamentLink": true,
+      "mapControls": 2,
+      "footerCredit": true
+    },
+    "consoleErrors": [],
+    "url": "https://dhaka.nonarkara.org/?lang=en",
+    "ready": true,
+    "screenshot": "docs/evidence/msh-2026-11-05-walk/walk-1024-en.png"
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "lang": "bn",
+    "lens": "walk",
+    "overflow": false,
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 41,
+      "bottom": 41
+    },
+    "map": {
+      "x": 0,
+      "y": 41,
+      "width": 1024,
+      "height": 727,
+      "bottom": 768
+    },
+    "watch": {
+      "x": 152,
+      "y": 698,
+      "width": 719,
+      "height": 28,
+      "bottom": 726
+    },
+    "key": {
+      "x": 8,
+      "y": 49,
+      "width": 290,
+      "height": 204,
+      "bottom": 253
+    },
+    "credit": {
+      "x": 493,
+      "y": 734,
+      "width": 521,
+      "height": 24,
+      "bottom": 758
+    },
+    "creditText": "Esri, Maxar, Earthstar Geographics | © OpenStreetMap · OpenFreeMap / OpenMapTiles | MapLibre",
+    "splashVisible": false,
+    "chromeCostPct": 5.34,
+    "walk": {
+      "panelVisible": true,
+      "panelRect": {
+        "x": 10,
+        "y": 114,
+        "width": 287,
+        "height": 138,
+        "bottom": 252
+      },
+      "counts": "১৪৭টি ভবন দৃশ্যমান · ১৪৩টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়",
+      "linkHref": "https://tools.oyasumi-gamedev.com/rokehan/#ll=23.711800%2C90.407200&s=100&far=1&tod=day&n=%E0%A6%AA%E0%A7%81%E0%A6%B0%E0%A6%BE%E0%A6%A8+%E0%A6%A2%E0%A6%BE%E0%A6%95%E0%A6%BE"
+    },
+    "taskVisible": {
+      "lens": true,
+      "watch": true,
+      "map": true,
+      "allInFirstScreen": true
+    },
+    "unobscuredRatio": 0.8767,
+    "readings": [
+      {
+        "text": "≋\nবন্যা\nঅনুপলব্ধ",
+        "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+        "tier": "unavailable",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "◍\nবায়ু\nAQI ১১৩ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর",
+        "label": "বায়ু: AQI ১১৩ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-05T12:00",
+        "tier": "warning",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "↑\nবাতাস\n৯.৭ কিমি/ঘ · মডেল",
+        "label": "বাতাস: ৯.৭ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৩২০° · 2026-11-05T12:15",
+        "tier": "neutral",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ",
+        "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+        "tier": "unavailable",
+        "clipped": true,
+        "visible": true
+      }
+    ],
+    "typeSizes": [
+      null,
+      null,
+      null
+    ],
+    "typeSizeCount": 3,
+    "preservation": {
+      "lenses": 15,
+      "watchItems": 4,
+      "parliamentLink": true,
+      "mapControls": 2,
+      "footerCredit": true
+    },
+    "consoleErrors": [],
+    "url": "https://dhaka.nonarkara.org/?lang=bn",
+    "ready": true,
+    "screenshot": "docs/evidence/msh-2026-11-05-walk/walk-1024-bn.png"
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "lang": "en",
+    "lens": "walk",
+    "overflow": false,
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 41,
+      "bottom": 41
+    },
+    "map": {
+      "x": 0,
+      "y": 41,
+      "width": 1440,
+      "height": 859,
+      "bottom": 900
+    },
+    "watch": {
+      "x": 367,
+      "y": 835,
+      "width": 707,
+      "height": 23,
+      "bottom": 858
+    },
+    "key": {
+      "x": 8,
+      "y": 49,
+      "width": 290,
+      "height": 202,
+      "bottom": 251
+    },
+    "credit": {
+      "x": 909,
+      "y": 866,
+      "width": 521,
+      "height": 24,
+      "bottom": 890
+    },
+    "creditText": "Esri, Maxar, Earthstar Geographics | © OpenStreetMap · OpenFreeMap / OpenMapTiles | MapLibre",
+    "splashVisible": false,
+    "chromeCostPct": 4.56,
+    "walk": {
+      "panelVisible": true,
+      "panelRect": {
+        "x": 10,
+        "y": 114,
+        "width": 287,
+        "height": 136,
+        "bottom": 250
+      },
+      "counts": "177 buildings in view · 173 carry a provider-computed height, not a survey",
+      "linkHref": "https://tools.oyasumi-gamedev.com/rokehan/#ll=23.711800%2C90.407200&s=100&far=1&tod=day&n=Old+Dhaka+%28Puran+Dhaka%29"
+    },
+    "taskVisible": {
+      "lens": true,
+      "watch": true,
+      "map": true,
+      "allInFirstScreen": true
+    },
+    "unobscuredRatio": 0.9294,
+    "readings": [
+      {
+        "text": "≋\nFLOOD\nn/a",
+        "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+        "tier": "unavailable",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "◍\nAIR\nAQI 113 · model · Unhealthy for Sensitive Groups",
+        "label": "Air: AQI 113 · model · Unhealthy for Sensitive Groups · Modelled, not a station reading · Unhealthy for Sensitive Groups · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-05T12:00",
+        "tier": "warning",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "↑\nWIND\n9.7 km/h · model",
+        "label": "Wind: 9.7 km/h · model · Modelled wind at 10 m · from 320° · 2026-11-05T12:15",
+        "tier": "neutral",
+        "clipped": false,
+        "visible": true
+      },
+      {
+        "text": "৳\nECONOMY\nn/a",
+        "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+        "tier": "unavailable",
+        "clipped": false,
+        "visible": true
+      }
+    ],
+    "typeSizes": [
+      null,
+      null,
+      null
+    ],
+    "typeSizeCount": 3,
+    "preservation": {
+      "lenses": 15,
+      "watchItems": 4,
+      "parliamentLink": true,
+      "mapControls": 2,
+      "footerCredit": true
+    },
+    "consoleErrors": [],
+    "url": "https://dhaka.nonarkara.org/?lang=en",
+    "ready": true,
+    "screenshot": "docs/evidence/msh-2026-11-05-walk/walk-1440-en.png"
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "lang": "bn",
+    "lens": "walk",
+    "overflow": false,
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 41,
+      "bottom": 41
+    },
+    "map": {
+      "x": 0,
+      "y": 41,
+      "width": 1440,
+      "height": 859,
+      "bottom": 900
+    },
+    "watch": {
+      "x": 360,
+      "y": 830,
+      "width": 719,
+      "height": 28,
+      "bottom": 858
+    },
+    "key": {
+      "x": 8,
+      "y": 49,
+      "width": 290,
+      "height": 204,
+      "bottom": 253
+    },
+    "credit": {
+      "x": 909,
+      "y": 866,
+      "width": 521,
+      "height": 24,
+      "bottom": 890
+    },
+    "creditText": "Esri, Maxar, Earthstar Geographics | © OpenStreetMap · OpenFreeMap / OpenMapTiles | MapLibre",
+    "splashVisible": false,
+    "chromeCostPct": 4.56,
+    "walk": {
+      "panelVisible": true,
+      "panelRect": {
+        "x": 10,
+        "y": 114,
+        "width": 287,
+        "height": 138,
+        "bottom": 252
+      },
+      "counts": "০টি ভবন দৃশ্যমান · ০টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়",
+      "linkHref": "https://tools.oyasumi-gamedev.com/rokehan/#ll=23.711800%2C90.407200&s=100&far=1&tod=day&n=Dhaka"
+    },
+    "taskVisible": {
+      "lens": true,
+      "watch": true,
+      "map": true,
+      "allInFirstScreen": true
+    },
+    "unobscuredRatio": 0.9258,
+    "readings": [
+      {
+        "text": "≋\nবন্যা\nঅনুপলব্ধ",
+        "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+        "tier": "unavailable",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "◍\nবায়ু\nAQI ১১৩ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর",
+        "label": "বায়ু: AQI ১১৩ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · সংবেদনশীলদের জন্য অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-05T12:00",
+        "tier": "warning",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "↑\nবাতাস\n৯.৭ কিমি/ঘ · মডেল",
+        "label": "বাতাস: ৯.৭ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৩২০° · 2026-11-05T12:15",
+        "tier": "neutral",
+        "clipped": true,
+        "visible": true
+      },
+      {
+        "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ",
+        "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+        "tier": "unavailable",
+        "clipped": true,
+        "visible": true
+      }
+    ],
+    "typeSizes": [
+      null,
+      null,
+      null
+    ],
+    "typeSizeCount": 3,
+    "preservation": {
+      "lenses": 15,
+      "watchItems": 4,
+      "parliamentLink": true,
+      "mapControls": 2,
+      "footerCredit": true
+    },
+    "consoleErrors": [],
+    "url": "https://dhaka.nonarkara.org/?lang=bn",
+    "ready": true,
+    "screenshot": "docs/evidence/msh-2026-11-05-walk/walk-1440-bn.png"
+  }
+]

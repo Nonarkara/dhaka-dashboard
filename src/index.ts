@@ -865,17 +865,45 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
   // ── /api/atlas/export ────────────────────────────────────────────────────
   if (url.pathname === "/api/atlas/export") {
-    const landmarksUrl = new URL("/dhaka-landmarks.geojson", request.url);
-    const res = await env.ASSETS.fetch(landmarksUrl.toString());
-    if (res.ok) {
-      const geojson = await res.json();
-      return jsonResponse(geojson, {
-        headers: {
-          "content-disposition": 'attachment; filename="dhaka-atlas-export.geojson"',
-        },
-      });
+    // The export carries the atlas's own reference layers — the landmarks
+    // it names, the rivers it measures and the transit it draws. A reader
+    // who downloads the map's evidence gets the evidence, not a part of it,
+    // and every feature says which layer it came from.
+    const layers = ["dhaka-landmarks", "dhaka-rivers", "dhaka-mrt"];
+    const features: unknown[] = [];
+    const missing: string[] = [];
+    for (const layer of layers) {
+      const layerUrl = new URL(`/${layer}.geojson`, request.url);
+      const res = await env.ASSETS.fetch(layerUrl.toString());
+      if (!res.ok) {
+        missing.push(layer);
+        continue;
+      }
+      const body = await res.json() as { features?: { properties?: Record<string, unknown> }[] };
+      for (const feature of body.features || []) {
+        features.push({
+          ...feature,
+          properties: { ...(feature.properties || {}), layer },
+        });
+      }
     }
-    return jsonResponse({ status: "unavailable", reasonCode: "export-missing" }, { status: 503 });
+    if (!features.length) {
+      return jsonResponse({ status: "unavailable", reasonCode: "export-missing", layers: missing }, { status: 503 });
+    }
+    return jsonResponse({
+      type: "FeatureCollection",
+      features,
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        layers,
+        missingLayers: missing.length ? missing : [],
+        provenance: "atlas reference layers; rivers carry their own observation provenance",
+      },
+    }, {
+      headers: {
+        "content-disposition": 'attachment; filename="dhaka-atlas-export.geojson"',
+      },
+    });
   }
 
   // ── /api/atlas/watch ─────────────────────────────────────────────────────

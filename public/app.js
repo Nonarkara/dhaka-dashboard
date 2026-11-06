@@ -29,6 +29,29 @@
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
 
+  /**
+   * The lens named in the address, when it names one the atlas has.
+   *
+   * A lens is a view, and a view worth reading is worth linking to. An
+   * unknown name is ignored rather than half-applied.
+   */
+  function lensFromUrl() {
+    const id = new URLSearchParams(window.location.search).get("lens");
+    return id && Object.prototype.hasOwnProperty.call(LENS_STORIES, id) ? id : null;
+  }
+
+  /** Keep the address in step with the lens, so the view can be shared. */
+  function lensInUrl(lensId) {
+    try {
+      const url = new URL(window.location.href);
+      if (lensId === "city") url.searchParams.delete("lens");
+      else url.searchParams.set("lens", lensId);
+      window.history.replaceState(null, "", url);
+    } catch {
+      /* the address bar is not a place the atlas can fail */
+    }
+  }
+
   function hideLoading() {
     if (loadingHidden) return;
     loadingHidden = true;
@@ -124,8 +147,8 @@
     walk: {
       title: "Street level",
       title_bn: "রাস্তার ধরনে",
-      desc: "Eye-level view of the mapped street. Massing uses the map provider's computed heights, which are not surveyed; the count of buildings in view is stated below.",
-      desc_bn: "মানচিত্রের রাস্তার চোখ-বিন্দুর উচ্চতায় দৃশ্য। ভবনের গঠন মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতা থেকে এসেছে, জরিপকৃত নয়; দৃশ্যমান ভবনের সংখ্যা নিচে দেওয়া আছে।"
+      desc: "Eye-level view of the mapped street. Colour follows the mapped OSM use; the heights are the map provider's computed values, not surveyed. The count of buildings in view is stated below.",
+      desc_bn: "মানচিত্রের রাস্তার চোখ-বিন্দুর উচ্চতায় দৃশ্য। রং আসে মানচিত্রভুক্ত OSM ব্যবহার থেকে; উচ্চতা মানচিত্র সরবরাহকারীর গণনাকৃত মান, জরিপকৃত নয়। দৃশ্যমান ভবনের সংখ্যা নিচে দেওয়া আছে।"
     }
   };
 
@@ -192,15 +215,20 @@
     // height, only the provider's computed render_height — so this layer is
     // drawn as an explicitly illustrative massing, never as a measured
     // building. It stays hidden until the Street level lens asks for it.
+    //
+    // The colour is the atlas's own Palette 1, because the use of a building
+    // IS mapped even when its height is not. The walls are solid: a
+    // translucent block standing on a filled footprint double-draws the
+    // ground and turns the street into mud.
     styleSpec.layers.push({
       id: "walk-massing", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 16,
       filter: ["!", ["has", "hide_3d"]],
       layout: { visibility: "none" },
       paint: {
-        "fill-extrusion-color": "#c9c5b8",
+        ...buildingPaint("render_height", "render_min_height"),
         "fill-extrusion-height": ["to-number", ["get", "render_height"], 0],
         "fill-extrusion-base": ["to-number", ["get", "render_min_height"], 0],
-        "fill-extrusion-opacity": 0.82
+        "fill-extrusion-opacity": 1
       }
     });
 
@@ -220,6 +248,20 @@
 
       for (const event of ['dragstart','zoomstart','rotatestart','pitchstart']) map.on(event, e => { if (e?.originalEvent) stopMapMotion(); });
       map.getCanvas?.().addEventListener?.('pointerdown', stopMapMotion);
+      // The atlas exposes its map so that the layout audit can measure the
+      // real camera and the real source features instead of guessing at
+      // them. A surface nobody can inspect cannot be audited.
+      window.AtlasMap = {
+        instance: map,
+        get camera() {
+          return {
+            zoom: map.getZoom(),
+            pitch: map.getPitch(),
+            bearing: map.getBearing(),
+            center: map.getCenter(),
+          };
+        },
+      };
       map.getCanvas?.().addEventListener?.('wheel', stopMapMotion, {passive:true});
       map.getCanvas?.().addEventListener?.('keydown', stopMapMotion);
       map.on("move", syncBuildingVisibility);
@@ -228,9 +270,26 @@
       // The walkthrough counts what the screen actually holds, and offers
       // the street scene for exactly where the reader is standing. Both
       // are re-read when the map settles, not when a request was made.
-      map.on("idle", () => { if (currentLens === "walk") renderWalkPanel(); });
-      map.on("moveend", () => { if (currentLens === "walk") renderWalkPanel(); });
-      map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+      //
+      // A walk moves the camera on every frame, and counting the buildings
+      // in view means querying the loaded source features. Doing that on
+      // every frame of a walk would cost more than the reading is worth,
+      // so the panel is refreshed on a short timer instead: the number on
+      // screen is always a measured one, never a stale zero.
+      let walkPanelTimer = null;
+      const scheduleWalkPanel = () => {
+        if (currentLens !== "walk" || walkPanelTimer) return;
+        walkPanelTimer = setTimeout(() => {
+          walkPanelTimer = null;
+          renderWalkPanel();
+        }, 200);
+      };
+      map.on("idle", scheduleWalkPanel);
+      map.on("moveend", scheduleWalkPanel);
+      // The walkthrough needs both the map and the district list, so it is
+    // attached once both exist.
+    window.AtlasWalk?.attach(map, areasData);
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
       // Attribution is a source instrument with its own row, including wrapped phone credits.
       if (typeof ResizeObserver !== "undefined") {
         const credit=document.querySelector('.maplibregl-ctrl-attrib');
@@ -252,7 +311,7 @@
 
       // Reveal the map on its first frame after the style is parsed; imagery fills in progressively.
       // map.loaded() and map.isStyleLoaded() both wait for every pitched-horizon tile (13–22 s).
-      map.once("style.load", () => { styleReady = true; });
+      map.once("style.load", () => { styleReady = true; applyLens(currentLens); });
       map.on("render", () => {
         if (styleReady) hideLoading();
       });
@@ -303,7 +362,11 @@
     }
     // Source footprints remain visible in both views; only tagged heights extrude.
     const parliamentVisible = is3D && useSnapshot;
-    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
+    // The walkthrough draws its own massing on top of the ground. The flat
+    // footprint fill would double-draw the same plan underneath it, so the
+    // street lens keeps the footprint for the ground plane only.
+    const inWalk = currentLens === "walk";
+    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot && !inWalk], ["city-footprints", !useSnapshot && !inWalk], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
       const visibility = visible ? "visible" : "none";
       if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
     }
@@ -533,6 +596,8 @@
       if (resAreas.ok) {
         areasData = await resAreas.json();
         populateQuickJump(areasData);
+        // The walkthrough needs the district list, which arrives after the map.
+        window.AtlasWalk?.attach(map, areasData);
         const areaId = new URLSearchParams(window.location.search).get("area");
         const initialArea = areasData.find(area => area.id === areaId);
         if (initialArea && currentLens === "city") flyToArea(initialArea, 0);
@@ -901,7 +966,12 @@
     const counts = measureStreetLevel();
     const countsEl = $("#atlas-walk-counts");
     if (countsEl) {
-      countsEl.textContent = !counts
+      // An empty feature list usually means the tiles have not arrived yet,
+      // not that the street has no buildings. "Zero" would be a false
+      // reading, and a false zero is the one number this project must never
+      // print.
+      const counted = counts && counts.total > 0;
+      countsEl.textContent = !counted
         ? (isBn ? "ভবনের সংখ্যা গণনা করা যায়নি।" : "Building count unavailable.")
         : isBn
           ? `${walkNumber(counts.total)}টি ভবন দৃশ্যমান · ${walkNumber(counts.withProviderHeight)}টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়`
@@ -913,13 +983,13 @@
 
     const note = $("#atlas-walk-note");
     if (note) note.textContent = isBn
-      ? "ভবনের গঠন মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতা থেকে আঁকা; জরিপকৃত উচ্চতা থেকে নয়।"
-      : "Massing is drawn from the map provider's computed heights, not surveyed ones.";
+      ? "রং আসে মানচিত্রভুক্ত OSM ব্যবহার থেকে; উচ্চতা মানচিত্র সরবরাহকারীর গণনাকৃত মান, জরিপকৃত নয়।"
+      : "Colour follows the mapped OSM use; the height is the map provider's computed value, not a survey.";
 
     const legend = $("#atlas-walk-legend-text");
     if (legend) legend.textContent = isBn
-      ? "চিত্রায় উচ্চতা — মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়"
-      : "Illustrative massing — height from the map provider, not surveyed";
+      ? "চিত্রায় গঠন — গণনাকৃত উচ্চতা, মানচিত্রভুক্ত ব্যবহার"
+      : "Illustrative massing — computed height, mapped use";
 
     const scout = $("#atlas-walk-scout");
     if (scout) {
@@ -938,7 +1008,9 @@
     currentLens = lensId;
     const token = ++lensToken;
     if ($("#atlas-lens")) $("#atlas-lens").value = lensId;
+    lensInUrl(lensId);
     window.AtlasForecast?.activate(lensId);
+    window.AtlasWalk?.activate(lensId);
     $$(".atlas-lenses button").forEach(btn => {
       btn.setAttribute("aria-pressed", btn.dataset.lens === lensId ? "true" : "false");
     });
@@ -956,7 +1028,10 @@
 
     const is3D = $("#atlas-view")?.value !== "2d";
     const vp = LENS_VIEWPORTS[lensId];
-    if (moveCamera && !["air", "rivers"].includes(lensId) && vp && typeof map.flyTo === "function") {
+    // The walkthrough owns its own camera: a street-level viewpoint is a
+    // function of the zoom and the window, so the lens table's fixed
+    // viewport would undo it.
+    if (moveCamera && !["air", "rivers", "walk"].includes(lensId) && vp && typeof map.flyTo === "function") {
       map.flyTo({
         center: vp.center,
         zoom: vp.zoom,
@@ -1383,6 +1458,10 @@
   }
 
   function bootAtlas() {
+    // A linked lens is chosen before the map exists, so the first render is
+    // already the view the reader asked for.
+    currentLens = lensFromUrl() || "city";
+
     window.addEventListener('atlas:sampling', event => {
       const bbox = event.detail?.bbox;
       if (!map || !Array.isArray(bbox) || bbox.length !== 4 || !bbox.every(Number.isFinite)) return;
@@ -1400,6 +1479,7 @@
     pollCityWatch();
     setInterval(pollCityWatch, 5 * 60 * 1000);
     window.AtlasInstruments?.start();
+    window.AtlasWalk?.start();
     window.AtlasCollage?.start();
     initMap();
   }

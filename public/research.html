@@ -3,18 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DHKx · Research, Data Sources &amp; Methodology</title>
-  <meta name="description" content="Methodology, data sources, license registry, provenance tiers, and refusal contracts for the Dhaka 3D Atlas and Civic Dashboard." />
+  <title>DHKx · Architecture of a Civic Satellite Atlas</title>
+  <meta name="description" content="The architecture of the Dhaka 3D Atlas: how a satellite pixel becomes a measured reading, how the reading is collected, archived and delivered, and the contracts that keep every number honest." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script src="/theme.js?v=dhaka-atlas-20261105-1793856554-c222ef8"></script>
-  <script src="/translations.js?v=dhaka-atlas-20261105-1793856554-c222ef8"></script>
-  <script src="/i18n.js?v=dhaka-atlas-20261105-1793856554-c222ef8"></script>
   <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261105-1793856554-c222ef8" />
   <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261105-1793856554-c222ef8" />
   <style>
     body { overflow-y: auto; height: auto; }
     .research-container {
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 24px 20px 80px;
     }
@@ -22,6 +20,11 @@
       border-bottom: 2px solid var(--accent);
       padding-bottom: 16px;
       margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
     .research-title {
       font-family: var(--font-display);
@@ -33,10 +36,10 @@
       color: var(--dim);
       font-size: var(--text-body);
       line-height: 1.5;
+      max-width: 62ch;
+      margin: 0;
     }
-    .research-section {
-      margin-bottom: 36px;
-    }
+    .research-section { margin-bottom: 36px; }
     .section-heading {
       font-family: var(--font-display);
       font-size: var(--text-display);
@@ -46,169 +49,614 @@
       margin: 24px 0 12px;
       color: var(--ink);
     }
+    .section-number {
+      font-family: var(--font-mono);
+      color: var(--accent);
+      margin-right: 8px;
+    }
+    .research-container p { line-height: 1.6; max-width: 74ch; }
+    .research-container li { line-height: 1.55; max-width: 74ch; }
     .provenance-box {
       background: var(--bg-raised);
+      border: 1px solid var(--line);
       border-left: 3px solid var(--accent);
-      padding: 12px 16px;
-      margin: 14px 0;
+      padding: 12px 14px;
+      margin: 12px 0;
       font-size: var(--text-body);
+      line-height: 1.55;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-micro);
+      margin: 10px 0 4px;
+    }
+    .data-table th, .data-table td {
+      border: 1px solid var(--line);
+      padding: 5px 7px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .data-table th {
+      font-family: var(--font-mono);
+      font-size: var(--text-micro);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--dim);
+      font-weight: 600;
+    }
+    code {
+      font-family: var(--font-mono);
+      font-size: var(--text-micro);
+      background: var(--bg-strong);
+      padding: 1px 4px;
+      color: var(--ink);
+    }
+    pre {
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      overflow-x: auto;
+      font-size: var(--text-micro);
+      line-height: 1.5;
+    }
+    pre code { background: none; padding: 0; }
+    /* The architecture diagram: one orthogonal grid, hairline rules, unequal
+       compartments, one colour block per plane. */
+    .arch-figure { margin: 14px 0 6px; }
+    .arch-figure svg { width: 100%; height: auto; display: block; }
+    .arch-caption {
+      font-size: var(--text-micro);
+      color: var(--dim);
+      line-height: 1.5;
+      margin: 8px 0 0;
+      max-width: 74ch;
+    }
+    .plane-list { list-style: none; padding: 0; margin: 10px 0 0; }
+    .plane-list li {
+      border-top: 1px solid var(--line);
+      padding: 9px 0;
+    }
+    .plane-name {
+      font-family: var(--font-mono);
+      font-size: var(--text-micro);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .plane-role { color: var(--dim); font-size: var(--text-micro); margin-top: 3px; line-height: 1.5; }
+    .swatch {
+      display: inline-block;
+      width: 9px; height: 9px;
+      margin-right: 7px;
+      vertical-align: baseline;
+    }
+    .swatch-observation { background: #2bb071; }
+    .swatch-measurement { background: #d9583b; }
+    .swatch-collection { background: #e68a2e; }
+    .swatch-edge { background: #257da4; }
+    .swatch-presentation { background: #f5f0dc; }
+    .lang-toggle {
+      font-family: var(--font-mono);
+      font-size: var(--text-micro);
+      background: var(--bg-raised);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 5px 9px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .lang-toggle:hover { border-color: var(--accent); }
+    .paper-note {
+      border-top: 1px solid var(--line);
+      margin-top: 28px;
+      padding-top: 12px;
+      font-size: var(--text-micro);
+      color: var(--dim);
+      line-height: 1.55;
     }
   </style>
 </head>
-<body data-surface="dhaka-research">
+<body>
   <div class="research-container">
     <header class="research-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <a href="/" class="city-brand-badge">DHKx</a>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <button type="button" id="language-toggle" class="atlas-btn atlas-btn-accent">English</button>
-          <a href="/" class="atlas-btn">← Back to 3D Atlas</a>
-        </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:var(--text-micro);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);"
+             data-en="DHKx · Working paper" data-bn="DHKx · কর্মপত্র">DHKx · Working paper</div>
+        <h1 class="research-title" data-en="Architecture of a Civic Satellite Atlas" data-bn="একটি নাগরিক উপগ্রহ অ্যাটলাসের স্থাপত্য">Architecture of a Civic Satellite Atlas</h1>
+        <p class="research-subtitle"
+           data-en="How a satellite pixel becomes a measured reading on screen, how that reading is collected and delivered, and the contracts that keep every number honest. Written for the city that has to act on it."
+           data-bn="একটি উপগ্রহ পিক্সেল কীভাবে পর্দায় একটি পরিমাপিত রিডিং হয়, সেই রিডিং কীভাবে সংগ্রহ ও পৌঁছানো হয়, এবং প্রতিটি সংখ্যাকে সৎ রাখার চুক্তি কী — সেই হিসাব অন্য যে শহর তার সিদ্ধান্ত নিতে হবে, তার জন্য।">
+          How a satellite pixel becomes a measured reading on screen, how that reading is collected and delivered, and the contracts that keep every number honest. Written for the city that has to act on it.
+        </p>
       </div>
-      <h1 class="research-title">Data Sources, Provenance &amp; Methodology</h1>
-      <p class="research-subtitle">
-        Every number, polygon, and status displayed on <strong>dhaka.nonarkara.org</strong> carries its source, collection time, reporting units, and license terms. This document details the open data infrastructure, validation standards, and refusal contracts.
-      </p>
+      <button type="button" class="lang-toggle" id="research-lang" aria-label="Switch language">English</button>
     </header>
 
     <main>
+
+      <!-- ── Abstract ────────────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading">1. Core Design &amp; Architectural Laws</h2>
-        <div class="provenance-box">
-          <strong>The Refusal Contract:</strong> If an upstream API is unreachable, times out, or produces malformed fields, the dashboard displays <code>unavailable</code> with an explicit machine-readable <code>reasonCode</code> and timestamp. It never invents a zero, never displays an empty widget as "normal", and never converts a lack of measurement into an "all-clear" signal.
-        </div>
-        <p>
-          Following Dr Non's cross-project principles (tested across Bangkok, Ho Chi Minh City, Jakarta, and Kuala Lumpur):
+        <h2 class="section-heading"><span class="section-number">00</span><span data-en="Abstract" data-bn="সারসংক্ষেপ">Abstract</span></h2>
+        <p data-en="Dhaka has 23 million people, a population grid nobody publishes for the city, and a government that decides where a road goes, where a pump goes and where a school goes. What it did not have, until this system, was a way to see any of it. This paper describes an instrument that reads the city from free satellite observation and free official statistics, measures the result in physical units, and refuses to print a number it cannot source."
+           data-bn="ঢাকায় ২৩ মিলিয়ন মানুষ, এমন জনগণভিত্তিক গ্রিড যা কেউ প্রকাশ করে না, আর এমন সরকার যা ঠিক করে রাস্তা কোথায় যাবে, পাম্প কোথায় বসবে আর স্কুল কোথায় হবে। এই ব্যবস্থা না হওয়া পর্যন্ত তার কোনো উপায় ছিল না ওগুলো দেখার। এই গবেষণাপত্র এমন একটি যন্ত্রের বর্ণনা দেয়, যা বিনামূল্যের উপগ্রহ পর্যবেক্ষণ ও বিনামূল্যের সরকারি পরিসংখ্যান থেকে শহর পড়ে, ফলাফল পদার্থিক এককে পরিমাপ করে, এবং যে সংখ্যার উৎস নেই তা মুদ্রণ করতে অস্বীকার করে।">
+          Dhaka has 23 million people, a population grid nobody publishes for the city, and a government that decides where a road goes, where a pump goes and where a school goes. What it did not have, until this system, was a way to see any of it. This paper describes an instrument that reads the city from free satellite observation and free official statistics, measures the result in physical units, and refuses to print a number it cannot source.
         </p>
-        <ul>
-          <li><strong>Provenance Tiers:</strong> Every feed is labeled with one of five tiers: <code>measured</code> (in-situ sensors), <code>modeled</code> (physical numerical simulations), <code>simulated</code> (urban scenarios), <code>reference</code> (official gazetteers/registers), or <code>unavailable</code>.</li>
-          <li><strong>Cache stamp, not Date.now():</strong> Build IDs are deterministic stamps committed to source, preventing hydration mismatches and guaranteeing reproducible releases.</li>
-          <li><strong>Dieter Rams Geometry:</strong> Zero border-radius, zero drop-shadows, zero decorative gradients, hairline 1px borders, and a strict signal palette.</li>
-          <li><strong>Bilingual Parity:</strong> Complete native Bengali (বাংলা) and English translation across all titles, descriptions, status pills, and error notifications.</li>
+      </section>
+
+      <!-- ── 1 The problem ────────────────────────────────────────────── -->
+      <section class="research-section">
+        <h2 class="section-heading"><span class="section-number">01</span><span data-en="The problem this instrument answers" data-bn="যে সমস্যার উত্তর এই যন্ত্র দেয়">The problem this instrument answers</span></h2>
+        <p data-en="A city of this density is measured constantly by satellites that pass over it several times a day. The observation is free, continuous and global. What has been missing is not the imagery — it is the translation. A radiance raster is not a district; a brightness value is not an economy. The work is in the step between the two, and that step is where instruments usually go wrong, silently."
+           data-bn="এই ঘনত্বের শহরকে দিনে কয়েকবার উপগ্রহ নিয়মিত পর্যবেক্ষণ করে। পর্যবেক্ষণ বিনামূল্য, নিরবচ্ছিন্ন ও বৈশ্বিক। যা অনুপস্থিত ছিল তা চিত্র নয় — অনুবাদ। একটি তেজ-বিবরণী চিত্র কোনো জেলা নয়; একটি উজ্জ্বলতার মান কোনো অর্থনীতি নয়। কাজ দুইয়ের মাঝে, আর সেখানেই যন্ত্র নীরবে ভুল হয়।">
+          A city of this density is measured constantly by satellites that pass over it several times a day. The observation is free, continuous and global. What has been missing is not the imagery — it is the translation. A radiance raster is not a district; a brightness value is not an economy. The work is in the step between the two, and that step is where instruments usually go wrong, silently.
+        </p>
+        <div class="provenance-box">
+          <strong data-en="The three failures this design refuses:" data-bn="যে তিনটি ব্যর্থতা এই নকশা প্রত্যাখ্যান করে:">The three failures this design refuses:</strong>
+          <ul style="margin:8px 0 0;padding-left:18px;">
+            <li data-en="A number with no upstream — typed in as if it were data." data-bn="উৎসহীন সংখ্যা — ডেটার মতো টাইপ করে দেওয়া।">A number with no upstream — typed in as if it were data.</li>
+            <li data-en="A zero where a measurement is missing — indistinguishable from a real zero." data-bn="পরিমাপ অনুপস্থিত অবস্থায় শূন্য — বাস্তব শূন্য থেকে আলাদা করা যায় না।">A zero where a measurement is missing — indistinguishable from a real zero.</li>
+            <li data-en="A plausible number in the wrong unit — the hardest to catch, because it looks right." data-bn="ভুল এককে যুক্তিসঙ্গত সংখ্যা — ধরা কঠিনতম, কারণ তা ঠিকই দেখায়।">A plausible number in the wrong unit — the hardest to catch, because it looks right.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ── 2 Architecture ───────────────────────────────────────────── -->
+      <section class="research-section">
+        <h2 class="section-heading"><span class="section-number">02</span><span data-en="System architecture" data-bn="ব্যবস্থার স্থাপত্য">System architecture</span></h2>
+        <p data-en="The system is five planes. Each one has one job, and each one can fail without taking the others down."
+           data-bn="ব্যবস্থাটি পাঁচটি স্তরে বিভক্ত। প্রতিটির একটিই কাজ, এবং প্রতিটি ব্যর্থ হতে পারে অন্যগুলোকে না টেনে।">
+          The system is five planes. Each one has one job, and each one can fail without taking the others down.
+        </p>
+
+        <figure class="arch-figure">
+          <svg viewBox="0 0 900 420" role="img" aria-labelledby="arch-title arch-desc">
+            <title id="arch-title">Five planes of the Dhaka civic satellite atlas</title>
+            <desc id="arch-desc">A left-to-right grid. Observation feeds Measurement, which feeds Collection, which feeds Edge, which feeds Presentation. Each plane is marked by one coloured block: green for observation, coral for measurement, amber for collection, blue for edge, and paper white for presentation. Hairline rules divide the grid into unequal compartments.</desc>
+
+            <!-- Hairline frame and rules -->
+            <g stroke="#476677" stroke-width="1" fill="none">
+              <rect x="0.5" y="0.5" width="899" height="419" />
+              <line x1="196" y1="0" x2="196" y2="420" />
+              <line x1="368" y1="0" x2="368" y2="420" />
+              <line x1="536" y1="0" x2="536" y2="420" />
+              <line x1="704" y1="0" x2="704" y2="420" />
+              <line x1="0" y1="286" x2="196" y2="286" />
+              <line x1="196" y1="196" x2="368" y2="196" />
+              <line x1="368" y1="330" x2="536" y2="330" />
+              <line x1="536" y1="150" x2="704" y2="150" />
+              <line x1="704" y1="256" x2="900" y2="256" />
+            </g>
+
+            <!-- One colour block per plane -->
+            <rect x="16" y="16" width="164" height="96" fill="#2bb071" />
+            <rect x="212" y="60" width="140" height="120" fill="#d9583b" />
+            <rect x="384" y="16" width="136" height="74" fill="#e68a2e" />
+            <rect x="552" y="196" width="136" height="118" fill="#257da4" />
+            <rect x="720" y="16" width="164" height="96" fill="#f5f0dc" />
+
+            <!-- Flow arrows, hairline -->
+            <g stroke="#f5f0dc" stroke-width="1" fill="none">
+              <path d="M180 64 H208" />
+              <path d="M204 60 l4 4 -4 4" />
+              <path d="M352 120 H380" />
+              <path d="M376 116 l4 4 -4 4" />
+              <path d="M520 53 H548" />
+              <path d="M544 49 l4 4 -4 4" />
+              <path d="M688 255 H716" />
+              <path d="M712 251 l4 4 -4 4" />
+            </g>
+
+            <!-- Labels -->
+            <g font-family="Barlow Semi Condensed, Hind Siliguri, sans-serif">
+              <g fill="#0d171d" font-size="13" font-weight="700">
+                <text x="26" y="40">OBSERVATION</text>
+              </g>
+              <g fill="#f5f0dc" font-size="12">
+                <text x="98" y="64">7 satellite instruments</text>
+                <text x="98" y="82">+ official statistics</text>
+                <text x="98" y="100">free, no key, global</text>
+              </g>
+
+              <g fill="#0d171d" font-size="13" font-weight="700">
+                <text x="222" y="86">MEASUREMENT</text>
+              </g>
+              <g fill="#f5f0dc" font-size="12">
+                <text x="282" y="110">pixel → index</text>
+                <text x="282" y="128">→ colour map</text>
+                <text x="282" y="146">→ physical unit</text>
+              </g>
+
+              <g fill="#0d171d" font-size="13" font-weight="700">
+                <text x="394" y="40">COLLECTION</text>
+              </g>
+              <g fill="#f5f0dc" font-size="12">
+                <text x="394" y="60">cron every 15 min</text>
+                <text x="394" y="78">every upstream response</text>
+              </g>
+
+              <g fill="#f5f0dc" font-size="13" font-weight="700">
+                <text x="562" y="220">EDGE</text>
+              </g>
+              <g fill="#f5f0dc" font-size="12">
+                <text x="562" y="244">Worker · 27 routes</text>
+                <text x="562" y="262">provenance envelope</text>
+                <text x="562" y="280">rate limit · cache</text>
+                <text x="562" y="298">R2 archive · D1 snapshot</text>
+              </g>
+
+              <g fill="#0d171d" font-size="13" font-weight="700">
+                <text x="730" y="40">PRESENTATION</text>
+              </g>
+              <g fill="#0d171d" font-size="12">
+                <text x="730" y="64">MapLibre client</text>
+                <text x="730" y="82">17 lenses</text>
+                <text x="730" y="100">thin instrument band</text>
+              </g>
+            </g>
+
+            <!-- Small caption row inside the grid -->
+            <g font-family="Barlow Semi Condensed, Hind Siliguri, sans-serif" font-size="10" fill="#b8af94" letter-spacing="0.06em">
+              <text x="16" y="304">FREE UPSTREAM</text>
+              <text x="16" y="320">NO AUTH · NO KEY</text>
+              <text x="212" y="216">DETERMINISTIC</text>
+              <text x="212" y="232">CATALOGUE-CHECKED</text>
+              <text x="384" y="350">PUBLISHED ON A CLOCK</text>
+              <text x="384" y="366">NOT ON VISIT</text>
+              <text x="720" y="276">BENGALI FIRST</text>
+              <text x="720" y="292">FLAT GEOMETRY</text>
+            </g>
+          </svg>
+          <figcaption class="arch-caption"
+            data-en="Five planes, left to right. The colour block on each is the plane's identity; the hairline rules are the contracts between them. A failure in one plane is visible as an unavailable status on the other side, never as a silent substitution."
+            data-bn="পাঁচটি স্তর, বাম থেকে ডানে। প্রতিটি স্তরের রঙের ব্লক তার পরিচয়; সরু রেখাগুলো তাদের মধ্যকার চুক্তি। একটি স্তর ব্যর্থ হলে অপর দিকে তা দৃশ্যমান অনুপলব্ধ-অবস্থা হয়, কখনো নীরবে কিছু প্রতিস্থাপন করে নয়।">
+            Five planes, left to right. The colour block on each is the plane's identity; the hairline rules are the contracts between them. A failure in one plane is visible as an unavailable status on the other side, never as a silent substitution.
+          </figcaption>
+        </figure>
+
+        <ul class="plane-list">
+          <li>
+            <div class="plane-name"><span class="swatch swatch-observation"></span><span data-en="Observation plane — the free world" data-bn="পর্যবেক্ষণ স্তর — বিনামূল্যের পৃথিবী">Observation plane — the free world</span></div>
+            <div class="plane-role" data-en="Seven satellite instruments from NASA GIBS (1,330 published layers, no key), NASA POWER for the solar and climate reanalysis, World Bank indicators, Open-Meteo for weather and air, and the Bangladesh Bureau of Water Development Board for river stages. Nothing here is free of caveats; each carries its own licence, cadence and known limits, all recorded in the register below."
+              data-bn="NASA GIBS-এর সাতটি উপগ্রহ যন্ত্র (প্রকাশিত ১,৩৩০ স্তর, কোনো কী ছাড়াই), সৌর ও জলবায়ু পুনঃবিশ্লেষণের জন্য NASA POWER, বিশ্বব্যাংকের সূচক, আবহাওয়া ও বায়ুর জন্য Open-Meteo, এবং নদীর পরিমাপের জন্য বাংলাদেশ পানি উন্নয়ন বোর্ড। এখানে কোনোটিই সম্পূর্ণ নির্ভেজন্ত নয়; প্রতিটির নিজস্ব লাইসেন্স, ছন্দ ও সীমা আছে, সবই নিচের রেজিস্ট্রে লেখা।">
+              Seven satellite instruments from NASA GIBS (1,330 published layers, no key), NASA POWER for the solar and climate reanalysis, World Bank indicators, Open-Meteo for weather and air, and the Bangladesh Bureau of Water Development Board for river stages. Nothing here is free of caveats; each carries its own licence, cadence and known limits, all recorded in the register below.
+            </div>
+          </li>
+          <li>
+            <div class="plane-name"><span class="swatch swatch-measurement"></span><span data-en="Measurement plane — pixels into physical units" data-bn="পরিমাপ স্তর — পিক্সেল থেকে পদার্থিক একক">Measurement plane — pixels into physical units</span></div>
+            <div class="plane-role" data-en="The only place in the system where a raster becomes a number. A satellite tile carries a palette index per pixel, not a quantity; the quantity lives in a separate colour map that the WMTS capabilities document names for each layer. This plane walks that whole chain and refuses to produce a figure when any link is broken."
+              data-bn="ব্যবস্থার একমাত্র স্থান যেখানে একটি চিত্র সংখ্যায় পরিণত হয়। উপগ্রহ টাইলে প্রতি পিক্সেলে একটি প্যালেট সূচক থাকে, পরিমাণ নয়; পরিমাণ থাকে আলাদা একটি রঙ-মানচিত্রে, যার নাম WMTS capabilities নথিপত্র প্রতিটি স্তরের জন্য দেয়। এই স্তরটি পুরো শৃঙ্খলটি অতিক্রম করে এবং কোনো লিংক ভাঙলে সংখ্যা দিতে অস্বীকার করে।">
+              The only place in the system where a raster becomes a number. A satellite tile carries a palette index per pixel, not a quantity; the quantity lives in a separate colour map that the WMTS capabilities document names for each layer. This plane walks that whole chain and refuses to produce a figure when any link is broken.
+            </div>
+          </li>
+          <li>
+            <div class="plane-name"><span class="swatch swatch-collection"></span><span data-en="Collection plane — a clock, not a visitor" data-bn="সংগ্রহ স্তর — দর্শক নয়, ঘড়ি">Collection plane — a clock, not a visitor</span></div>
+            <div class="plane-role" data-en="A scheduled collector runs every fifteen minutes, measures the city, archives every complete upstream response to object storage, and publishes a validated snapshot to the database. A visitor never starts an acquisition; a cold request reads what the clock already left. A snapshot is only published if all fourteen places carry all seven instruments and at least half of the measurements succeeded."
+              data-bn="প্রতি পনেরো মিনিটে একটি নির্ধারিত সংগ্রহক চলে, শহর পরিমাপ করে, প্রতিটি সম্পূর্ণ আপস্ট্রিম প্রতিক্রিয়া সংরক্ষণাগারে সংরক্ষণ করে এবং যাচাই করা স্ন্যাপশট ডেটাবেসে প্রকাশ করে। কোনো দর্শক কখনো পর্যবেক্ষণ শুরু করে না; ঠান্ডা অনুরোধ পড়ে ঘড়ি যা রেখে গেছে। সব চৌদ্দটি জায়গায় সাতটি যন্ত্রের প্রতিটি না থাকলে এবং অর্ধেকের বেশি পরিমাপ সফল না হলে স্ন্যাপশট প্রকাশিত হয় না।">
+              A scheduled collector runs every fifteen minutes, measures the city, archives every complete upstream response to object storage, and publishes a validated snapshot to the database. A visitor never starts an acquisition; a cold request reads what the clock already left. A snapshot is only published if all fourteen places carry all seven instruments and at least half of the measurements succeeded.
+            </div>
+          </li>
+          <li>
+            <div class="plane-name"><span class="swatch swatch-edge"></span><span data-en="Edge plane — one envelope for every answer" data-bn="এজ স্তর — প্রতিটি উত্তরের একই আবরণ">Edge plane — one envelope for every answer</span></div>
+            <div class="plane-role" data-en="Twenty-seven routes on a single Worker, each answering JSON with the same shape: a status, a machine-readable reason, a timestamp, and a provenance tier. Rate limiting per client address, an expiring cache, a persistent snapshot store and an object-storage archive of raw upstream responses. Nothing escapes as an unhandled error page."
+              data-bn="একটি একক Worker-এ সাতাশটি রুট, প্রতিটি একই আকারে JSON দেয়: একটি অবস্থা, একটি যন্ত্র-পাঠযোগ্য কারণ, একটি সময়চিহ্ন এবং একটি প্রমাণ-স্তর। প্রতি ঠিকানায় হার, মেয়াদোত্তীর্ণ ক্যাশ, একটি স্থায়ী স্ন্যাপশট স্টোর এবং কাঁচা আপস্ট্রিম প্রতিক্রিয়ার অবজেক্ট-স্টোরেজ আর্কাইভ। কোনো অনিয়ন্ত্রিত ত্রুটি পৃষ্ঠা বাইরে যায় না।">
+              Twenty-seven routes on a single Worker, each answering JSON with the same shape: a status, a machine-readable reason, a timestamp, and a provenance tier. Rate limiting per client address, an expiring cache, a persistent snapshot store and an object-storage archive of raw upstream responses. Nothing escapes as an unhandled error page.
+            </div>
+          </li>
+          <li>
+            <div class="plane-name"><span class="swatch swatch-presentation"></span><span data-en="Presentation plane — what a resident is asked to act on" data-bn="উপস্থাপনা স্তর — যে বিষয়ে বাসিন্দাকে পদক্ষেপ নিতে হয়">Presentation plane — what a resident is asked to act on</span></div>
+            <div class="plane-role" data-en="Seventeen map lenses over one canvas; a thin instrument band carrying the country's clock, the live exchange rate and the national readings; and a collage panel that puts seven domains and seven instruments side by side for one district at a time. The geometry is flat by rule — no rounded corners, no shadows, no gradients — and the language is Bengali first."
+              data-bn="একটি ক্যানভাসের উপরে সতেরোটি মানচিত্র লেন্স; দেশের ঘড়ি, লাভ বিনিময় হার ও জাতীয় রিডিং বহনকারী একটি সরু যন্ত্র-ব্যান্ড; এবং একটি কোলাজ প্যানেল, যেখানে সাতটি ক্ষেত্র ও সাতটি যন্ত্র একসঙ্গে, একবারে একটি এলাকার জন্য। নকশার নিয়মই সমতল — গোল কোণ নেই, ছায়া নেই, গ্রেডিয়েন্ট নেই — এবং ভাষা বাংলা প্রথম।">
+              Seventeen map lenses over one canvas; a thin instrument band carrying the country's clock, the live exchange rate and the national readings; and a collage panel that puts seven domains and seven instruments side by side for one district at a time. The geometry is flat by rule — no rounded corners, no shadows, no gradients — and the language is Bengali first.
+            </div>
+          </li>
         </ul>
       </section>
 
+      <!-- ── 3 How a number is born ───────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading">2. Authoritative Data Source Register</h2>
+        <h2 class="section-heading"><span class="section-number">03</span><span data-en="How a number is born" data-bn="একটি সংখ্যা কীভাবে জন্মায়">How a number is born</span></h2>
+        <p data-en="This is the core of the system, and it is worth stating in full because every number in the atlas is born this way."
+           data-bn="এটিই ব্যবস্থার মূল, এবং এটি বিস্তারিত বলা দরকার কারণ অ্যাটলাসের প্রতিটি সংখ্যা এভাবেই জন্মায়।">
+          This is the core of the system, and it is worth stating in full because every number in the atlas is born this way.
+        </p>
+        <pre><code>capabilities  →  colour map  →  palette index  →  physical value
+   does it         what unit       what is this        what is the
+   exist?          is this index?  pixel worth?        answer?</code></pre>
+        <ol>
+          <li data-en="The capabilities document is the authority. It names every layer, its tile matrix sets, its formats, its time dimension and its colour map. A layer id that is not in that document does not exist as far as this system is concerned, and a date the document does not list carries no observation."
+             data-bn="Capabilities নথিপত্রই হলো প্রামাণিক সূত্র। এটি প্রতিটি স্তরের নাম, টাইল ম্যাট্রিক্স, ফরম্যাট, সময়-মাত্রা ও রঙ-মানচিত্র উল্লেখ করে। সেই নথিপত্রে নেই এমন স্তরের আইডি এই ব্যবস্থার নীতে অস্তিত্বে নেই, আর নথিপত্রে না-তালিকাভুক্ত কোনো তারিখে পর্যবেক্ষণ নেই।">
+            The capabilities document is the authority. It names every layer, its tile matrix sets, its formats, its time dimension and its colour map. A layer id that is not in that document does not exist as far as this system is concerned, and a date the document does not list carries no observation.
+          </li>
+          <li data-en="The colour map is fetched from the link the capabilities document gives, not from a filename we guessed. It maps each palette index to a range in the layer's own unit — kelvin for a temperature, nW/(cm² sr) for radiance, a fraction for an index. It also marks which indices mean “no observation”, which is how an absent pixel is kept out of an average."
+             data-bn="রঙ-মানচিত্রটি capabilities নথিপত্রের দেওয়া লিংক থেকে আনা হয়, আমাদের অনুমান করা ফাইলনাম থেকে নয়। এটি প্রতিটি প্যালেট সূচককে স্তরের নিজস্ব এককে একটি পরিসরে মানচিত্র করে — তাপমাত্রার জন্য কেলভিন, তেজ-বিবরণীর জন্য nW/(cm² sr), সূচকের জন্য একটি ভগ্নাংশ। এটি কোন সূচক “পর্যবেক্ষণ নেই” তা-ও চিহ্নিত করে, যা ভাবেই অনুপস্থিত পিক্সেল গড়ের বাইরে থাকে।">
+            The colour map is fetched from the link the capabilities document gives, not from a filename we guessed. It maps each palette index to a range in the layer's own unit — kelvin for a temperature, nW/(cm² sr) for radiance, a fraction for an index. It also marks which indices mean “no observation”, which is how an absent pixel is kept out of an average.
+          </li>
+          <li data-en="The tile is fetched, the PNG is decoded, and the palette index of the pixel over the place is read. The index is then looked up in the colour map to give a range; the midpoint of that range is the honest estimate of what the quantised bin stands for."
+             data-bn="টাইল আনা হয়, PNG ডিকোড হয়, এবং জায়গার উপরের পিক্সেলের প্যালেট সূচক পঠা হয়। তারপর সেই সূচক রঙ-মানচিত্রে খোঁজা হয় যাতে একটি পরিসর পাওয়া যায়; সেই পরিসরের মধ্যবিন্দুই হলো কোয়ান্টাইজড বিনের প্রতিনিধিত্বের সৎ অনুমান।">
+            The tile is fetched, the PNG is decoded, and the palette index of the pixel over the place is read. The index is then looked up in the colour map to give a range; the midpoint of that range is the honest estimate of what the quantised bin stands for.
+          </li>
+        </ol>
+
+        <div class="provenance-box">
+          <strong data-en="Three traps this chain has to survive, each of which has already been observed in the wild:" data-bn="এই শৃঙ্খলকে যে তিনটি ফাঁদ পার করতে হয়, প্রতিটিই বাস্তবে ঘটেছে:">Three traps this chain has to survive, each of which has already been observed in the wild:</strong>
+          <ul style="margin:8px 0 0;padding-left:18px;">
+            <li data-en="The blank placeholder. A provider publishes a date directory before the observation behind it is ingested, and serves that date as a flat, opaque, single-colour tile. It is HTTP 200, non-empty, and indistinguishable from data to a status check or a byte count. Only decoding it, and then asking how much of the window actually carries an observation, tells the truth."
+               data-bn="ফাঁকা প্লেসহোল্ডার। প্রদানকারী পর্যবেক্ষণের আগেই তারিখের ডিরেক্টরি প্রকাশ করে এবং সেই তারিখটিকে সমতল, অস্বচ্ছ ও একক রঙের টাইল হিসেবে পরিবেশন করে। এটি HTTP 200, খালি নয়, এবং অবস্থা-পরীক্ষা বা বাইট-গণনায় ডেটা থেকে আলাদা করা যায় না। কেবল ডিকোড করে তারপর জানতে হয় যে উইন্ডোর কতটা আসলেই পর্যবেক্ষণ বহন করে।">
+              The blank placeholder. A provider publishes a date directory before the observation behind it is ingested, and serves that date as a flat, opaque, single-colour tile. It is HTTP 200, non-empty, and indistinguishable from data to a status check or a byte count. Only decoding it, and then asking how much of the window actually carries an observation, tells the truth.
+            </li>
+            <li data-en="The open-ended bin. A colour map's top bin is often written as an unbounded range. Its midpoint is a colour-map artefact, not a measurement — for the radiance map that midpoint is five hundred thousand, where the real reading is tens. Such a bin is reported as the lower bound it guarantees, and flagged."
+               data-bn="উন্মুক্ত উপরের বিন। রঙ-মানচিত্রের শেষ বিনটি প্রায়ই উন্মুক্ত পরিসরে লেখা থাকে। তার মধ্যবিন্দু রঙ-মানচিত্রের কৃত্রিমতা, পরিমাপ নয় — তেজ-বিবরণীর মানচিত্রে সেই মধ্যবিন্দু পাঁচ লক্ষ, যেখানে প্রকৃত রিডিং কয়েক দশ। এমন বিন প্রতিশ্রুতিটি যা নিশ্চিত করে সেই নিম্নসীমাটি হিসেবে জানানো হয় এবং চিহ্নিত করা হয়।">
+              The open-ended bin. A colour map's top bin is often written as an unbounded range. Its midpoint is a colour-map artefact, not a measurement — for the radiance map that midpoint is five hundred thousand, where the real reading is tens. Such a bin is reported as the lower bound it guarantees, and flagged.
+            </li>
+            <li data-en="The wrong unit. A layer measured with another layer's colour map yields the right shape in the wrong unit — the most dangerous failure, because it looks right. The colour map's declared unit is compared against the unit the atlas claims, and a mismatch stops the release."
+               data-bn="ভুল একক। অন্য স্তরের রঙ-মানচিত্রে মাপা স্তর সঠিক আকৃতি ভুল এককে দেয় — সবচেয়ে বিপজ্জনক ব্যর্থতা, কারণ তা ঠিকই দেখায়। রঙ-মানচিত্রের ঘোষিত একক অ্যাটলাসের দাবির সঙ্গে মিলিয়ে দেখা হয়, এবং অমিল হলে প্রকাশ থামে।">
+              The wrong unit. A layer measured with another layer's colour map yields the right shape in the wrong unit — the most dangerous failure, because it looks right. The colour map's declared unit is compared against the unit the atlas claims, and a mismatch stops the release.
+            </li>
+          </ul>
+        </div>
+
+        <p data-en="Two more rules follow from the same chain. The observation date is resolved by measurement, not by guessing: the system walks back from the published date until a window carries enough real observation to read. And a reading is never a whole district — it is a sample over a stated window at a stated resolution, and it says so."
+           data-bn="একই শৃঙ্খল থেকে আরও দুটি নিয়ম বের হয়। পর্যবেক্ষণের তারিখ অনুমান করে নয়, পরিমাপ করে নির্ধারিত হয়: ব্যবস্থাটি প্রকাশিত তারিখ থেকে পিছিয়ে যায় যতক্ষণ না উইন্ডোতে পড়ার মতো যথেষ্ট আসল পর্যবেক্ষণ জমা হয়। আর কোনো রিডিং কখনো পুরো এলাকার নয় — এটি নির্দিষ্ট উইন্ডোর উপর নির্দিষ্ট স্কেলে নেওয়া একটি নমুনা, এবং তা তাই বলে।">
+          Two more rules follow from the same chain. The observation date is resolved by measurement, not by guessing: the system walks back from the published date until a window carries enough real observation to read. And a reading is never a whole district — it is a sample over a stated window at a stated resolution, and it says so.
+        </p>
+      </section>
+
+      <!-- ── 4 The collage ────────────────────────────────────────────── -->
+      <section class="research-section">
+        <h2 class="section-heading"><span class="section-number">04</span><span data-en="The collage: seven domains, seven instruments" data-bn="কোলাজ: সাতটি ক্ষেত্র, সাতটি যন্ত্র">The collage: seven domains, seven instruments</span></h2>
+        <p data-en="One reading per district is a reading. Seven domains, each answered by a different instrument and all measured over the same fourteen places, is a collage — and it is the collage that says something, because the interesting fact about a city is rarely in one measurement. It is in the disagreement."
+           data-bn="প্রতি এলাকায় একটি রিডিং কেবল একটি রিডিং। সাতটি ক্ষেত্র, প্রতিটির উত্তর একটি ভিন্ন যন্ত্রে, সবগুলো একই চৌদ্দটি জায়গায় পরিমাপিত — এটি একটি কোলাজ, এবং কথা বলে এটিই, কারণ শহরের সমস্যাগুলো প্রায় কখনোই একটি পরিমাপে থাকে না। অসমততেই থাকে।">
+          One reading per district is a reading. Seven domains, each answered by a different instrument and all measured over the same fourteen places, is a collage — and it is the collage that says something, because the interesting fact about a city is rarely in one measurement. It is in the disagreement.
+        </p>
         <table class="data-table">
           <thead>
             <tr>
-              <th>Domain</th>
-              <th>Publisher / Provider</th>
-              <th>Dataset / Indicators</th>
-              <th>Provenance Tier</th>
-              <th>Update Frequency</th>
+              <th data-en="Domain" data-bn="ক্ষেত্র">Domain</th>
+              <th data-en="Instrument" data-bn="যন্ত্র">Instrument</th>
+              <th data-en="What it actually measures" data-bn="এটি আসলে কী পরিমাপ করে">What it actually measures</th>
+              <th data-en="National companion" data-bn="জাতীয় সহায়ক">National companion</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Hydrology &amp; Floods</strong></td>
-              <td>Bangladesh Water Development Board (BWDB) / FFWC</td>
-              <td>6 Peripheral river water levels (Buriganga, Turag, Balu, Shitalakshya, Tongi Khal, Dhaleshwari) vs official Danger Levels (m MSL)</td>
-              <td><code>measured</code></td>
-              <td>Daily bulletin (hourly during monsoon)</td>
+              <td data-en="Environment" data-bn="পরিবেশ">Environment</td>
+              <td data-en="MODIS land surface temperature, daytime" data-bn="MODIS ভূমি-পৃষ্ঠের তাপমাত্রা, দিনের">MODIS land surface temperature, daytime</td>
+              <td data-en="how hot the district's ground is at midday" data-bn="দুপুরে এলাকার ভূমি কতটা গরম">how hot the district's ground is at midday</td>
+              <td data-en="CO₂ per person" data-bn="জনপ্রতি কার্বন ডাই-অক্সাইড">CO₂ per person</td>
             </tr>
             <tr>
-              <td><strong>Macroeconomy</strong></td>
-              <td>Bangladesh Bank</td>
-              <td>Foreign exchange reserves (Gross &amp; BPM6), Worker inward remittances, USD/BDT crawling peg exchange rate</td>
-              <td><code>measured</code></td>
-              <td>Monthly bulletins &amp; trends</td>
+              <td data-en="Energy" data-bn="জ্বালানি">Energy</td>
+              <td data-en="NASA POWER solar climatology" data-bn="NASA POWER সৌর জলবায়ুবিজ্ঞান">NASA POWER solar climatology</td>
+              <td data-en="the ceiling on what rooftop solar could collect here" data-bn="এখানে ছাদের সোলার সর্বোচ্চ কতটা ধরা যেতে পারে">the ceiling on what rooftop solar could collect here</td>
+              <td data-en="electricity access, renewable share" data-bn="বিদ্যুৎ সরবরাহ, নবায়নযোগ্য অংশ">electricity access, renewable share</td>
             </tr>
             <tr>
-              <td><strong>Export Engine</strong></td>
-              <td>Export Promotion Bureau (EPB) / BGMEA</td>
-              <td>Ready-Made Garments (RMG) Knitwear and Woven monthly export values</td>
-              <td><code>measured</code></td>
-              <td>Monthly official release</td>
+              <td data-en="Economy" data-bn="অর্থনীতি">Economy</td>
+              <td data-en="VIIRS night radiance" data-bn="VIIRS রাতের আলোক তীব্রতা">VIIRS night radiance</td>
+              <td data-en="where the city's work is happening, relative to the city" data-bn="শহরের তুলনায় শহরের কাজ কোথায় হচ্ছে">where the city's work is happening, relative to the city</td>
+              <td data-en="GDP, exports, industry share, remittances" data-bn="জিডিপি, রপ্তানি, শিল্পখাতের অংশ, প্রবাসী আয়">GDP, exports, industry share, remittances</td>
             </tr>
             <tr>
-              <td><strong>Capital Markets</strong></td>
-              <td>Dhaka Stock Exchange (DSE)</td>
-              <td>DSEX benchmark index, market turnover, market capitalization</td>
-              <td><code>measured</code></td>
-              <td>Session close</td>
+              <td data-en="Mobility" data-bn="চলাচল">Mobility</td>
+              <td data-en="Landsat built-up extent" data-bn="Landsat নির্মিত ভূমির পরিসর">Landsat built-up extent</td>
+              <td data-en="how much of the ground is built, at 35 m" data-bn="ভূমির কতটা নির্মিত, ৩৫ মিটারে">how much of the ground is built, at 35 m</td>
+              <td data-en="urban population share" data-bn="শহুরে জনগণের অনুপাত">urban population share</td>
             </tr>
             <tr>
-              <td><strong>Inflation</strong></td>
-              <td>Bangladesh Bureau of Statistics (BBS)</td>
-              <td>Consumer Price Index (CPI) Headline, Food, and Non-Food Inflation</td>
-              <td><code>measured</code></td>
-              <td>Monthly bulletin</td>
+              <td data-en="People" data-bn="জনগণ">People</td>
+              <td data-en="MODIS vegetation index" data-bn="MODIS উদ্ভিদ সূচক">MODIS vegetation index</td>
+              <td data-en="how much of the ground is still growing things" data-bn="ভূমির কতটা এখনো জীবন্ত ফলপূজ">how much of the ground is still growing things</td>
+              <td data-en="literacy, secondary enrolment, unemployment" data-bn="সাক্ষরতা, মাধ্যমিক ভর্তি, বেকারত্ব">literacy, secondary enrolment, unemployment</td>
             </tr>
             <tr>
-              <td><strong>Air Quality</strong></td>
-              <td>Copernicus CAMS / Open-Meteo</td>
-              <td>7-Station Grid (Uttara, Mirpur, Gulshan, Farmgate, Motijheel, Sadarghat, Savar): PM2.5, PM10, NO2, SO2, CO, Ozone, US AQI</td>
-              <td><code>modeled</code></td>
-              <td>Hourly update, 72h forecast</td>
+              <td data-en="Smart living" data-bn="স্মার্ট লিভিং">Smart living</td>
+              <td data-en="MODIS land surface temperature, night-time" data-bn="MODIS ভূমি-পৃষ্ঠের তাপমাত্রা, রাতের">MODIS land surface temperature, night-time</td>
+              <td data-en="the heat that stays after dark" data-bn="রাত হলেও যে তাপ থেকে যায়">the heat that stays after dark</td>
+              <td data-en="life expectancy, physicians per 1,000" data-bn="আয়ুক্ষমাপ, হাজার মানুষে চিকিৎসক">life expectancy, physicians per 1,000</td>
             </tr>
             <tr>
-              <td><strong>Weather &amp; Rain</strong></td>
-              <td>ECMWF / Open-Meteo</td>
-              <td>Current temperature, relative humidity, apparent temp, 24h catchment precipitation accumulation</td>
-              <td><code>modeled</code></td>
-              <td>Hourly</td>
+              <td data-en="Governance" data-bn="শাসন">Governance</td>
+              <td data-en="MAIAC aerosol optical depth" data-bn="MAIAC অ্যারোসোল আপটিক্যাল ডেপথ">MAIAC aerosol optical depth</td>
+              <td data-en="what the atmosphere lets the satellite see of the city" data-bn="বায়ুমণ্ডল উপগ্রহকে শহরের কতটুকু দেখায়">what the atmosphere lets the satellite see of the city</td>
+              <td data-en="tax revenue" data-bn="কর আদায়">tax revenue</td>
             </tr>
+          </tbody>
+        </table>
+        <p data-en="One instrument per domain, so no two domains print the same measurement as their own finding. The national companions are dated World Bank series, so the two halves of the picture can be read against each other: what the instruments measured in one district, and what the state is doing about it nationally."
+           data-bn="প্রতি ক্ষেত্রে একটি যন্ত্র, তাই কোনো দুটি ক্ষেত্র একই পরিমাপ নিজের আলাদা ফলাফল হিসেবে ছাপে না। জাতীয় সহায়কগুলো তারিখসহ বিশ্বব্যাংকের সিরিজ, তাই ছবির দুই অংশ পরস্পরের বিপরীতে পড়া যায়: একটি এলাকায় যন্ত্রগুলো যা মাপল, এবং রাষ্ট্র জাতীয়ভাবে তার প্রতিক্রিয়া হিসেবে যা করছে।">
+          One instrument per domain, so no two domains print the same measurement as their own finding. The national companions are dated World Bank series, so the two halves of the picture can be read against each other: what the instruments measured in one district, and what the state is doing about it nationally.
+        </p>
+      </section>
+
+      <!-- ── 5 Honesty contracts ──────────────────────────────────────── -->
+      <section class="research-section">
+        <h2 class="section-heading"><span class="section-number">05</span><span data-en="Honesty contracts" data-bn="সৎতার চুক্তি">Honesty contracts</span></h2>
+        <div class="provenance-box">
+          <strong data-en="The refusal contract:" data-bn="প্রত্যাখ্যানের চুক্তি:">The refusal contract:</strong>
+          <span data-en=" If an upstream is unreachable, times out, or returns malformed fields, the system answers “unavailable” with an explicit machine-readable reason code and a timestamp. It never invents a zero, never presents an empty widget as normal, and never converts a lack of measurement into an all-clear."
+            data-bn=" কোনো আপস্ট্রিম অপ্রাপ্য হলে, সময়োত্তীর্ণ হলে, বা ত্রুটিপূর্ণ ক্ষেত্র ফিরালে ব্যবস্থাটি যন্ত্র-পাঠযোগ্য কারণ কোড ও সময়চিহ্নসহ “অনুপলব্ধ” বলে। এটি কখনো শূন্য বানায় না, কখনো খালি উইজেটকে স্বাভাবিক দেখায় না, এবং কখনো পরিমাপের অভাবকে সব-সুস্থ বানিয়ে দেয় না।">
+            If an upstream is unreachable, times out, or returns malformed fields, the system answers “unavailable” with an explicit machine-readable reason code and a timestamp. It never invents a zero, never presents an empty widget as normal, and never converts a lack of measurement into an all-clear.
+          </span>
+        </div>
+        <p data-en="Every reading carries a provenance tier, so a reader can tell at a glance what kind of claim is being made."
+           data-bn="প্রতিটি রিডিং একটি প্রমাণ-স্তর বহন করে, যাতে পাঠক এক নজরে বুঝতে পারেন দাবিটি কোন ধরনের।">
+          Every reading carries a provenance tier, so a reader can tell at a glance what kind of claim is being made.
+        </p>
+        <table class="data-table">
+          <thead>
             <tr>
-              <td><strong>Active Fires</strong></td>
-              <td>NASA FIRMS (NOAA-20 / VIIRS)</td>
-              <td>375m active thermal detections over brick kiln clusters in Savar, Gazipur, and Keraniganj</td>
-              <td><code>measured</code></td>
-              <td>Daily satellite pass</td>
+              <th data-en="Tier" data-bn="স্তর">Tier</th>
+              <th data-en="Meaning" data-bn="অর্থ">Meaning</th>
             </tr>
-            <tr>
-              <td><strong>Night Radiance</strong></td>
-              <td>NASA GIBS (Suomi NPP Black Marble)</td>
-              <td>VNP46A2 day/night band nighttime lights and urban electrification</td>
-              <td><code>measured</code></td>
-              <td>Daily composite</td>
-            </tr>
-            <tr>
-              <td><strong>Rapid Transit</strong></td>
-              <td>Dhaka Mass Transit Company (DMTCL) / RAJUK</td>
-              <td>MRT Line 6 stations, elevated alignment, Dhaka Elevated Expressway</td>
-              <td><code>reference</code></td>
-              <td>Surveyed alignments</td>
-            </tr>
-            <tr>
-              <td><strong>Seismic Risk</strong></td>
-              <td>USGS Earthquake Hazards Program</td>
-              <td>Magnitude 3.0+ events in Bengal Basin, Dauki Fault, and Tripura Fold Belt</td>
-              <td><code>measured</code></td>
-              <td>Real-time seismic network</td>
-            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>measured</code></td><td data-en="Observed by an instrument, at a stated time, over a stated window." data-bn="একটি যন্ত্রের পর্যবেক্ষণ, নির্দিষ্ট সময়ে, নির্দিষ্ট উইন্ডোতে।">Observed by an instrument, at a stated time, over a stated window.</td></tr>
+            <tr><td><code>modeled</code></td><td data-en="Computed by a physical or statistical model, not observed." data-bn="পদার্থিক বা পরিসংখ্যানগত মডেলে গণনা, পর্যবেক্ষিত নয়।">Computed by a physical or statistical model, not observed.</td></tr>
+            <tr><td><code>reference</code></td><td data-en="An official register or gazetteer — a place exists; its numbers do not." data-bn="একটি সরকারি রেজিস্টার বা গেজেট — জায়গাটির অস্তিত্ব, তার সংখ্যা নয়।">An official register or gazetteer — a place exists; its numbers do not.</td></tr>
+            <tr><td><code>unavailable</code></td><td data-en="Not measured, with a reason." data-bn="পরিমাপ করা হয়নি, একটি কারণসহ।">Not measured, with a reason.</td></tr>
           </tbody>
         </table>
       </section>
 
+      <!-- ── 6 Collection and delivery ────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading">3. Geographic Scope &amp; Bounding Coordinates</h2>
-        <p>
-          The atlas covers Greater Metropolitan Dhaka and its primary industrial and hydrological catchment:
+        <h2 class="section-heading"><span class="section-number">06</span><span data-en="Collection and delivery" data-bn="সংগ্রহ ও পৌঁছানো">Collection and delivery</span></h2>
+        <p data-en="A visitor-triggered measurement is a measurement that depends on who is looking, when, and whether the upstream was kind enough that minute. So the system does not measure for visitors. A scheduled collector runs every fifteen minutes; it measures the whole city once, archives every complete upstream response to object storage so that any published number can be traced back to the bytes it came from, and writes a validated snapshot to the database."
+           data-bn="দর্শকের উপর নির্ভরশীল পরিমাপ মানে পরিমাপটি নির্ভর করে কে দেখছে, কখন, এবং উপস্ট্রিম সেই মিনিটে ভদ্রতা ছিল কি না। তাই ব্যবস্থাটি দর্শকের জন্য পরিমাপ করে না। প্রতি পনেরো মিনিটে একটি নির্ধারিত সংগ্রহক চলে; এটি পুরো শহর একবার মাপে, প্রতিটি সম্পূর্ণ আপস্ট্রিম প্রতিক্রিয়া অবজেক্ট-স্টোরেজে সংরক্ষণ করে যাতে প্রকাশিত যেকোনো সংখ্যা তার মূল বাইট পর্যন্ত অনুসরণ করা যায়, এবং একটি যাচাই করা স্ন্যাপশট ডেটাবেসে লেখে।">
+          A visitor-triggered measurement is a measurement that depends on who is looking, when, and whether the upstream was kind enough that minute. So the system does not measure for visitors. A scheduled collector runs every fifteen minutes; it measures the whole city once, archives every complete upstream response to object storage so that any published number can be traced back to the bytes it came from, and writes a validated snapshot to the database.
         </p>
-        <div class="provenance-box">
-          <strong>Bounding Box (WGS84):</strong><br />
-          South: <code>23.60°N</code> (Narayanganj / Dhaleshwari confluence)<br />
-          North: <code>23.95°N</code> (Tongi Khal / Gazipur boundary / DEPZ Savar)<br />
-          West: <code>90.25°E</code> (National Martyrs' Memorial, Savar / Western Embankment)<br />
-          East: <code>90.55°E</code> (Balu River / Shitalakshya River / Adamjee EPZ)<br />
-          <strong>Center:</strong> <code>23.8103°N, 90.4125°E</code>
-        </div>
+        <ul>
+          <li data-en="A cold request reads the published snapshot. It never starts an acquisition." data-bn="ঠান্ডা অনুরোধ প্রকাশিত স্ন্যাপশট পড়ে। এটি কখনো পর্যবেক্ষণ শুরু করে না।">A cold request reads the published snapshot. It never starts an acquisition.</li>
+          <li data-en="A snapshot is published only if it is complete: fourteen places, seven instruments each, distinct instruments per place, and at least half the measurements succeeded." data-bn="স্ন্যাপশট প্রকাশিত হয় কেবল তখনই যখন তা সম্পূর্ণ: চৌদ্দটি জায়গা, প্রতিটিতে সাতটি যন্ত্র, প্রতি জায়গায় আলাদা যন্ত্র, এবং অর্ধেকের বেশি পরিমাপ সফল।">A snapshot is published only if it is complete: fourteen places, seven instruments each, distinct instruments per place, and at least half the measurements succeeded.</li>
+          <li data-en="A snapshot younger than four hours is fresh. Beyond that it is served as stale, with a reason code saying the collector is overdue. Beyond seven days it is not served at all." data-bn="চার ঘণ্টার কম বয়সী স্ন্যাপশট তাজা। এরপর সেটি পুরোনো হিসেবে পরিবেশিত হয়, সংগ্রহক দেরির কারণসহ। সাত দিনের বেশি পুরোনো স্ন্যাপশট আর পরিবেশিত হয় না।">A snapshot younger than four hours is fresh. Beyond that it is served as stale, with a reason code saying the collector is overdue. Beyond seven days it is not served at all.</li>
+        </ul>
       </section>
 
+      <!-- ── 7 Failure ────────────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading">4. Author &amp; Institutional Attribution</h2>
-        <p>
-          <strong>Dr Non Arkaraprasertkul</strong><br />
-          Senior Expert in Smart City Promotion, Digital Economy Promotion Agency (DEPA) of Thailand.<br />
-          Lover of Southeast Asian and South Asian delta cities; builder of open civic instruments across ASEAN (Bangkok, Jakarta, Kuala Lumpur, Ho Chi Minh City) and now Dhaka.
+        <h2 class="section-heading"><span class="section-number">07</span><span data-en="What happens when the world misbehaves" data-bn="পৃথিবী বিগড়ে গেলে কী হয়">What happens when the world misbehaves</span></h2>
+        <p data-en="Degradation is designed, not improvised. Each failure has a named, machine-readable reason code, and each one is visible in the interface rather than hidden behind an empty widget."
+           data-bn="অবনতি নকশা করা, তাৎক্ষণিক নয়। প্রতিটি ব্যর্থতার একটি নাম ও যন্ত্র-পাঠযোগ্য কারণ কোড আছে, এবং প্রতিটিই ইন্টারফেসে দৃশ্যমান, খালি উইজেটের পিছনে লুকানো নয়।">
+          Degradation is designed, not improvised. Each failure has a named, machine-readable reason code, and each one is visible in the interface rather than hidden behind an empty widget.
         </p>
-        <p style="font-size:var(--text-body);color:var(--dim);margin-top:20px;">
-          Deployed live at <a href="https://dhaka.nonarkara.org" style="color:var(--accent);">dhaka.nonarkara.org</a> · Cloudflare Workers Edge Infrastructure.
+        <table class="data-table">
+          <thead>
+            <tr><th data-en="Situation" data-bn="পরিস্থিতি">Situation</th><th data-en="What the system does" data-bn="ব্যবস্থা যা করে">What the system does</th></tr>
+          </thead>
+          <tbody>
+            <tr><td data-en="A satellite publishes a date with no observation behind it" data-bn="উপগ্রহ এমন তারিখ প্রকাশ করে যার পেছনে পর্যবেক্ষণ নেই">A satellite publishes a date with no observation behind it</td><td data-en="Walks back to the newest date whose window actually carries observation, and states which date it used." data-bn="যে তারিখে উইন্ডোতে আসলেই পর্যবেক্ষণ আছে তার নতুনতম তারিখে ফিরে যায়, এবং কোন তারিখ ব্যবহার করেছে তা জানায়।">Walks back to the newest date whose window actually carries observation, and states which date it used.</td></tr>
+            <tr><td data-en="Cloud over one district" data-bn="একটি এলাকার উপরে মেঘ">Cloud over one district</td><td data-en="That district's reading for that instrument is unavailable, with a reason. The other six instruments still report." data-bn="সেই এলাকার সেই যন্ত্রের রিডিং অনুপলব্ধ, একটি কারণসহ। বাকি ছয়টি যন্ত্র তখনও জানায়।">That district's reading for that instrument is unavailable, with a reason. The other six instruments still report.</td></tr>
+            <tr><td data-en="An upstream is down" data-bn="কোনো আপস্ট্রিম বন্ধ">An upstream is down</td><td data-en="The route answers unavailable with a reason code. The interface says which feed is missing instead of showing a stale number as if it were current." data-bn="রুটটি কারণ কোডসহ অনুপলব্ধ বলে। ইন্টারফেস কোন ফিড নেই তা বলে, পুরোনো সংখ্যাকে বর্তমান মনে করিয়ে দেখায় না।">The route answers unavailable with a reason code. The interface says which feed is missing instead of showing a stale number as if it were current.</td></tr>
+            <tr><td data-en="The collector itself fails" data-bn="সংগ্রহক নিজেই ব্যর্থ হলে">The collector itself fails</td><td data-en="No snapshot is published. The last valid one is served, and as it ages the response says stale, then refuses." data-bn="কোনো স্ন্যাপশট প্রকাশিত হয় না। শেষ বৈধ স্ন্যাপশট পরিবেশিত হয়, এবং বার্ধক্য বাড়লে উত্তর পুরোনো বলে, তারপর প্রত্যাখ্যান করে।">No snapshot is published. The last valid one is served, and as it ages the response says stale, then refuses.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ── 8 Data source register ───────────────────────────────────── -->
+      <section class="research-section">
+        <h2 class="section-heading"><span class="section-number">08</span><span data-en="Data source register" data-bn="তথ্য-উৎস রেজিস্টার">Data source register</span></h2>
+        <p data-en="Every source the atlas uses, with its publisher, its licence and its cadence. The atlas does not hide behind a source it has not checked."
+           data-bn="অ্যাটলাসের ব্যবহৃত প্রতিটি উৎস, প্রকাশক, লাইসেন্স ও ছন্দসহ। যে উৎস অ্যাটলাস পরীক্ষা করেনি তার পিছনে লুকায় না।">
+          Every source the atlas uses, with its publisher, its licence and its cadence. The atlas does not hide behind a source it has not checked.
+        </p>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th data-en="Publisher" data-bn="প্রকাশক">Publisher</th>
+              <th data-en="Dataset" data-bn="ডেটাসেট">Dataset</th>
+              <th data-en="Access" data-bn="প্রবেশ">Access</th>
+              <th data-en="Licence" data-bn="লাইসেন্স">Licence</th>
+              <th data-en="Cadence" data-bn="ছন্দ">Cadence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>NASA GIBS</td><td data-en="Day/Night Band radiance, land surface temperature, aerosol optical depth, vegetation index, flood extent, built-up extent" data-bn="ডে/নাইট ব্যান্ড তেজ-বিবরণী, ভূমি-পৃষ্ঠের তাপমাত্রা, অ্যারোসোল অপটিক্যাল ডেপথ, উদ্ভিদ সূচক, বন্যার পরিসর, নির্মিত ভূমির পরিসর">Day/Night Band radiance, land surface temperature, aerosol optical depth, vegetation index, flood extent, built-up extent</td><td data-en="WMTS, no key" data-bn="WMTS, কোনো কী নেই">WMTS, no key</td><td data-en="Free for scientific and public use; attribute NASA EOSDIS" data-bn="বৈজ্ঞানিক ও উন্মুক্ত ব্যবহারের জন্য বিনামূল্যে; NASA EOSDIS-কে কৃতজ্ঞতা দিন">Free for scientific and public use; attribute NASA EOSDIS</td><td data-en="daily to 16-day" data-bn="দৈনিক থেকে ১৬ দিন">daily to 16-day</td></tr>
+            <tr><td>NASA POWER</td><td data-en="Solar and meteorological reanalysis, 2001–2025 climatology" data-bn="সৌর ও আবহাওয়া পুনঃবিশ্লেষণ, ২০০১–২০২৫ জলবায়ুবিজ্ঞান">Solar and meteorological reanalysis, 2001–2025 climatology</td><td data-en="REST, no key" data-bn="REST, কোনো কী নেই">REST, no key</td><td data-en="Open, cite NASA POWER" data-bn="উন্মুক্ত, NASA POWER-কে উদ্ধৃত করুন">Open, cite NASA POWER</td><td data-en="annual climatology" data-bn="বার্ষিক জলবায়ুবিজ্ঞান">annual climatology</td></tr>
+            <tr><td>World Bank</td><td data-en="World Development Indicators" data-bn="বিশ্ব উন্নয়ন সূচক">World Development Indicators</td><td data-en="REST, no key" data-bn="REST, কোনো কী নেই">REST, no key</td><td>CC BY 4.0</td><td data-en="annual" data-bn="বার্ষিক">annual</td></tr>
+            <tr><td>Open-Meteo</td><td data-en="Weather and air-quality forecasts" data-bn="আবহাওয়া ও বায়ুর মানের পূর্বাভাস">Weather and air-quality forecasts</td><td data-en="REST, no key" data-bn="REST, কোনো কী নেই">REST, no key</td><td data-en="Free for non-commercial use" data-bn="অবাণিজ্যিক ব্যবহারের জন্য বিনামূল্যে">Free for non-commercial use</td><td data-en="hourly" data-bn="ঘণ্টাভিত্তিক">hourly</td></tr>
+            <tr><td>BWDB</td><td data-en="River gauge registry and stages" data-bn="নদীর গেজ ও পরিমাপ">River gauge registry and stages</td><td data-en="official feed, registered access" data-bn="সরকারি ফিড, নিবন্ধনকৃত প্রবেশ">official feed, registered access</td><td data-en="Government of Bangladesh" data-bn="বাংলাদেশ সরকার">Government of Bangladesh</td><td data-en="hourly" data-bn="ঘণ্টাভিত্তিক">hourly</td></tr>
+            <tr><td>OpenFreeMap / OSM</td><td data-en="Building footprints, roads, transit" data-bn="ভবনের পদচিহ্ন, রাস্তা, যাতায়াত">Building footprints, roads, transit</td><td data-en="vector tiles, no key" data-bn="ভেক্টর টাইল, কোনো কী নেই">vector tiles, no key</td><td>ODbL</td><td data-en="continuous" data-bn="নিরবচ্ছিন্ন">continuous</td></tr>
+            <tr><td>USGS</td><td data-en="Earthquake catalogue" data-bn="ভূমিকম্পের তালিকা">Earthquake catalogue</td><td data-en="REST, no key" data-bn="REST, কোনো কী নেই">REST, no key</td><td data-en="Public domain" data-bn="সরকারি সম্পত্তি">Public domain</td><td data-en="continuous" data-bn="নিরবচ্ছিন্ন">continuous</td></tr>
+            <tr><td>NOAA</td><td data-en="Bay of Bengal buoy observations" data-bn="বঙ্গোপসাগরের বয়ুজ উপস্থাপনা">Bay of Bengal buoy observations</td><td data-en="REST, no key" data-bn="REST, কোনো কী নেই">REST, no key</td><td data-en="Public domain" data-bn="সরকারি সম্পত্তি">Public domain</td><td data-en="hourly" data-bn="ঘণ্টাভিত্তিক">hourly</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ── 9 How to check our claims ────────────────────────────────── -->
+      <section class="research-section">
+        <h2 class="section-heading"><span class="section-number">09</span><span data-en="How to check our claims" data-bn="আমাদের দাবিগুলো যাচাই করার উপায়">How to check our claims</span></h2>
+        <p data-en="A claim in a paper is worth exactly what the reader can check. Every assertion this system makes about its own behaviour is enforced by a test that can be made to fail."
+           data-bn="পত্রে দাবি ততটাই মূল্যবান যতটাই পাঠক যাচাই করতে পারেন। এই ব্যবস্থা নিজের আচরণ সম্পর্কে যে দাবি করে, প্রতিটি এমন একটি পরীক্ষায় বাঁধা যা ব্যর্থ করানো যায়।">
+          A claim in a paper is worth exactly what the reader can check. Every assertion this system makes about its own behaviour is enforced by a test that can be made to fail.
+        </p>
+        <ul>
+          <li data-en="Fifteen test suites run on every release. One of them validates every satellite layer id, tile level and unit against the vendored 1,330-layer capabilities catalogue, checks the tile arithmetic against the published scale denominators, and checks that the tile cache cannot hold a failure for long." data-bn="প্রতিটি প্রকাশে পনেরোটি পরীক্ষা-স্যুট চলে। এর একটি যাচাই করে প্রতিটি উপগ্রহ স্তরের আইডি, টাইল স্তর ও একককে সংরক্ষিত ১,৩৩০-স্তরের capabilities নথিপত্রের সঙ্গে মিলিয়ে, প্রকাশিত স্কেল ডিনমিনেটরের সঙ্গে টাইল হিসাব মিলিয়ে, এবং যাচাই করে যে টাইল ক্যাশ দীর্ঘ সময় ব্যর্থতা ধরে রাখতে পারে না।">
+            Fifteen test suites run on every release. One of them validates every satellite layer id, tile level and unit against the vendored 1,330-layer capabilities catalogue, checks the tile arithmetic against the published scale denominators, and checks that the tile cache cannot hold a failure for long.
+          </li>
+          <li data-en="A mutation harness breaks the code that each assertion guards — one defect at a time — and requires the suite to fail every time. A green test that cannot go red is a comment, and this project does not ship comments." data-bn="একটি মিউটেশন হারনেস প্রতিটি অনুমানের পাহারা ভাঙে — একবারে একটি ত্রুটি — এবং প্রতিবার স্যুট ব্যর্থ হতে হয়। যে সবুজ পরীক্ষা লাল হতে পারে না তা মন্তব্য, এবং এই প্রকল্প মন্তব্য পাঠায় না।">
+            A mutation harness breaks the code that each assertion guards — one defect at a time — and requires the suite to fail every time. A green test that cannot go red is a comment, and this project does not ship comments.
+          </li>
+          <li data-en="The release itself verifies its own bytes: the deployed assets are compared byte-for-byte against what was committed, and live satellite tiles are fetched over Dhaka and checked for real content before the release is declared live." data-bn="প্রকাশ নিজেই তার বাইট যাচাই করে: প্রকাশিত সম্পদগুলো প্রতিশৃঙ্গিভুক্ত অবস্থার সঙ্গে বাইট-ধরে-বাইট তুলনা হয়, এবং ঢাকার উপরে জীবন্ত উপগ্রহ টাইল আনা হয় ও প্রকাশ ঘোষণার আগে আসল বিষয়বস্তুর জন্য যাচাই করা হয়।">
+            The release itself verifies its own bytes: the deployed assets are compared byte-for-byte against what was committed, and live satellite tiles are fetched over Dhaka and checked for real content before the release is declared live.
+          </li>
+          <li data-en="Every upstream response behind a published number is archived, so a reader can trace a figure back to the bytes it came from rather than trusting this paper." data-bn="প্রকাশিত সংখ্যার পেছনের প্রতিটি আপস্ট্রিম প্রতিক্রিয়া সংরক্ষিত থাকে, যাতে পাঠক এই পত্রকে বিশ্বাস না করে সংখ্যাটি তার মূল বাইট পর্যন্ত অনুসরণ করতে পারেন।">
+            Every upstream response behind a published number is archived, so a reader can trace a figure back to the bytes it came from rather than trusting this paper.
+          </li>
+        </ul>
+      </section>
+
+      <!-- ── 10 Limits ────────────────────────────────────────────────── -->
+      <section class="research-section">
+        <h2 class="section-heading"><span class="section-number">10</span><span data-en="What this system cannot do" data-bn="এই ব্যবস্থা যা করতে পারে না">What this system cannot do</span></h2>
+        <p data-en="The limits are stated here because a civic instrument that overstates itself is worse than none."
+           data-bn="সীমাবদ্ধতাগুলো এখানেই বলা হচ্ছে, কারণ যে নাগরিক যন্ত্র নিজেকে বড় করে বলে তা কোনো যন্ত্রের চেয়েও খারাপ।">
+          The limits are stated here because a civic instrument that overstates itself is worse than none.
+        </p>
+        <ul>
+          <li data-en="It cannot count people directly. Population comes from a published model grid, and the atlas says so wherever it appears." data-bn="এটি সরাসরি মানুষ গুনতে পারে না। জনগণ আসে প্রকাশিত মডেল গ্রিড থেকে, এবং যেখানেই তা থাকে অ্যাটলাস তা বলে।">It cannot count people directly. Population comes from a published model grid, and the atlas says so wherever it appears.</li>
+          <li data-en="It cannot survey a building. Street-level massing is drawn from the map provider's computed height, and the interface counts how many visible buildings rest on one rather than on a survey." data-bn="এটি কোনো ভবন জরিপ করতে পারে না। রাস্তার ধরনের ভবন-আকৃতি মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতা থেকে আঁকা, এবং ইন্টারফেস গণনা করে কতগুলো দৃশ্যমান ভবন জরিপের উপরে দাঁড়ানো নয়।">It cannot survey a building. Street-level massing is drawn from the map provider's computed height, and the interface counts how many visible buildings rest on one rather than on a survey.</li>
+          <li data-en="It cannot read what a building is used for. Night radiance says a place is lit, not what the light is for." data-bn="এটি পড়তে পারে না কোনো ভবন কী কাজে ব্যবহৃত হয়। রাতের আলোক তীব্রতা বলে জায়গাটি আলোকিত, আলো কীসের জন্য তা নয়।">It cannot read what a building is used for. Night radiance says a place is lit, not what the light is for.</li>
+          <li data-en="A district reading is a sample over a stated window at a stated resolution, not a whole-district average. Ward-level polygons are not yet in the atlas, and until they are, the reading says what it actually covers." data-bn="এলাকার রিডিং নির্দিষ্ট উইন্ডোতে নির্দিষ্ট স্কেলে নেওয়া নমুনা, পুরো এলাকার গড় নয়। ওয়ার্ড-পর্যায়ের পলিগন এখনও অ্যাটলাসে নেই, এবং তা আসার আগ পর্যন্ত রিডিং বলে যে এটি আসলে কী আড়াল।">A district reading is a sample over a stated window at a stated resolution, not a whole-district average. Ward-level polygons are not yet in the atlas, and until they are, the reading says what it actually covers.</li>
+          <li data-en="The official flood warning service requires a registered credential the atlas does not hold, so the flood tier it shows is a modelled rainfall proxy, labelled as such, and never presented as an official warning." data-bn="সরকারি বন্যা-সতর্কতা পরিষেবার জন্য নিবন্ধনকৃত পরিচয়পত্র লাগে যা অ্যাটলাসের কাছে নেই, তাই এটি যে বন্যার স্তর দেখায় তা একটি মডেলড বৃষ্টির প্রক্সি, তেমনভাবেই চিহ্নিত, এবং কখনো সরকারি সতর্কতা হিসেবে উপস্থাপিত হয় না।">The official flood warning service requires a registered credential the atlas does not hold, so the flood tier it shows is a modelled rainfall proxy, labelled as such, and never presented as an official warning.</li>
+        </ul>
+      </section>
+
+      <!-- ── 11 Attribution ───────────────────────────────────────────── -->
+      <section class="research-section">
+        <h2 class="section-heading"><span class="section-number">11</span><span data-en="Attribution" data-bn="কৃতজ্ঞতা">Attribution</span></h2>
+        <p>
+          <strong data-en="Dr Non Arkaraprasertkul" data-bn="ড্র. নন আরকরাপ্রসের্তকুল">Dr Non Arkaraprasertkul</strong><br />
+          <span data-en="Senior Expert in Smart City Promotion, Digital Economy Promotion Agency (DEPA) of Thailand." data-bn="থাইল্যান্ডের ডিজিটাল ইকোনমি প্রমোশন এজেন্সি (ডিইপিএ)-র স্মার্ট সিটি প্রমোশনে সিনিয়র এক্সপার্ট।">Senior Expert in Smart City Promotion, Digital Economy Promotion Agency (DEPA) of Thailand.</span><br />
+          <span data-en="Builder of open civic instruments across ASEAN and the delta cities." data-bn="আসিয়ান ও বদ্বীপ শহরগুলোতে উন্মুক্ত নাগরিক যন্ত্রের নির্মাতা।">Builder of open civic instruments across ASEAN and the delta cities.</span>
+        </p>
+        <p class="paper-note">
+          <span data-en="The satellite collage, the measurement chain, the provenance contract and this paper are the author's work, developed with automated agents. Satellite data is NASA, ESA, World Bank, Open-Meteo, USGS and NOAA. Street-scene reference rendering by Location Scout (oyasumi-gamedev.com), used with attribution. The atlas is deployed on Cloudflare Workers at"
+             data-bn="উপগ্রহ কোলাজ, পরিমাপ শৃঙ্খল, প্রমাণ-চুক্তি ও এই পত্রটি লেখকের নিজস্ব কাজ, স্বয়ংক্রিয় এজেন্টের সহায়তায়। উপগ্রহের তথ্য NASA, ESA, বিশ্বব্যাংক, Open-Meteo, USGS ও NOAA-র। রাস্তার দৃশ্যের রেফারেন্স রেন্ডারিং Location Scout (oyasumi-gamedev.com)-এর, কৃতজ্ঞতাসহ ব্যবহৃত। অ্যাটলাসটি Cloudflare Workers-এ">
+            The satellite collage, the measurement chain, the provenance contract and this paper are the author's work, developed with automated agents. Satellite data is NASA, ESA, World Bank, Open-Meteo, USGS and NOAA. Street-scene reference rendering by Location Scout (oyasumi-gamedev.com), used with attribution. The atlas is deployed on Cloudflare Workers at
+          </span>
+          <a href="https://dhaka.nonarkara.org" style="color:var(--accent);">dhaka.nonarkara.org</a>.
         </p>
       </section>
     </main>
   </div>
+
+  <script>
+    // The paper is written in English and published in Bengali. A long argument
+    // does not fit a phrase catalogue, so each block carries both languages
+    // and this swaps between them, following the same language source the
+    // rest of the atlas uses.
+    (function () {
+      function current() {
+        try { return localStorage.getItem('dhaka-atlas-language') || 'bn'; } catch { return 'bn'; }
+      }
+      function apply(lang) {
+        document.documentElement.lang = lang;
+        for (const el of document.querySelectorAll('[data-en]')) {
+          el.textContent = lang === 'bn' ? el.dataset.bn : el.dataset.en;
+        }
+        const toggle = document.getElementById('research-lang');
+        if (toggle) {
+          toggle.textContent = lang === 'bn' ? 'English' : 'বাংলা';
+          toggle.setAttribute('aria-label', lang === 'bn' ? 'Switch to English' : 'বাংলায় দেখুন');
+        }
+      }
+      const query = new URLSearchParams(location.search).get('lang');
+      const lang = query === 'en' || query === 'bn' ? query : current();
+      apply(lang);
+      const toggle = document.getElementById('research-lang');
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          const next = document.documentElement.lang === 'bn' ? 'en' : 'bn';
+          try { localStorage.setItem('dhaka-atlas-language', next); } catch {}
+          const url = new URL(location.href);
+          url.searchParams.set('lang', next);
+          history.replaceState(null, '', url.toString());
+          apply(next);
+          window.AtlasLanguage?.set?.(next);
+        });
+      }
+      window.addEventListener('atlas:language', event => apply(event.detail));
+    })();
+  </script>
 </body>
 </html>
