@@ -88,6 +88,7 @@ snapshot collector: not-due-or-running
 ✓ Exploration conservation: provider values remain flat, explicit source heights extrude, moving target updates the link, native footprints persist.
 ✓ API truthfulness: failures are not cached or published, a measured corridor is not stamped missing, out-of-range coordinates are refused, a crash answers in JSON
 ✓ Runtime API: valid export preserves all layers; malformed/empty/missing layers are partial or unavailable; throws and invalid coordinates are JSON refusals.
+✓ Worker GIBS: decoded JPEG variation, blank/corrupt/type mismatch refusal, exact decoded date and60-second no-stale availability.
 ✓ GIBS verifier: exact advertised date, decoded PNG/JPEG, blanks/404/type mismatch, source registry, degraded null/reason and mixed-source status
 ✓ Shared GIBS decoder: transparent RGBA and palette variance excluded, opaque zero/variation preserved
 ✓ PNG transport validation: real signature, complete chunks/scanlines and supported filters

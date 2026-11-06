@@ -192,3 +192,72 @@ const coordinates = await runtime.fetch(new Request('https://test.invalid/api/at
 assert.equal(coordinates.status, 400);
 assert.equal((await coordinates.json()).reasonCode, 'coordinates-out-of-range');
 console.log('✓ Runtime API: valid export preserves all layers; malformed/empty/missing layers are partial or unavailable; throws and invalid coordinates are JSON refusals.');
+
+// The Worker must decode JPEG pixels too: GIBS returns blank JPEGs with HTTP200.
+const jpeg = await import('jpeg-js');
+const encodeJpeg = rgba => jpeg.encode({width: 2, height: 2, data: Buffer.from(rgba)}, 100).data;
+const blankJpeg = encodeJpeg(Array.from({length: 4}, () => [255, 255, 255, 255]).flat());
+const variedJpeg = encodeJpeg([0, 0, 0, 255, 255, 255, 255, 255, 255, 0, 0, 255, 0, 0, 255, 255]);
+const environmentRequest = worker => worker.fetch(new Request('https://test.invalid/api/atlas/environment'), {});
+const originalFetch = globalThis.fetch;
+const originalNow = Date.now;
+try {
+  for (const [bytes, type, available] of [
+    [blankJpeg, 'image/jpeg', false], [Buffer.from('fake JPEG'), 'image/jpeg', false],
+    [variedJpeg, 'text/html', false], [variedJpeg, 'image/png', false],
+    [Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), 'image/jpeg', false],
+    [variedJpeg, 'image/jpeg; charset=binary', true],
+  ]) {
+    globalThis.fetch = async url => String(url).endsWith('.jpg')
+      ? new Response(bytes, {headers: {'content-type': type, 'content-length': String(bytes.length)}})
+      : new Response('', {status: 404});
+    const response = await environmentRequest(loadWorker());
+    const body = await response.json();
+    const truecolor = body.layers.find(layer => layer.id === 'VIIRS_NOAA20_CorrectedReflectance_TrueColor');
+    assert.equal(truecolor.status, available ? 'ok' : 'unavailable', `${type} must be decoded, not believed by byte length`);
+    assert.ok(Number.isFinite(Date.parse(truecolor.availability_checked_at)));
+    assert.equal(response.headers.get('cache-control'), 'no-store', 'availability is never served by a stale shared/browser cache');
+    assert.equal(body.availability_ttl_seconds, 60);
+    if (available) {
+      assert.equal(truecolor.latest_date, new Date().toISOString().slice(0, 10));
+      assert.ok(truecolor.template.includes(`/${truecolor.latest_date}/`));
+    } else {
+      assert.equal(truecolor.latest_date, null);
+      assert.equal(truecolor.template, null);
+      assert.ok(truecolor.reasonCode);
+    }
+  }
+  // A uniformly blank newest day must resolve to the prior decoded day,
+  // never inherit the newest HTTP200's date.
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  globalThis.fetch = async url => String(url).endsWith('.jpg')
+    ? new Response(String(url).includes(`/${yesterday}/`) ? variedJpeg : blankJpeg, {headers: {'content-type': 'image/jpeg'}})
+    : new Response('', {status: 404});
+  const dated = (await (await environmentRequest(loadWorker())).json()).layers.find(layer => layer.format === 'jpg');
+  assert.equal(dated.latest_date, yesterday, 'the advertised date belongs to pixels that actually passed decoding');
+  assert.ok(dated.template.includes(`/${yesterday}/`));
+
+  let tileCalls = 0, upstreamAvailable = true;
+  globalThis.fetch = async url => {
+    tileCalls++;
+    return upstreamAvailable && String(url).endsWith('.jpg') ? new Response(variedJpeg, {headers: {'content-type': 'image/jpeg'}}) : new Response('', {status: 404});
+  };
+  const cachedWorker = loadWorker();
+  const first = await (await environmentRequest(cachedWorker)).json();
+  const countAfterCollection = tileCalls;
+  upstreamAvailable = false;
+  const cached = await (await environmentRequest(cachedWorker)).json();
+  assert.equal(tileCalls, countAfterCollection, 'requests inside the short availability window share completed probes');
+  assert.equal(cached.layers[0].availability_checked_at, first.layers[0].availability_checked_at, 'cache does not invent a newer probe time');
+  Date.now = () => originalNow() + 60001;
+  const expiredResponse = await environmentRequest(cachedWorker);
+  const expired = await expiredResponse.json();
+  assert.ok(tileCalls > countAfterCollection, 'availability must be reprobed after60seconds');
+  assert.equal(expiredResponse.status, 503);
+  assert.equal(expired.status, 'unavailable');
+  assert.ok(expired.layers.every(layer => layer.status === 'unavailable' && layer.latest_date === null && layer.template === null), 'an expired successful image is not returned stale during source failure');
+} finally {
+  globalThis.fetch = originalFetch;
+  Date.now = originalNow;
+}
+console.log('✓ Worker GIBS: decoded JPEG variation, blank/corrupt/type mismatch refusal, exact decoded date and60-second no-stale availability.');

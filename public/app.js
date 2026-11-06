@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261106-1793960140-0de944b";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261106-1793960229-51a58e3";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -797,13 +797,13 @@
     try {
       blob = await res.blob();
     } catch {
-      return true;
+      return false;
     }
     if (!blob.size) return false;
     try {
       const bitmap = await createImageBitmap(blob);
       const ctx = gibsContext2d(bitmap.width, bitmap.height);
-      if (!ctx) return true;
+      if (!ctx) { bitmap.close?.(); return false; }
       ctx.drawImage(bitmap, 0, 0);
       const { data } = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
       bitmap.close?.();
@@ -820,8 +820,8 @@
       if (!seen) return false;
       return max - min > 2;
     } catch {
-      // Cannot decode: the bytes are the only evidence available.
-      return true;
+      // Bytes alone cannot establish a usable observation.
+      return false;
     }
   }
 

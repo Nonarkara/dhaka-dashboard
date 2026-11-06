@@ -6,6 +6,7 @@ import { getOutlook } from "./outlook.js";
 import { BUILD_ID, ATLAS_VERSION } from "./build-id.js";
 import { checkRateLimit } from "./rate-limit.js";
 import type { RateLimitEnv } from "./rate-limit.js";
+import { decode as decodeJpeg } from "jpeg-js";
 import { inspectGibsTile, workerInflate } from "./gibs-png.js";
 import { GIBS_CATALOGUE_CAPTURED } from "./gibs-catalogue.js";
 import { MACRO_INDICATORS, RIVER_STATIONS, AIR_STATIONS, DHAKA_STUDY_BOUNDARY, FLOOD_SCENARIO_TYPES, DDM_SHELTER_SOURCE, SHELTER_REGISTER, SHELTER_SCENARIO_TYPES } from "./dhaka-data.js";
@@ -233,9 +234,11 @@ interface GibsLayerReport {
   format: string | null;
   status: "ok" | "unavailable";
   latest_date: string | null;
+  availability_checked_at: string;
   reasonCode: string | null;
 }
 
+const GIBS_AVAILABILITY_TTL_MS = 60_000;
 const GIBS_BASE = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best";
 
 const GIBS_LAYERS: GibsLayerSpec[] = [
@@ -285,14 +288,23 @@ async function gibsTileAvailable(spec: GibsLayerSpec, date: string | null): Prom
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) return false;
-    if (spec.format === "jpg") {
-      // JPEG carries no alpha and the Worker has no JPEG decoder. GIBS serves
-      // JPEG layers as 404 rather than as placeholder tiles, so a delivered
-      // JPEG means the observation exists.
-      return Number(res.headers.get("content-length") || 0) > 0;
-    }
+    const expectedType = spec.format === "jpg" ? "image/jpeg" : "image/png";
+    if (res.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !== expectedType) return false;
     const buf = await res.arrayBuffer();
-    if (!buf.byteLength) return false;
+    if (!buf.byteLength || buf.byteLength > 2 * 1024 * 1024) return false;
+    if (spec.format === "jpg") {
+      // HTTP 200 also serves uniform placeholders. Decode the advertised tile
+      // with bounded allocation, using typed arrays rather than Node Buffer.
+      const decoded = decodeJpeg(new Uint8Array(buf), {useTArray: true, maxResolutionInMP: 1, maxMemoryUsageInMB: 16, tolerantDecoding: false});
+      const min = [255, 255, 255], max = [0, 0, 0];
+      for (let i = 0; i < decoded.data.length; i += 4) {
+        for (let channel = 0; channel < 3; channel++) {
+          min[channel] = Math.min(min[channel], decoded.data[i + channel]);
+          max[channel] = Math.max(max[channel], decoded.data[i + channel]);
+        }
+      }
+      return max.some((value, channel) => value - min[channel] > 2);
+    }
     const verdict = await inspectGibsTile(buf, workerInflate);
     return verdict.hasData;
   } catch {
@@ -326,6 +338,7 @@ async function resolveGibsLayer(spec: GibsLayerSpec): Promise<GibsLayerReport> {
         format: spec.format,
         status: "ok",
         latest_date: r.date,
+        availability_checked_at: new Date().toISOString(),
         reasonCode: null,
       };
     }
@@ -342,6 +355,7 @@ async function resolveGibsLayer(spec: GibsLayerSpec): Promise<GibsLayerReport> {
     format: spec.format,
     status: "unavailable",
     latest_date: null,
+    availability_checked_at: new Date().toISOString(),
     reasonCode: undated ? "gibs-date-unresolved" : "gibs-no-observation",
   };
 }
@@ -361,6 +375,7 @@ async function resolveRadarLayer(): Promise<GibsLayerReport> {
     format: null,
     status: "unavailable",
     latest_date: null,
+    availability_checked_at: new Date().toISOString(),
     reasonCode: "upstream-unreachable",
   };
   try {
@@ -765,13 +780,23 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
   if (url.pathname === "/api/atlas/environment") {
     const { data, error } = await fetchWithCache<GibsLayerReport[]>(
       "gibs:environment",
-      30 * 60 * 1000,
+      GIBS_AVAILABILITY_TTL_MS,
       async () => {
         const gibs = await Promise.all(GIBS_LAYERS.map((spec) => resolveGibsLayer(spec)));
         const radar = await resolveRadarLayer();
         return [...gibs, radar];
       },
       [],
+      reports => {
+        const oldestDate = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
+        for (const report of reports) {
+          const age = Date.now() - Date.parse(report.availability_checked_at);
+          if (!Number.isFinite(age) || age < 0 || age >= GIBS_AVAILABILITY_TTL_MS ||
+            (report.status === "ok" && report.kind === "gibs-raster" && (!report.latest_date || report.latest_date < oldestDate))) {
+            throw new Error("gibs-availability-expired");
+          }
+        }
+      },
     );
 
     const anyOk = data.some((l) => l.status === "ok");
@@ -786,9 +811,10 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         date: new Date().toISOString().split("T")[0],
         source: "NASA GIBS WMTS · epsg3857/best · observation date resolved per layer by decoding the tile",
         catalogue_captured: GIBS_CATALOGUE_CAPTURED,
+        availability_ttl_seconds: GIBS_AVAILABILITY_TTL_MS / 1000,
         layers: data,
       },
-      { status: anyOk ? 200 : 503 },
+      { status: anyOk ? 200 : 503, headers: {"cache-control": "no-store"} },
     );
   }
 

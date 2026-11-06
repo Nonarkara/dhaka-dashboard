@@ -20,6 +20,8 @@
  * Refresh the fixture with: node scripts/refresh-gibs-catalogue.mjs
  */
 import { readFileSync } from "node:fs";
+import vm from "node:vm";
+import assert from "node:assert/strict";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -227,6 +229,19 @@ for (const p of REQUIRED_ENDPOINT_PATTERNS) {
 // Authoritative Dhaka centre coordinates.
 if (!srcIndex.includes("23.8103") || !srcIndex.includes("90.4125")) {
   fail("src/index.ts missing authoritative Dhaka center coordinates (23.8103, 90.4125)");
+}
+
+// Execute the browser probe: a decoding/read/context failure is unknown, not data.
+const probeSource = appJs.slice(appJs.indexOf("  async function gibsTileHasData("), appJs.indexOf("  // GIBS publishes each product", appJs.indexOf("  async function gibsTileHasData(")));
+for (const mode of ['varied', 'blank', 'transparent', 'read-failed', 'decode-failed', 'no-context']) {
+  const context = vm.createContext({
+    AbortSignal,
+    fetch: async () => ({ok:true, blob:async () => {if(mode==='read-failed')throw Error('read failed');return {size:8};}}),
+    createImageBitmap: async () => {if(mode==='decode-failed')throw Error('decode failed');return {width:2,height:1,close(){}};},
+    gibsContext2d: () => mode==='no-context'?null:{drawImage(){},getImageData(){return {data:new Uint8Array([0,0,0,mode==='transparent'?0:255,mode==='varied'?200:0,0,0,mode==='transparent'?0:255])};}},
+  });
+  const probe=vm.runInContext(probeSource+';gibsTileHasData',context);
+  assert.equal(await probe('https://example.test/tile'), mode==='varied', `browser tile probe ${mode}`);
 }
 
 // ── Report ─────────────────────────────────────────────────────────────────
