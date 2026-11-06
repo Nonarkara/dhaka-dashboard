@@ -140,3 +140,71 @@ for(const lang of ['bn','en']) {
   assert.match(item.attrs['aria-label'],/CAMS.*2026-11-04/,'source and valid time stay in accessible name');
 }
 console.log('✓ Watch behavior: visible AQI category, complete accessible evidence, Bengali/English rerender.');
+
+// Run the actual transit renderer, including failure/retry and response races.
+const transitRetry = {handlers: {}, addEventListener(type, handler) {this.handlers[type] = handler;}};
+const transitCell = {dataset: {}, innerHTML: '', querySelector(selector) {return selector === '[data-feed-retry]' ? transitRetry : null;}};
+const transitBody = {dataset: {}, innerHTML: '', querySelector(selector) {return selector === 'td' ? transitCell : null;}};
+const transitList = {hidden: true}, transitSummary = {textContent: ''}, transitItems = {innerHTML: ''};
+const transitElements = new Map([['#transit-registry', transitBody], ['#transit-stations-list', transitList], ['#transit-stations-summary', transitSummary], ['#transit-stations-items', transitItems]]);
+const transitDocument = {documentElement: {lang: 'en'}, querySelector: s => transitElements.get(s) || null, addEventListener() {}};
+const transitWindow = {};
+let transitFetch;
+vm.runInNewContext(source.slice(0, source.lastIndexOf('  if (document.readyState')) + 'window.transitTest=loadTransitRegistry;})();', {
+  document: transitDocument, window: transitWindow, fetch: (...args) => transitFetch(...args), AbortController, AbortSignal, Intl,
+});
+const registry = JSON.parse(readFileSync('public/dhaka-mrt.geojson', 'utf8'));
+const transitSuccess = () => ({ok: true, status: 200, json: async () => ({status: 'ok', transit: registry})});
+for (const lang of ['en', 'bn']) {
+  transitDocument.documentElement.lang = lang;
+  transitFetch = async (_url, options) => {
+    assert.ok(options.signal instanceof AbortSignal, 'transit acquisition has a bounded abort signal');
+    return {ok: false, status: 503, json: async () => ({status: 'unavailable', reasonCode: 'transit-missing', timestamp: '2026-11-06T00:00:00Z'})};
+  };
+  await transitWindow.transitTest();
+  assert.equal(transitBody.innerHTML, '<tr><td colspan="3"></td></tr>', 'failure UI belongs inside a valid table cell');
+  assert.equal(transitBody.dataset.status, 'unavailable');
+  assert.equal(transitBody.dataset.reasonCode, 'transit-missing');
+  assert.equal(transitBody.dataset.checkedAt, '2026-11-06T00:00:00Z');
+  assert.match(transitCell.innerHTML, /transit-missing.*2026-11-06T00:00:00Z/s);
+  assert.match(transitCell.innerHTML, lang === 'bn' ? /আবার চেষ্টা/ : /Retry/);
+  assert.ok(transitList.hidden, 'failure hides a previous station list');
+  transitFetch = async () => transitSuccess();
+  await transitRetry.handlers.click({currentTarget: transitRetry});
+  assert.equal(transitBody.dataset.status, 'ok');
+  assert.equal(transitBody.dataset.reasonCode, undefined, 'success clears old failure state');
+  assert.notEqual(transitBody.dataset.checkedAt, '2026-11-06T00:00:00Z');
+  assert.equal(transitList.hidden, false);
+  assert.equal((transitItems.innerHTML.match(/<li>/g) || []).length, 17, 'all mapped stations survive');
+  assert.doesNotMatch(transitBody.innerHTML,/hud-badge/,'global reference qualification replaces repetitive badges');
+  assert.match(transitItems.innerHTML, lang === 'bn' ? /কমলাপুর \(সম্প্রসারণ\)/ : /Kamalapur Station \(Extension\)/);
+  assert.match(transitBody.innerHTML, lang === 'bn' ? /মানচিত্রভুক্ত স্টেশন.*সম্প্রসারণসহ/ : /mapped stations.*including extension/);
+  assert.match(transitSummary.textContent, lang === 'bn' ? /সম্প্রসারণসহ/ : /includes extension/);
+}
+let releaseOld, oldSignal;
+transitDocument.documentElement.lang = 'en';
+transitFetch = (_url, options) => {oldSignal = options.signal; return new Promise(resolve => {releaseOld = resolve;});};
+const oldRequest = transitWindow.transitTest();
+transitDocument.documentElement.lang = 'bn';
+transitFetch = async () => transitSuccess();
+await transitWindow.transitTest();
+assert.ok(oldSignal.aborted, 'new request aborts previous acquisition');
+const currentMarkup = transitBody.innerHTML;
+releaseOld({ok: false, status: 503, json: async () => ({status: 'unavailable', reasonCode: 'late-failure'})});
+await oldRequest;
+assert.equal(transitBody.innerHTML, currentMarkup, 'late old-language failure cannot replace current success');
+assert.equal(transitBody.dataset.status, 'ok');
+transitFetch = () => new Promise(resolve => {releaseOld = resolve;});
+const staleSuccess = transitWindow.transitTest();
+transitFetch = async () => ({ok: false, status: 503, json: async () => ({status: 'unavailable', reasonCode: 'current-failure'})});
+await transitWindow.transitTest();
+releaseOld(transitSuccess());
+await staleSuccess;
+assert.equal(transitBody.dataset.reasonCode, 'current-failure', 'late success cannot erase newer failure');
+transitFetch = async () => {throw Object.assign(new Error('timeout'), {name: 'TimeoutError'});};
+await transitWindow.transitTest();
+assert.equal(transitBody.dataset.reasonCode, 'request-timeout');
+assert.match(transitCell.innerHTML, /request-timeout/);
+console.log('✓ Transit runtime: bilingual 17-station reference/extension labels, timed requests, visible dated failures, retry recovery and stale-response rejection.');
+
+assert.match(html,/Reference network registry; routes, lengths and capacities below are unverified reference entries, not current operating status/,'removing repeated badges retains the explicit global source limitation');

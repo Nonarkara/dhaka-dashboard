@@ -31,7 +31,7 @@
           <option value="city">City in 3D</option><option value="rivers">River outlook</option>
           <option value="air">Air forecast</option><option value="people">Population</option><option value="economy">Economic engine</option>
           <option value="transit">Transit &amp; Metro</option><option value="heritage">Architectural heritage</option>
-          <option value="walk">Street level</option>
+          <option value="walk">Low-angle map</option>
           <option value="haze">Brick kilns &amp; smoke</option><option value="rain">Rain · next 24 h</option>
           <option value="radar">Rain radar</option><option value="cloud">Satellite clouds</option>
           <option value="aerosol">Satellite aerosol (AOD)</option>
@@ -84,25 +84,29 @@
 
       <details id="people-key" class="people-key" hidden></details>
 
-      <!-- The walkthrough. Only shown by the Street level lens. -->
-      <section class="atlas-walk" id="atlas-walk" hidden aria-label="Street-level walkthrough">
-        <p class="atlas-walk-counts" id="atlas-walk-counts" role="status">—</p>
-        <p class="atlas-walk-status" id="atlas-walk-status" role="status">—</p>
-        <p class="atlas-walk-keys" id="atlas-walk-keys"></p>
+      <!-- Authored map viewpoints and explicit manual exploration. -->
+      <section class="atlas-walk" id="atlas-walk" hidden aria-label="Low-angle map exploration">
+        <p class="atlas-walk-place" id="atlas-walk-place" role="status">—</p>
+        <p id="atlas-walk-note">Source heights only; unknown flat. Not a walking route.</p>
         <div class="atlas-walk-nav">
-          <button type="button" id="atlas-walk-prev" class="atlas-walk-step">← Previous stop</button>
-          <button type="button" id="atlas-walk-next" class="atlas-walk-step">Next stop →</button>
+          <button type="button" id="atlas-walk-prev" class="atlas-walk-step">← Previous</button>
+          <button type="button" id="atlas-walk-next" class="atlas-walk-step">Next →</button>
         </div>
-        <details class="atlas-walk-itinerary">
-          <summary id="atlas-walk-itinerary-summary">Walk itinerary</summary>
-          <nav class="atlas-walk-route" id="atlas-walk-route" aria-label="Walk itinerary"></nav>
-        </details>
-        <a class="atlas-walk-scout" id="atlas-walk-scout" href="https://tools.oyasumi-gamedev.com/rokehan/" target="_blank" rel="noopener noreferrer">Open the street scene render ↗</a>
-        <details class="atlas-walk-more">
-          <summary id="atlas-walk-summary">How this is measured</summary>
-          <p id="atlas-walk-note">Massing is drawn from the map provider's computed heights, not surveyed ones.</p>
-          <p class="atlas-walk-legend"><span class="atlas-walk-swatch" aria-hidden="true"></span><span id="atlas-walk-legend-text">Illustrative massing — height from the map provider, not surveyed</span></p>
-          <p id="atlas-walk-credit">Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · elevation Terrain Tiles. Opened in a new tab.</p>
+        <details class="atlas-walk-tools">
+          <summary>Exploration tools &amp; sources</summary>
+          <p class="atlas-walk-status" id="atlas-walk-status" role="status">—</p>
+          <p class="atlas-walk-keys" id="atlas-walk-keys"></p>
+          <p class="atlas-walk-counts" id="atlas-walk-counts" role="status">—</p>
+          <details class="atlas-walk-itinerary">
+            <summary id="atlas-walk-itinerary-summary">Map viewpoints</summary>
+            <nav class="atlas-walk-route" id="atlas-walk-route" aria-label="Map viewpoints"></nav>
+          </details>
+          <a class="atlas-walk-scout" id="atlas-walk-scout" href="https://tools.oyasumi-gamedev.com/rokehan/" target="_blank" rel="noopener noreferrer">Open map centre in external scene ↗</a>
+          <details class="atlas-walk-more">
+            <summary id="atlas-walk-summary">How this is measured</summary>
+            <p class="atlas-walk-legend"><span class="atlas-walk-swatch" aria-hidden="true"></span><span id="atlas-walk-legend-text">Mapped footprints · explicit heights only</span></p>
+            <p id="atlas-walk-credit">External scene: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap. Opens in a new tab.</p>
+          </details>
         </details>
       </section>
 </aside>
@@ -230,11 +234,10 @@
             <th>Corridor / System</th>
             <th>Type</th>
             <th>Length / Capacity</th>
-            <th>Status</th>
           </tr>
         </thead>
         <tbody id="transit-registry">
-          <tr><td colspan="4">Loading transit registry…</td></tr>
+          <tr><td colspan="3">Loading transit registry…</td></tr>
         </tbody>
       </table>
       <details id="transit-stations-list" hidden>

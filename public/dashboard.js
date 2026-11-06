@@ -69,13 +69,27 @@
     railway_station: { en: 'Railway station', bn: 'রেলওয়ে স্টেশন' },
   };
 
+  let transitRequest = 0;
+  let transitController;
+
   async function loadTransitRegistry() {
     const body = $('#transit-registry');
     if (!body) return;
     const list = $('#transit-stations-list');
+    const requestId = ++transitRequest;
+    const language = document.documentElement.lang;
+    transitController?.abort();
+    transitController = new AbortController();
+    const current = () => requestId === transitRequest && language === document.documentElement.lang && body === $('#transit-registry');
+    delete body.dataset.reasonCode;
+    delete body.dataset.checkedAt;
+    body.dataset.status = 'loading';
+    body.innerHTML = `<tr><td colspan="3">${tr('Loading transit registry…', 'পরিবহন তথ্যসূত্র লোড হচ্ছে…')}</td></tr>`;
+    if (list) list.hidden = true;
     try {
-      const response = await fetch('/api/dhaka/transit');
+      const response = await fetch('/api/dhaka/transit', { signal: AbortSignal.any([transitController.signal, AbortSignal.timeout(10000)]) });
       const data = await readFeedResponse(response);
+      if (!current()) return;
       const features = Array.isArray(data.transit?.features) ? data.transit.features : [];
       if (!features.length) throw Object.assign(new Error('Empty registry'), { reasonCode: 'transit-registry-empty' });
 
@@ -87,7 +101,6 @@
       const railStations = of('railway_station');
       const num = n => new Intl.NumberFormat(isBn ? 'bn-BD' : 'en-GB').format(n);
 
-      const badge = `<span class="hud-badge" style="background:var(--bg-strong)">${tr('Reference only', 'শুধু তথ্যসূত্র')}</span>`;
       const rows = [];
 
       const rail = of('rapid_transit')[0];
@@ -95,10 +108,9 @@
         const p = rail.properties;
         const length = Number.isFinite(p.length_km) ? `${num(p.length_km)} km` : '—';
         rows.push(`<tr>
-            <td><strong>${nameOf(rail)}</strong>${p.operator ? `<br><small style="color:var(--dim)">${escapeHtml(p.operator)}</small>` : ''}</td>
+            <td><strong>${nameOf(rail)}</strong>${p.operator ? `<br><small data-language-fixed style="color:var(--dim)">${escapeHtml(p.operator)}</small>` : ''}</td>
             <td>${tr(TRANSIT_TYPES.rapid_transit.en, TRANSIT_TYPES.rapid_transit.bn)}</td>
-            <td>${length} · ${num(stations.length)} ${tr('Stations', 'স্টেশন')}</td>
-            <td>${badge}</td>
+            <td>${length} · ${num(stations.length)} ${tr('mapped stations (including extension)', 'মানচিত্রভুক্ত স্টেশন (সম্প্রসারণসহ)')}</td>
           </tr>`);
       }
 
@@ -107,10 +119,9 @@
         const p = expressway.properties;
         const length = Number.isFinite(p.length_km) ? `${num(p.length_km)} km` : '—';
         rows.push(`<tr>
-            <td><strong>${nameOf(expressway)}</strong>${p.operator ? `<br><small style="color:var(--dim)">${escapeHtml(p.operator)}</small>` : ''}</td>
+            <td><strong>${nameOf(expressway)}</strong>${p.operator ? `<br><small data-language-fixed style="color:var(--dim)">${escapeHtml(p.operator)}</small>` : ''}</td>
             <td>${tr(TRANSIT_TYPES.expressway.en, TRANSIT_TYPES.expressway.bn)}</td>
             <td>${length}</td>
-            <td>${badge}</td>
           </tr>`);
       }
 
@@ -119,7 +130,6 @@
             <td><strong>${num(busTerminals.length)} ${tr('Bus terminals', 'বাস টার্মিনাল')}</strong><br><small style="color:var(--dim)">${busTerminals.map(nameOf).join(' · ')}</small></td>
             <td>${tr(TRANSIT_TYPES.bus_terminal.en, TRANSIT_TYPES.bus_terminal.bn)}</td>
             <td>${num(busTerminals.length)}</td>
-            <td>${badge}</td>
           </tr>`);
       }
 
@@ -128,17 +138,16 @@
             <td><strong>${railStations.map(nameOf).join(' · ')}</strong>${railStations[0].properties?.role_bn ? `<br><small style="color:var(--dim)">${escapeHtml(isBn ? railStations[0].properties.role_bn : (railStations[0].properties.role || ''))}</small>` : ''}</td>
             <td>${tr(TRANSIT_TYPES.railway_station.en, TRANSIT_TYPES.railway_station.bn)}</td>
             <td>${num(railStations.length)}</td>
-            <td>${badge}</td>
           </tr>`);
       }
 
       body.innerHTML = rows.join('');
-      body.dataset.status = 'ok';
+      markFeedReady(body);
 
       if (list) {
         const items = $('#transit-stations-items');
         const summary = $('#transit-stations-summary');
-        if (summary) summary.textContent = `${tr('Stations', 'স্টেশন')} (${num(stations.length)})`;
+        if (summary) summary.textContent = `${tr('Mapped stations · includes extension', 'মানচিত্রভুক্ত স্টেশন · সম্প্রসারণসহ')} (${num(stations.length)})`;
         if (items) {
           items.innerHTML = stations.map(f => {
             const p = f.properties;
@@ -149,9 +158,11 @@
         list.hidden = stations.length === 0;
       }
     } catch (err) {
-      body.dataset.status = 'unavailable';
-      body.dataset.reasonCode = err?.reasonCode || 'transit-registry-unavailable';
-      body.innerHTML = `<tr><td colspan="4">${tr('Transit registry unavailable.', 'পরিবহন তথ্যসূত্র অনুপলব্ধ।')}</td></tr>`;
+      if (!current()) return;
+      body.innerHTML = '<tr><td colspan="3"></td></tr>';
+      const cell = body.querySelector('td');
+      renderFeedFailure(cell, err, 'Transit registry unavailable.', 'পরিবহন তথ্যসূত্র অনুপলব্ধ।', loadTransitRegistry);
+      Object.assign(body.dataset, cell.dataset);
       if (list) list.hidden = true;
     }
   }

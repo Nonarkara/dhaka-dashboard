@@ -872,26 +872,48 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
     const layers = ["dhaka-landmarks", "dhaka-rivers", "dhaka-mrt"];
     const features: unknown[] = [];
     const missing: string[] = [];
-    for (const layer of layers) {
-      const layerUrl = new URL(`/${layer}.geojson`, request.url);
-      const res = await env.ASSETS.fetch(layerUrl.toString());
-      if (!res.ok) {
-        missing.push(layer);
-        continue;
+    const validGeometry = (geometry: unknown): boolean => {
+      if (!geometry || typeof geometry !== "object") return false;
+      const g = geometry as {type?: string; coordinates?: unknown; geometries?: unknown};
+      if (g.type === "GeometryCollection") return Array.isArray(g.geometries) && g.geometries.length > 0 && g.geometries.every(validGeometry);
+      const point = (value: unknown): value is number[] => Array.isArray(value) && value.length >= 2 && value.every(v => typeof v === "number" && Number.isFinite(v)) && Math.abs(value[0]) <= 180 && Math.abs(value[1]) <= 90;
+      const line = (value: unknown): boolean => Array.isArray(value) && value.length >= 2 && value.every(point);
+      const ring = (value: unknown): boolean => Array.isArray(value) && value.length >= 4 && value.every(point) && value[0].length === value[value.length - 1].length && value[0].every((v: number, i: number) => v === value[value.length - 1][i]);
+      const polygon = (value: unknown): boolean => Array.isArray(value) && value.length > 0 && value.every(ring);
+      const multiple = (value: unknown, check: (item: unknown) => boolean): boolean => Array.isArray(value) && value.length > 0 && value.every(check);
+      switch (g.type) {
+        case "Point": return point(g.coordinates);
+        case "MultiPoint": return multiple(g.coordinates, point);
+        case "LineString": return line(g.coordinates);
+        case "MultiLineString": return multiple(g.coordinates, line);
+        case "Polygon": return polygon(g.coordinates);
+        case "MultiPolygon": return multiple(g.coordinates, polygon);
+        default: return false;
       }
-      const body = await res.json() as { features?: { properties?: Record<string, unknown> }[] };
-      for (const feature of body.features || []) {
-        features.push({
-          ...feature,
-          properties: { ...(feature.properties || {}), layer },
-        });
+    };
+    for (const layer of layers) {
+      try {
+        const layerUrl = new URL(`/${layer}.geojson`, request.url);
+        const res = await env.ASSETS.fetch(layerUrl.toString());
+        if (!res.ok) throw new Error("export-layer-missing");
+        const body = await res.json() as {type?: string; features?: {type?: string; properties?: Record<string, unknown> | null; geometry?: unknown}[]};
+        if (body?.type !== "FeatureCollection" || !Array.isArray(body.features) || !body.features.length || !body.features.every(feature =>
+          feature?.type === "Feature" && Object.hasOwn(feature, "properties") && (feature.properties == null || (typeof feature.properties === "object" && !Array.isArray(feature.properties))) && validGeometry(feature.geometry)
+        )) throw new Error("export-layer-invalid");
+        for (const feature of body.features) {
+          features.push({...feature, properties: {...(feature.properties || {}), layer}});
+        }
+      } catch {
+        missing.push(layer);
       }
     }
     if (!features.length) {
-      return jsonResponse({ status: "unavailable", reasonCode: "export-missing", layers: missing }, { status: 503 });
+      return jsonResponse({ status: "unavailable", reasonCode: "export-missing", timestamp: new Date().toISOString(), layers: missing }, { status: 503 });
     }
     return jsonResponse({
       type: "FeatureCollection",
+      status: missing.length ? "partial" : "ok",
+      reasonCode: missing.length ? "export-layers-missing-or-invalid" : null,
       features,
       metadata: {
         generatedAt: new Date().toISOString(),

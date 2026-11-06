@@ -13,7 +13,7 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
 | **City in 3D** | OSM building footprints at zoom 14+ in every 3D lens; local Parliament detail preserves courtyards and eight explicit source heights; unknown heights stay flat, plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
-| **Street level** | Eye-level view of the mapped street. The massing is drawn from the map provider's computed heights, which are **not surveyed**; the panel states how many buildings in view rest on that number. One click opens a detailed street scene render for the reader's own coordinates | OpenStreetMap / OpenFreeMap (provider `render_height`); street scene render by Location Scout (oyasumi-gamedev.com) |
+| **Low-angle map** | Manual map exploration and authored viewpoint bookmarks. Only explicit source heights extrude; unknown heights stay flat. Projection-model camera estimates are not surveyed eye height. Counts are unique identified rendered footprints; the external scene link uses the map centre | OpenStreetMap / OpenFreeMap; credited external Location Scout link |
 | **River outlook** | Northeast GloFAS daily model reaches with ensemble quartiles and available-series maxima; Dhaka reference station registry has no connected observations or calibrated warnings | Bangladesh Water Development Board (BWDB) / FFWC |
 | **Population** | Dated WorldPop 2025 estimates in 1 km cells and 2,181 mapped school/healthcare objects; no census or capacity inference | WorldPop / OpenStreetMap |
 | **Economic engine** | Ready-Made Garment (RMG) export corridors, Savar DEPZ, Adamjee EPZ, Motijheel financial district, and wholesale hubs (Kawran Bazar, Islampur, Chawkbazar) | Export Promotion Bureau (EPB), Bangladesh Bank, DSE |
@@ -133,3 +133,12 @@ Current weather/air/wind validate source time, UTC offset, units and finite admi
 The inherited geometric Parliament sketch is preserved at `/parliament-reference.html` as a bilingual, manually turnable nongeographic design study. The map retains all4,076dated OSM footprints and14courtyard rings; eight explicit source heights extrude, while4,068unknown heights remain flat. Provider-derived streamed `render_height` is not treated as an explicit source height.
 
 Repository recovery and release proof: `docs/evidence/reconciliation-2026-11-04/`. CI without Cloudflare credentials reports validation only; authenticated release uses the same canonical `scripts/deploy-live.sh` gates as local shipping. There are18configured npm test suites, counted from package.json; previous20-suite summaries were inaccurate.
+
+
+## MiniMax follow-up audit · 6 November 2026
+
+The low-angle exploration lens preserves keyboard controls, authored viewpoints and explicit source-height geometry. It does not establish a walking route, access or a pedestrian position. A/D directions, hidden/manual/exit interruption, reduced motion and late data attachment are covered by executable VM tests rather than source-string assertions. The default75° pitch retains geographic context;85° remains the manual limit.
+
+Transit now labels17mapped registry stations including the Kamalapur extension, without claiming17operating stations. Failures retain their reason/time and a working Retry; stale language responses cannot overwrite the current desk. Export validates each layer and reports malformed/missing collections as partial or unavailable.
+
+The report's axial-grid claim is stale: protectedSTYLE.md and currentCSS already specify modular map-edge instruments. There are23configured npm suites after adding executable exploration behavior. Deployment and live-build status are recorded separately in docs/evidence/audit-2026-11-06/; a successful test run does not prove a release, and an account API503alone does not establish a global Cloudflare outage.

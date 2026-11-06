@@ -126,3 +126,69 @@ for (const route of documented) {
 }
 
 console.log('✓ API truthfulness: failures are not cached or published, a measured corridor is not stamped missing, out-of-range coordinates are refused, a crash answers in JSON');
+// Execute the Worker: string-presence checks cannot establish these contracts.
+const { default: ts } = await import('typescript');
+const { createRequire } = await import('node:module');
+const nativeRequire = createRequire(import.meta.url);
+function loadWorker() {
+  const modules = new Map();
+  function load(name) {
+    if (modules.has(name)) return modules.get(name);
+    const js = ts.transpileModule(readFileSync(`src/${name}.ts`, 'utf8'), {compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022}}).outputText;
+    const module = {exports: {}};
+    modules.set(name, module.exports);
+    new Function('require', 'module', 'exports', js)(path => path.startsWith('.') ? load(path.replace('./', '').replace('.js', '')) : nativeRequire(path), module, module.exports);
+    return module.exports;
+  }
+  return load('index').default;
+}
+const runtime = loadWorker();
+const feature = {type: 'Feature', properties: {name: 'Reference'}, geometry: {type: 'Point', coordinates: [90.4, 23.7]}};
+const validLayer = {type: 'FeatureCollection', features: [feature]};
+const requestExport = async layers => {
+  const response = await runtime.fetch(new Request('https://test.invalid/api/atlas/export'), {ASSETS: {fetch: async url => {
+    const layer = layers[String(url).split('/').pop()];
+    if (layer === 'throw') throw new Error('asset offline');
+    if (layer === 'json-error') return new Response('{');
+    return layer === undefined ? new Response('', {status: 404}) : Response.json(layer);
+  }}});
+  return {response, body: await response.json()};
+};
+const allLayers = {'dhaka-landmarks.geojson': validLayer, 'dhaka-rivers.geojson': validLayer, 'dhaka-mrt.geojson': validLayer};
+let result = await requestExport(allLayers);
+assert.equal(result.body.status, 'ok');
+assert.equal(result.body.features.length, 3);
+assert.deepEqual(result.body.metadata.missingLayers, []);
+assert.deepEqual(result.body.features.map(f => f.properties.layer), ['dhaka-landmarks', 'dhaka-rivers', 'dhaka-mrt']);
+const actual = await requestExport(Object.fromEntries(Object.keys(allLayers).map(name => [name, JSON.parse(readFileSync(`public/${name}`, 'utf8'))])));
+assert.equal(actual.body.status, 'ok', 'all existing atlas layers remain exportable');
+assert.equal(actual.body.features.length, Object.keys(allLayers).reduce((sum, name) => sum + JSON.parse(readFileSync(`public/${name}`, 'utf8')).features.length, 0));
+const invalidLayers = [undefined, {}, null, {features: [feature]}, {type: 'FeatureCollection', features: []},
+  {type: 'FeatureCollection', features: {}}, {type: 'FeatureCollection', features: [null]},
+  ...[{}, {type: 'Feature', properties: {}, geometry: {type: 'Point', coordinates: [999, 23]}},
+    {...feature, geometry: {type: 'LineString', coordinates: [[90, 23]]}},
+    {...feature, geometry: {type: 'Polygon', coordinates: [[[90, 23], [91, 23], [91, 24], [90, 24]]]}}]
+    .map(f => ({type: 'FeatureCollection', features: [f]})), 'throw', 'json-error'];
+for (const invalid of invalidLayers) {
+  const partial = await requestExport({...allLayers, 'dhaka-rivers.geojson': invalid});
+  assert.equal(partial.response.status, 200);
+  assert.equal(partial.body.status, 'partial');
+  assert.equal(partial.body.reasonCode, 'export-layers-missing-or-invalid');
+  assert.deepEqual(partial.body.metadata.missingLayers, ['dhaka-rivers']);
+  assert.equal(partial.body.features.length, 2, 'invalid layer contributes no fabricated features');
+  const unavailable = await requestExport(Object.fromEntries(Object.keys(allLayers).map(k => [k, invalid])));
+  assert.equal(unavailable.response.status, 503);
+  assert.equal(unavailable.body.status, 'unavailable');
+  assert.ok(Number.isFinite(Date.parse(unavailable.body.timestamp)));
+  assert.equal(unavailable.response.headers.get('cache-control'), 'no-store');
+}
+const thrown = await runtime.fetch(new Request('https://test.invalid/'), {ASSETS: {fetch() {throw new Error('asset failure');}}});
+assert.equal(thrown.status, 500);
+const thrownBody = await thrown.json();
+assert.equal(thrownBody.reasonCode, 'handler-failed');
+assert.ok(Number.isFinite(Date.parse(thrownBody.timestamp)));
+assert.equal(thrown.headers.get('cache-control'), 'no-store');
+const coordinates = await runtime.fetch(new Request('https://test.invalid/api/atlas/at-this-point?lat=999&lng=90'), {});
+assert.equal(coordinates.status, 400);
+assert.equal((await coordinates.json()).reasonCode, 'coordinates-out-of-range');
+console.log('✓ Runtime API: valid export preserves all layers; malformed/empty/missing layers are partial or unavailable; throws and invalid coordinates are JSON refusals.');

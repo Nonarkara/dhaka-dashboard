@@ -1,26 +1,7 @@
-// The walkthrough: a first-person walk through the city the atlas measures.
-//
-// The Street level lens already draws the massing at the map provider's
-// computed heights and says so. What was missing is the part that makes a
-// walk a walk: standing in the street, turning your head, and moving.
-//
-// Three rules govern what this module claims:
-//
-//  1. The camera's height above the map plane is measured, not asserted.
-//     MapLibre renders a pitched map with a level camera — the map plane is
-//     rotated under the lens rather than the lens tilted over the map — so
-//     the height is a consequence of the zoom, the pitch and the size of the
-//     window. A reader is entitled to know it, and it is read back from the
-//     map rather than guessed at.
-//
-//  2. The walk moves over the map's flat plane. The atlas carries no
-//     elevation model, so the ground under the reader is the map's zero, and
-//     the panel says that too.
-//
-//  3. The route is an authored itinerary over the atlas's own measured
-//     districts, in an order a person could actually walk. It is not a
-//     computed walking route: there is no routing engine here and the panel
-//     does not pretend otherwise.
+// Manual exploration of the map plane with authored district viewpoints.
+// Coordinates come from the atlas registry; neither these bookmarks nor keyboard
+// movement establish street access, a walking route, or a pedestrian position.
+// Camera values below are projection-model estimates, not surveyed elevations.
 
 (function () {
   'use strict';
@@ -28,24 +9,15 @@
   const bn = () => document.documentElement.lang === 'bn';
   const tr = (en, be) => (bn() ? be : en);
 
-  /** The walking speed of a person, in metres per second. */
+  /** Map-plane translation rates, in metres per second. */
   const SPEED_MPS = 1.35;
   const STRAFE_MPS = 0.9;
   const TURN_DEG_PER_SEC = 80;
   const MAX_PITCH = 85;
+  const DEFAULT_PITCH = 75; // Retain geographic context rather than imply eye height.
 
-  /**
-   * The zoom the walk stands at.
-   *
-   * Not a matter of taste. The streamed vector tiles carry their building
-   * outlines natively to z19 and the raster basemap no further, so z19 is
-   * the last zoom at which the atlas is looking at the data as it was
-   * published. Above it the camera would magnify the tiles and the street
-   * would go soft; below it the city stops being a street.
-   *
-   * The camera's height follows from this zoom, and it is measured rather
-   * than chosen: see measureCamera().
-   */
+  // Authored low-angle map framing; camera altitude depends on the viewport.
+  // Zoom is not evidence that a viewpoint is at a person's eye height.
   const STREET_ZOOM = 19;
 
   /**
@@ -59,20 +31,20 @@
   /**
    * The itinerary.
    *
-   * The districts are the atlas's own, in the order a walker meets them
-   * coming north up the old city. Each stop carries the bearing to face
-   * when standing there — a direction, not a claim about what is visible.
+   * The atlas registry supplies district reference coordinates. The order and
+   * bearings are authored bookmarks, not a street-connected route or proof
+   * that a particular building, entrance or path can be reached.
    */
   const ROUTE = [
     {
       id: 'old-dhaka', bearing: 20,
-      note: 'The old walled city, at street level.',
-      note_bn: 'পুরোন ঢাকা, রাস্তার ধরনে।',
+      note: 'Old Dhaka district reference viewpoint.',
+      note_bn: 'পুরোন ঢাকার জেলা-রেফারেন্স দৃশ্য।',
     },
     {
       id: 'chawkbazar', bearing: 350,
-      note: 'The densest wholesale fabric in the country.',
-      note_bn: 'দেশের সবচেয়ে ঘন পাইকারি কাঠামো।',
+      note: 'Chawkbazar district reference viewpoint.',
+      note_bn: 'চকবাজারের জেলা-রেফারেন্স দৃশ্য।',
     },
     {
       id: 'sadarghat', bearing: 120,
@@ -81,8 +53,8 @@
     },
     {
       id: 'motijheel', bearing: 200,
-      note: 'The financial core, emptied after dark.',
-      note_bn: 'আর্থিক কেন্দ্র, যা রাতে ফাঁকা হয়ে যায়।',
+      note: 'Motijheel district reference viewpoint.',
+      note_bn: 'মতিঝিলের জেলা-রেফারেন্স দৃশ্য।',
     },
     {
       id: 'kawran-bazar', bearing: 270,
@@ -91,8 +63,8 @@
     },
     {
       id: 'gulshan', bearing: 340,
-      note: 'The commercial belt, and the light it leaves on.',
-      note_bn: 'বাণিজ্যিক এলাকা, এবং সে যে আলো রেখে যায়।',
+      note: 'Gulshan district reference viewpoint.',
+      note_bn: 'গুলশানের জেলা-রেফারেন্স দৃশ্য।',
     },
   ];
 
@@ -103,6 +75,12 @@
   /** True once the camera has actually been put at a stop. */
   let standing = false;
   let stopIndex = 0;
+  let atBookmark = false;
+  let boundMap = null;
+  let previousMaxPitch = null;
+  let previousKeyboardEnabled = false;
+  let collageLoading = false;
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   const keys = new Set();
   let rafId = null;
   let lastFrame = 0;
@@ -113,27 +91,13 @@
 
   // ── Measuring the camera ────────────────────────────────────────────────
   //
-  // MapLibre's pitched view is a level camera looking at a tilted map. A
-  // ground point at distance d from the camera's foot therefore appears at
-  // the screen row
-  //
-  //     y = y_horizon + f · H / d
-  //
-  // with f the focal length in pixels and H the camera's height above the
-  // ground plane. Writing u for the distance from the middle of the screen
-  // to the horizon and A for H·f, the distance from the middle of the
-  // screen's ground point to the ground point at row y is
-  //
-  //     D(y) = A · s / (u · (u + s)),      s = y − middle
-  //
-  // Two rows are enough to solve for u and A. The focal length then comes
-  // from the horizon and the angle at which the middle row looks down, and
-  // the height is H = A / f.
-  //
-  // Every number is read back from the map with map.unproject(), which is
-  // the map's own projection of a screen row onto the ground. When the rows
-  // do not agree with one another, the measurement is refused: a wrong
-  // number here would be a lie about where the reader is standing.
+  // Fit a planar perspective model to map.unproject() samples. The camera
+  // looks down by depression θ; the fitted vertical asymptote gives u=f tanθ.
+  // Ground offsets satisfy D(s)=A*s/[u*(u+s)], with A=f*H/cos²θ.
+  // Thus altitude H=A*cos²θ/f. Additional rows and the map's pitch provide
+  // independent consistency checks; a failed fit returns unavailable.
+  // This estimates height over the map plane only: no terrain, eye-height,
+  // street position or surveyed building-height claim follows from the fit.
 
   /** The ground point under a screen position. */
   function groundAt(x, y) {
@@ -166,11 +130,10 @@
   }
 
   /**
-   * The camera, measured from the ground under the screen.
+   * Camera altitude estimated from the map-plane projection.
    *
-   * Returns null when the view cannot be measured — a flat map has no
-   * horizon to read, and a camera that cannot be measured must not be
-   * given a height.
+   * Returns null when the projection samples do not support the model.
+   * A flat map or inconsistent projection must not produce an altitude.
    */
   function measureCamera() {
     if (!map) return null;
@@ -192,7 +155,7 @@
     // The zoom fixes the ground scale that unproject() reports in. A camera
     // height measured at one zoom is not the camera's height at another, so
     // the reading is only valid at the zoom it was taken at.
-    const z = map.getZoom();
+    if (!Number.isFinite(map.getZoom())) return null;
 
     // Ground offsets from the centre, along the camera's own heading.
     const along = p => {
@@ -256,11 +219,13 @@
     const focal = u / Math.tan(depression);
     if (!Number.isFinite(focal) || focal <= 0) return null;
 
-    const heightM = A / focal;
+    if (Math.abs(depression - (90 - pitchDeg) * Math.PI / 180) > 0.01) return null;
+    const heightM = A * Math.cos(depression) ** 2 / focal;
     if (!Number.isFinite(heightM) || heightM <= 0) return null;
 
     return {
       heightM,
+      method: 'planar-projection-model',
       horizonY: mid - u,
       focalPx: focal,
       rows: rows.length,
@@ -285,13 +250,15 @@
   /** Move the viewpoint by a step along the current bearing. */
   function step(dNorthM, dEastM) {
     if (!map) return;
+    invalidateBookmark();
     const c = map.getCenter();
     const [lng, lat] = metresToLatLng(c.lat, c.lng, dNorthM, dEastM);
     map.jumpTo({ center: [lng, lat] });
   }
 
   function frame(now) {
-    if (!active) return;
+    rafId = null;
+    if (!active || !map || document.hidden || !keys.size) { stopInput(); return; }
     const dt = lastFrame ? Math.min((now - lastFrame) / 1000, 0.1) : 0;
     lastFrame = now;
 
@@ -304,21 +271,22 @@
       step(-SPEED_MPS * dt * Math.cos(b), -SPEED_MPS * dt * Math.sin(b));
     }
     if (keys.has('a')) {
-      const b = ((map.getBearing() + 90) * Math.PI) / 180;
-      step(STRAFE_MPS * dt * Math.cos(b), STRAFE_MPS * dt * Math.sin(b));
-    }
-    if (keys.has('d')) {
       const b = ((map.getBearing() - 90) * Math.PI) / 180;
       step(STRAFE_MPS * dt * Math.cos(b), STRAFE_MPS * dt * Math.sin(b));
     }
+    if (keys.has('d')) {
+      const b = ((map.getBearing() + 90) * Math.PI) / 180;
+      step(STRAFE_MPS * dt * Math.cos(b), STRAFE_MPS * dt * Math.sin(b));
+    }
+    if (keys.has('arrowleft') || keys.has('arrowright')) invalidateBookmark();
     if (keys.has('arrowleft')) map.setBearing(map.getBearing() - TURN_DEG_PER_SEC * dt);
     if (keys.has('arrowright')) map.setBearing(map.getBearing() + TURN_DEG_PER_SEC * dt);
 
-    rafId = requestAnimationFrame(frame);
+    if (keys.size) rafId = requestAnimationFrame(frame);
   }
 
   /**
-   * Put the reader in the street.
+   * Apply an authored district-reference map viewpoint.
    *
    * Returns false when the districts have not arrived yet, which is the
    * ordinary case at first: the map is ready long before the district list
@@ -333,17 +301,20 @@
     map.jumpTo({
       center: [area.lng, area.lat],
       zoom: STREET_ZOOM,
-      pitch: MAX_PITCH,
+      pitch: DEFAULT_PITCH,
       bearing: stop.bearing,
     });
     standing = true;
+    atBookmark = true;
     return true;
   }
 
   /** Stand at a stop: move there and turn to face its bearing. */
   function goToStop(index) {
+    stopInput();
     stopIndex = (index + ROUTE.length) % ROUTE.length;
-    standAtStop(stopIndex);
+    atBookmark = false;
+    if (active) standAtStop(stopIndex);
     render();
   }
 
@@ -370,7 +341,7 @@
       button.type = 'button';
       button.className = 'atlas-walk-stop';
       button.dataset.index = String(i);
-      button.setAttribute('aria-pressed', String(i === stopIndex));
+      button.setAttribute('aria-pressed', String(atBookmark && i === stopIndex));
       const name = document.createElement('strong');
       name.textContent = bn() ? area.name_bn || area.name : area.name;
       const note = document.createElement('small');
@@ -390,8 +361,8 @@
     const summary = $('#atlas-walk-itinerary-summary');
     if (summary) {
       summary.textContent = shown
-        ? tr(`Walk itinerary · ${shown} stops`, `ভ্রমণসূচি · ${shown}টি স্থান`)
-        : tr('Walk itinerary', 'ভ্রমণসূচি');
+        ? tr(`Map viewpoints · ${shown}`, `মানচিত্রের দৃশ্য · ${shown}টি`)
+        : tr('Map viewpoints', 'মানচিত্রের দৃশ্য');
     }
   }
 
@@ -400,33 +371,38 @@
     if (!el) return;
     const height = cameraHeightM();
     const heightText = height === null
-      ? tr('camera height unavailable', 'যন্ত্রের উচ্চতা অনুপলব্ধ')
-      : tr(`camera ≈ ${height.toFixed(1)} m above the map plane`, `মানচিত্রের সমতলের উপরে যন্ত্র ≈ ${height.toFixed(1)} মিটার`);
+      ? tr('Map-plane camera estimate unavailable', 'মানচিত্রের সমতল থেকে ক্যামেরার আনুমানিক উচ্চতা অনুপলব্ধ')
+      : tr(`Model camera ≈ ${height.toFixed(1)} m above map plane`, `মডেল ক্যামেরা মানচিত্রের সমতল থেকে ≈ ${height.toFixed(1)} মিটার`);
     // The panel is re-rendered on every settled frame of a walk; the text is
     // only rewritten when the reading has actually moved.
-    if (el.textContent !== heightText) el.textContent = heightText;
+    const area = atBookmark ? areaById(ROUTE[stopIndex].id) : null;
+    const context = area ? (bn() ? area.name_bn || area.name : area.name) : tr('Exploring map', 'মানচিত্র অন্বেষণ');
+    const place = $("#atlas-walk-place");
+    if (place && place.textContent !== context) place.textContent = context;
+    const text = `${context} · ${heightText}`;
+    if (el.textContent !== text) el.textContent = text;
   }
 
   /**
    * The controls, stated plainly.
    *
-   * A walk nobody can move is a picture, so the keys are on the panel
-   * rather than hidden in a manual.
+   * Keyboard controls remain beside the camera qualification. Movement is
+   * map exploration; the panel does not imply a traversable street route.
    */
   function renderKeys() {
     const el = $('#atlas-walk-keys');
     if (!el) return;
     const text = bn()
-      ? '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> হাঁটুন · <kbd>←</kbd><kbd>→</kbd> ঘুরুন'
-      : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to walk · <kbd>←</kbd><kbd>→</kbd> to turn';
+      ? '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> সরান · <kbd>←</kbd><kbd>→</kbd> ঘুরুন'
+      : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to move · <kbd>←</kbd><kbd>→</kbd> to turn';
     if (el.innerHTML !== text) el.innerHTML = text;
   }
 
   function renderStopButtons() {
     const prev = $('#atlas-walk-prev');
     const next = $('#atlas-walk-next');
-    if (prev) prev.textContent = tr('← Previous stop', '← আগের স্থান');
-    if (next) next.textContent = tr('Next stop →', 'পরের স্থান →');
+    if (prev) {prev.textContent=tr('← Previous','← আগের');prev.setAttribute('aria-label',tr('Previous map viewpoint','আগের মানচিত্রের দৃশ্য'));}
+    if (next) {next.textContent=tr('Next →','পরের →');next.setAttribute('aria-label',tr('Next map viewpoint','পরের মানচিত্রের দৃশ্য'));}
   }
 
   function render() {
@@ -440,76 +416,141 @@
    *  whenever the map settles. */
   function onMapSettled() {
     if (!active) return;
+    const area = areaById(ROUTE[stopIndex].id);
+    const c = map.getCenter();
+    if (atBookmark && (!area || Math.abs(c.lng - area.lng) > 1e-7 || Math.abs(c.lat - area.lat) > 1e-7)) {
+      stopInput();
+      invalidateBookmark();
+    }
     renderStatus();
   }
 
+  function stopInput() {
+    keys.clear();
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    rafId = null;
+    lastFrame = 0;
+  }
+
+  function invalidateBookmark() {
+    if (!atBookmark) return;
+    atBookmark = false;
+    $('#atlas-walk-route')?.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', 'false'));
+    renderStatus();
+  }
+
+  function manualInput() { stopInput(); invalidateBookmark(); }
+  function onCanvasPointerDown() {
+    manualInput();
+    map?.getCanvas()?.focus?.({preventScroll:true});
+  }
+  function onMapInput(event) { if (event?.originalEvent) manualInput(); }
+  function onVisibility() { if (document.hidden) stopInput(); }
+  function onMotionPreference() { stopInput(); }
+
   function onKeyDown(event) {
-    if (!active) return;
+    if (!active || !map || document.hidden || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (document.querySelector('dialog[open]') || document.querySelector('#atlas-menu[open]')) return;
     const target = event.target;
-    if (target && /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName)) return;
+    if (target && /^(INPUT|SELECT|TEXTAREA|BUTTON|A|SUMMARY)$/.test(target.tagName)) return;
     if (target && target.isContentEditable) return;
     const key = event.key.toLowerCase();
     if (!['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) return;
+    if (event.repeat && !keys.has(key)) return;
     event.preventDefault();
+    if (reducedMotion?.matches) {
+      // Reduced motion uses one discrete user-requested step per key press.
+      if (event.repeat) return;
+      keys.add(key);
+      lastFrame = 1;
+      frame(101);
+      stopInput();
+      return;
+    }
     keys.add(key);
+    if (rafId === null) rafId = requestAnimationFrame(frame);
   }
 
   function onKeyUp(event) {
     keys.delete(event.key.toLowerCase());
+    if (!keys.size) stopInput();
   }
 
-  function onBlur() {
-    keys.clear();
+  function bindMap() {
+    if (!active || !map || boundMap === map) return;
+    boundMap = map;
+    previousMaxPitch = map.getMaxPitch?.() ?? 85;
+    previousKeyboardEnabled = map.keyboard?.isEnabled?.() === true;
+    if (previousKeyboardEnabled) map.keyboard.disable();
+    map.setMaxPitch?.(MAX_PITCH);
+    map.on('moveend', onMapSettled);
+    map.on('resize', onMapSettled);
+    for (const type of ['dragstart', 'zoomstart', 'rotatestart', 'pitchstart']) map.on(type, onMapInput);
+    map.getCanvas()?.addEventListener?.('pointerdown', onCanvasPointerDown);
+    map.getCanvas()?.addEventListener?.('wheel', manualInput, { passive: true });
+  }
+
+  function unbindMap() {
+    if (!boundMap) return;
+    boundMap.off('moveend', onMapSettled);
+    boundMap.off('resize', onMapSettled);
+    for (const type of ['dragstart', 'zoomstart', 'rotatestart', 'pitchstart']) boundMap.off(type, onMapInput);
+    boundMap.getCanvas()?.removeEventListener?.('pointerdown', onCanvasPointerDown);
+    boundMap.getCanvas()?.removeEventListener?.('wheel', manualInput);
+    boundMap.setMaxPitch?.(previousMaxPitch);
+    if (previousKeyboardEnabled) boundMap.keyboard?.enable?.();
+    previousKeyboardEnabled = false;
+    boundMap = null;
   }
 
   function activate(lensId) {
     const shouldWalk = lensId === 'walk';
     if (shouldWalk === active) {
-      // The lens is already the walk, but the camera may never have reached
-      // the street — the districts arrive after the map does. Try again.
+      bindMap();
       if (active && !standing) standAtStop(stopIndex);
       return;
     }
+    stopInput();
     active = shouldWalk;
-    if (!map) return;
-
+    standing = false;
+    atBookmark = false;
     if (active) {
       document.addEventListener('keydown', onKeyDown, { passive: false });
       document.addEventListener('keyup', onKeyUp);
-      window.addEventListener('blur', onBlur);
-      lastFrame = 0;
-      rafId = requestAnimationFrame(frame);
-      // Raise the pitch limit for the walk so the viewpoint can reach the
-      // street, and restore the atlas's own limit afterwards.
-      try { map.setMaxPitch(MAX_PITCH); } catch { /* older builds clamp at 85 */ }
-      standing = false;
+      document.addEventListener('visibilitychange', onVisibility);
+      document.addEventListener('pointerdown', stopInput, true);
+      document.addEventListener('focusin', stopInput);
+      window.addEventListener('blur', stopInput);
+      reducedMotion?.addEventListener?.('change', onMotionPreference);
+      bindMap();
       standAtStop(stopIndex);
       render();
-      map.on('moveend', onMapSettled);
-      map.on('resize', onMapSettled);
     } else {
-      map.off('moveend', onMapSettled);
-      map.off('resize', onMapSettled);
+      unbindMap();
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp);
-      window.removeEventListener('blur', onBlur);
-      keys.clear();
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = null;
-      standing = false;
-      try { map.setMaxPitch(85); } catch { /* ignore */ }
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('pointerdown', stopInput, true);
+      document.removeEventListener('focusin', stopInput);
+      window.removeEventListener('blur', stopInput);
+      reducedMotion?.removeEventListener?.('change', onMotionPreference);
     }
   }
 
   async function loadCollage() {
+    if (collageLoading || collage) return;
+    collageLoading = true;
     try {
       const res = await fetch('/api/atlas/collage', { signal: AbortSignal.timeout(45000) });
+      if (!res.ok) return;
       const body = await res.json();
       if (!Array.isArray(body?.districts)) return;
       collage = body;
       render();
     } catch {
       collage = null;
+    } finally {
+      collageLoading = false;
     }
   }
 
@@ -521,12 +562,16 @@
     },
     /** Called by the lens switcher so the walk follows the lens. */
     activate,
+    /** Task changes can cancel held input without discarding the viewpoint. */
+    stop: stopInput,
     /** The map arrives after the module is loaded. */
     attach(mapInstance, areasData) {
+      if (map !== mapInstance) { stopInput(); unbindMap(); standing = false; atBookmark = false; }
       map = mapInstance;
       areas = areasData || [];
+      bindMap();
       // The districts may have arrived after the walk was asked for. When
-      // they do, the camera finally goes to the street.
+      // they do, the camera finally applies its authored bookmark.
       if (active && !standing) standAtStop(stopIndex);
       render();
       // The collage is fetched once, however many times the district list

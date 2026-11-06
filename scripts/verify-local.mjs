@@ -23,6 +23,7 @@ const REQUIRED_FILES = [
   "public/parliament-reference.js",
   "public/parliament-reference.css",
   "public/app.js",
+  "public/walk.js",
   "public/people.js",
   "public/data/ddm-source-review.json",
   "public/data/people-manifest.json",

@@ -3,10 +3,8 @@
  *
  * Two things are checked here, both of which are easy to break silently:
  *
- *  1. The walk must not claim more than it does. It moves over a flat map
- *     plane with no elevation model, its massing comes from the map
- *     provider's computed heights rather than a survey, and its itinerary is
- *     authored rather than routed. The panel has to say so.
+ *  1. Preserve the map exploration module and its qualifications. Actual
+ *     input/lifecycle/projection behavior is exercised by test-walk-behavior.
  *
  *  2. The paper is published in Bengali and English together. A page that
  *     says `<html lang="bn">` and then reads as English only is a parity
@@ -42,9 +40,7 @@ ok("the walk lens is not overridden by the lens viewport", () => {
 
 // ── The walk states its own limits ─────────────────────────────────────────
 ok("the walk panel states the limits of what it measures", () => {
-  // The massing is the provider's computed height, not a survey.
-  assert.ok(walk.includes("render_height") || app.includes("render_height"),
-    "the walk no longer draws the provider's massing");
+  // Unknown height remains unavailable; the map qualification stays visible.
   assert.ok(index.includes("atlas-walk-legend-text"), "the massing caveat is gone from the panel");
   assert.ok(index.includes("atlas-walk-note"), "the massing note is gone from the panel");
   assert.ok(index.includes("atlas-walk-credit"), "the credit line is gone from the panel");
@@ -54,20 +50,21 @@ ok("the walk panel states the limits of what it measures", () => {
 });
 
 // ── The camera height is computed, not asserted ────────────────────────────
-ok("the camera height is computed from the live camera", () => {
+ok("the model camera estimate is qualified", () => {
   assert.ok(walk.includes("cameraHeightM"), "the camera height is not computed");
   assert.ok(walk.includes("getCanvas().clientHeight"), "the camera height ignores the window");
   assert.ok(walk.includes("getPitch()"), "the camera height ignores the pitch");
   assert.ok(walk.includes("getZoom()"), "the camera height ignores the zoom");
-  // And it is shown to the reader rather than kept internal.
+  assert.ok(walk.includes("Model camera") && walk.includes("estimate unavailable"), "model estimate and refusal must both be named");
+  // The model estimate is shown to the reader rather than kept internal.
   assert.ok(index.includes("atlas-walk-status"), "the camera height is not shown");
   assert.ok(walk.includes("atlas-walk-status"), "the camera height is not written to the panel");
 });
 
 // ── The walk is over a flat plane, and says so ─────────────────────────────
 ok("the walk says it moves over the map plane, not a surveyed terrain", () => {
-  assert.ok(walk.includes("flat plane") || walk.includes("flat map plane"),
-    "the walk does not state that it moves over a flat plane");
+  assert.ok(walk.includes("map plane") || walk.includes("map-plane"),
+    "the exploration does not identify its map-plane model");
 });
 
 // ── The itinerary is authored and every stop is a real district ────────────

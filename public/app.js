@@ -145,10 +145,10 @@
       desc_bn: "দৈনিক নাসা ভিআইআইআরএস যৌথ বন্যা শনাক্তকরণ, ১ দিনের জানালা — বাংলাদেশ বদ্বীপ।"
     },
     walk: {
-      title: "Street level",
-      title_bn: "রাস্তার ধরনে",
-      desc: "Eye-level view of the mapped street. Colour follows the mapped OSM use; the heights are the map provider's computed values, not surveyed. The count of buildings in view is stated below.",
-      desc_bn: "মানচিত্রের রাস্তার চোখ-বিন্দুর উচ্চতায় দৃশ্য। রং আসে মানচিত্রভুক্ত OSM ব্যবহার থেকে; উচ্চতা মানচিত্র সরবরাহকারীর গণনাকৃত মান, জরিপকৃত নয়। দৃশ্যমান ভবনের সংখ্যা নিচে দেওয়া আছে।"
+      title: "Low-angle map",
+      title_bn: "নিচু কোণের মানচিত্র",
+      desc: "Explore authored map viewpoints with manual controls. Only explicit source heights extrude; unknown heights stay flat. This is not a walking route or proof of street access.",
+      desc_bn: "নিজস্ব মানচিত্রের দৃশ্য হাতে নিয়ন্ত্রণ করে দেখুন। কেবল উৎসে নথিভুক্ত উচ্চতা ত্রিমাত্রিক; অজানা উচ্চতা সমতল থাকে। এটি হাঁটার পথ বা রাস্তা ব্যবহারের প্রমাণ নয়।"
     }
   };
 
@@ -211,25 +211,14 @@
       filter: ["!", ["has", "hide_3d"]],
       paint: buildingPaint("source_height_unavailable", "source_base_unavailable")
     });
-    // The street-level massing. The streamed tile carries no surveyed
-    // height, only the provider's computed render_height — so this layer is
-    // drawn as an explicitly illustrative massing, never as a measured
-    // building. It stays hidden until the Street level lens asks for it.
-    //
-    // The colour is the atlas's own Palette 1, because the use of a building
-    // IS mapped even when its height is not. The walls are solid: a
-    // translucent block standing on a filled footprint double-draws the
-    // ground and turns the street into mud.
+    // Keep the low-angle exploration layer, but never promote provider-computed
+    // render heights to source evidence. Unknown streamed heights remain flat;
+    // tagged local heights continue through the Parliament source layer.
     styleSpec.layers.push({
       id: "walk-massing", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 16,
       filter: ["!", ["has", "hide_3d"]],
       layout: { visibility: "none" },
-      paint: {
-        ...buildingPaint("render_height", "render_min_height"),
-        "fill-extrusion-height": ["to-number", ["get", "render_height"], 0],
-        "fill-extrusion-base": ["to-number", ["get", "render_min_height"], 0],
-        "fill-extrusion-opacity": 1
-      }
+      paint: { ...buildingPaint("source_height_unavailable", "source_base_unavailable"), "fill-extrusion-opacity": 1 }
     });
 
     try {
@@ -263,7 +252,10 @@
         },
       };
       map.getCanvas?.().addEventListener?.('wheel', stopMapMotion, {passive:true});
-      map.getCanvas?.().addEventListener?.('keydown', stopMapMotion);
+      map.getCanvas?.().addEventListener?.('keydown', event => {
+        if (currentLens === 'walk' && /^(w|a|s|d|arrowup|arrowdown|arrowleft|arrowright)$/i.test(event.key || '')) return;
+        stopMapMotion();
+      });
       map.on("move", syncBuildingVisibility);
       map.on("moveend", syncBuildingVisibility);
       map.on("zoomend", syncBuildingVisibility);
@@ -295,8 +287,12 @@
         const credit=document.querySelector('.maplibregl-ctrl-attrib');
         const wrap=document.querySelector('.atlas-map-wrap');
         if (credit && wrap) {
-          const reserve=()=>wrap.style.setProperty('--map-credit-height',`${Math.ceil(credit.getBoundingClientRect().height)}px`);
-          new ResizeObserver(reserve).observe(credit); reserve();
+          const watch=document.querySelector('#atlas-watch');
+          const reserve=()=>{
+            wrap.style.setProperty('--map-credit-height',`${Math.ceil(credit.getBoundingClientRect().height)}px`);
+            wrap.style.setProperty('--map-watch-height',`${Math.ceil(watch?.getBoundingClientRect().height || 0)}px`);
+          };
+          const observer=new ResizeObserver(reserve); observer.observe(credit); if(watch)observer.observe(watch); reserve();
         }
       }
 
@@ -362,11 +358,8 @@
     }
     // Source footprints remain visible in both views; only tagged heights extrude.
     const parliamentVisible = is3D && useSnapshot;
-    // The walkthrough draws its own massing on top of the ground. The flat
-    // footprint fill would double-draw the same plan underneath it, so the
-    // street lens keeps the footprint for the ground plane only.
-    const inWalk = currentLens === "walk";
-    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot && !inWalk], ["city-footprints", !useSnapshot && !inWalk], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
+    // Flat source footprints stay visible while exploring at low pitch.
+    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
       const visibility = visible ? "visible" : "none";
       if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
     }
@@ -714,7 +707,7 @@
     radarTimer = null;
     if (radarToggle) { radarToggle.textContent = tr('Play radar','রাডার চালান'); radarToggle.disabled = reducedMotion(); }
   }
-  function stopMapMotion() { pauseRadar(); window.AtlasForecast?.pause(); map?.stop?.(); }
+  function stopMapMotion() { pauseRadar(); window.AtlasForecast?.pause(); window.AtlasWalk?.stop(); map?.stop?.(); }
 
   let dynamicLayers = [];
   let dynamicClickHandlers = [];
@@ -897,18 +890,9 @@
     dynamicLayers = [];
   }
 
-  // ── The walkthrough ────────────────────────────────────────────────────
-  // The atlas streams OpenFreeMap tiles. That tile carries no surveyed
-  // building height — only the provider's computed render_height — so at
-  // street level a truthful map would show a flat ground and nothing else.
-  // The walkthrough therefore draws that height as an explicitly
-  // ILLUSTRATIVE massing, in a material of its own, and states how many
-  // buildings in view rest on a provider number rather than on a survey.
-  //
-  // It also hands the reader one click to a far more detailed street
-  // scene: Location Scout builds the same coordinates from the same OSM
-  // data, at eye level, with drawn facades. No code is taken from it; the
-  // link carries the coordinates and the credit.
+  // Low-angle map exploration preserves source footprints and manual controls.
+  // Authored bookmarks do not establish street position, access or walkability.
+  // The credited external link opens the map target, not a geolocated reader.
   const SCOUT_BASE = "https://tools.oyasumi-gamedev.com/rokehan/";
 
   function walkNumber(n) {
@@ -937,22 +921,21 @@
   }
 
   function measureStreetLevel() {
-    if (!map || typeof map.querySourceFeatures !== "function") return null;
-    let features = [];
+    if (!map || typeof map.queryRenderedFeatures !== "function") return null;
+    const layers=["city-footprints","parliament-footprints"].filter(id=>map.getLayer(id) && map.getLayoutProperty(id,"visibility")!=="none");
+    if (!layers.length) return null;
     try {
-      features = map.querySourceFeatures("buildings", { sourceLayer: "building" }) || [];
-    } catch {
-      return null;
-    }
-    let total = 0;
-    let withProviderHeight = 0;
-    for (const f of features) {
-      const p = f.properties || {};
-      if (p.hide_3d) continue;
-      total += 1;
-      if (Number(p.render_height || 0) > 0) withProviderHeight += 1;
-    }
-    return { total, withProviderHeight };
+      const features=map.queryRenderedFeatures({layers});
+      const ids=new Set(); let unidentified=0;
+      for (const feature of features || []) {
+        if (feature.properties?.hide_3d) continue;
+        const id=feature.id ?? feature.properties?.osm_id ?? feature.properties?.['@id'];
+        if (typeof id!=="string" && typeof id!=="number") { unidentified++; continue; }
+        ids.add(`${feature.source || ""}/${feature.sourceLayer || ""}/${id}`);
+      }
+      // This is a partial, identified footprint count, not a building census.
+      return {total:ids.size,unidentified};
+    } catch { return null; }
   }
 
   function renderWalkPanel() {
@@ -966,41 +949,32 @@
     const counts = measureStreetLevel();
     const countsEl = $("#atlas-walk-counts");
     if (countsEl) {
-      // An empty feature list usually means the tiles have not arrived yet,
-      // not that the street has no buildings. "Zero" would be a false
-      // reading, and a false zero is the one number this project must never
-      // print.
       const counted = counts && counts.total > 0;
       countsEl.textContent = !counted
-        ? (isBn ? "ভবনের সংখ্যা গণনা করা যায়নি।" : "Building count unavailable.")
-        : isBn
-          ? `${walkNumber(counts.total)}টি ভবন দৃশ্যমান · ${walkNumber(counts.withProviderHeight)}টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়`
-          : `${walkNumber(counts.total)} buildings in view · ${walkNumber(counts.withProviderHeight)} carry a provider-computed height, not a survey`;
+        ? tr("Footprint count unavailable.","ভবনের সীমারেখার সংখ্যা অনুপলব্ধ।")
+        : tr(`${walkNumber(counts.total)} unique identified footprints rendered · not a building census${counts.unidentified ? ` · ${walkNumber(counts.unidentified)} unidentified fragments excluded` : ""}`,
+          `${walkNumber(counts.total)}টি অনন্য শনাক্ত সীমারেখা আঁকা হয়েছে · ভবনের শুমারি নয়${counts.unidentified ? ` · ${walkNumber(counts.unidentified)}টি অশনাক্ত অংশ বাদ` : ""}`);
+
     }
 
     const summary = $("#atlas-walk-summary");
     if (summary) summary.textContent = isBn ? "কীভাবে মাপা হয়েছে" : "How this is measured";
 
     const note = $("#atlas-walk-note");
-    if (note) note.textContent = isBn
-      ? "রং আসে মানচিত্রভুক্ত OSM ব্যবহার থেকে; উচ্চতা মানচিত্র সরবরাহকারীর গণনাকৃত মান, জরিপকৃত নয়।"
-      : "Colour follows the mapped OSM use; the height is the map provider's computed value, not a survey.";
-
+    if (note) note.textContent = tr("Source heights only; unknown flat. Not a walking route.","কেবল নথিভুক্ত উচ্চতা; অজানা সমতল। হাঁটার পথ নয়।");
     const legend = $("#atlas-walk-legend-text");
-    if (legend) legend.textContent = isBn
-      ? "চিত্রায় গঠন — গণনাকৃত উচ্চতা, মানচিত্রভুক্ত ব্যবহার"
-      : "Illustrative massing — computed height, mapped use";
+    if (legend) legend.textContent = tr("Mapped footprints · explicit heights only","মানচিত্রের সীমারেখা · কেবল নথিভুক্ত উচ্চতা");
 
     const scout = $("#atlas-walk-scout");
     if (scout) {
       scout.href = streetScoutUrl();
-      scout.textContent = isBn ? "রাস্তার দৃশ্য রেন্ডার খুলুন ↗" : "Open the street scene render ↗";
+      scout.textContent = isBn ? "মানচিত্রের কেন্দ্র বাইরের দৃশ্যে খুলুন ↗" : "Open map centre in external scene ↗";
     }
 
     const credit = $("#atlas-walk-credit");
     if (credit) credit.textContent = isBn
-      ? "রাস্তার দৃশ্য রেন্ডার: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · উচ্চতা Terrain Tiles। নতুন ট্যাবে খোলে।"
-      : "Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · elevation Terrain Tiles. Opened in a new tab.";
+      ? "বাইরের দৃশ্য: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap। এর জ্যামিতি ও প্রবেশের অনুমান আলাদা। নতুন ট্যাবে খোলে।"
+      : "External scene by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap. Its geometry and access assumptions are separate. Opens in a new tab.";
   }
 
   function applyLens(lensId, { moveCamera = lensId !== currentLens } = {}) {

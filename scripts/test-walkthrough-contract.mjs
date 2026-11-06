@@ -1,112 +1,100 @@
-// The walkthrough contract.
-//
-// The Street level lens is the atlas's only eye-level surface, and it is
-// the one place in the project where a building's height is drawn from a
-// number nobody surveyed. That is allowed only under conditions, and this
-// test holds the conditions in place:
-//
-//   1. The lens exists and is reachable from the lens picker.
-//   2. Its camera is at eye level, and the map is allowed to tilt that far.
-//   3. Its massing layer is hidden unless the lens asks for it, and it
-//      draws the provider's render_height — never a "source height" the
-//      tile does not carry.
-//   4. The panel tells the reader how many buildings in view rest on that
-//      provider number, in both languages.
-//   5. The link out to the street scene carries the reader's own
-//      coordinates, and the credit names the tool that draws it.
-//
-//   node scripts/test-walkthrough-contract.mjs
-
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const read=p=>readFileSync(p,'utf8');
+const app=read('public/app.js'), html=read('public/index.html'), css=read('public/dhaka-design.css');
 
-const html = readFileSync('public/index.html', 'utf8');
-const app = readFileSync('public/app.js', 'utf8');
-const css = readFileSync('public/dhaka-design.css', 'utf8');
-const dashboard = readFileSync('public/dashboard.js', 'utf8');
+// Preserve the exploration feature without licensing unsupported geographic height.
+assert.match(html,/<option value="walk">Low-angle map<\/option>/);
+assert.match(app,/AtlasWalk\?\.activate/);
+assert.match(app,/AtlasWalk\?\.attach/);
+assert.match(app,/maxPitch: 85/);
+const layer=app.slice(app.indexOf('id: "walk-massing"'),app.indexOf('\n    try {',app.indexOf('id: "walk-massing"')));
+assert.match(layer,/buildingPaint\("source_height_unavailable", "source_base_unavailable"\)/);
+assert.doesNotMatch(layer,/\["get", "render_(?:min_)?height"\]/,'provider-derived heights cannot become geographic geometry');
+assert.doesNotMatch(layer,/buildingPaint\("render_height"/);
+assert.match(css,/\.atlas-walk\[hidden\]\s*\{\s*display:none/);
+assert.match(html,/id="atlas-walk-route"/,'authored bookmarks remain');
+assert.match(html,/id="atlas-walk-prev"/);
+assert.match(html,/id="atlas-walk-next"/);
+assert.match(app,/panel.hidden = !isWalk/);
+assert.match(html,/rel="noopener noreferrer"/);
+assert.match(app,/Location Scout \(oyasumi-gamedev.com\)/);
+assert.match(read('scripts/verify-live-bytes.mjs'),/'walk.js'/,'new runtime module must be byte-verified');
+assert.match(read('scripts/stamp-build-id.mjs'),/walk/,'new runtime module must follow the release epoch');
 
-// ── 1. The lens is offered and described ──────────────────────────────────
-assert.match(html, /<option value="walk">/, 'the lens picker must offer the Street level lens');
-assert.match(app, /walk:\s*\{\s*\n?\s*title:\s*"Street level"/, 'the lens must carry a story title');
-assert.match(app, /title_bn:\s*"রাস্তার ধরনে"/, 'the lens story must exist in Bengali');
+// Exercise the real count/qualifications/link implementation with rendered IDs.
+const elements=new Map();
+for(const id of ['atlas-walk','atlas-walk-counts','atlas-walk-summary','atlas-walk-note','atlas-walk-legend-text','atlas-walk-scout','atlas-walk-credit'])elements.set('#'+id,{textContent:'',hidden:true});
+const doc={documentElement:{lang:'en'},querySelector:s=>elements.get(s)||null,addEventListener(){}};
+const win={location:{search:''},addEventListener(){}};
+const prefix=app.slice(0,app.indexOf('  // Safe boot:'));
+vm.runInNewContext(prefix+'window.test={setMap:m=>map=m,measureStreetLevel,buildingPaint,syncBuildingVisibility,streetScoutUrl,show:()=>{currentLens="walk";renderWalkPanel();}};})();',{window:win,document:doc,URLSearchParams,URL,Intl,console});
+let features=[],queried;
+const map={getLayer:id=>['city-footprints','parliament-footprints'].includes(id)?{}:null,getLayoutProperty:()=> 'visible',queryRenderedFeatures:options=>{queried=options;return features;},getCenter:()=>({lat:23.75,lng:90.4})};
+win.test.setMap(map);
+features=[
+ {id:10,source:'buildings',sourceLayer:'building',properties:{}},
+ {id:10,source:'buildings',sourceLayer:'building',properties:{}}, // adjacent source fragment
+ {id:'way/5',source:'parliament-detail',properties:{}},
+ {source:'buildings',properties:{}}, // no stable identity
+ {id:11,source:'buildings',properties:{hide_3d:true}},
+];
+assert.equal(win.test.measureStreetLevel().total,2,'unique rendered IDs, not loaded tile fragments');
+assert.equal(win.test.measureStreetLevel().unidentified,1);
+assert.equal(queried.layers.join(','),'city-footprints,parliament-footprints');
+for(const lang of ['en','bn']) {
+ doc.documentElement.lang=lang;win.test.show();
+ assert.equal(elements.get('#atlas-walk').hidden,false);
+ assert.match(elements.get('#atlas-walk-counts').textContent,lang==='en'?/2 unique identified footprints rendered/:/২টি অনন্য/);
+ assert.match(elements.get('#atlas-walk-note').textContent,lang==='en'?/unknown flat/:/অজানা সমতল/);
+ assert.match(elements.get('#atlas-walk-scout').textContent,lang==='en'?/map centre/:/মানচিত্রের কেন্দ্র/);
+ const link=new URL(elements.get('#atlas-walk-scout').href);
+ assert.equal(new URLSearchParams(link.hash.slice(1)).get('ll'),'23.750000,90.400000');
+}
+features=[];doc.documentElement.lang='en';win.test.show();
+assert.equal(elements.get('#atlas-walk-counts').textContent,'Footprint count unavailable.','empty source cannot fabricate zero buildings');
+map.queryRenderedFeatures=()=>{throw Error('tiles absent');};
+assert.equal(win.test.measureStreetLevel(),null);
+assert.match(read('public/dashboard.js'),/\/api\/dhaka\/transit/);
+assert.match(html,/id="transit-registry"/);
+console.log('✓ Map exploration: explicit source heights, rendered-ID dedup, unknown count, bilingual qualification/map-centre link and preserved transit/bookmark controls.');
 
-// ── 2. The camera is at eye level ─────────────────────────────────────────
-const viewports = app.match(/const LENS_VIEWPORTS = \{[\s\S]*?\n  \};/);
-assert.ok(viewports, 'the lens camera table must exist');
-const viewport = viewports[0].match(/\n\s*walk:\s*\{[^}]*\}/);
-assert.ok(viewport, 'the walkthrough must have a camera viewport');
-const pitch = Number(viewport[0].match(/pitch:\s*(\d+(?:\.\d+)?)/)?.[1]);
-const zoom = Number(viewport[0].match(/zoom:\s*(\d+(?:\.\d+)?)/)?.[1]);
-assert.ok(pitch >= 80, `the walkthrough camera must be at eye level, not ${pitch}°`);
-assert.ok(zoom >= 17, `the walkthrough camera must be close to the ground, not zoom ${zoom}`);
+// Execute the shared paint expression: a provider render value is not a
+// substitute for the original source tag. Zero and absent source metadata
+// remain flat; a tagged local height remains an actual extrusion.
+function evaluate(expression,properties) {
+  if(!Array.isArray(expression))return expression;
+  const [op,...args]=expression;
+  if(op==='get')return properties[args[0]];
+  if(op==='to-number') {
+    for(const arg of args) {
+      const value=evaluate(arg,properties);
+      if(value!==null&&value!==undefined&&Number.isFinite(Number(value)))return Number(value);
+    }
+    return 0;
+  }
+  if(op==='max')return Math.max(...args.map(arg=>evaluate(arg,properties)));
+  if(op==='>')return evaluate(args[0],properties)>evaluate(args[1],properties);
+  if(op==='case')return evaluate(args[0],properties)?evaluate(args[1],properties):evaluate(args[2],properties);
+  throw Error('unsupported paint operation '+op);
+}
+const streamed=win.test.buildingPaint('source_height_unavailable','source_base_unavailable');
+assert.equal(evaluate(streamed['fill-extrusion-height'],{render_height:99,render_min_height:12}),0);
+const tagged=win.test.buildingPaint('height_m','min_height_m');
+assert.equal(evaluate(tagged['fill-extrusion-height'],{height_m:35.7,min_height_m:0}),35.7);
+assert.equal(evaluate(tagged['fill-extrusion-height'],{height_m:null}),0);
 
-// MapLibre caps the pitch at 85°. The map must be allowed to reach it.
-const maxPitch = Number(app.match(/maxPitch:\s*(\d+(?:\.\d+)?)/)?.[1]);
-assert.ok(maxPitch >= pitch, `the map's maxPitch (${maxPitch}) must allow the lens pitch (${pitch})`);
-
-// ── 3. The massing is illustrative, provider-derived, and opt-in ──────────
-const layer = app.match(/id:\s*"walk-massing"[\s\S]*?\n    \}\);/);
-assert.ok(layer, 'the walkthrough must have its own massing layer');
-assert.match(layer[0], /visibility:\s*"none"/, 'the massing layer must be hidden until the lens asks for it');
-assert.match(layer[0], /"get",\s*"render_height"/, 'the massing must draw the provider height');
-assert.match(layer[0], /"get",\s*"render_min_height"/, 'the massing must sit on the provider base');
-assert.ok(
-  !/"source_height/.test(layer[0]),
-  'the massing must not read a source height the streamed tile does not carry',
-);
-assert.match(
-  app,
-  /map\.setLayoutProperty\("walk-massing",\s*"visibility",\s*lensId === "walk"/,
-  'the massing layer must be shown by the walk lens and by no other',
-);
-
-// ── 4. The reader is told what the numbers are ───────────────────────────
-assert.match(html, /id="atlas-walk-counts"/, 'the panel must carry the building count');
-assert.match(html, /id="atlas-walk-note"/, 'the panel must carry the method note');
-assert.match(html, /id="atlas-walk-legend-text"/, 'the panel must carry the massing legend');
-assert.match(app, /carry a provider-computed height, not a survey/, 'the count must say the height is not surveyed');
-assert.match(app, /মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়/, 'the count must say so in Bengali too');
-assert.match(app, /Illustrative massing/, 'the legend must name the massing as illustrative');
-
-// The count must come from what the screen holds, not from a constant.
-assert.match(app, /querySourceFeatures\(\s*"buildings"/, 'the count must be read from the map source');
-// An empty feature list means the tiles have not arrived, not that the
-// street has no buildings. A zero there would be a false reading.
-assert.match(app, /counts\.total > 0/, 'the count must never print a zero it did not measure');
-assert.match(app, /Building count unavailable\./, 'an unmeasured count must say so');
-// Solid walls. A translucent block standing on a filled footprint
-// double-draws the ground and turns the street into mud.
-assert.match(layer[0], /"fill-extrusion-opacity":\s*1\b/, 'the street walls must be solid');
-assert.match(layer[0], /buildingPaint\("render_height",\s*"render_min_height"\)/, 'the massing must reuse the atlas palette for colour');
-
-// ── 5. The link out carries the reader's own coordinates and the credit ───
-assert.match(app, /SCOUT_BASE\s*=\s*"https:\/\/tools\.oyasumi-gamedev\.com\/rokehan\/"/, 'the street scene link must be well formed');
-const url = app.match(/function streetScoutUrl[\s\S]*?\n  \}/);
-assert.ok(url, 'the street scene link must be built from the map centre');
-assert.match(url[0], /map\.getCenter\(\)/, 'the link must carry the reader\'s own coordinates');
-assert.match(url[0], /ll:/, 'the link must carry the coordinates');
-assert.match(url[0], /tod:/, 'the link must carry a time of day');
-assert.match(url[0], /far:/, 'the link must carry a surroundings distance');
-assert.match(url[0], /n:/, 'the link must carry the place name');
-assert.match(html, /rel="noopener noreferrer"/, 'the link must open safely');
-assert.match(html, /target="_blank"/, 'the link must not navigate the atlas away');
-assert.match(app, /Location Scout \(oyasumi-gamedev\.com\)/, 'the credit must name the street scene tool');
-assert.match(app, /OpenStreetMap \/ OpenFreeMap/, 'the credit must name the map sources');
-
-// The atlas must not carry the tool's code. A link is use; a copy is not.
-assert.ok(!/rokehan/i.test(app.replace(/rokehan\//g, '')), 'no tool code may be vendored into the atlas');
-
-// ── 6. The panel must not be on screen in any other lens ─────────────────
-assert.match(app, /panel\.hidden = !isWalk/, 'the panel must be hidden outside the walk lens');
-assert.match(css, /\.atlas-walk\[hidden\]\s*\{\s*display:none/, 'the hidden panel must really be hidden');
-
-// ── 7. The transit desk reads the registry, not a copied table ────────────
-assert.match(html, /id="transit-registry"/, 'the transit desk must be rendered into a container');
-assert.ok(
-  !/16 Stations/.test(html),
-  'the transit desk must not carry a hand-written station count; the registry holds the number',
-);
-assert.match(dashboard, /fetch\('\/api\/dhaka\/transit'\)/, 'the transit desk must read the network registry');
-assert.match(dashboard, /metro_station/, 'the transit desk must count the stations from the registry');
-
-console.log('✓ Walkthrough: eye-level lens, opt-in illustrative massing, counted provider heights, credited link, registry-driven transit desk');
+// The selected map target, rather than an invented camera-foot position,
+// drives the external link each time. Manual exploration cannot retain an
+// old place's coordinates or invent a measured pedestrian position.
+map.getCenter=()=>({lat:23.8,lng:90.41});
+const moved=new URL(win.test.streetScoutUrl());
+assert.equal(new URLSearchParams(moved.hash.slice(1)).get('ll'),'23.800000,90.410000');
+const visibility=new Map();
+map.setLayoutProperty=(id,key,value)=>visibility.set(id,value);
+map.getLayoutProperty=id=>visibility.get(id)||"none";
+win.test.syncBuildingVisibility();
+assert.equal(visibility.get('city-footprints'),'visible','low-angle exploration retains unknown flat footprints');
+assert.equal(map.getLayoutProperty('parliament-footprints'),'none','exclusive local/native coverage selection survives');
+console.log('✓ Exploration conservation: provider values remain flat, explicit source heights extrude, moving target updates the link, native footprints persist.');

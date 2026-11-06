@@ -2,6 +2,18 @@
 // Keys are the canonical English source strings.
 
 window.ATLAS_BN = {
+  "Low-angle map exploration": "নিচু কোণের মানচিত্র দেখা",
+  "Exploration tools & sources": "নিয়ন্ত্রণ ও উৎস",
+  "Source heights only; unknown flat. Not a walking route.": "কেবল নথিভুক্ত উচ্চতা; অজানা সমতল। হাঁটার পথ নয়।",
+  "← Previous": "← আগের",
+  "Next →": "পরের →",
+
+  "Low-angle map": "নিচু কোণের মানচিত্র",
+  "Map viewpoints": "মানচিত্রের দৃশ্য",
+  "Only explicit source heights extrude; unknown heights stay flat.": "কেবল উৎসে নথিভুক্ত উচ্চতা ত্রিমাত্রিক; অজানা উচ্চতা সমতল থাকে।",
+  "Mapped footprints · explicit heights only": "মানচিত্রের সীমারেখা · কেবল নথিভুক্ত উচ্চতা",
+  "Open map centre in external scene ↗": "মানচিত্রের কেন্দ্র বাইরের দৃশ্যে খুলুন ↗",
+
   "Flood": "বন্যা",
   "Air": "বায়ু",
   "Wind": "বাতাস",
