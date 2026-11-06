@@ -16,16 +16,16 @@ The task is to retain mapped building blocks in every lens and make Louis Kahn's
 Download the public OSM map XML from `https://api.openstreetmap.org/api/0.6/map?bbox=90.369,23.752,90.388,23.773`. The map response references two building relations outside its original extent; download `/api/0.6/relation/9716353/full` and `/api/0.6/relation/10186588/full` from the same API so all member rings are present. Run:
 
 ```sh
-python3 scripts/bake-parliament-buildings.py map.osm relation-9716353.osm relation-10186588.osm
+python 3 scripts/bake-parliament-buildings.py map.osm relation-9716353.osm relation-10186588.osm
 ```
 
 The baker refuses incomplete relations, missing nodes, unclosed rings, unassigned courtyards or a missing Parliament. Input SHA-256 checksums are recorded in the output metadata. Building-part-only features are omitted because this is footprint massing; no procedural roof components are generated.
 
 ## Verification
 
-`test-building-behavior.mjs` evaluates the actual application functions with a map stub. It asserts all 12 lenses retain buildings; raster ordering; source-ready gating; exclusive local/city visibility; outward-pan, low-zoom, offline and2D behavior; authored cameras and the wide Parliament adjustment; positive height fallback; closed rings, unique IDs, Parliament holes and duplicate-parent removal. These supplement real rendered checks, not replace them.
+`test-building-behavior.mjs` evaluates the actual application functions with a map stub. It asserts all 12 lenses retain buildings; raster ordering; source-ready gating; exclusive local/city visibility; outward-pan, low-zoom, offline and 2D behavior; authored cameras and the wide Parliament adjustment; positive height fallback; closed rings, unique IDs, Parliament holes and duplicate-parent removal. These supplement real rendered checks, not replace them.
 
-CUA browser checks locally exercised Parliament in City and Heritage, switched2D/3D, then zoomed out to confirm streamed coverage returns without overlapping block layers. Desktop 1440×900 activated the detail source; zooming out restored the city source. Phone and desktop screenshots were independently reviewed. PNGs from the geometry fixture are scaled to fit the available browser pane; JSON records actual iframe dimensions. The detailed heights and architectural interiors remain unsurveyed. No physical Android-device benchmark is claimed.
+CUA browser checks locally exercised Parliament in City and Heritage, switched 2D/3D, then zoomed out to confirm streamed coverage returns without overlapping block layers. Desktop 1440×900 activated the detail source; zooming out restored the city source. Phone and desktop screenshots were independently reviewed. PNGs from the geometry fixture are scaled to fit the available browser pane; JSON records actual iframe dimensions. The detailed heights and architectural interiors remain unsurveyed. No physical Android-device benchmark is claimed.
 
 Rendered Parliament scene measurements (same bounds/60% map/attribution budget as parent gate):
 

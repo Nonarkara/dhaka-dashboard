@@ -85,9 +85,10 @@
       <details id="people-key" class="people-key" hidden></details>
 
       <!-- Authored map viewpoints and explicit manual exploration. -->
-      <section class="atlas-walk" id="atlas-walk" hidden aria-label="Low-angle map exploration">
+      <section class="atlas-walk" id="atlas-walk" hidden aria-label="Street-level walkthrough">
         <p class="atlas-walk-place" id="atlas-walk-place" role="status">—</p>
-        <p id="atlas-walk-note">Source heights only; unknown flat. Not a walking route.</p>
+        <p class="atlas-walk-counts" id="atlas-walk-counts" role="status">—</p>
+        <p id="atlas-walk-note">Heights are the map provider's, not surveyed.</p>
         <div class="atlas-walk-nav">
           <button type="button" id="atlas-walk-prev" class="atlas-walk-step">← Previous</button>
           <button type="button" id="atlas-walk-next" class="atlas-walk-step">Next →</button>
@@ -96,16 +97,16 @@
           <summary>Exploration tools &amp; sources</summary>
           <p class="atlas-walk-status" id="atlas-walk-status" role="status">—</p>
           <p class="atlas-walk-keys" id="atlas-walk-keys"></p>
-          <p class="atlas-walk-counts" id="atlas-walk-counts" role="status">—</p>
+          <p class="atlas-walk-ground" id="atlas-walk-ground">The ground is the map's flat plane; the atlas carries no elevation model. These viewpoints are not a walking route and do not establish street access.</p>
           <details class="atlas-walk-itinerary">
             <summary id="atlas-walk-itinerary-summary">Map viewpoints</summary>
             <nav class="atlas-walk-route" id="atlas-walk-route" aria-label="Map viewpoints"></nav>
           </details>
-          <a class="atlas-walk-scout" id="atlas-walk-scout" href="https://tools.oyasumi-gamedev.com/rokehan/" target="_blank" rel="noopener noreferrer">Open map centre in external scene ↗</a>
+          <a class="atlas-walk-scout" id="atlas-walk-scout" href="https://tools.oyasumi-gamedev.com/rokehan/" target="_blank" rel="noopener noreferrer">Open the street scene render ↗</a>
           <details class="atlas-walk-more">
             <summary id="atlas-walk-summary">How this is measured</summary>
-            <p class="atlas-walk-legend"><span class="atlas-walk-swatch" aria-hidden="true"></span><span id="atlas-walk-legend-text">Mapped footprints · explicit heights only</span></p>
-            <p id="atlas-walk-credit">External scene: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap. Opens in a new tab.</p>
+            <p class="atlas-walk-legend"><span class="atlas-walk-swatch" aria-hidden="true"></span><span id="atlas-walk-legend-text">Illustrative massing — height from the map provider, not surveyed</span></p>
+            <p id="atlas-walk-credit">Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · elevation Terrain Tiles. Its geometry and access assumptions are separate. Opens in a new tab.</p>
           </details>
         </details>
       </section>

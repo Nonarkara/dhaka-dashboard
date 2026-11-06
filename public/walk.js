@@ -14,7 +14,10 @@
   const STRAFE_MPS = 0.9;
   const TURN_DEG_PER_SEC = 80;
   const MAX_PITCH = 85;
-  const DEFAULT_PITCH = 75; // Retain geographic context rather than imply eye height.
+  // The steepest pitch the map allows. At this angle the street runs to the
+  // horizon and the buildings close in on both sides, which is what makes
+  // the view a street rather than an aerial of a block.
+  const DEFAULT_PITCH = 85;
 
   // Authored low-angle map framing; camera altitude depends on the viewport.
   // Zoom is not evidence that a viewpoint is at a person's eye height.
@@ -375,12 +378,11 @@
       : tr(`Model camera ≈ ${height.toFixed(1)} m above map plane`, `মডেল ক্যামেরা মানচিত্রের সমতল থেকে ≈ ${height.toFixed(1)} মিটার`);
     // The panel is re-rendered on every settled frame of a walk; the text is
     // only rewritten when the reading has actually moved.
+    if (el.textContent !== heightText) el.textContent = heightText;
     const area = atBookmark ? areaById(ROUTE[stopIndex].id) : null;
     const context = area ? (bn() ? area.name_bn || area.name : area.name) : tr('Exploring map', 'মানচিত্র অন্বেষণ');
     const place = $("#atlas-walk-place");
     if (place && place.textContent !== context) place.textContent = context;
-    const text = `${context} · ${heightText}`;
-    if (el.textContent !== text) el.textContent = text;
   }
 
   /**

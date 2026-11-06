@@ -17,7 +17,7 @@ still requires validation. No evacuation routes are designated or flat-roof buil
 | WorldPop 2025 R2025A | Population model, 100m cells | Ingested (people-grid.json) | 1,280 cells in Dhaka bbox | CC BY 4.0; modeled, not census |
 | OSM school/hospital/clinic | 2,181 facility objects | Ingested (facilities.geojson) | Dhaka bbox | ODbL 1.0; no capacity/opening status |
 | BWDB / FFWC station registry | 6 river gauge stations with danger levels | Referenced (unavailable readings) | Buriganga, Turag, Balu, Shitalakshya, Tongi Khal, Dhaleshwari | Registry coordinates unreviewed; no live gauge feed |
-| FFWC API (api3.ffwc.gov.bd) | Candidate gauge/forecast source | Browser fetch returned 502 during this audit | — | No payload or adapter validated |
+| FFWC API (api 3.ffwc.gov.bd) | Candidate gauge/forecast source | Browser fetch returned 502 during this audit | — | No payload or adapter validated |
 | DDM AWARE shelter info | Table plus embedded structured inventory with lat/lon | Source structure reviewed; 1,950 records/coordinate pairs | Five source points inside population-grid extent; municipal coverage unknown | Locations, source update date, readiness and reuse terms unreviewed |
 | NASA GIBS / POWER / CAMS | Satellite radiance, LST, aerosol, solar | Measured (collage) | 14 sampled districts | 86/98 readings; modeled provenance |
 
@@ -47,7 +47,7 @@ River stations carry `evidenceClass: "unverified_reference"`, `geometryMethod: "
 
 **DHAKA_STUDY_BOUNDARY** — population-grid study extent (not DNCC/DSCC):
 - [90.23895227009733, 23.594164517100097, 90.55988906432036, 23.960378575820744] (EPSG:4326)
-- Source: public/data/people-manifest.json; scripts/refresh-people.py expands atlas bbox [90.25,23.60,90.55,23.95] to complete 1 km UTM46N cells and exports outer corners to WGS84.
+- Source: public/data/people-manifest.json; scripts/refresh-people.py expands atlas bbox [90.25,23.60,90.55,23.95] to complete 1 km UTM 46N cells and exports outer corners to WGS 84.
 - Limitations: no administrative-boundary match or planning validation. Facility references are clipped to this grid; legacy river stations may lie outside it. An authored-area point envelope is not a municipal boundary.
 
 ## 4 · Flood scenario types

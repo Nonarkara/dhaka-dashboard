@@ -2,17 +2,13 @@
 // Keys are the canonical English source strings.
 
 window.ATLAS_BN = {
-  "Low-angle map exploration": "নিচু কোণের মানচিত্র দেখা",
+  "Heights are the map provider's, not surveyed.": "উচ্চতা মানচিত্র সরবরাহকারীর, জরিপকৃত নয়।",
+  "The ground is the map's flat plane; the atlas carries no elevation model. These viewpoints are not a walking route and do not establish street access.": "মাটি মানচিত্রের সমতল; মানচিত্রে উচ্চতার মডেল নেই। এই দৃশ্যগুলো হাঁটার পথ নয় এবং রাস্তায় প্রবেশযোগ্যতা প্রমাণ করে না।",
   "Exploration tools & sources": "নিয়ন্ত্রণ ও উৎস",
-  "Source heights only; unknown flat. Not a walking route.": "কেবল নথিভুক্ত উচ্চতা; অজানা সমতল। হাঁটার পথ নয়।",
   "← Previous": "← আগের",
   "Next →": "পরের →",
 
-  "Low-angle map": "নিচু কোণের মানচিত্র",
   "Map viewpoints": "মানচিত্রের দৃশ্য",
-  "Only explicit source heights extrude; unknown heights stay flat.": "কেবল উৎসে নথিভুক্ত উচ্চতা ত্রিমাত্রিক; অজানা উচ্চতা সমতল থাকে।",
-  "Mapped footprints · explicit heights only": "মানচিত্রের সীমারেখা · কেবল নথিভুক্ত উচ্চতা",
-  "Open map centre in external scene ↗": "মানচিত্রের কেন্দ্র বাইরের দৃশ্যে খুলুন ↗",
 
   "Flood": "বন্যা",
   "Air": "বায়ু",
@@ -327,7 +323,7 @@ window.ATLAS_BN = {
   "carries its source, collection time, reporting units, and license terms. This document details the open data infrastructure, validation standards, and refusal contracts.": "সঙ্গে তার উৎস, সংগ্রহের সময়, প্রতিবেদনের একক ও লাইসেন্সের শর্ত থাকে। এই নথিতে উন্মুক্ত তথ্যের অবকাঠামো, যাচাইয়ের মান এবং প্রত্যাখ্যানের চুক্তি বিস্তারিতভাবে দেওয়া হয়েছে।",
   "Street-level walkthrough": "রাস্তার ধরনের ওপরে ভ্রমণ",
   "Massing is drawn from the map provider's computed heights, not surveyed ones.": "ভবনের গঠন মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতা থেকে আঁকা; জরিপকৃত উচ্চতা থেকে নয়।",
-  "Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · elevation Terrain Tiles. Opened in a new tab.": "রাস্তার দৃশ্য রেন্ডার: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · উচ্চতা Terrain Tiles। নতুন ট্যাবে খোলে।",
+  "Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · elevation Terrain Tiles. Its geometry and access assumptions are separate. Opens in a new tab.": "রাস্তার দৃশ্য রেন্ডার: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · উচ্চতা Terrain Tiles। এর জ্যামিতি ও প্রবেশের অনুমান আলাদা। নতুন ট্যাবে খোলে।",
   "1. Core Design & Architectural Laws": "১. মূল নকশা ও স্থাপত্যের নীতি",
   "The Refusal Contract:": "প্রত্যাখ্যানের চুক্তি:",
   "If an upstream API is unreachable, times out, or produces malformed fields, the dashboard displays": "কোনো উপরের-স্তরের API অগ্রহযোগ্য না হলে, সময়োত্তীর্ণ হলে, বা ত্রুটিপূর্ণ ঘর দিলে, ড্যাশবোর্ড",

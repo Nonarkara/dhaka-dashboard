@@ -50,7 +50,7 @@ rate limit that we hit. Every layer is a WMTS tile service in EPSG:3857 with
 `GoogleMapsCompatible` tile matrices, so the tile arithmetic is the standard
 web-mercator pyramid.
 
-- Capabilities: `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml`
+- Capabilities: `https://gibs.earthdata.nasa.gov/wmts/epsg 3857/best/1.0.0/WMTSCapabilities.xml`
 - Tiles: `…/best/{layer}/default/{date}/GoogleMapsCompatible_Level{N}/{z}/{y}/{x}.png`
 - Colour maps: `https://gibs.earthdata.nasa.gov/colormaps/v1.3/{file}.xml`
 
@@ -86,7 +86,7 @@ rather than asserted.
 | `OPERA_L3_Dynamic_Surface_Water_Extent-HLS` | Flood extent, optical | 12 |
 | `VIIRS_Combined_Flood_1/2/3-Day` | Multi-sensor flood detection | 9 |
 | `MODIS_Combined_Flood_1/2/3-Day` | MODIS flood detection | 9 |
-| `VIIRS_Black_Marble` | Night lights, gap-filled, VNP46A2 | 8 |
+| `VIIRS_Black_Marble` | Night lights, gap-filled, VNP 46A2 | 8 |
 | `VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance` | Night radiance, NOAA-20 | 8 |
 | `MODIS_Combined_L3_IGBP_Land_Cover_Type_Annual` | Land cover classification | 8 |
 | `MODIS_Aqua_L3_NDVI_Monthly`, `MODIS_Terra_L3_NDVI_16Day` | Vegetation | 7, 9 |
@@ -143,13 +143,13 @@ mission.
 ### USGS / Earth Search — Landsat scenes and STAC
 
 - `https://stacapi.usgs.gov/stac` — **did not respond** from this machine.
-- `https://earth-search.aws.element84.com/v1/search` — **responded**, and
+- `https://earth-search.aws.element 84.com/v1/search` — **responded**, and
   carries real Landsat Collection 2 Level-2 scenes over Dhaka.
 - The USGS collection id is `landsat-c2l2-sr` (not `landsat-c2-l2-sr`).
 
 ### NOAA NDBC — the Bay of Bengal buoys
 
-`https://www.ndbc.noaa.gov/data/realtime2/{id}.txt`
+`https://www.ndbc.noaa.gov/data/realtime 2/{id}.txt`
 
 - Buoy 23019 returns live wind and sea-surface temperature.
 - Buoys 23008 and 23219 returned 404 on the day of checking — station ids
@@ -174,8 +174,8 @@ mission.
 
 ### Currency
 
-- `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json`
-  — works, daily, CC0, with a `date` field the atlas validates.
+- `https://cdn.jsdelivr.net/npm/@fawazahmed 0/currency-api@latest/v1/currencies/usd.json`
+  — works, daily, CC 0, with a `date` field the atlas validates.
 - `https://open.er-api.com/v6/latest/USD` — works, daily.
 
 ### FFWC — the official flood forecast centre
@@ -207,7 +207,7 @@ Recorded so the next person does not repeat it.
 
 | Attempt | Outcome |
 |---|---|
-| `gibs.earthdata.nasa.gov/colormaps/v1.3/GT1_BlackMarble_Default.xml` | 404 — the colour map filename is not the layer name; read the href from the capabilities document instead. |
+| `gibs.earthdata.nasa.gov/colormaps/v1.3/GT 1_BlackMarble_Default.xml` | 404 — the colour map filename is not the layer name; read the href from the capabilities document instead. |
 | `jeodpp.jrc.ec.europa.eu/…/GHS_POP_E2020_…_4326_3ss_V1_0_23N090E.tif` | 404 — GHSL ships zipped row/column bundles, not per-city GeoTIFFs. |
 | `data.worldpop.org/GIS/Population/…/2020_BGD_1km_Aggregated.tif` | 404 — the path has changed. |
 | `data-api.globalforestwatch.org/dataset` | 404 without a version parameter. |
@@ -236,7 +236,7 @@ states its averaging range — *"25-year Meteorological and Solar Monthly &
 Annual Climatologies (January 2001 - December 2025)"* — and the adapter
 replaced it with the phrase "climatological normal". A number without its
 period is a number without a meaning. The period, the source grid
-(`SYN1DEG`) and the point the upstream answered for are all kept now.
+(`SYN 1 DEG`) and the point the upstream answered for are all kept now.
 
 **3. A reading claimed a rate it had not measured.** One phrasing said the
 coolest district after dark was "the fastest night-time cooling in the city".
@@ -324,11 +324,11 @@ and no longer does:
 - NASA POWER — https://power.larc.nasa.gov/
 - ESA WorldCover — https://esa-worldcover.org/
 - JRC GHSL — https://ghsl.jrc.ec.europa.eu/
-- NASA GIBS capabilities — https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml
+- NASA GIBS capabilities — https://gibs.earthdata.nasa.gov/wmts/epsg 3857/best/1.0.0/WMTSCapabilities.xml
 - USGS Landsat — https://www.usgs.gov/landsat-missions/landsat-collection-2
-- Earth Search STAC — https://earth-search.aws.element84.com/
+- Earth Search STAC — https://earth-search.aws.element 84.com/
 - NOAA NDBC — https://www.ndbc.noaa.gov/
 - World Bank Open Data — https://data.worldbank.org/
 - Open-Meteo — https://open-meteo.com/
-- Fawaz Ahmed Currency API — https://github.com/fawazahmed0/exchange-api
+- Fawaz Ahmed Currency API — https://github.com/fawazahmed 0/exchange-api
 - OpenStreetMap Overpass — https://overpass-api.de/

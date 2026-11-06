@@ -19,14 +19,14 @@ Building categories use actual OSM tags, never height, proximity or random color
 Spatial Hallucination (SH) Elimination: Overlays are budgeted strictly to prevent map obstruction. The atlas menu groups its controls without clipping or shrinking readable labels; the map key fits its labels; the forecast playback panel groups model values with playback controls; and the observation HUD is tightened from 310 px to 220 px. This preserves the maximum possible operating viewport for the hero 3D map. Height provenance and Parliament courtyards remain intact.
 
 ### Satellite Observation, Atmospheric Modeling & 3D Spatial Geometry
-Satellite rasters come from NASA GIBS (WMTS, `epsg3857/best`). Every layer id, tile matrix set and file format is validated against the GIBS capabilities catalogue by `scripts/test-environment-contract.mjs`, and `scripts/verify-gibs-live.mjs` confirms at release time that the tiles still return imagery over Dhaka. GIBS publishes each product on its own latency, so the observation date is resolved by probing candidate dates rather than assumed, and the resolved date is printed in the lens status strip. A layer with no observation reports `unavailable` with a `reasonCode` — it never renders an empty raster as if it were data.
+Satellite rasters come from NASA GIBS (WMTS, `epsg 3857/best`). Every layer id, tile matrix set and file format is validated against the GIBS capabilities catalogue by `scripts/test-environment-contract.mjs`, and `scripts/verify-gibs-live.mjs` confirms at release time that the tiles still return imagery over Dhaka. GIBS publishes each product on its own latency, so the observation date is resolved by probing candidate dates rather than assumed, and the resolved date is printed in the lens status strip. A layer with no observation reports `unavailable` with a `reasonCode` — it never renders an empty raster as if it were data.
 
 GIBS also publishes a date directory before the observation behind it has been ingested, and serves that date as a fully blank placeholder tile: HTTP 200, non-empty, opaque, one uniform colour. A status check or a byte count accepts it, and painting it would cover the map with a white square. The observation date is therefore accepted only after the tile is **decoded** and shown to carry content (`src/gibs-png.ts`; the browser decodes with a canvas, the Worker with `DecompressionStream`). The browser resolves the date at runtime; the Worker uses the GIBS capabilities catalogue as its floor.
 
 - **NASA Aerosol Optical Depth (AOD)**: NASA MODIS MAIAC L2G (1 km product, served on GIBS `GoogleMapsCompatible_Level7` tiles) daily atmospheric aerosol column density, measuring transboundary particulate loading and winter smoke over the Bengal Basin.
-- **Satellite Cloud Reflectance**: NASA VIIRS NOAA-20 corrected true-colour surface reflectance (`Level9`, JPEG), daily.
-- **Night-Time Radiance**: NASA VIIRS Suomi NPP Day/Night Band radiance (`Level7`), the Black Marble family product, daily.
-- **Flood Inundation**: NASA VIIRS combined flood detection, 1-day window (`Level9`), daily.
+- **Satellite Cloud Reflectance**: NASA VIIRS NOAA-20 corrected true-colour surface reflectance (`Level 9`, JPEG), daily.
+- **Night-Time Radiance**: NASA VIIRS Suomi NPP Day/Night Band radiance (`Level 7`), the Black Marble family product, daily.
+- **Flood Inundation**: NASA VIIRS combined flood detection, 1-day window (`Level 9`), daily.
 - **Doppler Rain Radar Playback**: Dynamic RainViewer Doppler radar loop cycling past observation frames with BST timestamps, displaying precipitation movement across the delta.
 - **Catchment Rainfall Modeling**: Modeled 24-hour precipitation accumulation across 5 Greater Dhaka drainage basins (Buriganga, Turag, Balu, Tongi North, Savar West) with intensity-coded badges and interactive hydrologic observation cards.
 - **Winter Smoke Transport & Brick Kiln Arcs**: Live 10m surface wind vectors from Open-Meteo coupled with spatial kiln clusters in Savar, Gazipur, Keraniganj, and Narayanganj, illustrating seasonal particulate drift into central Dhaka.
@@ -34,7 +34,7 @@ GIBS also publishes a date directory before the observation behind it has been i
 
 Operational requirements distilled from a private delegate discussion: policy decisions, improvement without demolition/displacement, upstream-driven northeast flash floods, agricultural warning lead time, forecast accuracy and agency implementation. No private transcript is distributed. The talk's numerical accuracy claims are unvalidated and excluded.
 
-The outlook is a model playback, paused by default. CAMS global PM2.5 uses native-scale cells, three-hour frames and a fixed concentration scale. GloFAS discharge uses daily model reaches and ensemble quartiles. Model issue time is not exposed by the provider and remains null; retrieval and valid times are separate. Missing values stay missing.
+The outlook is a model playback, paused by default. CAMS global PM 2.5 uses native-scale cells, three-hour frames and a fixed concentration scale. GloFAS discharge uses daily model reaches and ensemble quartiles. Model issue time is not exposed by the provider and remains null; retrieval and valid times are separate. Missing values stay missing.
 
 ### Northeast river outlook and decision limits
 
@@ -48,10 +48,10 @@ Field inundation requires a calibrated terrain/hydraulic model and local validat
 
 ### National instruments
 
-The unfinished clock/economy band is integrated through a bounded national-data disclosure. Bangladesh time uses the device clock with an explicit label, independent of cached server responses. World Bank WDI values retain annual periods and source links; they do not become live economic measurements. A CC0 daily FX reference retains its data date and is never labeled a live tradable rate. Latest valid dated observations are selected after country, indicator, number and period checks. Missing feeds show reason codes and timestamps; full evidence remains available at phone widths.
+The unfinished clock/economy band is integrated through a bounded national-data disclosure. Bangladesh time uses the device clock with an explicit label, independent of cached server responses. World Bank WDI values retain annual periods and source links; they do not become live economic measurements. A CC 0 daily FX reference retains its data date and is never labeled a live tradable rate. Latest valid dated observations are selected after country, indicator, number and period checks. Missing feeds show reason codes and timestamps; full evidence remains available at phone widths.
 
 ### Geometry audit
 
 A compact map toolbar remains 48px. Density cannot be achieved with 24px targets, clipped labels or unreadable microtype. Map settings use complete wrapping labels and at least 36px controls. The building key expands to its content, and the player keeps readable qualifications beside play and scrub. Populated phone, tablet, desktop, Bengali and error states are measured and independently reviewed before release.
 
-Sources: https://open-meteo.com/en/docs/air-quality-api ; https://open-meteo.com/en/docs/flood-api ; https://github.com/fawazahmed0/exchange-api ; https://datahelpdesk.worldbank.org/knowledgebase/articles/898599-indicator-api-queries . Official warnings: https://ffwc.gov.bd .
+Sources: https://open-meteo.com/en/docs/air-quality-api ; https://open-meteo.com/en/docs/flood-api ; https://github.com/fawazahmed 0/exchange-api ; https://datahelpdesk.worldbank.org/knowledgebase/articles/898599-indicator-api-queries . Official warnings: https://ffwc.gov.bd .

@@ -113,7 +113,12 @@ class Session {
       awaitPromise: true,
     });
     if (result.exceptionDetails) {
-      throw new Error(`Page evaluation failed: ${result.exceptionDetails.text}`);
+      // The page's own error text, when it has one. "Uncaught" alone tells
+      // an auditor nothing about which line failed.
+      const detail = result.exceptionDetails.exception?.description
+        || result.exceptionDetails.text
+        || 'unknown error';
+      throw new Error(`Page evaluation failed: ${detail}`);
     }
     return result.result?.value;
   }

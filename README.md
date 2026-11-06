@@ -18,15 +18,15 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 | **Population** | Dated WorldPop 2025 estimates in 1 km cells and 2,181 mapped school/healthcare objects; no census or capacity inference | WorldPop / OpenStreetMap |
 | **Economic engine** | Ready-Made Garment (RMG) export corridors, Savar DEPZ, Adamjee EPZ, Motijheel financial district, and wholesale hubs (Kawran Bazar, Islampur, Chawkbazar) | Export Promotion Bureau (EPB), Bangladesh Bank, DSE |
 | **Transit & Metro** | The network registry read live by the Metro desk: MRT Line 6 alignment with its 17 stations, Dhaka Elevated Expressway, three inter-district bus terminals (Gabtoli, Mohakhali, Sayedabad) and Dhaka Airport railway station. Sadarghat launch terminal and Kamalapur remain mapped landmarks | DMTCL, DTCA, Bangladesh Railway, BIWTA |
-| **Air forecast** | Regional CAMS PM2.5 playback at approximately 45 km in native three-hour steps for the next 48 hours; city-center 72-hour timeline remains in the air desk | Copernicus CAMS / Open-Meteo |
+| **Air forecast** | Regional CAMS PM 2.5 playback at approximately 45 km in native three-hour steps for the next 48 hours; city-center 72-hour timeline remains in the air desk | Copernicus CAMS / Open-Meteo |
 | **Brick kilns & smoke** | Explicit unavailable state until FIRMS retrieval is configured; surface wind only, no 925 hPa field | NASA FIRMS (VIIRS NOAA-20 375m), ECMWF |
 | **Architectural heritage** | Mughal, colonial, and modern masterworks: Lalbagh Fort (1678), Ahsan Manzil (1872), Louis Kahn's Jatiya Sangsad Bhaban (1982), Curzon Hall (1904) | Directorate of Archaeology, Survey of Bangladesh |
 | **Rain · next 24 h** | Validated 24-hour precipitation totals at five query points; not catchment averages or flood risk | Open-Meteo High-Resolution Precipitation Models |
 | **Rain radar** | Live Doppler radar precipitation loop over the Bengal Delta | RainViewer Doppler Radar Mosaic |
 | **Satellite clouds** | Daily true-color atmospheric cloud reflectance | NASA GIBS / NOAA-20 VIIRS True Color |
-| **Night lights** | Nighttime radiance and urban electrification patterns | NASA GIBS / Suomi NPP VIIRS Black Marble (VNP46A2) |
+| **Night lights** | Nighttime radiance and urban electrification patterns | NASA GIBS / Suomi NPP VIIRS Black Marble (VNP 46A2) |
 | **Satellite flood detection** | Dated VIIRS combined one-day flood-detection imagery; not a forecast of local arrival or field impacts | NASA GIBS |
-| **Satellite aerosol (AOD)** | Dated MODIS MAIAC atmospheric aerosol column; not ground-level PM2.5 | NASA GIBS |
+| **Satellite aerosol (AOD)** | Dated MODIS MAIAC atmospheric aerosol column; not ground-level PM 2.5 | NASA GIBS |
 
 ---
 
@@ -65,8 +65,8 @@ The dashboard runs on a Cloudflare Worker serving a zero-bundle-overhead static 
 | `/api/atlas/rainfall` | GET | 24-hour rainfall accumulation across 5 catchment basins |
 | `/api/atlas/fires` | GET | NASA FIRMS active fire hotspots in Savar/Gazipur kiln arcs |
 | `/api/atlas/wind` | GET | Modeled surface wind; pressure-level transport and pollution attribution unavailable |
-| `/api/atlas/outlook?kind=air` or `kind=flood` | GET | Regional CAMS PM2.5 / GloFAS daily discharge playback; warning/arrival/harvest guidance unavailable |
-| `/api/atlas/instruments` | GET | Dated national World Bank annual series and daily CC0 FX references; partial failure metadata |
+| `/api/atlas/outlook?kind=air` or `kind=flood` | GET | Regional CAMS PM 2.5 / GloFAS daily discharge playback; warning/arrival/harvest guidance unavailable |
+| `/api/atlas/instruments` | GET | Dated national World Bank annual series and daily CC 0 FX references; partial failure metadata |
 | `/api/atlas/people` | GET | WorldPop 2025 population model and dated OSM facility reference manifest; asset hashes and source limits |
 | `/api/atlas/environment` | GET | Dated NASA GIBS WMTS endpoints and RainViewer radar metadata |
 | `/api/atlas/earthquake` | GET | USGS seismic events in the Bengal Basin and Dauki Fault zone |
@@ -128,17 +128,17 @@ Planning provenance/source review: [docs/DHAKA-PLANNING-PROVENANCE.md](docs/DHAK
 
 All 17 dated national World Bank series and daily reference FX are available from the Bangladesh data desk in seven domains. The compact header does not need a separate instruments strip for this desk to work. Fractional rates retain decimals; failure of server-time synchronization is labelled as a device clock.
 
-Current weather/air/wind validate source time, UTC offset, units and finite admissible values before caching. Rainfall requires24consecutive nonnegative hourly millimetre observations with a valid current interval. Its map points do not establish catchment coverage. Flood/shelter operational assessments remain unavailable.
+Current weather/air/wind validate source time, UTC offset, units and finite admissible values before caching. Rainfall requires 24 consecutive nonnegative hourly millimetre observations with a valid current interval. Its map points do not establish catchment coverage. Flood/shelter operational assessments remain unavailable.
 
-The inherited geometric Parliament sketch is preserved at `/parliament-reference.html` as a bilingual, manually turnable nongeographic design study. The map retains all4,076dated OSM footprints and14courtyard rings; eight explicit source heights extrude, while4,068unknown heights remain flat. Provider-derived streamed `render_height` is not treated as an explicit source height.
+The inherited geometric Parliament sketch is preserved at `/parliament-reference.html` as a bilingual, manually turnable nongeographic design study. The map retains all 4,076 dated OSM footprints and 14 courtyard rings; eight explicit source heights extrude, while 4,068 unknown heights remain flat. Provider-derived streamed `render_height` is not treated as an explicit source height.
 
-Repository recovery and release proof: `docs/evidence/reconciliation-2026-11-04/`. CI without Cloudflare credentials reports validation only; authenticated release uses the same canonical `scripts/deploy-live.sh` gates as local shipping. There are18configured npm test suites, counted from package.json; previous20-suite summaries were inaccurate.
+Repository recovery and release proof: `docs/evidence/reconciliation-2026-11-04/`. CI without Cloudflare credentials reports validation only; authenticated release uses the same canonical `scripts/deploy-live.sh` gates as local shipping. There are 22 configured npm test suites, counted from package.json; previous 20-suite summaries were inaccurate.
 
 
 ## MiniMax follow-up audit · 6 November 2026
 
-The low-angle exploration lens preserves keyboard controls, authored viewpoints and explicit source-height geometry. It does not establish a walking route, access or a pedestrian position. A/D directions, hidden/manual/exit interruption, reduced motion and late data attachment are covered by executable VM tests rather than source-string assertions. The default75° pitch retains geographic context;85° remains the manual limit.
+The low-angle exploration lens preserves keyboard controls, authored viewpoints and explicit source-height geometry. It does not establish a walking route, access or a pedestrian position. A/D directions, hidden/manual/exit interruption, reduced motion and late data attachment are covered by executable VM tests rather than source-string assertions. The default 75° pitch retains geographic context;85° remains the manual limit.
 
-Transit now labels17mapped registry stations including the Kamalapur extension, without claiming17operating stations. Failures retain their reason/time and a working Retry; stale language responses cannot overwrite the current desk. Export validates each layer and reports malformed/missing collections as partial or unavailable.
+Transit now labels 17 mapped registry stations including the Kamalapur extension, without claiming 17 operating stations. Failures retain their reason/time and a working Retry; stale language responses cannot overwrite the current desk. Export validates each layer and reports malformed/missing collections as partial or unavailable.
 
-The report's axial-grid claim is stale: protectedSTYLE.md and currentCSS already specify modular map-edge instruments. There are23configured npm suites after adding executable exploration behavior. Deployment and live-build status are recorded separately in docs/evidence/audit-2026-11-06/; a successful test run does not prove a release, and an account API503alone does not establish a global Cloudflare outage.
+The report's axial-grid claim is stale: protected STYLE.md and current CSS already specify modular map-edge instruments. There are 23 configured npm suites after adding executable exploration behavior. Deployment and live-build status are recorded separately in docs/evidence/audit-2026-11-06/; a successful test run does not prove a release, and an account API 503 alone does not establish a global Cloudflare outage.

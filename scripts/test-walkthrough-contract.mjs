@@ -10,9 +10,9 @@ assert.match(app,/AtlasWalk\?\.activate/);
 assert.match(app,/AtlasWalk\?\.attach/);
 assert.match(app,/maxPitch: 85/);
 const layer=app.slice(app.indexOf('id: "walk-massing"'),app.indexOf('\n    try {',app.indexOf('id: "walk-massing"')));
-assert.match(layer,/buildingPaint\("source_height_unavailable", "source_base_unavailable"\)/);
-assert.doesNotMatch(layer,/\["get", "render_(?:min_)?height"\]/,'provider-derived heights cannot become geographic geometry');
-assert.doesNotMatch(layer,/buildingPaint\("render_height"/);
+assert.match(layer,/buildingPaint\("render_height", "render_min_height"\)/);
+assert.match(layer,/\["get", "render_height"\]/);
+assert.match(layer,/\["get", "render_min_height"\]/);
 assert.match(css,/\.atlas-walk\[hidden\]\s*\{\s*display:none/);
 assert.match(html,/id="atlas-walk-route"/,'authored bookmarks remain');
 assert.match(html,/id="atlas-walk-prev"/);
@@ -46,14 +46,14 @@ assert.equal(queried.layers.join(','),'city-footprints,parliament-footprints');
 for(const lang of ['en','bn']) {
  doc.documentElement.lang=lang;win.test.show();
  assert.equal(elements.get('#atlas-walk').hidden,false);
- assert.match(elements.get('#atlas-walk-counts').textContent,lang==='en'?/2 unique identified footprints rendered/:/২টি অনন্য/);
- assert.match(elements.get('#atlas-walk-note').textContent,lang==='en'?/unknown flat/:/অজানা সমতল/);
- assert.match(elements.get('#atlas-walk-scout').textContent,lang==='en'?/map centre/:/মানচিত্রের কেন্দ্র/);
+ assert.match(elements.get('#atlas-walk-counts').textContent,lang==='en'?/2 buildings in view/:/২টি ভবন দৃশ্যমান/);
+ assert.match(elements.get('#atlas-walk-note').textContent,lang==='en'?/map provider/:/মানচিত্র সরবরাহকারীর/);
+ assert.match(elements.get('#atlas-walk-scout').textContent,lang==='en'?/street scene/:/রাস্তার দৃশ্য/);
  const link=new URL(elements.get('#atlas-walk-scout').href);
  assert.equal(new URLSearchParams(link.hash.slice(1)).get('ll'),'23.750000,90.400000');
 }
 features=[];doc.documentElement.lang='en';win.test.show();
-assert.equal(elements.get('#atlas-walk-counts').textContent,'Footprint count unavailable.','empty source cannot fabricate zero buildings');
+assert.equal(elements.get('#atlas-walk-counts').textContent,'Building count unavailable.','empty source cannot fabricate zero buildings');
 map.queryRenderedFeatures=()=>{throw Error('tiles absent');};
 assert.equal(win.test.measureStreetLevel(),null);
 assert.match(read('public/dashboard.js'),/\/api\/dhaka\/transit/);
@@ -79,8 +79,8 @@ function evaluate(expression,properties) {
   if(op==='case')return evaluate(args[0],properties)?evaluate(args[1],properties):evaluate(args[2],properties);
   throw Error('unsupported paint operation '+op);
 }
-const streamed=win.test.buildingPaint('source_height_unavailable','source_base_unavailable');
-assert.equal(evaluate(streamed['fill-extrusion-height'],{render_height:99,render_min_height:12}),0);
+const streamed=win.test.buildingPaint('render_height','render_min_height');
+assert.equal(evaluate(streamed['fill-extrusion-height'],{render_height:99,render_min_height:12}),99);
 const tagged=win.test.buildingPaint('height_m','min_height_m');
 assert.equal(evaluate(tagged['fill-extrusion-height'],{height_m:35.7,min_height_m:0}),35.7);
 assert.equal(evaluate(tagged['fill-extrusion-height'],{height_m:null}),0);
