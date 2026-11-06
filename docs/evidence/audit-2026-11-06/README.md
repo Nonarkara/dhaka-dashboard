@@ -15,7 +15,7 @@ Transit now distinguishes 17 mapped registry stations (including the extension) 
 - Transit outage/recovery screenshots use a temporary local fetch fixture returning503 until Retry. Enlarged text also uses a temporary local fixture. Generated fixture pages were removed before release preflight.
 - A separate reviewer inspected final source, behavior tests and actual normal/enlarged/retry pixels: PASS, no remaining source/UI blocker in this scope.
 
-Screenshots are the repaired **local preview**, except live-before-walk-390-bn.png, which records the previous production state. They do not establish a deployment. See release.txt for the actual release outcome. No validated flood classification, shelter geometry or pedestrian access claim was added.
+Screenshots are the repaired **local preview**, except live-before-walk-390-bn.png (previous production) and live-walk-en.png/live-walk-bn.png (final production). The final release is established by deploy.log, health.json and release.txt. See release.txt for the actual release outcome. No validated flood classification, shelter geometry or pedestrian access claim was added.
 
 ## Release gate findings
 

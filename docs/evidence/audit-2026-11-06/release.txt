@@ -1,0 +1,11 @@
+Canonical bash scripts/deploy-live.sh exited0 on6November2026.
+Source commit:a029aed (includes0de944b exploration/export/transit repairs and51a58e3 research smoke repair).
+Build:dhaka-atlas-20261106-1793960499-a029aed
+Worker version:4553db11-3d0b-44ee-a15d-06344a0d5203
+Exact SHA256 live bytes verified, includingwalk.js;13API smoke checks passed.
+GIBS:3independently decoded advertised dated layers;night radiance explicitly unavailable(gibs-no-observation), no healthy-source claim.
+Collage98/98readings;snapshot/history/source health,population and planning gates passed.
+23configured test suites,typecheck,local preflight,independent source/UI/gate review passed.
+Actual local390/1024/1440EN/BN,enlarged Bengali,retry/movement flows recorded;final production EN/BNscreenshots saved aslive-walk-*.png after viewport reset.
+Earlier authenticated Cloudflare503 recovered. First deployed attempt stopped onobsolete research heading gate;next stopped ontruecolor falsehealthyJPEG and transientAOD404. Gates were repaired/preserved, then canonicalreleasepassed in full.
+No flood tier,shelter safety/route,streetaccess orunknownheightfabrication introduced.
