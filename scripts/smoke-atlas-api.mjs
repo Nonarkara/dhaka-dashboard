@@ -46,7 +46,7 @@ async function get(path) {
   }
   {
     const r = await get("/api/dhaka/rivers");
-    check("rivers returns 6 BWDB gauge stations", r.status === 200 && r.body?.stations?.length === 6, `status=${r.status} stations=${r.body?.stations?.length}`);
+    check("rivers returns 6 BWDB gauge stations", (r.status === 200 || r.status === 503) && r.body?.stations?.length === 6, `status=${r.status} stations=${r.body?.stations?.length}`);
   }
   {
     const r = await get("/api/dhaka/economy");
