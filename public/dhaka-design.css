@@ -560,7 +560,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-menu-body > * { flex-shrink:0; }
 .atlas-header:has(.atlas-menu[open]) { z-index:100; }
 /* Imagery credit must stay visible on phones: the watch strip sits above the attribution control. */
-@media (max-width: 768px) { .atlas-watch { bottom: 34px; } }
+@media (max-width: 768px) { .atlas-watch { bottom: 34px; right: 100px; } }
 
 /* Exact forecast values stay available without relying on bar hover or colour. */
 .air-data-table { margin-top:8px; }
