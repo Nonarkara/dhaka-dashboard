@@ -576,7 +576,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-watch-item { flex-wrap:wrap; pointer-events:auto; }
 .atlas-watch-item strong { white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; text-align:right; }
 @media (max-width:768px) {
-  .atlas-watch-item { gap:3px 5px; }
+  .atlas-watch-item { gap:3px 5px; min-height:44px; }
   .atlas-watch-item strong { flex:1 1 100%; }
 }
 
