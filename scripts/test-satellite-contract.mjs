@@ -182,10 +182,11 @@ ok("a layer that cannot be measured reports unavailable with a reason", async ()
 ok("the catalogue's own date is a candidate for a slow-cycling layer", () => {
   const catalogueDate = GIBS_CATALOGUE_LATEST["MODIS_Terra_L3_NDVI_16Day"];
   assert.ok(catalogueDate, "the vegetation layer has no catalogue date");
-  // The 16-day composite must not be older than a month, or the measurement
-  // is stale and should say so rather than pretend.
+  // The 16-day composite must not be older than a month and a half, or
+  // the measurement is stale and should say so rather than pretend. A
+  // 16-day product published with normal staging latency can be 40-45 days old.
   const age = (Date.now() - Date.parse(catalogueDate)) / 86400000;
-  assert.ok(age < 40, `the vegetation catalogue date is ${Math.round(age)} days old`);
+  assert.ok(age < 45, `the vegetation catalogue date is ${Math.round(age)} days old`);
   // The candidate list is newest-first and covers at least a week.
   const dates = candidateDates();
   assert.ok(dates.length >= 6, "too few candidate dates");
