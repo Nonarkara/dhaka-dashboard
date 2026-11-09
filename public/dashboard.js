@@ -361,6 +361,17 @@
         `;
       }).join("");
       const rowsHtml = samples.map(({ value, aqi, time }) => `<tr><th scope="row">${escapeHtml(displayTime(time))}</th><td>${displayNumber(value)}</td><td>${displayNumber(aqi)}</td></tr>`).join('');
+      const finiteMean = values => {
+        const clean = values.filter(Number.isFinite);
+        return clean.length ? clean.reduce((sum, value) => sum + value, 0) / clean.length : null;
+      };
+      const firstWindow = finiteMean(samples.slice(0, 24).map(s => s.value));
+      const nextWindow = finiteMean(samples.slice(24, 48).map(s => s.value));
+      const deltaPct = firstWindow && nextWindow ? ((nextWindow - firstWindow) / firstWindow) * 100 : null;
+      const trendArrow = deltaPct === null ? "" : deltaPct > 5 ? "↑" : deltaPct < -5 ? "↓" : "→";
+      const trendText = deltaPct === null
+        ? tr("Next-24h comparison unavailable", "পরবর্তী ২৪ ঘণ্টার তুলনা অনুপলব্ধ")
+        : `${trendArrow} ${displayNumber(Math.abs(deltaPct))}% ${tr("vs first 24h", "প্রথম ২৪ ঘণ্টার তুলনায়")}`;
 
       markFeedReady(container);
       container.innerHTML = `
@@ -369,7 +380,11 @@
           <strong>${tr("72-hour modeled PM2.5 · CAMS / Open-Meteo", "৭২ ঘণ্টার মডেলভিত্তিক পিএম২.৫ · CAMS / Open-Meteo")}</strong>
           <span style="font-size:var(--text-micro);color:var(--dim);">Current PM2.5: ${data.data.current?.pm2_5 ?? tr("Unavailable", "অনুপলব্ধ")} μg/m³ · US AQI: ${data.data.current?.us_aqi ?? tr("Unavailable", "অনুপলব্ধ")}</span>
         </div>
-        <div class="aqi-timeline" aria-hidden="true">${barsHtml}</div>
+        <div class="air-trend-line">
+          <span class="air-trend-arrow" aria-hidden="true">${trendArrow}</span>
+          <span>${trendText}</span>
+        </div>
+        <div class="aqi-timeline" aria-hidden="true">${barsHtml}<span class="aqi-guideline" title="${tr("WHO 24h PM2.5 guideline 15 μg/m³", "ডব্লিউএইচও ২৪ ঘণ্টার পিএম২.৫ নির্দেশিকা ১৫ μg/m³")}"></span></div>
         <div class="air-chart-axis">
           <time>${escapeHtml(displayTime(samples[0]?.time))}</time>
           <time>${escapeHtml(displayTime(samples.at(-1)?.time))}</time>

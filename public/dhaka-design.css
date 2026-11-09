@@ -98,6 +98,7 @@
 
 /* Air Quality Timeline Chart */
 .aqi-timeline {
+  position: relative;
   display: flex;
   align-items: flex-end;
   gap: 2px;
@@ -106,6 +107,28 @@
   border: 1px solid var(--line);
   padding: 6px 4px 2px;
   margin: 10px 0;
+}
+.aqi-guideline {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 8px;
+  border-top: 1px dashed var(--line-strong, var(--dim));
+  pointer-events: none;
+}
+.air-trend-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--dim);
+  margin: -4px 0 6px;
+}
+.air-trend-arrow {
+  color: var(--accent);
+  font-size: var(--text-body);
+  line-height: 1;
 }
 .aqi-bar {
   flex: 1 1 0;
