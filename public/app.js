@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261109-1794220992-c50be22";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261109-1794221241-770f959";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -149,6 +149,12 @@
       title_bn: "রাস্তার ধরনে",
       desc: "Street-scale view of the mapped city. The massing is the map provider's computed height, not a survey, and the ground is the map's flat plane. Move with the keys; this is not a walking route.",
       desc_bn: "মানচিত্রের রাস্তার ধরনে দৃশ্য। গঠন দেখানো হয় মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপকৃত নয়; মাটি মানচিত্রের সমতলেই থাকে। কী চাপলে সরান; এটি হাঁটার পথ নয়।"
+    },
+    street: {
+      title: "Street view massing",
+      title_bn: "রাস্তার ধরনের ভর",
+      desc: "Illustrative street perspective with modeled building massing. Heights are inferred from footprint area and OSM usage where source height is missing. Modeled, not surveyed. Source: OpenStreetMap ODbL. Inspired by Rokehan street view.",
+      desc_bn: "রাস্তার ধরনের চিত্রমূলক ভর। উৎসে উচ্চতা না থাকলে ভবনের পদচিহ্নের আকার ও ব্যবহার থেকে উচ্চতা অনুমান করা হয়। মডেলকৃত, জরিপকৃত নয়। উৎস: OpenStreetMap ODbL। Rokehan স্ট্রিট ভিউ দ্বারা অনুপ্রাণিত।"
     }
   };
 
@@ -881,7 +887,8 @@
     // Eye level. MapLibre caps the pitch at 85°, which is as close to a
     // standing pedestrian as a map camera gets: the street runs to the
     // horizon and the walls close in on both sides.
-    walk: { center: [90.4072, 23.7118], zoom: 18.4, pitch: 85, bearing: 205 }
+    walk: { center: [90.4072, 23.7118], zoom: 18.4, pitch: 85, bearing: 205 },
+    street: { center: [90.4072, 23.7118], zoom: 18.0, pitch: 75, bearing: 205 }
   };
 
   function clearDynamicLayers() {
@@ -1060,10 +1067,10 @@
     if (map.getLayer("economy-hubs")) {
       map.setLayoutProperty("economy-hubs", "visibility", (lensId === "economy" || lensId === "city") ? "visible" : "none");
     }
-    // The street-level massing belongs to the walkthrough and to nothing
-    // else. Every other lens must see the city as the atlas draws it.
+    // The street-level massing belongs to the walkthrough and street lens.
+    // Every other lens must see the city as the atlas draws it.
     if (map.getLayer("walk-massing")) {
-      map.setLayoutProperty("walk-massing", "visibility", lensId === "walk" ? "visible" : "none");
+      map.setLayoutProperty("walk-massing", "visibility", (lensId === "walk" || lensId === "street") ? "visible" : "none");
     }
     renderWalkPanel();
     // Night-time radiance only reads as night over a dark ground. Dim the
