@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261109-1794207335-13074e2";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261109-1794220992-c50be22";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -318,7 +318,7 @@
 
       // Reveal the map on its first frame after the style is parsed; imagery fills in progressively.
       // map.loaded() and map.isStyleLoaded() both wait for every pitched-horizon tile (13–22 s).
-      map.once("style.load", () => { styleReady = true; applyLens(currentLens); hideLoading(); });
+      map.once("style.load", () => { styleReady = true; applyLens(currentLens); const el = $("#atlas-map-loading"); if (el) el.style.pointerEvents = "none"; });
       map.on("render", () => {
         if (styleReady) hideLoading();
       });
