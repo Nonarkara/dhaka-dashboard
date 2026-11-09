@@ -318,7 +318,7 @@
 
       // Reveal the map on its first frame after the style is parsed; imagery fills in progressively.
       // map.loaded() and map.isStyleLoaded() both wait for every pitched-horizon tile (13–22 s).
-      map.once("style.load", () => { styleReady = true; applyLens(currentLens); });
+      map.once("style.load", () => { styleReady = true; applyLens(currentLens); hideLoading(); });
       map.on("render", () => {
         if (styleReady) hideLoading();
       });
