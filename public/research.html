@@ -176,7 +176,7 @@
 
       <!-- ── Abstract ────────────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">00</span><span data-en="Abstract" data-bn="সারসংক্ষেপ">Abstract</span></h2>
+        <h2 class="section-heading"><span class="section-number">00&nbsp;</span><span data-en="Abstract" data-bn="সারসংক্ষেপ">Abstract</span></h2>
         <p data-en="Dhaka has 23 million people, a population grid nobody publishes for the city, and a government that decides where a road goes, where a pump goes and where a school goes. What it did not have, until this system, was a way to see any of it. This paper describes an instrument that reads the city from free satellite observation and free official statistics, measures the result in physical units, and refuses to print a number it cannot source."
            data-bn="ঢাকায় ২৩ মিলিয়ন মানুষ, এমন জনগণভিত্তিক গ্রিড যা কেউ প্রকাশ করে না, আর এমন সরকার যা ঠিক করে রাস্তা কোথায় যাবে, পাম্প কোথায় বসবে আর স্কুল কোথায় হবে। এই ব্যবস্থা না হওয়া পর্যন্ত তার কোনো উপায় ছিল না ওগুলো দেখার। এই গবেষণাপত্র এমন একটি যন্ত্রের বর্ণনা দেয়, যা বিনামূল্যের উপগ্রহ পর্যবেক্ষণ ও বিনামূল্যের সরকারি পরিসংখ্যান থেকে শহর পড়ে, ফলাফল পদার্থিক এককে পরিমাপ করে, এবং যে সংখ্যার উৎস নেই তা মুদ্রণ করতে অস্বীকার করে।">
           Dhaka has 23 million people, a population grid nobody publishes for the city, and a government that decides where a road goes, where a pump goes and where a school goes. What it did not have, until this system, was a way to see any of it. This paper describes an instrument that reads the city from free satellite observation and free official statistics, measures the result in physical units, and refuses to print a number it cannot source.
@@ -185,7 +185,7 @@
 
       <!-- ── 1 The problem ────────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">01</span><span data-en="The problem this instrument answers" data-bn="যে সমস্যার উত্তর এই যন্ত্র দেয়">The problem this instrument answers</span></h2>
+        <h2 class="section-heading"><span class="section-number">01&nbsp;</span><span data-en="The problem this instrument answers" data-bn="যে সমস্যার উত্তর এই যন্ত্র দেয়">The problem this instrument answers</span></h2>
         <p data-en="A city of this density is measured constantly by satellites that pass over it several times a day. The observation is free, continuous and global. What has been missing is not the imagery — it is the translation. A radiance raster is not a district; a brightness value is not an economy. The work is in the step between the two, and that step is where instruments usually go wrong, silently."
            data-bn="এই ঘনত্বের শহরকে দিনে কয়েকবার উপগ্রহ নিয়মিত পর্যবেক্ষণ করে। পর্যবেক্ষণ বিনামূল্য, নিরবচ্ছিন্ন ও বৈশ্বিক। যা অনুপস্থিত ছিল তা চিত্র নয় — অনুবাদ। একটি তেজ-বিবরণী চিত্র কোনো জেলা নয়; একটি উজ্জ্বলতার মান কোনো অর্থনীতি নয়। কাজ দুইয়ের মাঝে, আর সেখানেই যন্ত্র নীরবে ভুল হয়।">
           A city of this density is measured constantly by satellites that pass over it several times a day. The observation is free, continuous and global. What has been missing is not the imagery — it is the translation. A radiance raster is not a district; a brightness value is not an economy. The work is in the step between the two, and that step is where instruments usually go wrong, silently.
@@ -202,7 +202,7 @@
 
       <!-- ── 2 Architecture ───────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">02</span><span data-en="System architecture" data-bn="ব্যবস্থার স্থাপত্য">System architecture</span></h2>
+        <h2 class="section-heading"><span class="section-number">02&nbsp;</span><span data-en="System architecture" data-bn="ব্যবস্থার স্থাপত্য">System architecture</span></h2>
         <p data-en="The system is five planes. Each one has one job, and each one can fail without taking the others down."
            data-bn="ব্যবস্থাটি পাঁচটি স্তরে বিভক্ত। প্রতিটির একটিই কাজ, এবং প্রতিটি ব্যর্থ হতে পারে অন্যগুলোকে না টেনে।">
           The system is five planes. Each one has one job, and each one can fail without taking the others down.
@@ -211,99 +211,84 @@
         <figure class="arch-figure">
           <svg viewBox="0 0 900 420" role="img" aria-labelledby="arch-title arch-desc">
             <title id="arch-title">Five planes of the Dhaka civic satellite atlas</title>
-            <desc id="arch-desc">A left-to-right grid. Observation feeds Measurement, which feeds Collection, which feeds Edge, which feeds Presentation. Each plane is marked by one coloured block: green for observation, coral for measurement, amber for collection, blue for edge, and paper white for presentation. Hairline rules divide the grid into unequal compartments.</desc>
+            <desc id="arch-desc">A left-to-right grid of five unequal compartments. Each carries one coloured block at the top and the name of the plane inside it. From left to right: Observation, in green; Measurement, in coral; Collection, in amber; Edge, in blue; Presentation, in paper white. Hairline rules carry the flow from one plane to the next.</desc>
 
-            <!-- Hairline frame and rules -->
+            <!-- Hairline frame and the rules that carry the flow -->
             <g stroke="#476677" stroke-width="1" fill="none">
               <rect x="0.5" y="0.5" width="899" height="419" />
               <line x1="196" y1="0" x2="196" y2="420" />
               <line x1="368" y1="0" x2="368" y2="420" />
               <line x1="536" y1="0" x2="536" y2="420" />
               <line x1="704" y1="0" x2="704" y2="420" />
-              <line x1="0" y1="286" x2="196" y2="286" />
-              <line x1="196" y1="196" x2="368" y2="196" />
-              <line x1="368" y1="330" x2="536" y2="330" />
-              <line x1="536" y1="150" x2="704" y2="150" />
-              <line x1="704" y1="256" x2="900" y2="256" />
+              <line x1="0" y1="300" x2="196" y2="300" />
+              <line x1="196" y1="212" x2="368" y2="212" />
+              <line x1="368" y1="332" x2="536" y2="332" />
+              <line x1="536" y1="248" x2="704" y2="248" />
+              <line x1="704" y1="270" x2="900" y2="270" />
             </g>
 
-            <!-- One colour block per plane -->
-            <rect x="16" y="16" width="164" height="96" fill="#2bb071" />
-            <rect x="212" y="60" width="140" height="120" fill="#d9583b" />
-            <rect x="384" y="16" width="136" height="74" fill="#e68a2e" />
-            <rect x="552" y="196" width="136" height="118" fill="#257da4" />
-            <rect x="720" y="16" width="164" height="96" fill="#f5f0dc" />
+            <!-- One colour block per plane, each with the plane's name inside -->
+            <rect x="16" y="16" width="164" height="64" fill="#2bb071" />
+            <rect x="212" y="16" width="140" height="64" fill="#d9583b" />
+            <rect x="384" y="16" width="136" height="64" fill="#e68a2e" />
+            <rect x="552" y="16" width="136" height="64" fill="#257da4" />
+            <rect x="720" y="16" width="164" height="64" fill="#f5f0dc" />
 
-            <!-- Flow arrows, hairline -->
+            <!-- The flow between the blocks -->
             <g stroke="#f5f0dc" stroke-width="1" fill="none">
-              <path d="M180 64 H208" />
-              <path d="M204 60 l4 4 -4 4" />
-              <path d="M352 120 H380" />
-              <path d="M376 116 l4 4 -4 4" />
-              <path d="M520 53 H548" />
-              <path d="M544 49 l4 4 -4 4" />
-              <path d="M688 255 H716" />
-              <path d="M712 251 l4 4 -4 4" />
+              <path d="M180 48 H206" /><path d="M202 44 l4 4 -4 4" />
+              <path d="M352 48 H378" /><path d="M374 44 l4 4 -4 4" />
+              <path d="M520 48 H546" /><path d="M542 44 l4 4 -4 4" />
+              <path d="M688 48 H714" /><path d="M710 44 l4 4 -4 4" />
             </g>
 
-            <!-- Labels -->
-            <g font-family="Barlow Semi Condensed, Hind Siliguri, sans-serif">
-              <g fill="#0d171d" font-size="13" font-weight="700">
-                <text x="26" y="40">OBSERVATION</text>
-              </g>
-              <g fill="#f5f0dc" font-size="12">
-                <text x="98" y="64">7 satellite instruments</text>
-                <text x="98" y="82">+ official statistics</text>
-                <text x="98" y="100">free, no key, global</text>
-              </g>
-
-              <g fill="#0d171d" font-size="13" font-weight="700">
-                <text x="222" y="86">MEASUREMENT</text>
-              </g>
-              <g fill="#f5f0dc" font-size="12">
-                <text x="282" y="110">pixel → index</text>
-                <text x="282" y="128">→ colour map</text>
-                <text x="282" y="146">→ physical unit</text>
-              </g>
-
-              <g fill="#0d171d" font-size="13" font-weight="700">
-                <text x="394" y="40">COLLECTION</text>
-              </g>
-              <g fill="#f5f0dc" font-size="12">
-                <text x="394" y="60">cron every 15 min</text>
-                <text x="394" y="78">every upstream response</text>
-              </g>
-
-              <g fill="#f5f0dc" font-size="13" font-weight="700">
-                <text x="562" y="220">EDGE</text>
-              </g>
-              <g fill="#f5f0dc" font-size="12">
-                <text x="562" y="244">Worker · 27 routes</text>
-                <text x="562" y="262">provenance envelope</text>
-                <text x="562" y="280">rate limit · cache</text>
-                <text x="562" y="298">R2 archive · D1 snapshot</text>
-              </g>
-
-              <g fill="#0d171d" font-size="13" font-weight="700">
-                <text x="730" y="40">PRESENTATION</text>
-              </g>
-              <g fill="#0d171d" font-size="12">
-                <text x="730" y="64">MapLibre client</text>
-                <text x="730" y="82">17 lenses</text>
-                <text x="730" y="100">thin instrument band</text>
-              </g>
+            <!-- The plane names, inside their own blocks -->
+            <g font-family="Barlow Semi Condensed, Hind Siliguri, sans-serif" font-size="13" font-weight="700" fill="#0d171d">
+              <text x="26" y="43">OBSERVATION</text>
+              <text x="222" y="43">MEASUREMENT</text>
+              <text x="394" y="43">COLLECTION</text>
+              <text x="562" y="43">EDGE</text>
+              <text x="730" y="43">PRESENTATION</text>
             </g>
 
-            <!-- Small caption row inside the grid -->
+            <!-- What each plane does, in the ground beside the block -->
+            <g font-family="Barlow Semi Condensed, Hind Siliguri, sans-serif" font-size="11.5" fill="#b8af94">
+              <text x="16" y="108">7 satellite instruments</text>
+              <text x="16" y="126">+ official statistics</text>
+              <text x="16" y="144">free, no key, global</text>
+
+              <text x="212" y="108">pixel → index</text>
+              <text x="212" y="126">→ colour map</text>
+              <text x="212" y="144">→ physical unit</text>
+
+              <text x="384" y="108">cron every 15 min</text>
+              <text x="384" y="126">every upstream response</text>
+              <text x="384" y="144">archived, then published</text>
+
+              <text x="552" y="108">Worker · 27 routes</text>
+              <text x="552" y="126">provenance envelope</text>
+              <text x="552" y="144">rate limit · cache</text>
+              <text x="552" y="162">R2 archive · D1 snapshot</text>
+
+              <text x="720" y="108">MapLibre client</text>
+              <text x="720" y="126">17 lenses</text>
+              <text x="720" y="144">thin instrument band</text>
+              <text x="720" y="162">collage panel</text>
+            </g>
+
+            <!-- The contracts, stated where they happen -->
             <g font-family="Barlow Semi Condensed, Hind Siliguri, sans-serif" font-size="10" fill="#b8af94" letter-spacing="0.06em">
-              <text x="16" y="304">FREE UPSTREAM</text>
-              <text x="16" y="320">NO AUTH · NO KEY</text>
-              <text x="212" y="216">DETERMINISTIC</text>
-              <text x="212" y="232">CATALOGUE-CHECKED</text>
-              <text x="384" y="350">PUBLISHED ON A CLOCK</text>
-              <text x="384" y="366">NOT ON VISIT</text>
-              <text x="720" y="276">BENGALI FIRST</text>
-              <text x="720" y="292">FLAT GEOMETRY</text>
+              <text x="16" y="326">NO AUTH · NO KEY</text>
+              <text x="16" y="342">GLOBAL COVERAGE</text>
+              <text x="212" y="238">DETERMINISTIC</text>
+              <text x="212" y="254">CATALOGUE-CHECKED</text>
+              <text x="212" y="270">REFUSES A BROKEN LINK</text>
+              <text x="384" y="358">PUBLISHED ON A CLOCK</text>
+              <text x="384" y="374">NOT ON VISIT</text>
+              <text x="552" y="274">ONE ENVELOPE</text>
+              <text x="552" y="290">EVERY ROUTE</text>
+              <text x="720" y="296">BENGALI FIRST</text>
+              <text x="720" y="312">FLAT GEOMETRY</text>
             </g>
           </svg>
           <figcaption class="arch-caption"
@@ -354,7 +339,7 @@
 
       <!-- ── 3 How a number is born ───────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">03</span><span data-en="How a number is born" data-bn="একটি সংখ্যা কীভাবে জন্মায়">How a number is born</span></h2>
+        <h2 class="section-heading"><span class="section-number">03&nbsp;</span><span data-en="How a number is born" data-bn="একটি সংখ্যা কীভাবে জন্মায়">How a number is born</span></h2>
         <p data-en="This is the core of the system, and it is worth stating in full because every number in the atlas is born this way."
            data-bn="এটিই ব্যবস্থার মূল, এবং এটি বিস্তারিত বলা দরকার কারণ অ্যাটলাসের প্রতিটি সংখ্যা এভাবেই জন্মায়।">
           This is the core of the system, and it is worth stating in full because every number in the atlas is born this way.
@@ -403,7 +388,7 @@
 
       <!-- ── 4 The collage ────────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">04</span><span data-en="The collage: seven domains, seven instruments" data-bn="কোলাজ: সাতটি ক্ষেত্র, সাতটি যন্ত্র">The collage: seven domains, seven instruments</span></h2>
+        <h2 class="section-heading"><span class="section-number">04&nbsp;</span><span data-en="The collage: seven domains, seven instruments" data-bn="কোলাজ: সাতটি ক্ষেত্র, সাতটি যন্ত্র">The collage: seven domains, seven instruments</span></h2>
         <p data-en="One reading per district is a reading. Seven domains, each answered by a different instrument and all measured over the same fourteen places, is a collage — and it is the collage that says something, because the interesting fact about a city is rarely in one measurement. It is in the disagreement."
            data-bn="প্রতি এলাকায় একটি রিডিং কেবল একটি রিডিং। সাতটি ক্ষেত্র, প্রতিটির উত্তর একটি ভিন্ন যন্ত্রে, সবগুলো একই চৌদ্দটি জায়গায় পরিমাপিত — এটি একটি কোলাজ, এবং কথা বলে এটিই, কারণ শহরের সমস্যাগুলো প্রায় কখনোই একটি পরিমাপে থাকে না। অসমততেই থাকে।">
           One reading per district is a reading. Seven domains, each answered by a different instrument and all measured over the same fourteen places, is a collage — and it is the collage that says something, because the interesting fact about a city is rarely in one measurement. It is in the disagreement.
@@ -470,7 +455,7 @@
 
       <!-- ── 5 Honesty contracts ──────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">05</span><span data-en="Honesty contracts" data-bn="সৎতার চুক্তি">Honesty contracts</span></h2>
+        <h2 class="section-heading"><span class="section-number">05&nbsp;</span><span data-en="Honesty contracts" data-bn="সৎতার চুক্তি">Honesty contracts</span></h2>
         <div class="provenance-box">
           <strong data-en="The refusal contract:" data-bn="প্রত্যাখ্যানের চুক্তি:">The refusal contract:</strong>
           <span data-en=" If an upstream is unreachable, times out, or returns malformed fields, the system answers “unavailable” with an explicit machine-readable reason code and a timestamp. It never invents a zero, never presents an empty widget as normal, and never converts a lack of measurement into an all-clear."
@@ -500,7 +485,7 @@
 
       <!-- ── 6 Collection and delivery ────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">06</span><span data-en="Collection and delivery" data-bn="সংগ্রহ ও পৌঁছানো">Collection and delivery</span></h2>
+        <h2 class="section-heading"><span class="section-number">06&nbsp;</span><span data-en="Collection and delivery" data-bn="সংগ্রহ ও পৌঁছানো">Collection and delivery</span></h2>
         <p data-en="A visitor-triggered measurement is a measurement that depends on who is looking, when, and whether the upstream was kind enough that minute. So the system does not measure for visitors. A scheduled collector runs every fifteen minutes; it measures the whole city once, archives every complete upstream response to object storage so that any published number can be traced back to the bytes it came from, and writes a validated snapshot to the database."
            data-bn="দর্শকের উপর নির্ভরশীল পরিমাপ মানে পরিমাপটি নির্ভর করে কে দেখছে, কখন, এবং উপস্ট্রিম সেই মিনিটে ভদ্রতা ছিল কি না। তাই ব্যবস্থাটি দর্শকের জন্য পরিমাপ করে না। প্রতি পনেরো মিনিটে একটি নির্ধারিত সংগ্রহক চলে; এটি পুরো শহর একবার মাপে, প্রতিটি সম্পূর্ণ আপস্ট্রিম প্রতিক্রিয়া অবজেক্ট-স্টোরেজে সংরক্ষণ করে যাতে প্রকাশিত যেকোনো সংখ্যা তার মূল বাইট পর্যন্ত অনুসরণ করা যায়, এবং একটি যাচাই করা স্ন্যাপশট ডেটাবেসে লেখে।">
           A visitor-triggered measurement is a measurement that depends on who is looking, when, and whether the upstream was kind enough that minute. So the system does not measure for visitors. A scheduled collector runs every fifteen minutes; it measures the whole city once, archives every complete upstream response to object storage so that any published number can be traced back to the bytes it came from, and writes a validated snapshot to the database.
@@ -514,7 +499,7 @@
 
       <!-- ── 7 Failure ────────────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">07</span><span data-en="What happens when the world misbehaves" data-bn="পৃথিবী বিগড়ে গেলে কী হয়">What happens when the world misbehaves</span></h2>
+        <h2 class="section-heading"><span class="section-number">07&nbsp;</span><span data-en="What happens when the world misbehaves" data-bn="পৃথিবী বিগড়ে গেলে কী হয়">What happens when the world misbehaves</span></h2>
         <p data-en="Degradation is designed, not improvised. Each failure has a named, machine-readable reason code, and each one is visible in the interface rather than hidden behind an empty widget."
            data-bn="অবনতি নকশা করা, তাৎক্ষণিক নয়। প্রতিটি ব্যর্থতার একটি নাম ও যন্ত্র-পাঠযোগ্য কারণ কোড আছে, এবং প্রতিটিই ইন্টারফেসে দৃশ্যমান, খালি উইজেটের পিছনে লুকানো নয়।">
           Degradation is designed, not improvised. Each failure has a named, machine-readable reason code, and each one is visible in the interface rather than hidden behind an empty widget.
@@ -534,7 +519,7 @@
 
       <!-- ── 8 Data source register ───────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">08</span><span data-en="Data source register" data-bn="তথ্য-উৎস রেজিস্টার">Data source register</span></h2>
+        <h2 class="section-heading"><span class="section-number">08&nbsp;</span><span data-en="Data source register" data-bn="তথ্য-উৎস রেজিস্টার">Data source register</span></h2>
         <p data-en="Every source the atlas uses, with its publisher, its licence and its cadence. The atlas does not hide behind a source it has not checked."
            data-bn="অ্যাটলাসের ব্যবহৃত প্রতিটি উৎস, প্রকাশক, লাইসেন্স ও ছন্দসহ। যে উৎস অ্যাটলাস পরীক্ষা করেনি তার পিছনে লুকায় না।">
           Every source the atlas uses, with its publisher, its licence and its cadence. The atlas does not hide behind a source it has not checked.
@@ -564,7 +549,7 @@
 
       <!-- ── 9 How to check our claims ────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">09</span><span data-en="How to check our claims" data-bn="আমাদের দাবিগুলো যাচাই করার উপায়">How to check our claims</span></h2>
+        <h2 class="section-heading"><span class="section-number">09&nbsp;</span><span data-en="How to check our claims" data-bn="আমাদের দাবিগুলো যাচাই করার উপায়">How to check our claims</span></h2>
         <p data-en="A claim in a paper is worth exactly what the reader can check. Every assertion this system makes about its own behaviour is enforced by a test that can be made to fail."
            data-bn="পত্রে দাবি ততটাই মূল্যবান যতটাই পাঠক যাচাই করতে পারেন। এই ব্যবস্থা নিজের আচরণ সম্পর্কে যে দাবি করে, প্রতিটি এমন একটি পরীক্ষায় বাঁধা যা ব্যর্থ করানো যায়।">
           A claim in a paper is worth exactly what the reader can check. Every assertion this system makes about its own behaviour is enforced by a test that can be made to fail.
@@ -587,7 +572,7 @@
 
       <!-- ── 10 Limits ────────────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">10</span><span data-en="What this system cannot do" data-bn="এই ব্যবস্থা যা করতে পারে না">What this system cannot do</span></h2>
+        <h2 class="section-heading"><span class="section-number">10&nbsp;</span><span data-en="What this system cannot do" data-bn="এই ব্যবস্থা যা করতে পারে না">What this system cannot do</span></h2>
         <p data-en="The limits are stated here because a civic instrument that overstates itself is worse than none."
            data-bn="সীমাবদ্ধতাগুলো এখানেই বলা হচ্ছে, কারণ যে নাগরিক যন্ত্র নিজেকে বড় করে বলে তা কোনো যন্ত্রের চেয়েও খারাপ।">
           The limits are stated here because a civic instrument that overstates itself is worse than none.
@@ -603,7 +588,7 @@
 
       <!-- ── 11 Attribution ───────────────────────────────────────────── -->
       <section class="research-section">
-        <h2 class="section-heading"><span class="section-number">11</span><span data-en="Attribution" data-bn="কৃতজ্ঞতা">Attribution</span></h2>
+        <h2 class="section-heading"><span class="section-number">11&nbsp;</span><span data-en="Attribution" data-bn="কৃতজ্ঞতা">Attribution</span></h2>
         <p>
           <strong data-en="Dr Non Arkaraprasertkul" data-bn="ড্র. নন আরকরাপ্রসের্তকুল">Dr Non Arkaraprasertkul</strong><br />
           <span data-en="Senior Expert in Smart City Promotion, Digital Economy Promotion Agency (DEPA) of Thailand." data-bn="থাইল্যান্ডের ডিজিটাল ইকোনমি প্রমোশন এজেন্সি (ডিইপিএ)-র স্মার্ট সিটি প্রমোশনে সিনিয়র এক্সপার্ট।">Senior Expert in Smart City Promotion, Digital Economy Promotion Agency (DEPA) of Thailand.</span><br />

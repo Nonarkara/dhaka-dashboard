@@ -202,6 +202,7 @@ window.ATLAS_BN = {
   "Macroeconomic engine": "সামষ্টিক অর্থনীতি",
   "Metro & mobility": "মেট্রো ও পরিবহন",
   "How it is built (Research & Method) \u2197": "নির্মাণপদ্ধতি (গবেষণা ও পদ্ধতি) ↗",
+  "How this is built — the architecture paper ↗": "এটি কীভাবে তৈরি — স্থাপত্যপত্র ↗",
   "City watch API (JSON) \u2197": "নগর পর্যবেক্ষণ API (JSON) ↗",
   "Loading Dhaka 3D Atlas & Layers\u2026": "ঢাকার ত্রিমাত্রিক মানচিত্র ও স্তর লোড হচ্ছে…",
   "Quick jump to Dhaka districts": "ঢাকার এলাকায় দ্রুত যান",
