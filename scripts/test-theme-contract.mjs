@@ -42,4 +42,20 @@ for (const v of REQUIRED_VARIABLES) {
   }
 }
 
-console.log("✓ test-theme-contract.mjs passed: Wada Sanzo palette and theme definitions verified.");
+// The type scale is three sizes, and the browser's own <small> is a fourth
+// one at 10.83px. A desk that renders a secondary line without saying what
+// size it wants puts that size on the page, so the element is pinned to the
+// micro scale by the stylesheet.
+if (!/small\s*\{[^}]*font-size:\s*var\(--text-micro\)/.test(css)) {
+  console.error("FAIL: public/style.css must pin <small> to the micro type size");
+  process.exit(1);
+}
+
+// No element may name a pixel size directly: the scale lives in the tokens.
+const hardCoded = css.match(/font-size:\s*\d+(?:\.\d+)?px/g) || [];
+if (hardCoded.length) {
+  console.error(`FAIL: public/style.css names pixel font sizes directly: ${hardCoded.join(", ")}`);
+  process.exit(1);
+}
+
+console.log("✓ test-theme-contract.mjs passed: Wada Sanzo palette, theme definitions and the three-size type scale verified.");
