@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261112-1794467297-2b3536c";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261112-1794491132-519eec1";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -197,6 +197,15 @@
       },
       layers: [
         {
+          // The ground beyond the imagery. At a street-level pitch the map
+          // plane ends at the horizon, and MapLibre's default black leaves a
+          // hole in the page. This is the atlas's own ground tone instead —
+          // flat, and it follows the theme.
+          id: "atlas-ground",
+          type: "background",
+          paint: { "background-color": "#0d171d" }
+        },
+        {
           id: "basemap-esri",
           type: "raster",
           source: "esri-satellite",
@@ -352,7 +361,7 @@
 
       // Reveal the map on its first frame after the style is parsed; imagery fills in progressively.
       // map.loaded() and map.isStyleLoaded() both wait for every pitched-horizon tile (13–22 s).
-      map.once("style.load", () => { styleReady = true; applyLens(currentLens); wireBuildingInspection(); const el = $("#atlas-map-loading"); if (el) el.style.pointerEvents = "none"; });
+      map.once("style.load", () => { styleReady = true; applyLens(currentLens); wireBuildingInspection(); applyGroundColour(); const el = $("#atlas-map-loading"); if (el) el.style.pointerEvents = "none"; });
       map.on("render", () => {
         if (styleReady) hideLoading();
       });
@@ -452,6 +461,21 @@
       return null;
     }
     return { ...sun, aboveHorizon };
+  }
+
+  /**
+   * The ground beyond the imagery, in the theme's own colour.
+   *
+   * The map's style cannot read a CSS variable, so the three themes name
+   * their ground here — the same values the stylesheet uses — and the map
+   * is told when the theme changes.
+   */
+  const THEME_GROUND = { dark: "#0d171d", light: "#fcf8ed", contrast: "#050a0d" };
+  function applyGroundColour() {
+    if (!map || typeof map.setPaintProperty !== "function") return;
+    if (!map.getLayer("atlas-ground")) return;
+    const theme = document.documentElement.dataset.theme || "dark";
+    map.setPaintProperty("atlas-ground", "background-color", THEME_GROUND[theme] || THEME_GROUND.dark);
   }
 
   function showMapFailure() {
@@ -1577,6 +1601,11 @@
       applyLens(currentLens);
       populateQuickJump(areasData);
       renderCityWatch();
+    });
+
+    // The map's ground follows the theme, so the page is one surface.
+    window.addEventListener("atlas:theme", () => {
+      applyGroundColour();
     });
   }
 
