@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261111-1794418636-f3161c6";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261112-1794467297-2b3536c";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -275,6 +275,9 @@
         // The sun's own reading, so the audit can check the light against
         // the sky rather than take the claim on trust.
         sun() { return sunOverDhaka(new Date()); },
+        // Whether the map has finished drawing what it is showing. The
+        // audit waits for this before it measures a surface.
+        get idle() { return mapIdle; },
       };
       map.getCanvas?.().addEventListener?.('wheel', stopMapMotion, {passive:true});
       map.getCanvas?.().addEventListener?.('keydown', event => {

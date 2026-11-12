@@ -160,10 +160,16 @@ const TILES = `(() => {
   const m = window.AtlasMap?.instance;
   try {
     if (!m) return { tilesLoaded: false, zoom: null, pitch: null };
+    const counts = document.getElementById('atlas-walk-counts');
     return {
       tilesLoaded: !!(m.areTilesLoaded && m.areTilesLoaded()),
+      // The map's own word for "the camera has stopped and the tiles it
+      // shows have arrived". Tiles alone are not enough: MapLibre reports
+      // them loaded before it has asked for the next zoom's tiles.
+      idle: !!window.AtlasMap?.idle,
       zoom: +m.getZoom().toFixed(2),
       pitch: +m.getPitch().toFixed(1),
+      walkCounts: counts ? counts.textContent.trim() : null,
       sun: (() => { try { return window.AtlasMap.sun ? window.AtlasMap.sun() : null; } catch { return null; } })(),
     };
   } catch { return { tilesLoaded: false, zoom: null, pitch: null }; }
@@ -255,16 +261,27 @@ async function main() {
         // evidence of anything.
         const settleDeadline = Date.now() + 60000;
         let settle = { tilesLoaded: false };
+        let settled = false;
         while (Date.now() < settleDeadline) {
           settle = await session.evaluate(TILES);
           const cameraReady = LENS === 'city' || (settle?.zoom ?? 0) >= 17;
-          if (settle?.tilesLoaded && cameraReady) break;
+          // The walkthrough publishes its count only once the map has
+          // settled and two readings agree. A frame taken before that
+          // shows a panel saying it is still reading — the honest state
+          // of the product, but not the surface a reader waits to see.
+          const countReady = LENS !== 'walk'
+            || !/Reading the street|পড়া হচ্ছে/.test(settle?.walkCounts || '');
+          if (settle?.tilesLoaded && settle?.idle && cameraReady && countReady) {
+            settled = true;
+            break;
+          }
           await sleep(500);
         }
         const row = await session.evaluate(MEASURE);
         row.url = url;
         row.ready = !!ready?.ready;
         row.tilesLoaded = !!settle?.tilesLoaded;
+        row.settled = settled;
         row.settle = settle;
         row.consoleErrors = await session.evaluate(CONSOLE_ERRORS);
         rows.push(row);
@@ -280,7 +297,7 @@ async function main() {
         console.log(
           `  ${LENS} ${viewport.width}x${viewport.height} ${lang}: chrome ${row.chromeCostPct}% · ` +
           `watch ${row.watch?.height}px · map ${row.unobscuredRatio} · ${row.typeSizeCount} sizes · ${flag} · ` +
-          `tiles ${row.tilesLoaded ? 'loaded' : 'UNLOADED'}` +
+          `tiles ${row.tilesLoaded ? 'loaded' : 'UNLOADED'} · settled ${row.settled ? 'yes' : 'NO'}` +
           (row.walk?.panelVisible ? ` · walk panel ${row.walk.panelRect.height}px · "${row.walk.counts}"` : ''),
         );
       }
@@ -300,10 +317,10 @@ async function main() {
   writeFileSync(`${outDir}/geometry.json`, `${JSON.stringify(rows, null, 2)}\n`);
   writeFileSync(`${outDir}/msh-record.json`, `${JSON.stringify(payload, null, 2)}\n`);
 
-  const failures = rows.filter(r => !r.ready || r.overflow || !r.tilesLoaded);
+  const failures = rows.filter(r => !r.ready || r.overflow || !r.tilesLoaded || !r.settled);
   console.log(`\n✓ Measured ${rows.length} viewport/language cases → ${outDir}/geometry.json`);
   if (failures.length) {
-    console.log(`✗ ${failures.length} case(s) not ready, overflowing, or measured on unloaded tiles — treat the numbers as unverified`);
+    console.log(`✗ ${failures.length} case(s) not ready, overflowing, unsettled, or measured on unloaded tiles — treat the numbers as unverified`);
     process.exitCode = 1;
   }
 }
