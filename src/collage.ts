@@ -521,6 +521,7 @@ async function measureSolar(points: MeasurePoint[]): Promise<{ measurements: Mea
       domain: "energy",
       unit: r.unit,
       resolutionM: null,
+      windowM: null,
       status: r.status,
       value: r.value,
       min: r.value,

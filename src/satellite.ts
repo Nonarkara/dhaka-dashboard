@@ -262,6 +262,8 @@ export interface Measurement {
   reasonCode: string | null;
   /** Ground resolution of one pixel, in metres, at the measured latitude. */
   resolutionM: number | null;
+  /** The ground the sampled window covers, in metres. */
+  windowM: number | null;
   source?: string; sourceUrl?: string; provenance?: "measured" | "modeled" | "reference";
   period?: string | null; retrievedAt?: string; nativeResolutionM?: number | null;
   nativeResolutionDegrees?: number | null; returnedCoordinates?: number[] | null;
@@ -280,6 +282,19 @@ export function groundResolutionM(level: number, lat: number): number {
   const equator = 156543.03392804097 / Math.pow(2, level);
   const cos = Math.cos((lat * Math.PI) / 180);
   return equator * Math.max(cos, 1e-6);
+}
+
+/**
+ * The ground a sampled window actually covers, in metres.
+ *
+ * A measurement is an average over a square window of pixels, so the honest
+ * answer to "how much ground is this number about?" is the width of that
+ * window, not the size of one pixel. This stops a district reading from
+ * implying that it describes the whole district: it describes a neighbourhood
+ * around the district centre, and the width says how big.
+ */
+export function windowWidthM(level: number, lat: number, radiusPx: number): number {
+  return groundResolutionM(level, lat) * (radiusPx * 2 + 1);
 }
 
 /**
@@ -710,6 +725,7 @@ export async function measureLayer(
           domain: layer.domain,
           unit: layer.unit,
           resolutionM: Math.round(groundResolutionM(layer.tileLevel, point.lat)),
+          windowM: Math.round(windowWidthM(layer.tileLevel, point.lat, radiusPx)),
           status: "ok" as const,
           value: Number((share * 100).toFixed(2)),
           min: Number((share * 100).toFixed(2)),
@@ -741,6 +757,7 @@ export async function measureLayer(
         domain: layer.domain,
         unit: layer.unit,
         resolutionM: Math.round(groundResolutionM(layer.tileLevel, point.lat)),
+        windowM: Math.round(windowWidthM(layer.tileLevel, point.lat, radiusPx)),
         status: "ok" as const,
         value: Number(mean.toFixed(3)),
         min: Number(Math.min(...values).toFixed(3)),
@@ -780,6 +797,7 @@ function unavailableMeasurement(
     domain: layer.domain,
     unit: layer.unit,
     resolutionM: Math.round(groundResolutionM(layer.tileLevel, point.lat)),
+    windowM: Math.round(windowWidthM(layer.tileLevel, point.lat, radiusPx)),
     status: "unavailable",
     value: null,
     min: null,
@@ -821,6 +839,7 @@ export async function measureLayerAt(
     domain: layer.domain,
     unit: layer.unit,
     resolutionM: Math.round(groundResolutionM(layer.tileLevel, point.lat)),
+    windowM: Math.round(windowWidthM(layer.tileLevel, point.lat, radiusPx)),
   };
 
   const colormap = GIBS_COLORMAPS[layer.id];

@@ -19,7 +19,7 @@ import { readFileSync } from "node:fs";
 import { readdirSync } from "node:fs";
 
 const catalogue = JSON.parse(readFileSync("scripts/fixtures/gibs-catalogue.json", "utf8"));
-const { MEASURED_LAYERS, DOMAINS, measureLayer, groundResolutionM, tileForPoint, globalPixelForPoint, tilesForWindow, resolveIndexValue, candidateDates, TILE_SIZE } =
+const { MEASURED_LAYERS, DOMAINS, measureLayer, groundResolutionM, tileForPoint, globalPixelForPoint, tilesForWindow, resolveIndexValue, candidateDates, windowWidthM, TILE_SIZE } =
   await import("../src/satellite.ts");
 const { GIBS_COLORMAPS } = await import("../src/gibs-colormaps.ts");
 const { GIBS_CATALOGUE_LATEST } = await import("../src/gibs-catalogue.ts");
@@ -136,6 +136,15 @@ ok("ground resolution halves with each level", () => {
   assert.ok(l12 > 34 && l12 < 36, `level 12 resolution is ${l12} m, expected about 35.0`);
 });
 
+// ── 5c. A measurement must state how much ground it covers ─────────────────
+ok("the sampled window is wider than one pixel and stated on every reading", () => {
+  const dhakaLat = 23.81;
+  const res = groundResolutionM(7, dhakaLat);
+  const window = windowWidthM(7, dhakaLat, 2);
+  assert.ok(window > res, "the window is not wider than a pixel");
+  assert.ok(Math.abs(window - res * 5) < 0.5, `the window is not five pixels across: ${window} vs ${res * 5}`);
+});
+
 // ── 6. The colour map turns an index into a physical quantity ─────────────
 ok("a palette index resolves to the quantity its colour map states", () => {
   const radiance = GIBS_COLORMAPS["VIIRS_SNPP_DayNightBand_At_Sensor_Radiance"];
@@ -176,6 +185,7 @@ ok("a layer that cannot be measured reports unavailable with a reason", async ()
   assert.equal(m.value, null, "an unmeasurable layer reported a value");
   assert.equal(m.mean, null);
   assert.equal(m.reasonCode, "colormap-unresolved");
+  assert.ok(m.windowM && m.windowM > 0, "an unmeasurable layer still states its window width");
 });
 
 // ── 8. The catalogue date is used for layers on a slow cycle ───────────────

@@ -103,6 +103,7 @@
           <span>${esc(basis.source || tr('Source unavailable','উৎস অনুপলব্ধ'))} · ${esc(basis.provenance === 'modeled' ? tr('modeled','মডেলভিত্তিক') : basis.provenance === 'reference' ? tr('reference','তথ্যসূত্র') : tr('satellite-derived estimate','উপগ্রহভিত্তিক অনুমান'))}</span>
           ${basis.resolutionM ? `<span>${tr('Tile pixel spacing','টাইলের পিক্সেলের দূরত্ব')}: ${number(basis.resolutionM)} m · ${tr('native resolution unverified','মূল রেজোলিউশন যাচাই করা হয়নি')}</span>` : `<span>${basis.nativeResolutionDegrees ? tr(`Source grid ${basis.nativeResolutionDegrees}°; not rooftop potential`, `উৎসের গ্রিড ${number(basis.nativeResolutionDegrees)}°; ছাদের সম্ভাবনা নয়`) : tr('Native resolution unavailable','মূল রেজোলিউশন অনুপলব্ধ')}</span>`}
           <span>${basis.coverage === null ? tr('Model point; observed coverage not supplied','মডেলের স্থান; পর্যবেক্ষণের পরিমাণ সরবরাহ করা হয়নি') : tr('Observed sample coverage','নমুনায় তথ্যের পরিমাণ') + ': ' + number(basis.coverage * 100) + '%'}</span>
+          ${basis.windowM ? `<span>${tr('Sampled over','নমুনার সীমারেখা')}: ${number(Math.round(basis.windowM / 1000))} ${tr('km wide','কিমি বিস্তৃত')}</span>` : ''}
           ${basis.rank ? `<span>${basis.tied
             ? tr(`tied ${basis.rank} of ${basis.of}`, `${basis.of}টির মধ্যে যৌথ ${basis.rank} নম্বর`)
             : tr(`rank ${basis.rank} of ${basis.of}`, `${basis.of}টির মধ্যে ${basis.rank} নম্বর`)}</span>` : ''}
