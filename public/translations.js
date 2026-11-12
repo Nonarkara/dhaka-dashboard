@@ -285,7 +285,9 @@ window.ATLAS_BN = {
   "rank": "নম্বর",
   "tied": "যৌথ",
   "of": "এর মধ্যে",
-  // The walkthrough lens.
+  // The walkthrough lens. The picker name is the honesty label: this is a
+  // low-angle map, not a surveyed street position.
+  "Low-angle map": "নিচু কোণের মানচিত্র",
   "Street level": "রাস্তার ধরনে",
   "How this is measured": "কীভাবে মাপা হয়েছে",
   "Illustrative massing — height from the map provider, not surveyed": "চিত্রায় উচ্চতা — মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়",
