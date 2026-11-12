@@ -132,7 +132,7 @@ Current weather/air/wind validate source time, UTC offset, units and finite admi
 
 The inherited geometric Parliament sketch is preserved at `/parliament-reference.html` as a bilingual, manually turnable nongeographic design study. The map retains all 4,076 dated OSM footprints and 14 courtyard rings; eight explicit source heights extrude, while 4,068 unknown heights remain flat. Provider-derived streamed `render_height` is not treated as an explicit source height.
 
-Repository recovery and release proof: `docs/evidence/reconciliation-2026-11-04/`. CI without Cloudflare credentials reports validation only; authenticated release uses the same canonical `scripts/deploy-live.sh` gates as local shipping. There are 22 configured npm test suites, counted from package.json; previous 20-suite summaries were inaccurate.
+Repository recovery and release proof: `docs/evidence/reconciliation-2026-11-04/`. CI without Cloudflare credentials reports validation only; authenticated release uses the same canonical `scripts/deploy-live.sh` gates as local shipping. There are 24 configured npm test suites, counted from package.json; previous 20- and 22-suite summaries were inaccurate.
 
 
 ## MiniMax follow-up audit · 6 November 2026

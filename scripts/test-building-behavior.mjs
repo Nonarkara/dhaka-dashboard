@@ -155,6 +155,9 @@ function evaluate(e,props) {
   if(op==='to-number'){for(const arg of args){const v=evaluate(arg,props);if(v!==null && v!==undefined && Number.isFinite(Number(v)))return Number(v);}return 0;}
   if(op==='max')return Math.max(...args.map(x=>evaluate(x,props)));
   if(op==='>')return evaluate(args[0],props)>evaluate(args[1],props);
+  if(op==='<')return evaluate(args[0],props)<evaluate(args[1],props);
+  if(op==='>=')return evaluate(args[0],props)>=evaluate(args[1],props);
+  if(op==='<=')return evaluate(args[0],props)<=evaluate(args[1],props);
   if(op==='+')return evaluate(args[0],props)+evaluate(args[1],props);
   if(op==='case')return evaluate(args[0],props)?evaluate(args[1],props):evaluate(args[2],props);
   throw new Error(op);
@@ -163,6 +166,10 @@ const paint=api.buildingPaint('render_height','render_min_height');
 for(const height of [undefined,null,0,-1])assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:height}),0);
 assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:35.7}),35.7);
 assert.equal(evaluate(paint['fill-extrusion-height'],{render_min_height:10}),0);
+// A bad height tag is a bad tag, not a tall building. The atlas clamps it
+// rather than extruding a hundred-kilometre tower over the city.
+assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:99999}),500,'an absurd height is clamped');
+assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:-12}),0,'a negative height stays flat');
 console.log(`✓ Building behavior: ${detail.features.length} real footprints, Parliament courtyards, all lenses, exclusive detail switch, pan/offline/2D fallback and authored camera`);
 
 ({api,map}=app());

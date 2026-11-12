@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -39,6 +39,26 @@ if (pkg.name !== "dhaka-dashboard") {
 }
 if (pkg.type !== "module") {
   console.error("FAIL: package.json type must be module");
+  process.exit(1);
+}
+
+// The README states how many test suites the project runs. That number has
+// gone stale twice, so it is counted here from the script itself rather
+// than trusted.
+const suiteFiles = readdirSync(join(root, "scripts")).filter(f => /^test-.*\.mjs$/.test(f));
+const configured = (pkg.scripts.test.match(/(?:node|tsc)\s+(?:--import\s+\S+\s+)?scripts\/test-[\w.-]+\.mjs/g) || []).length;
+if (configured !== suiteFiles.length) {
+  console.error(`FAIL: package.json runs ${configured} test suites but scripts/ holds ${suiteFiles.length} test files`);
+  process.exit(1);
+}
+const readme = readFileSync(join(root, "README.md"), "utf8");
+const claimed = readme.match(/There are (\d+) configured npm test suites/);
+if (!claimed) {
+  console.error("FAIL: README must state how many npm test suites are configured");
+  process.exit(1);
+}
+if (Number(claimed[1]) !== configured) {
+  console.error(`FAIL: README claims ${claimed[1]} test suites; package.json runs ${configured}`);
   process.exit(1);
 }
 

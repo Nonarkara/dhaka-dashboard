@@ -11,6 +11,14 @@
 
   let map = null;
   let currentLens = "city";
+  // Has the map finished drawing what it is showing?
+  //
+  // MapLibre reports "idle" only when the camera has stopped and every tile
+  // it shows has arrived. Before that, the buildings on screen are a
+  // fraction of the buildings the map is about to draw. A count read from a
+  // loading map is a partial count wearing the clothes of a total, so the
+  // walkthrough's number waits for this flag.
+  let mapIdle = false;
   let currentBasemap = "esri";
   let activeOverlayLayer = null;
   let landmarksData = null;
@@ -149,12 +157,6 @@
       title_bn: "রাস্তার ধরনে",
       desc: "Street-scale view of the mapped city. The massing is the map provider's computed height, not a survey, and the ground is the map's flat plane. Move with the keys; this is not a walking route.",
       desc_bn: "মানচিত্রের রাস্তার ধরনে দৃশ্য। গঠন দেখানো হয় মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপকৃত নয়; মাটি মানচিত্রের সমতলেই থাকে। কী চাপলে সরান; এটি হাঁটার পথ নয়।"
-    },
-    street: {
-      title: "Street view massing",
-      title_bn: "রাস্তার ধরনের ভর",
-      desc: "Illustrative street perspective with modeled building massing. Heights are inferred from footprint area and OSM usage where source height is missing. Modeled, not surveyed. Source: OpenStreetMap ODbL. Inspired by Rokehan street view.",
-      desc_bn: "রাস্তার ধরনের চিত্রমূলক ভর। উৎসে উচ্চতা না থাকলে ভবনের পদচিহ্নের আকার ও ব্যবহার থেকে উচ্চতা অনুমান করা হয়। মডেলকৃত, জরিপকৃত নয়। উৎস: OpenStreetMap ODbL। Rokehan স্ট্রিট ভিউ দ্বারা অনুপ্রাণিত।"
     }
   };
 
@@ -169,10 +171,13 @@
     const styleSpec = {
       version: 8,
       light: {
-        anchor: "viewport",
+        // The sun, not a lamp. The position is replaced with the real solar
+        // bearing over Dhaka as soon as the map is up, so the walls are lit
+        // from where the sun actually is.
+        anchor: "map",
         color: "#f5f0dc",
         intensity: 0.55,
-        position: [1.3, 110, 45]
+        position: [1.4, 100, 55]
       },
       glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
       sources: {
@@ -267,6 +272,9 @@
             center: map.getCenter(),
           };
         },
+        // The sun's own reading, so the audit can check the light against
+        // the sky rather than take the claim on trust.
+        sun() { return sunOverDhaka(new Date()); },
       };
       map.getCanvas?.().addEventListener?.('wheel', stopMapMotion, {passive:true});
       map.getCanvas?.().addEventListener?.('keydown', event => {
@@ -293,7 +301,16 @@
           renderWalkPanel();
         }, 200);
       };
-      map.on("idle", scheduleWalkPanel);
+      // The map's own word for "the camera has stopped and the tiles it
+      // shows have arrived". A building count taken before that is a
+      // fraction of the view, so the count waits for this.
+      map.on("idle", () => { mapIdle = true; scheduleWalkPanel(); });
+      // One handler per event: the camera has moved, so the screen is no
+      // longer the settled one the count was read from.
+      for (const event of ['dragstart','zoomstart','rotatestart','pitchstart']) {
+        map.on(event, e => { mapIdle = false; if (e?.originalEvent) stopMapMotion(); });
+      }
+      map.on("movestart", () => { mapIdle = false; });
       map.on("moveend", scheduleWalkPanel);
       // The walkthrough needs both the map and the district list, so it is
     // attached once both exist.
@@ -319,12 +336,20 @@
         hideLoading();
         window.AtlasForecast?.attach(map);
         window.AtlasPeople?.attach(map);
+        // The sun is placed over the city as soon as the style can carry it,
+        // and re-placed every minute, because the sun moves.
+        applySolarLight();
+        const keepTheSunMoving = () => setTimeout(() => {
+          applySolarLight();
+          keepTheSunMoving();
+        }, 60000);
+        keepTheSunMoving();
         await Promise.all([loadDataLayers(), loadParliamentBuildings()]);
       });
 
       // Reveal the map on its first frame after the style is parsed; imagery fills in progressively.
       // map.loaded() and map.isStyleLoaded() both wait for every pitched-horizon tile (13–22 s).
-      map.once("style.load", () => { styleReady = true; applyLens(currentLens); const el = $("#atlas-map-loading"); if (el) el.style.pointerEvents = "none"; });
+      map.once("style.load", () => { styleReady = true; applyLens(currentLens); wireBuildingInspection(); const el = $("#atlas-map-loading"); if (el) el.style.pointerEvents = "none"; });
       map.on("render", () => {
         if (styleReady) hideLoading();
       });
@@ -345,17 +370,106 @@
     }
   }
 
+  // Dhaka, and the sun over it.
+  //
+  // The solar position is computed from the absolute instant, which already
+  // carries universal time — a clock in the browser is not a local wall
+  // clock, and shifting it again would put the sun in the wrong sky.
+  // Bangladesh keeps one civil offset all year (UTC+6, no daylight saving),
+  // so a reader's "noon" is always six hours away from universal noon.
+  const DHAKA_LAT = 23.7449;
+  const DHAKA_LNG = 90.4072;
+
+  /**
+   * The sun's bearing and height over Dhaka.
+   *
+   * The NOAA low-precision solar position: good to a fraction of a degree,
+   * which is enough to say which faces are lit and not enough to call it an
+   * ephemeris. Returns null when the computation cannot be trusted.
+   */
+  function sunOverDhaka(date) {
+    // Any clock that can report a time will do; the caller may hand over a
+    // Date from another realm.
+    const time = typeof date?.getTime === "function" ? date.getTime() : NaN;
+    if (!Number.isFinite(time)) return null;
+    const rad = Math.PI / 180;
+    const n = time / 86400000 + 2440587.5 - 2451545.0;
+    const meanLongitude = (280.460 + 0.9856474 * n) % 360;
+    const meanAnomaly = (357.528 + 0.9856003 * n) % 360;
+    const eclipticLongitude = (meanLongitude
+      + 1.915 * Math.sin(meanAnomaly * rad)
+      + 0.020 * Math.sin(2 * meanAnomaly * rad)) * rad;
+    const obliquity = (23.439 - 0.0000004 * n) * rad;
+    const declination = Math.asin(Math.sin(obliquity) * Math.sin(eclipticLongitude));
+    const rightAscension = Math.atan2(Math.cos(obliquity) * Math.sin(eclipticLongitude), Math.cos(eclipticLongitude));
+    // Greenwich mean sidereal time, in hours, then the local hour angle.
+    const gmstHours = (18.697374558 + 24.06570982441908 * n) % 24;
+    const localSidereal = (gmstHours + DHAKA_LNG / 15) * 15 * rad;
+    let hourAngle = localSidereal - rightAscension;
+    hourAngle = ((hourAngle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+    const lat = DHAKA_LAT * rad;
+    const altitude = Math.asin(Math.sin(lat) * Math.sin(declination)
+      + Math.cos(lat) * Math.cos(declination) * Math.cos(hourAngle));
+    const cosAzimuth = (Math.sin(declination) - Math.sin(altitude) * Math.sin(lat))
+      / (Math.cos(altitude) * Math.cos(lat));
+    if (!Number.isFinite(cosAzimuth)) return null;
+    let azimuth = Math.acos(Math.max(-1, Math.min(1, cosAzimuth)));
+    if (hourAngle > 0) azimuth = 2 * Math.PI - azimuth;
+    const altitudeDeg = altitude / rad;
+    const azimuthDeg = azimuth / rad;
+    if (!Number.isFinite(altitudeDeg) || !Number.isFinite(azimuthDeg)) return null;
+    return { altitudeDeg, azimuthDeg };
+  }
+
+  /**
+   * Light the city from the sun that is actually over it.
+   *
+   * MapLibre's light takes a bearing in degrees clockwise from north — when
+   * the light is anchored to the map — and a polar angle measured from
+   * straight above. A sun 40° high is a polar angle of 50°. The tint warms
+   * as the sun drops toward the horizon, and once the sun is down the light
+   * goes cool and dim, because that is what the hour looks like.
+   */
+  function applySolarLight() {
+    if (!map || typeof map.setLight !== "function") return null;
+    const sun = sunOverDhaka(new Date());
+    if (!sun) return null;
+    const aboveHorizon = sun.altitudeDeg > -0.833; // the sun's own radius at the horizon
+    const polar = Math.max(6, Math.min(90, 90 - sun.altitudeDeg));
+    const lowSun = aboveHorizon && sun.altitudeDeg < 12;
+    try {
+      map.setLight({
+        anchor: "map",
+        position: [1.4, sun.azimuthDeg, polar],
+        color: aboveHorizon ? (lowSun ? "#f7dcae" : "#f5f0dc") : "#9fb4d8",
+        intensity: aboveHorizon ? (lowSun ? 0.42 : 0.55) : 0.28
+      });
+    } catch {
+      // The style may not be ready yet. The next tick will try again.
+      return null;
+    }
+    return { ...sun, aboveHorizon };
+  }
+
   function showMapFailure() {
     const el = $("#atlas-map-loading");
     if (el) { el.classList.remove("loaded"); el.innerHTML = `<strong>${tr("Map unavailable", "মানচিত্র অনুপলব্ধ")}</strong><p>${tr("Map initialization failed. Reload to retry; civic data remains available from City watch.", "মানচিত্র চালু হয়নি। আবার চেষ্টা করতে রিলোড করুন; নগর পর্যবেক্ষণে তথ্য পাওয়া যাবে।")}</p><button class="atlas-btn" onclick="location.reload()">${tr("Retry", "আবার চেষ্টা")}</button>`; }
   }
 
+  // A height outside this range is a bad tag, not a tall building. The
+  // atlas clamps it rather than extruding a hundred-kilometre tower.
+  const MAX_HEIGHT_M = 500;
+  const MIN_HEIGHT_M = 1;
+
   function buildingPaint(heightKey, baseKey) {
-    const base = ["max", 0, ["to-number", ["get", baseKey], 0]];
+    const raw = ["to-number", ["get", heightKey], 0];
+    const height = ["case", [">", raw, MAX_HEIGHT_M], MAX_HEIGHT_M, ["case", ["<", raw, MIN_HEIGHT_M], 0, raw]];
+    const rawBase = ["max", 0, ["to-number", ["get", baseKey], 0]];
+    const base = ["case", [">", rawBase, MAX_HEIGHT_M], MAX_HEIGHT_M, rawBase];
     return {
       "fill-extrusion-color": window.DhakaDesign?.paint || "#b4b0a3",
-      "fill-extrusion-height": ["case", [">", ["to-number", ["get", heightKey], 0], base], ["to-number", ["get", heightKey], 0], 0],
-      "fill-extrusion-base": ["case", [">", ["to-number", ["get", heightKey], 0], base], base, 0],
+      "fill-extrusion-height": ["case", [">", height, base], height, 0],
+      "fill-extrusion-base": ["case", [">", height, base], base, 0],
       "fill-extrusion-opacity": 0.9
     };
   }
@@ -427,6 +541,27 @@
       parliamentSourceReady = false;
       syncBuildingVisibility();
       console.warn("Parliament detail unavailable; retaining streamed buildings", error);
+    }
+  }
+
+  /**
+   * Make the streamed city inspectable.
+   *
+   * Every building in the atlas comes from the map provider, and most of
+   * them carry no height at all. A reader who clicks one has to be told
+   * what the provider did and did not give — otherwise the massing reads
+   * as surveyed architecture when it is not.
+   */
+  function wireBuildingInspection() {
+    for (const layerId of ["city-footprints", "city-buildings", "walk-massing"]) {
+      if (!map.getLayer(layerId)) continue;
+      map.on("click", layerId, event => {
+        const feature = event.features?.[0];
+        if (!feature) return;
+        showInspectionHUD("streamed-building", { ...feature.properties }, event.lngLat);
+      });
+      map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
     }
   }
 
@@ -649,7 +784,7 @@
     });
   }
 
-  function showInspectionHUD(type, props) {
+  function showInspectionHUD(type, props, lngLat) {
     // Map tags are public external data, not trusted HTML.
     props = Object.fromEntries(Object.entries(props).map(([key,value]) => [key, typeof value === 'string' ? value.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) : value]));
     const hud = $("#atlas-observation-hud");
@@ -682,6 +817,25 @@
 
         <p>${tr("Mapped footprint massing; not a surveyed architectural model.", "মানচিত্রভিত্তিক ভবনের রূপ; জরিপকৃত স্থাপত্য মডেল নয়।")}</p>
       `;
+    } else if (type === "streamed-building") {
+      // The provider's own numbers, said plainly. A massing drawn from a
+      // computed height must never read as a measured building.
+      const providerHeight = Number(props.render_height || 0);
+      const providerBase = Number(props.render_min_height || 0);
+      const hasHeight = Number.isFinite(providerHeight) && providerHeight >= 1;
+      const coordinates = lngLat
+        ? `${lngLat.lng.toFixed(5)}, ${lngLat.lat.toFixed(5)}`
+        : tr("Unknown", "অজানা");
+      rowsHtml = `
+        <div class="hud-row"><span class="hud-label">${tr("Provider height", "সরবরাহকারীর উচ্চতা")}</span><span class="hud-value">${hasHeight ? `${providerHeight} m` : tr("None · flat footprint", "নেই · সমতল সীমারেখা")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${hasHeight
+          ? tr("Map provider's computed height — not surveyed", "মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতা — জরিপকৃত নয়")
+          : tr("No height in the source", "উৎসে উচ্চতা নেই")}</span></div>
+        ${hasHeight && providerBase > 0 ? `<div class="hud-row"><span class="hud-label">${tr("Provider base", "সরবরাহকারীর ভিত্তি")}</span><span class="hud-value">${providerBase} m</span></div>` : ""}
+        <div class="hud-row"><span class="hud-label">${tr("Footprint source", "সীমারেখার উৎস")}</span><span class="hud-value">${tr("OpenStreetMap ODbL · OpenFreeMap", "OpenStreetMap ODbL · OpenFreeMap")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Coordinates", "স্থানাঙ্ক")}</span><span class="hud-value">${coordinates}</span></div>
+        <p>${tr("Illustrative massing from the map provider. This is not a surveyed building and not an architectural model.", "মানচিত্র সরবরাহকারীর চিত্রায় গঠন। এটি জরিপকৃত ভবন নয় এবং স্থাপত্যপত্রও নয়।")}</p>
+      `;
     } else if (type === "landmark") {
       rowsHtml = `
         <div class="hud-row"><span class="hud-label">Year / Era:</span><span class="hud-value">${props.year || "Historic"}</span></div>
@@ -702,11 +856,17 @@
       `;
     }
 
+    // A streamed building carries no name of its own. The panel must not
+    // print "undefined" or leak an internal type name to the reader.
+    const title = name || (type === "streamed-building" ? tr("Building", "ভবন") : tr("Feature", "বৈশিষ্ট্য"));
+    const badge = (type === "building" || type === "streamed-building")
+      ? tr("building", "ভবন")
+      : type;
     hud.innerHTML = `
       <div class="hud-header">
         <div>
-          <h4 class="hud-title">${name}</h4>
-          <span class="hud-badge">${type === "building" ? tr("building", "ভবন") : type}</span>
+          <h4 class="hud-title">${title}</h4>
+          <span class="hud-badge">${badge}</span>
         </div>
         <button class="modal-close-btn" onclick="document.getElementById('atlas-observation-hud').hidden = true;">✕</button>
       </div>
@@ -887,8 +1047,7 @@
     // Eye level. MapLibre caps the pitch at 85°, which is as close to a
     // standing pedestrian as a map camera gets: the street runs to the
     // horizon and the walls close in on both sides.
-    walk: { center: [90.4072, 23.7118], zoom: 18.4, pitch: 85, bearing: 205 },
-    street: { center: [90.4072, 23.7118], zoom: 18.0, pitch: 75, bearing: 205 }
+    walk: { center: [90.4072, 23.7118], zoom: 18.4, pitch: 85, bearing: 205 }
   };
 
   function clearDynamicLayers() {
@@ -938,8 +1097,19 @@
     return `${SCOUT_BASE}#${params.toString()}`;
   }
 
+  /**
+   * The buildings the screen actually holds.
+   *
+   * Returns null while the map is still settling — the camera is moving,
+   * or the tiles it is about to draw have not arrived. A reading taken
+   * then would be a fraction of the view, and a fraction printed as a
+   * total is the one reading this instrument must never publish.
+   */
   function measureStreetLevel() {
     if (!map || typeof map.queryRenderedFeatures !== "function") return null;
+    if (!mapIdle) return null;
+    if (typeof map.areTilesLoaded === "function" && !map.areTilesLoaded()) return null;
+    if (typeof map.isSourceLoaded === "function" && !map.isSourceLoaded("buildings")) return null;
     const layers=["city-footprints","parliament-footprints"].filter(id=>map.getLayer(id) && map.getLayoutProperty(id,"visibility")!=="none");
     if (!layers.length) return null;
     try {
@@ -963,6 +1133,74 @@
     } catch { return null; }
   }
 
+  /**
+   * The count on screen.
+   *
+   * Two readings that agree, taken half a second apart, mean the map has
+   * stopped changing: the tiles it shows have arrived and the camera has
+   * settled. Until then the panel says the street is being read, because
+   * the honest state of a loading map is not a number — it is no number.
+   */
+  let walkSampleKey = null;
+  let walkSampleAt = 0;
+
+  /**
+   * Keep the count current while the walkthrough is open.
+   *
+   * The camera can walk while the panel is up, and a number that froze
+   * while the city moved is a stale reading. The cadence is a short chain
+   * of timeouts rather than an interval, so it stops the moment the lens
+   * changes and never outlives the panel it serves.
+   */
+  let walkCountTimer = null;
+  function scheduleWalkCount() {
+    if (walkCountTimer) return;
+    walkCountTimer = setTimeout(() => {
+      walkCountTimer = null;
+      if (currentLens !== "walk") return;
+      refreshWalkCount();
+      scheduleWalkCount();
+    }, 500);
+  }
+  function refreshWalkCount() {
+    const reading = measureStreetLevel();
+    const key = reading ? `${reading.total}/${reading.unidentified}/${reading.withProviderHeight}` : "pending";
+    const now = Date.now();
+    const stable = key !== "pending" && key === walkSampleKey && (now - walkSampleAt) >= 500;
+    walkSampleKey = key;
+    walkSampleAt = now;
+    paintWalkCount(stable ? reading : null);
+  }
+
+  function paintWalkCount(reading) {
+    const countsEl = $("#atlas-walk-counts");
+    if (!countsEl) return;
+    if (!reading) {
+      // The map has not finished drawing. The reader is told the count is
+      // being read, not handed a smaller number.
+      countsEl.textContent = tr("Reading the street…", "রাস্তা পড়া হচ্ছে…");
+      return;
+    }
+    const counted = reading.total > 0;
+    if (!counted) {
+      countsEl.textContent = tr("Building count unavailable.","ভবনের সংখ্যা অনুপলব্ধ।");
+      return;
+    }
+    // The number and the words agree with each other. "1 buildings in view"
+    // is the kind of line that makes a reader stop trusting the number.
+    const total = walkNumber(reading.total);
+    const heights = walkNumber(reading.withProviderHeight);
+    const unidentified = walkNumber(reading.unidentified);
+    const buildings = reading.total === 1 ? tr("building in view", "টি ভবন দৃশ্যমান") : tr("buildings in view", "টি ভবন দৃশ্যমান");
+    const carries = reading.withProviderHeight === 1 ? tr("carries", "টির") : tr("carry", "টির");
+    const fragments = reading.unidentified === 1
+      ? tr(" · 1 unidentified fragment excluded", " · ১টি অশনাক্ত অংশ বাদ")
+      : tr(" · ${unidentified} unidentified fragments excluded", " · ${unidentified}টি অশনাক্ত অংশ বাদ");
+    countsEl.textContent = tr(
+      `${total} ${buildings} · ${heights} ${carries} a provider-computed height, not a survey${reading.unidentified ? fragments : ""}`,
+      `${total}টি ভবন দৃশ্যমান · ${heights}টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়${reading.unidentified ? ` · ${unidentified}টি অশনাক্ত অংশ বাদ` : ""}`);
+  }
+
   function renderWalkPanel() {
     const panel = $("#atlas-walk");
     if (!panel) return;
@@ -971,16 +1209,10 @@
     if (!isWalk) return;
     const isBn = document.documentElement.lang === "bn";
 
-    const counts = measureStreetLevel();
-    const countsEl = $("#atlas-walk-counts");
-    if (countsEl) {
-      const counted = counts && counts.total > 0;
-      countsEl.textContent = !counted
-        ? tr("Building count unavailable.","ভবনের সংখ্যা অনুপলব্ধ।")
-        : tr(`${walkNumber(counts.total)} buildings in view · ${walkNumber(counts.withProviderHeight)} carry a provider-computed height, not a survey${counts.unidentified ? ` · ${walkNumber(counts.unidentified)} unidentified fragments excluded` : ""}`,
-          `${walkNumber(counts.total)}টি ভবন দৃশ্যমান · ${walkNumber(counts.withProviderHeight)}টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়${counts.unidentified ? ` · ${walkNumber(counts.unidentified)}টি অশনাক্ত অংশ বাদ` : ""}`);
-
-    }
+    // The count is owned by the settled-reading rule, not by this render:
+    // a reading that is not stable yet is published as "being read", never
+    // as a smaller number.
+    refreshWalkCount();
 
     const summary = $("#atlas-walk-summary");
     if (summary) summary.textContent = isBn ? "কীভাবে মাপা হয়েছে" : "How this is measured";
@@ -1007,6 +1239,10 @@
   }
 
   function applyLens(lensId, { moveCamera = lensId !== currentLens } = {}) {
+    // A lens the atlas does not have — a stale bookmark, a renamed view —
+    // must land on a real lens rather than on a map with nothing drawn.
+    const wanted = LENS_STORIES[lensId] ? lensId : "city";
+    lensId = wanted;
     stopMapMotion();
     currentLens = lensId;
     const token = ++lensToken;
@@ -1014,9 +1250,7 @@
     lensInUrl(lensId);
     window.AtlasForecast?.activate(lensId);
     window.AtlasWalk?.activate(lensId);
-    $$(".atlas-lenses button").forEach(btn => {
-      btn.setAttribute("aria-pressed", btn.dataset.lens === lensId ? "true" : "false");
-    });
+    if (lensId === "walk") scheduleWalkCount();
 
     const isBn = document.documentElement.lang === "bn";
     const story = LENS_STORIES[lensId] || LENS_STORIES.city;
@@ -1070,7 +1304,7 @@
     // The street-level massing belongs to the walkthrough and street lens.
     // Every other lens must see the city as the atlas draws it.
     if (map.getLayer("walk-massing")) {
-      map.setLayoutProperty("walk-massing", "visibility", (lensId === "walk" || lensId === "street") ? "visible" : "none");
+      map.setLayoutProperty("walk-massing", "visibility", lensId === "walk" ? "visible" : "none");
     }
     renderWalkPanel();
     // Night-time radiance only reads as night over a dark ground. Dim the
@@ -1307,9 +1541,6 @@
     window.addEventListener('pagehide', stopMapMotion);
     window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', stopMapMotion);
     $("#atlas-lens")?.addEventListener("change", e => applyLens(e.target.value));
-    $$(".atlas-lenses button").forEach(btn => {
-      btn.addEventListener("click", () => applyLens(btn.dataset.lens));
-    });
 
     $("#atlas-basemap")?.addEventListener("change", e => {
       currentBasemap = e.target.value;

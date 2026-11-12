@@ -151,6 +151,25 @@ const READY = `(() => {
 })()`;
 
 /**
+ * The map's own state: what it is showing and whether it has finished
+ * drawing it. A street-level lens pulls z19 tiles the city lens never asks
+ * for, and a measurement taken before they arrive describes a black
+ * rectangle rather than the surface a reader would see.
+ */
+const TILES = `(() => {
+  const m = window.AtlasMap?.instance;
+  try {
+    if (!m) return { tilesLoaded: false, zoom: null, pitch: null };
+    return {
+      tilesLoaded: !!(m.areTilesLoaded && m.areTilesLoaded()),
+      zoom: +m.getZoom().toFixed(2),
+      pitch: +m.getPitch().toFixed(1),
+      sun: (() => { try { return window.AtlasMap.sun ? window.AtlasMap.sun() : null; } catch { return null; } })(),
+    };
+  } catch { return { tilesLoaded: false, zoom: null, pitch: null }; }
+})()`;
+
+/**
  * Console errors seen on the page.
  *
  * A harness that silently renders a broken surface would hand the audit a
@@ -230,12 +249,23 @@ async function main() {
         }
 
         await session.evaluate('document.fonts ? document.fonts.ready.then(() => true) : true');
-        // A street-level lens pulls a z18 tile the city lens never asks for.
-        await sleep(LENS && LENS !== 'city' ? 4000 : 1200);
-
+        // Wait for the map to finish drawing what it is showing. A
+        // street-level lens pulls z19 tiles the city lens never asks for,
+        // and a frame taken before they arrive is a black rectangle, not
+        // evidence of anything.
+        const settleDeadline = Date.now() + 60000;
+        let settle = { tilesLoaded: false };
+        while (Date.now() < settleDeadline) {
+          settle = await session.evaluate(TILES);
+          const cameraReady = LENS === 'city' || (settle?.zoom ?? 0) >= 17;
+          if (settle?.tilesLoaded && cameraReady) break;
+          await sleep(500);
+        }
         const row = await session.evaluate(MEASURE);
         row.url = url;
         row.ready = !!ready?.ready;
+        row.tilesLoaded = !!settle?.tilesLoaded;
+        row.settle = settle;
         row.consoleErrors = await session.evaluate(CONSOLE_ERRORS);
         rows.push(row);
 
@@ -249,8 +279,9 @@ async function main() {
         const flag = row.ready ? 'ready' : 'NOT-READY';
         console.log(
           `  ${LENS} ${viewport.width}x${viewport.height} ${lang}: chrome ${row.chromeCostPct}% · ` +
-          `watch ${row.watch?.height}px · map ${row.unobscuredRatio} · ${row.typeSizeCount} sizes · ${flag}` +
-          (row.walk?.panelVisible ? ` · walk panel ${row.walk.panelRect.height}px` : ''),
+          `watch ${row.watch?.height}px · map ${row.unobscuredRatio} · ${row.typeSizeCount} sizes · ${flag} · ` +
+          `tiles ${row.tilesLoaded ? 'loaded' : 'UNLOADED'}` +
+          (row.walk?.panelVisible ? ` · walk panel ${row.walk.panelRect.height}px · "${row.walk.counts}"` : ''),
         );
       }
     }
@@ -269,10 +300,10 @@ async function main() {
   writeFileSync(`${outDir}/geometry.json`, `${JSON.stringify(rows, null, 2)}\n`);
   writeFileSync(`${outDir}/msh-record.json`, `${JSON.stringify(payload, null, 2)}\n`);
 
-  const failures = rows.filter(r => !r.ready || r.overflow);
+  const failures = rows.filter(r => !r.ready || r.overflow || !r.tilesLoaded);
   console.log(`\n✓ Measured ${rows.length} viewport/language cases → ${outDir}/geometry.json`);
   if (failures.length) {
-    console.log(`✗ ${failures.length} case(s) not ready or overflowing — treat the numbers as unverified`);
+    console.log(`✗ ${failures.length} case(s) not ready, overflowing, or measured on unloaded tiles — treat the numbers as unverified`);
     process.exitCode = 1;
   }
 }
