@@ -226,6 +226,9 @@ ok("the collage ranks districts against the whole city", () => {
     static: false,
     censored: false,
     reasonCode: null,
+    // Every measured reading states the ground its window covers.
+    windowM: 1119 * 5,
+    resolutionM: 1119,
     ...extra,
   });
 
@@ -247,6 +250,17 @@ ok("the collage ranks districts against the whole city", () => {
   const env = readings.get("b").find(r => r.domain === "environment");
   assert.ok(env.reading.includes("Daytime surface heat"), "the reading does not name its signal");
   assert.ok(env.reading_bn && env.reading_bn.length > 0, "the reading has no Bengali text");
+
+  // A reading must state how much ground it covers. The measurement carries
+  // the window; if the basis drops it on the way to the reader, the number
+  // goes out describing a whole district when it describes a neighbourhood.
+  const windowed = readings.get("b").find(r => r.domain === "environment").basis.windowM;
+  assert.equal(typeof windowed, "number", "the basis does not carry the sampled window");
+  assert.ok(windowed > 0, "the sampled window is not a length");
+  // The client renders the window, so the basis must carry the field the
+  // client reads. A rename on either side must fail here, not in the reader's
+  // face as a line that silently never appears.
+  assert.ok(readFileSync("public/collage.js", "utf8").includes('basis.windowM'), "the client no longer renders the sampled window");
 
   // A reading must carry the same quantity in both languages. A temperature
   // written as Celsius in English and as Kelvin in Bengali is two different

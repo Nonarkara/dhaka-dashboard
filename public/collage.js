@@ -31,6 +31,20 @@
     return new Intl.NumberFormat(bn() ? 'bn-BD' : 'en-GB', { maximumFractionDigits: 2 }).format(value);
   }
 
+  /**
+   * How much ground a reading covers, in the units a reader thinks in.
+   *
+   * The window is a length, not a count, so it is never rounded to a
+   * flattering number: 5.6 km stays 5.6 km, and a window narrower than a
+   * kilometre is given in metres.
+   */
+  function windowText(metres) {
+    if (typeof metres !== 'number' || !Number.isFinite(metres) || metres <= 0) return '';
+    if (metres < 1000) return `${number(Math.round(metres))} m`;
+    const km = metres / 1000;
+    return `${number(km < 10 ? Math.round(km * 10) / 10 : Math.round(km))} km`;
+  }
+
   /** Show a temperature in Celsius, because Kelvin is not a temperature people feel. */
   function display(m) {
     if (m.value === null || m.value === undefined) return '—';
@@ -103,7 +117,7 @@
           <span>${esc(basis.source || tr('Source unavailable','উৎস অনুপলব্ধ'))} · ${esc(basis.provenance === 'modeled' ? tr('modeled','মডেলভিত্তিক') : basis.provenance === 'reference' ? tr('reference','তথ্যসূত্র') : tr('satellite-derived estimate','উপগ্রহভিত্তিক অনুমান'))}</span>
           ${basis.resolutionM ? `<span>${tr('Tile pixel spacing','টাইলের পিক্সেলের দূরত্ব')}: ${number(basis.resolutionM)} m · ${tr('native resolution unverified','মূল রেজোলিউশন যাচাই করা হয়নি')}</span>` : `<span>${basis.nativeResolutionDegrees ? tr(`Source grid ${basis.nativeResolutionDegrees}°; not rooftop potential`, `উৎসের গ্রিড ${number(basis.nativeResolutionDegrees)}°; ছাদের সম্ভাবনা নয়`) : tr('Native resolution unavailable','মূল রেজোলিউশন অনুপলব্ধ')}</span>`}
           <span>${basis.coverage === null ? tr('Model point; observed coverage not supplied','মডেলের স্থান; পর্যবেক্ষণের পরিমাণ সরবরাহ করা হয়নি') : tr('Observed sample coverage','নমুনায় তথ্যের পরিমাণ') + ': ' + number(basis.coverage * 100) + '%'}</span>
-          ${basis.windowM ? `<span>${tr('Sampled over','নমুনার সীমারেখা')}: ${number(Math.round(basis.windowM / 1000))} ${tr('km wide','কিমি বিস্তৃত')}</span>` : ''}
+          ${basis.windowM ? `<span>${tr('Sampled over','নমুনার সীমারেখা')}: ${windowText(basis.windowM)} ${tr('wide','বিস্তৃত')}</span>` : ''}
           ${basis.rank ? `<span>${basis.tied
             ? tr(`tied ${basis.rank} of ${basis.of}`, `${basis.of}টির মধ্যে যৌথ ${basis.rank} নম্বর`)
             : tr(`rank ${basis.rank} of ${basis.of}`, `${basis.of}টির মধ্যে ${basis.rank} নম্বর`)}</span>` : ''}

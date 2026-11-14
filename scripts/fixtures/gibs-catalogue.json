@@ -1,6 +1,6 @@
 {
   "source": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml",
-  "captured": "2026-10-28",
+  "captured": "2026-11-14",
   "observationWindowDays": 4,
   "layerCount": 1330,
   "layers": {
@@ -101,7 +101,7 @@
         "image/png"
       ],
       "earliest": "2023-02-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SNPP_LimbProfiler_Aerosol_ExtinctionCoefficient_12KM": {
       "title": "Aerosol Extinction Vertical Profile (11.5 - 12.5 km, OMPS Limb Profiler, Suomi NPP)",
@@ -112,7 +112,7 @@
         "image/png"
       ],
       "earliest": "2013-11-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMPS_NOAA21_LimbProfiler_Aerosol_ExtinctionCoefficient_14KM": {
       "title": "Aerosol Extinction Vertical Profile (13.5 - 14.5 km, OMPS Limb Profiler, NOAA-21)",
@@ -123,7 +123,7 @@
         "image/png"
       ],
       "earliest": "2023-02-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SNPP_LimbProfiler_Aerosol_ExtinctionCoefficient_14KM": {
       "title": "Aerosol Extinction Vertical Profile (13.5 - 14.5 km, OMPS Limb Profiler, Suomi NPP)",
@@ -134,7 +134,7 @@
         "image/png"
       ],
       "earliest": "2013-11-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMPS_NOAA21_LimbProfiler_Aerosol_ExtinctionCoefficient_16KM": {
       "title": "Aerosol Extinction Vertical Profile (15.5 - 16.5 km, OMPS Limb Profiler, NOAA-21)",
@@ -145,7 +145,7 @@
         "image/png"
       ],
       "earliest": "2023-02-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SNPP_LimbProfiler_Aerosol_ExtinctionCoefficient_16KM": {
       "title": "Aerosol Extinction Vertical Profile (15.5 - 16.5 km, OMPS Limb Profiler, Suomi NPP)",
@@ -156,7 +156,7 @@
         "image/png"
       ],
       "earliest": "2013-11-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMPS_NOAA21_LimbProfiler_Aerosol_ExtinctionCoefficient_18KM": {
       "title": "Aerosol Extinction Vertical Profile (17.5 - 18.5 km, OMPS Limb Profiler, NOAA-21)",
@@ -167,7 +167,7 @@
         "image/png"
       ],
       "earliest": "2023-02-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SNPP_LimbProfiler_Aerosol_ExtinctionCoefficient_18KM": {
       "title": "Aerosol Extinction Vertical Profile (17.5 - 18.5 km, OMPS Limb Profiler, Suomi NPP)",
@@ -178,7 +178,7 @@
         "image/png"
       ],
       "earliest": "2013-11-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMPS_NOAA21_LimbProfiler_Aerosol_ExtinctionCoefficient_20KM": {
       "title": "Aerosol Extinction Vertical Profile (19.5 - 20.5 km, OMPS Limb Profiler, NOAA-21)",
@@ -189,7 +189,7 @@
         "image/png"
       ],
       "earliest": "2023-02-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SNPP_LimbProfiler_Aerosol_ExtinctionCoefficient_20KM": {
       "title": "Aerosol Extinction Vertical Profile (19.5 - 20.5 km, OMPS Limb Profiler, Suomi NPP)",
@@ -200,7 +200,7 @@
         "image/png"
       ],
       "earliest": "2013-11-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMPS_NOAA21_LimbProfiler_AerosolHeight": {
       "title": "Aerosol Extinction Vertical Profile (Aerosol Height, OMPS Limb Profiler, NOAA-21)",
@@ -211,7 +211,7 @@
         "image/png"
       ],
       "earliest": "2023-02-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SNPP_LimbProfiler_AerosolHeight": {
       "title": "Aerosol Extinction Vertical Profile (Aerosol height, OMPS Limb Profiler, Suomi NPP)",
@@ -222,7 +222,7 @@
         "image/png"
       ],
       "earliest": "2013-11-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMPS_NOAA20_NadirMapper_AerosolIndex_360": {
       "title": "Aerosol Index (At 360nm, L3, Daily, OMPS Nadir Mapper, NOAA-20)",
@@ -255,7 +255,7 @@
         "image/png"
       ],
       "earliest": "2025-04-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_NOAA21_NadirMapper_AerosolIndex_380": {
       "title": "Aerosol Index (L3, At 380nm, OMPS Nadir Mapper, NOAA-21)",
@@ -266,7 +266,7 @@
         "image/png"
       ],
       "earliest": "2025-04-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_NOAA21_NadirMapper_AerosolIndex_PyroCumuloNimbus_380": {
       "title": "Aerosol Index (L3, PyroCumuloNimbus at 380nm, OMPS Nadir Mapper, NOAA-21)",
@@ -277,7 +277,7 @@
         "image/png"
       ],
       "earliest": "2025-04-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMI_Aerosol_Index": {
       "title": "Aerosol Index (OMI, Aura)",
@@ -288,7 +288,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_Aerosol_Index": {
       "title": "Aerosol Index (OMPS, Suomi NPP)",
@@ -299,7 +299,7 @@
         "image/png"
       ],
       "earliest": "2012-01-26",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMPS_NOAA20_NadirMapper_AerosolIndex_PyroCumuloNimbus_360": {
       "title": "Aerosol Index (PyroCumuloNimbus at 360nm, L3, Daily, OMPS Nadir Mapper, NOAA-20)",
@@ -332,7 +332,7 @@
         "image/png"
       ],
       "earliest": "2025-04-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_Aerosol_Index_PyroCumuloNimbus": {
       "title": "Aerosol Index (PyroCumuloNimbus, OMPS, Suomi NPP)",
@@ -343,7 +343,7 @@
         "image/png"
       ],
       "earliest": "2012-01-26",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Aerosol_Optical_Depth_3km": {
       "title": "Aerosol Optical Depth (3km, MODIS, Aqua)",
@@ -354,7 +354,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Aerosol_Optical_Depth_3km": {
       "title": "Aerosol Optical Depth (3km, MODIS, Terra)",
@@ -365,7 +365,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMI_Absorbing_Aerosol_Optical_Thickness_MW_388": {
       "title": "Aerosol Optical Depth (Absorbing, Multi-Wavelength, 388.0 nm, OMI, Aura)",
@@ -376,7 +376,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-24"
+      "latest": "2026-11-09"
     },
     "OMI_Aerosol_Optical_Depth": {
       "title": "Aerosol Optical Depth (OMI, Aura)",
@@ -387,7 +387,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Combined_Value_Added_AOD": {
       "title": "Aerosol Optical Depth (Value Added, MODIS, Combined Aqua and Terra)",
@@ -398,7 +398,7 @@
         "image/png"
       ],
       "earliest": "2017-04-19",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MERRA2_Aerosol_Optical_Depth_Analysis_Monthly": {
       "title": "Aerosol Optical Depth Analysis (Monthly, MERRA2)",
@@ -431,7 +431,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "SWDB_Aerosol_Optical_Thickness_550nm_Daily": {
       "title": "Aerosol Optical Thickness 550nm (Daily, SeaWiFS Deep Blue)",
@@ -464,7 +464,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "GOES-East_ABI_Air_Mass": {
       "title": "Air Mass (ABI, GOES-East)",
@@ -508,7 +508,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MLS_Temperature_46hPa_Night": {
       "title": "Air Temperature (46 hPa, Night, MLS, Aura)",
@@ -519,7 +519,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "GLDAS_Near_Surface_Air_Temperature_Monthly": {
       "title": "Air Temperature (Monthly, Near Surface, Noah LSM,  GLDAS)",
@@ -541,7 +541,7 @@
         "image/png"
       ],
       "earliest": "2000-04-09",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "MERRA2_Air_Temperature_250hPa_Monthly": {
       "title": "Air Temperature at 250hPa (Monthly, MERRA2)",
@@ -563,7 +563,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Surface_Air_Temperature_Monthly_Day": {
       "title": "Air Temperature at Surface (L3, Daytime/Ascending, Monthly, AIRS, Aqua)",
@@ -574,7 +574,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "AIRS_L3_Surface_Air_Temperature_Daily_Night": {
       "title": "Air Temperature at Surface (L3, Nighttime/Descending, Daily, AIRS, Aqua)",
@@ -585,7 +585,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Surface_Air_Temperature_Monthly_Night": {
       "title": "Air Temperature at Surface (L3, Nighttime/Descending, Monthly, AIRS, Aqua)",
@@ -596,7 +596,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "Amphibian_Richness_All_Species_2013": {
       "title": "Amphibian Richness - All Species (Species: Global Amphibian Richness Grids, 2013)",
@@ -673,7 +673,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-26"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance": {
       "title": "At Sensor Radiance (Day/Night Band, VIIRS, NOAA-20)",
@@ -684,7 +684,7 @@
         "image/png"
       ],
       "earliest": "2024-03-25",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_DayNightBand_At_Sensor_Radiance": {
       "title": "At Sensor Radiance (Day/Night Band, VIIRS, NOAA-21)",
@@ -694,8 +694,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": null,
-      "latest": null
+      "earliest": "2026-10-27",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance": {
       "title": "At Sensor Radiance (Day/Night Band, VIIRS, Suomi NPP)",
@@ -706,7 +706,7 @@
         "image/png"
       ],
       "earliest": "2020-11-18",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance_LERC": {
       "title": "At Sensor Radiance (LERC, Day/Night Band, VIIRS, Suomi NPP)",
@@ -761,7 +761,7 @@
         "image/jpeg"
       ],
       "earliest": "2024-03-18",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_DayNightBand_AtSensor_M15": {
       "title": "Black Marble Nighttime Blue/Yellow Composite (Day/Night Band, VIIRS, NOAA-21)",
@@ -771,8 +771,8 @@
       "formats": [
         "image/jpeg"
       ],
-      "earliest": null,
-      "latest": null
+      "earliest": "2026-10-27",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_DayNightBand_AtSensor_M15": {
       "title": "Black Marble Nighttime Blue/Yellow Composite (Day/Night Band, VIIRS, Suomi NPP)",
@@ -783,7 +783,7 @@
         "image/jpeg"
       ],
       "earliest": "2021-04-30",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "MODIS_Combined_L3_Black_Sky_Albedo_Daily": {
       "title": "Black Sky Albedo (L3, Daily, MODIS, Aqua+Terra)",
@@ -794,7 +794,7 @@
         "image/png"
       ],
       "earliest": "2000-05-18",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "BlueMarble_NextGeneration": {
       "title": "Blue Marble (MODIS)",
@@ -882,7 +882,7 @@
         "image/png"
       ],
       "earliest": "2014-03-04",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "TRMM_Brightness_Temp_Asc": {
       "title": "Brightness Temperature (Ascending, TMI, TRMM)",
@@ -904,7 +904,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Brightness_Temp_BandI5_Day": {
       "title": "Brightness Temperature (Band I5, Day, VIIRS, NOAA-21)",
@@ -915,7 +915,7 @@
         "image/png"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Brightness_Temp_BandI5_Day": {
       "title": "Brightness Temperature (Band I5, Day, VIIRS, Suomi NPP)",
@@ -926,7 +926,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_Brightness_Temp_BandI5_Night": {
       "title": "Brightness Temperature (Band I5, Night, VIIRS, NOAA-20)",
@@ -937,7 +937,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Brightness_Temp_BandI5_Night": {
       "title": "Brightness Temperature (Band I5, Night, VIIRS, NOAA-21)",
@@ -948,7 +948,7 @@
         "image/png"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Brightness_Temp_BandI5_Night": {
       "title": "Brightness Temperature (Band I5, Night, VIIRS, Suomi NPP)",
@@ -959,7 +959,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Brightness_Temp_Band31_Day": {
       "title": "Brightness Temperature (Band31, Day, MODIS, Aqua)",
@@ -970,7 +970,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Brightness_Temp_Band31_Day": {
       "title": "Brightness Temperature (Band31, Day, MODIS, Terra)",
@@ -981,7 +981,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Brightness_Temp_Band31_Night": {
       "title": "Brightness Temperature (Band31, Night, MODIS, Aqua)",
@@ -992,7 +992,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Brightness_Temp_Band31_Night": {
       "title": "Brightness Temperature (Band31, Night, MODIS, Terra)",
@@ -1003,7 +1003,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "AMSUA_NOAA15_Brightness_Temp_Channel_1": {
       "title": "Brightness Temperature (Channel 01, AMSU-A / NOAA-15)",
@@ -1509,7 +1509,7 @@
         "image/png"
       ],
       "earliest": "2014-03-04",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "TRMM_Brightness_Temp_Dsc": {
       "title": "Brightness Temperature (Descending, TMI, TRMM)",
@@ -1839,7 +1839,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MLS_CO_215hPa_Night": {
       "title": "Carbon Monoxide (215 hPa, Night, MLS, Aura)",
@@ -1850,7 +1850,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Carbon_Monoxide_500hPa_Volume_Mixing_Ratio_Day": {
       "title": "Carbon Monoxide (L2, 500 hPa, Day, AIRS, Aqua)",
@@ -1861,7 +1861,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Carbon_Monoxide_500hPa_Volume_Mixing_Ratio_Night": {
       "title": "Carbon Monoxide (L2, 500 hPa, Night, AIRS, Aqua)",
@@ -1872,7 +1872,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MOPITT_CO_Daily_Total_Column_L2": {
       "title": "Carbon Monoxide (L2, Daily, Total Column, MOPITT, Terra)",
@@ -1993,7 +1993,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-09"
     },
     "AIRS_L3_Carbon_Monoxide_500hPa_Volume_Mixing_Ratio_Monthly_Day": {
       "title": "Carbon Monoxide Volume Mixing Ratio at 500hPa (L3, Daytime/Ascending, Monthly, AIRS, Aqua)",
@@ -2004,7 +2004,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "AIRS_L3_Carbon_Monoxide_500hPa_Volume_Mixing_Ratio_Daily_Night": {
       "title": "Carbon Monoxide Volume Mixing Ratio at 500hPa (L3, Nighttime/Descending, Daily, AIRS, Aqua)",
@@ -2015,7 +2015,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Carbon_Monoxide_500hPa_Volume_Mixing_Ratio_Monthly_Night": {
       "title": "Carbon Monoxide Volume Mixing Ratio at 500hPa (L3, Nighttime/Descending, Monthly, AIRS, Aqua)",
@@ -2026,7 +2026,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "MODIS_Aqua_L2_Chlorophyll_A": {
       "title": "Chlorophyll A (L2, MODIS, Aqua)",
@@ -2037,7 +2037,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L2_Chlorophyll_A": {
       "title": "Chlorophyll A (L2, MODIS, Terra)",
@@ -2048,7 +2048,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_L2_Chlorophyll_A": {
       "title": "Chlorophyll A (L2, VIIRS, Suomi NPP)",
@@ -2059,7 +2059,7 @@
         "image/png"
       ],
       "earliest": "2012-01-02",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "MERIS_ENVISAT_Chlorophyll_a": {
       "title": "Chlorophyll a ( MERIS, ENVISAT)",
@@ -2081,7 +2081,7 @@
         "image/png"
       ],
       "earliest": "2024-02-25",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "S3A_OLCI_Chlorophyll_a": {
       "title": "Chlorophyll a (OLCI, Sentinel-3A)",
@@ -2092,7 +2092,7 @@
         "image/png"
       ],
       "earliest": "2016-04-25",
-      "latest": "2026-10-27"
+      "latest": "2026-11-11"
     },
     "S3B_OLCI_Chlorophyll_a": {
       "title": "Chlorophyll a (OLCI, Sentinel-3B)",
@@ -2103,7 +2103,7 @@
         "image/png"
       ],
       "earliest": "2018-05-14",
-      "latest": "2026-10-27"
+      "latest": "2026-11-11"
     },
     "SEAWIFS_ORBVIEW-2_GAC_Chlorophyll_a": {
       "title": "Chlorophyll a (SeaWiFS)",
@@ -2136,7 +2136,7 @@
         "image/png"
       ],
       "earliest": "2017-12-13",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "VIIRS_NOAA21_Chlorophyll_a": {
       "title": "Chlorophyll a (VIIRS, NOAA-21)",
@@ -2147,7 +2147,7 @@
         "image/png"
       ],
       "earliest": "2023-03-31",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_Cirrus_Reflectance_SWIR_M11": {
       "title": "Cirrus Reflectance (SWIR, Band M11, VIIRS, Suomi NPP)",
@@ -2213,7 +2213,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Clear_Sky_Confidence_Day": {
       "title": "Clear Sky Confidence (Day, VIIRS, Suomi NPP)",
@@ -2224,7 +2224,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_Clear_Sky_Confidence_Night": {
       "title": "Clear Sky Confidence (Night, VIIRS, NOAA-20)",
@@ -2235,7 +2235,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Clear_Sky_Confidence_Night": {
       "title": "Clear Sky Confidence (Night, VIIRS, Suomi NPP)",
@@ -2246,7 +2246,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "AIRS_L3_Clear_Sky_Outgoing_Longwave_Radiation_Daily_Day": {
       "title": "Clear Sky Outgoing Longwave Radiation (L3, Daytime/Ascending, Daily, AIRS, Aqua)",
@@ -2257,7 +2257,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Clear_Sky_Outgoing_Longwave_Radiation_Monthly_Day": {
       "title": "Clear Sky Outgoing Longwave Radiation (L3, Daytime/Ascending, Monthly, AIRS, Aqua)",
@@ -2268,7 +2268,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "AIRS_L3_Clear_Sky_Outgoing_Longwave_Radiation_Daily_Night": {
       "title": "Clear Sky Outgoing Longwave Radiation (L3, Nighttime/Descending, Daily, AIRS, Aqua)",
@@ -2279,7 +2279,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Clear_Sky_Outgoing_Longwave_Radiation_Monthly_Night": {
       "title": "Clear Sky Outgoing Longwave Radiation (L3, Nighttime/Descending, Monthly, AIRS, Aqua)",
@@ -2290,7 +2290,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "MODIS_Aqua_Cloud_Effective_Radius_16": {
       "title": "Cloud Effective Radius (1.6µm, MODIS, Aqua)",
@@ -2301,7 +2301,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_Cloud_Effective_Radius_16": {
       "title": "Cloud Effective Radius (1.6µm, MODIS, Terra)",
@@ -2312,7 +2312,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_Cloud_Effective_Radius_16_PCL": {
       "title": "Cloud Effective Radius (1.6µm, PCL, MODIS, Aqua)",
@@ -2323,7 +2323,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_Cloud_Effective_Radius_16_PCL": {
       "title": "Cloud Effective Radius (1.6µm, PCL, MODIS, Terra)",
@@ -2334,7 +2334,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_Cloud_Effective_Radius_1621": {
       "title": "Cloud Effective Radius (2.1µm, 1621 Algorithm, MODIS, Aqua)",
@@ -2345,7 +2345,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_Cloud_Effective_Radius_1621": {
       "title": "Cloud Effective Radius (2.1µm, 1621 Algorithm, MODIS, Terra)",
@@ -2356,7 +2356,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_Cloud_Effective_Radius": {
       "title": "Cloud Effective Radius (2.1µm, MODIS, Aqua)",
@@ -2367,7 +2367,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Effective_Radius": {
       "title": "Cloud Effective Radius (2.1µm, MODIS, Terra)",
@@ -2378,7 +2378,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Effective_Radius_PCL_1621": {
       "title": "Cloud Effective Radius (2.1µm, PCL, 1621 Algorithm, MODIS, Aqua)",
@@ -2389,7 +2389,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_Cloud_Effective_Radius_PCL_1621": {
       "title": "Cloud Effective Radius (2.1µm, PCL, 1621 Algorithm, MODIS, Terra)",
@@ -2400,7 +2400,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_Cloud_Effective_Radius_PCL": {
       "title": "Cloud Effective Radius (2.1µm, PCL, MODIS, Aqua)",
@@ -2411,7 +2411,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Effective_Radius_PCL": {
       "title": "Cloud Effective Radius (2.1µm, PCL, MODIS, Terra)",
@@ -2422,7 +2422,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Effective_Radius_37_PCL": {
       "title": "Cloud Effective Radius (3.7µm,  PCL, MODIS, Terra)",
@@ -2433,7 +2433,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Effective_Radius_37": {
       "title": "Cloud Effective Radius (3.7µm, MODIS, Aqua)",
@@ -2444,7 +2444,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Effective_Radius_37": {
       "title": "Cloud Effective Radius (3.7µm, MODIS, Terra)",
@@ -2455,7 +2455,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Effective_Radius_37_PCL": {
       "title": "Cloud Effective Radius (3.7µm, PCL, MODIS, Aqua)",
@@ -2466,7 +2466,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Cloud_Effective_Radius": {
       "title": "Cloud Effective Radius (VIIRS, NOAA-20)",
@@ -2477,7 +2477,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_Cloud_Effective_Radius": {
       "title": "Cloud Effective Radius (VIIRS, Suomi NPP)",
@@ -2488,7 +2488,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-26"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Cloud_Fraction_Day": {
       "title": "Cloud Fraction (Day, MODIS, Aqua)",
@@ -2499,7 +2499,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Fraction_Day": {
       "title": "Cloud Fraction (Day, MODIS, Terra)",
@@ -2510,7 +2510,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Fraction_Night": {
       "title": "Cloud Fraction (Night, MODIS, Aqua)",
@@ -2521,7 +2521,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Fraction_Night": {
       "title": "Cloud Fraction (Night, MODIS, Terra)",
@@ -2532,7 +2532,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "SSMI_DMSP_F8_Cloud_Liquid_Water_Over_Oceans_Ascending": {
       "title": "Cloud Liquid Water (Ascending, Local AM, DMSP-F8 / SSMI)",
@@ -2609,7 +2609,7 @@
         "image/png"
       ],
       "earliest": "2003-10-26",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F17_Cloud_Liquid_Water_Over_Oceans_Ascending": {
       "title": "Cloud Liquid Water (Ascending, Local PM, DMSP-F17 / SSMIS)",
@@ -2620,7 +2620,7 @@
         "image/png"
       ],
       "earliest": "2006-12-14",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F10_Cloud_Liquid_Water_Over_Oceans_Descending": {
       "title": "Cloud Liquid Water (Descending, Local AM, DMSP-F10 / SSMI)",
@@ -2686,7 +2686,7 @@
         "image/png"
       ],
       "earliest": "2003-10-26",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F17_Cloud_Liquid_Water_Over_Oceans_Descending": {
       "title": "Cloud Liquid Water (Descending, Local AM, DMSP-F17 / SSMIS)",
@@ -2697,7 +2697,7 @@
         "image/png"
       ],
       "earliest": "2006-12-14",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F8_Cloud_Liquid_Water_Over_Oceans_Descending": {
       "title": "Cloud Liquid Water (Descending, Local PM, DMSP-F8 / SSMI)",
@@ -2796,7 +2796,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Multi_Layer_Flag": {
       "title": "Cloud Multi Layer Flag (MODIS, Terra)",
@@ -2807,7 +2807,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Optical_Thickness_16": {
       "title": "Cloud Optical Thickness (1.6µm, MODIS, Aqua)",
@@ -2818,7 +2818,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_Cloud_Optical_Thickness_16": {
       "title": "Cloud Optical Thickness (1.6µm, MODIS, Terra)",
@@ -2829,7 +2829,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_Cloud_Optical_Thickness_16_PCL": {
       "title": "Cloud Optical Thickness (1.6µm, PCL, MODIS, Aqua)",
@@ -2840,7 +2840,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_Cloud_Optical_Thickness_16_PCL": {
       "title": "Cloud Optical Thickness (1.6µm, PCL, MODIS, Terra)",
@@ -2851,7 +2851,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_Cloud_Optical_Thickness_1621": {
       "title": "Cloud Optical Thickness (2.1µm, 1621 Algorithm, MODIS, Aqua)",
@@ -2862,7 +2862,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_Cloud_Optical_Thickness_1621": {
       "title": "Cloud Optical Thickness (2.1µm, 1621 Algorithm, MODIS, Terra)",
@@ -2873,7 +2873,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_Cloud_Optical_Thickness": {
       "title": "Cloud Optical Thickness (2.1µm, MODIS, Aqua)",
@@ -2884,7 +2884,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Optical_Thickness": {
       "title": "Cloud Optical Thickness (2.1µm, MODIS, Terra)",
@@ -2895,7 +2895,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Optical_Thickness_PCL_1621": {
       "title": "Cloud Optical Thickness (2.1µm, PCL, 1621 Algorithm, MODIS, Aqua)",
@@ -2906,7 +2906,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_Cloud_Optical_Thickness_PCL_1621": {
       "title": "Cloud Optical Thickness (2.1µm, PCL, 1621 Algorithm, MODIS, Terra)",
@@ -2917,7 +2917,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_Cloud_Optical_Thickness_PCL": {
       "title": "Cloud Optical Thickness (2.1µm, PCL, MODIS, Aqua)",
@@ -2928,7 +2928,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Optical_Thickness_PCL": {
       "title": "Cloud Optical Thickness (2.1µm, PCL, MODIS, Terra)",
@@ -2939,7 +2939,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Cloud_Optical_Thickness": {
       "title": "Cloud Optical Thickness (VIIRS, NOAA-20)",
@@ -2950,7 +2950,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_Cloud_Optical_Thickness": {
       "title": "Cloud Optical Thickness (VIIRS, Suomi NPP)",
@@ -2961,7 +2961,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-26"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Cloud_Phase_Infrared_Day": {
       "title": "Cloud Phase (Infrared, Day, MODIS, Aqua)",
@@ -2972,7 +2972,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Phase_Infrared_Day": {
       "title": "Cloud Phase (Infrared, Day, MODIS, Terra)",
@@ -2983,7 +2983,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Phase_Infrared_Night": {
       "title": "Cloud Phase (Infrared, Night, MODIS, Aqua)",
@@ -2994,7 +2994,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Phase_Infrared_Night": {
       "title": "Cloud Phase (Infrared, Night, MODIS, Terra)",
@@ -3005,7 +3005,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Phase_Optical_Properties": {
       "title": "Cloud Phase Optical Properties (MODIS, Aqua)",
@@ -3016,7 +3016,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Phase_Optical_Properties": {
       "title": "Cloud Phase Optical Properties (MODIS, Terra)",
@@ -3027,7 +3027,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMI_Cloud_Pressure": {
       "title": "Cloud Pressure (OMI, Aura)",
@@ -3038,7 +3038,7 @@
         "image/png"
       ],
       "earliest": "2005-01-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MISR_Cloud_Stereo_Height_Histogram_Bin_0.5km_Monthly": {
       "title": "Cloud Stereo Height (No Wind Correction, &amp;lt; 0.5 km, Monthly, MISR, Terra)",
@@ -3071,7 +3071,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Top_Height_Day": {
       "title": "Cloud Top Height (Day, MODIS, Terra)",
@@ -3082,7 +3082,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Cloud_Top_Height_Day": {
       "title": "Cloud Top Height (Day, VIIRS, NOAA-20)",
@@ -3093,7 +3093,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_Cloud_Top_Height_Day": {
       "title": "Cloud Top Height (Day, VIIRS, Suomi NPP)",
@@ -3104,7 +3104,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-26"
+      "latest": "2026-11-02"
     },
     "AIRS_L2_Cloud_Top_Height_Day": {
       "title": "Cloud Top Height (L2, Day, AIRS, Aqua)",
@@ -3115,7 +3115,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Cloud_Top_Height_Night": {
       "title": "Cloud Top Height (L2, Night, AIRS, Aqua)",
@@ -3126,7 +3126,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Top_Height_Night": {
       "title": "Cloud Top Height (Night, MODIS, Aqua)",
@@ -3137,7 +3137,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Top_Height_Night": {
       "title": "Cloud Top Height (Night, MODIS, Terra)",
@@ -3148,7 +3148,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Cloud_Top_Height_Night": {
       "title": "Cloud Top Height (Night, VIIRS, NOAA-20)",
@@ -3159,7 +3159,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_Cloud_Top_Height_Night": {
       "title": "Cloud Top Height (Night, VIIRS, Suomi NPP)",
@@ -3170,7 +3170,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-26"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Cloud_Top_Pressure_Day": {
       "title": "Cloud Top Pressure (Day, MODIS, Aqua)",
@@ -3181,7 +3181,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Top_Pressure_Day": {
       "title": "Cloud Top Pressure (Day, MODIS, Terra)",
@@ -3192,7 +3192,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Top_Pressure_Night": {
       "title": "Cloud Top Pressure (Night, MODIS, Aqua)",
@@ -3203,7 +3203,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Top_Pressure_Night": {
       "title": "Cloud Top Pressure (Night, MODIS, Terra)",
@@ -3214,7 +3214,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Top_Temp_Day": {
       "title": "Cloud Top Temperature (Day, MODIS, Aqua)",
@@ -3225,7 +3225,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Top_Temp_Day": {
       "title": "Cloud Top Temperature (Day, MODIS, Terra)",
@@ -3236,7 +3236,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Top_Temp_Night": {
       "title": "Cloud Top Temperature (Night, MODIS, Aqua)",
@@ -3247,7 +3247,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Top_Temp_Night": {
       "title": "Cloud Top Temperature (Night, MODIS, Terra)",
@@ -3258,7 +3258,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Water_Path": {
       "title": "Cloud Water Path (MODIS, Aqua)",
@@ -3269,7 +3269,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Water_Path": {
       "title": "Cloud Water Path (MODIS, Terra)",
@@ -3280,7 +3280,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Cloud_Water_Path_PCL": {
       "title": "Cloud Water Path (PCL, MODIS, Aqua)",
@@ -3291,7 +3291,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Cloud_Water_Path_PCL": {
       "title": "Cloud Water Path (PCL, MODIS, Terra)",
@@ -3302,7 +3302,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "TEMPO_L2_Cloud_Cloud_Fraction_Total_Granule": {
       "title": "Clouds (L2, Cloud Fraction Total, Subdaily, TEMPO)",
@@ -3665,7 +3665,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L3_Passive_Brightness_Temp_V": {
       "title": "Corrected Brightness Temperature (L3, Passive, V Polarization, Radiometer, SMAP)",
@@ -3676,7 +3676,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "MODIS_Terra_CorrectedReflectance_Bands367": {
       "title": "Corrected Reflectance (Bands 3-6-7, MODIS, Terra)",
@@ -3687,7 +3687,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_CorrectedReflectance_Bands721": {
       "title": "Corrected Reflectance (Bands 7-2-1, MODIS, Aqua)",
@@ -3698,7 +3698,7 @@
         "image/jpeg"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_CorrectedReflectance_Bands721": {
       "title": "Corrected Reflectance (Bands 7-2-1, MODIS, Terra)",
@@ -3709,7 +3709,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1": {
       "title": "Corrected Reflectance (Bands M11-I2-I1, VIIRS, NOAA-20)",
@@ -3720,7 +3720,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_CorrectedReflectance_BandsM11-I2-I1": {
       "title": "Corrected Reflectance (Bands M11-I2-I1, VIIRS, NOAA-21)",
@@ -3731,7 +3731,7 @@
         "image/jpeg"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_CorrectedReflectance_BandsM3-I3-M11": {
       "title": "Corrected Reflectance (Bands M3-I3-M11, VIIRS, NOAA-20)",
@@ -3742,7 +3742,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_CorrectedReflectance_BandsM3-I3-M11": {
       "title": "Corrected Reflectance (Bands M3-I3-M11, VIIRS, NOAA-21)",
@@ -3753,7 +3753,7 @@
         "image/jpeg"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1_Granule": {
       "title": "Corrected Reflectance (M11-I2-I1, Granules, VIIRS, NOAA-20)",
@@ -3786,7 +3786,7 @@
         "image/jpeg"
       ],
       "earliest": "2015-11-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_CorrectedReflectance_BandsM3-I3-M11_Granule": {
       "title": "Corrected Reflectance (M3-I3-M11, Granules, VIIRS, NOAA-20)",
@@ -3819,7 +3819,7 @@
         "image/jpeg"
       ],
       "earliest": "2015-11-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_CorrectedReflectance_TrueColor_Granule": {
       "title": "Corrected Reflectance (True Color, Granules, VIIRS, NOAA-20)",
@@ -3863,7 +3863,7 @@
         "image/jpeg"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_CorrectedReflectance_TrueColor": {
       "title": "Corrected Reflectance (True Color, MODIS, Terra)",
@@ -3874,7 +3874,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OCI_PACE_True_Color": {
       "title": "Corrected Reflectance (True Color, OCI, PACE)",
@@ -3885,7 +3885,7 @@
         "image/jpeg"
       ],
       "earliest": "2024-02-25",
-      "latest": "2026-10-27"
+      "latest": "2026-11-09"
     },
     "SPEXONE_PACE_True_Color": {
       "title": "Corrected Reflectance (True Color, SPEXone, PACE)",
@@ -3896,7 +3896,7 @@
         "image/png"
       ],
       "earliest": "2025-08-21",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "VIIRS_NOAA20_CorrectedReflectance_TrueColor": {
       "title": "Corrected Reflectance (True Color, VIIRS, NOAA-20)",
@@ -3907,7 +3907,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_CorrectedReflectance_TrueColor": {
       "title": "Corrected Reflectance (True Color, VIIRS, NOAA-21)",
@@ -3918,7 +3918,7 @@
         "image/jpeg"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_CorrectedReflectance_TrueColor": {
       "title": "Corrected Reflectance (True Color, VIIRS, Suomi NPP)",
@@ -3929,7 +3929,7 @@
         "image/jpeg"
       ],
       "earliest": "2015-11-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "Agricultural_Lands_Croplands_2000": {
       "title": "Croplands (Global Agricultural Lands, 2000)",
@@ -4028,7 +4028,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Angstrom_Exponent_Ocean": {
       "title": "Dark Target Aerosol Angstrom Exponent (Ocean, MODIS, Terra)",
@@ -4039,7 +4039,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Angstrom_Exponent_Dark_Target_Ocean": {
       "title": "Dark Target Aerosol Angstrom Exponent (Ocean, VIIRS, NOAA-20)",
@@ -4072,7 +4072,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Aerosol": {
       "title": "Dark Target Aerosol Optical Depth (Land and Ocean, MODIS, Terra)",
@@ -4083,7 +4083,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_AOD_Dark_Target_Land_Ocean": {
       "title": "Dark Target Aerosol Optical Depth (Land and Ocean, VIIRS, NOAA-20)",
@@ -4094,7 +4094,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_AOD_Dark_Target_Land_Ocean": {
       "title": "Dark Target Aerosol Optical Depth (Land and Ocean, VIIRS, NOAA-21)",
@@ -4105,7 +4105,7 @@
         "image/png"
       ],
       "earliest": "2023-02-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_AOD_Dark_Target_Land_Ocean": {
       "title": "Dark Target Aerosol Optical Depth (Land and Ocean, VIIRS, Suomi NPP)",
@@ -4116,7 +4116,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Data_No_Data": {
       "title": "Data/No Data Mask (Day, MODIS, Aqua)",
@@ -4127,7 +4127,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Data_No_Data": {
       "title": "Data/No Data Mask (Day, MODIS, Terra)",
@@ -4138,7 +4138,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_DayNightBand": {
       "title": "Day/Night Band (VIIRS, NOAA-20)",
@@ -4149,7 +4149,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_DayNightBand": {
       "title": "Day/Night Band (VIIRS, NOAA-21)",
@@ -4160,7 +4160,7 @@
         "image/png"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_DayNightBand": {
       "title": "Day/Night Band (VIIRS, Suomi NPP)",
@@ -4171,18 +4171,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-28"
-    },
-    "VIIRS_NOAA20_Angstrom_Exponent_Deep_Blue_Land_Ocean": {
-      "title": "Deep Blue Aerosol Angstrom Exponent (Land and Ocean, VIIRS, NOAA-20)",
-      "tileMatrixSets": [
-        "GoogleMapsCompatible_Level6"
-      ],
-      "formats": [
-        "image/png"
-      ],
-      "earliest": "2018-01-05",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_Angstrom_Exponent_Deep_Blue_Best_Estimate": {
       "title": "Deep Blue Aerosol Angstrom Exponent (Land and Ocean, VIIRS, NOAA-20)",
@@ -4195,6 +4184,17 @@
       "earliest": "2018-02-17",
       "latest": "2026-08-04"
     },
+    "VIIRS_NOAA20_Angstrom_Exponent_Deep_Blue_Land_Ocean": {
+      "title": "Deep Blue Aerosol Angstrom Exponent (Land and Ocean, VIIRS, NOAA-20)",
+      "tileMatrixSets": [
+        "GoogleMapsCompatible_Level6"
+      ],
+      "formats": [
+        "image/png"
+      ],
+      "earliest": "2018-01-05",
+      "latest": "2026-11-14"
+    },
     "VIIRS_NOAA21_Angstrom_Exponent_Deep_Blue_Land_Ocean": {
       "title": "Deep Blue Aerosol Angstrom Exponent (Land and Ocean, VIIRS, NOAA-21)",
       "tileMatrixSets": [
@@ -4204,18 +4204,7 @@
         "image/png"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-28"
-    },
-    "VIIRS_SNPP_Angstrom_Exponent_Deep_Blue_Land_Ocean": {
-      "title": "Deep Blue Aerosol Angstrom Exponent (Land and Ocean, VIIRS, Suomi NPP)",
-      "tileMatrixSets": [
-        "GoogleMapsCompatible_Level6"
-      ],
-      "formats": [
-        "image/png"
-      ],
-      "earliest": "2012-03-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Angstrom_Exponent_Deep_Blue_Best_Estimate": {
       "title": "Deep Blue Aerosol Angstrom Exponent (Land and Ocean, VIIRS, Suomi NPP)",
@@ -4228,6 +4217,17 @@
       "earliest": "2012-03-01",
       "latest": "2026-08-03"
     },
+    "VIIRS_SNPP_Angstrom_Exponent_Deep_Blue_Land_Ocean": {
+      "title": "Deep Blue Aerosol Angstrom Exponent (Land and Ocean, VIIRS, Suomi NPP)",
+      "tileMatrixSets": [
+        "GoogleMapsCompatible_Level6"
+      ],
+      "formats": [
+        "image/png"
+      ],
+      "earliest": "2012-03-01",
+      "latest": "2026-11-02"
+    },
     "MODIS_Aqua_Angstrom_Exponent_Land": {
       "title": "Deep Blue Aerosol Angstrom Exponent (Land, MODIS, Aqua)",
       "tileMatrixSets": [
@@ -4237,7 +4237,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Angstrom_Exponent_Land": {
       "title": "Deep Blue Aerosol Angstrom Exponent (Land, MODIS, Terra)",
@@ -4248,7 +4248,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_AOD_Deep_Blue_Land_Ocean": {
       "title": "Deep Blue Aerosol Optical Depth (Land and Ocean, VIIRS, NOAA-20)",
@@ -4259,7 +4259,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_AOD_Deep_Blue_Land_Ocean": {
       "title": "Deep Blue Aerosol Optical Depth (Land and Ocean, VIIRS, NOAA-21)",
@@ -4270,7 +4270,7 @@
         "image/png"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_AOD_Deep_Blue_Land_Ocean": {
       "title": "Deep Blue Aerosol Optical Depth (Land and Ocean, VIIRS, Suomi NPP)",
@@ -4281,7 +4281,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_AOD_Deep_Blue_Land": {
       "title": "Deep Blue Aerosol Optical Depth (Land, MODIS, Aqua)",
@@ -4292,7 +4292,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_AOD_Deep_Blue_Land": {
       "title": "Deep Blue Aerosol Optical Depth (Land, MODIS, Terra)",
@@ -4303,7 +4303,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_AOT_Deep_Blue_Best_Estimate": {
       "title": "Deep Blue Aerosol Optical Thickness (Land and Ocean, VIIRS, NOAA-20)",
@@ -4325,7 +4325,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_Aerosol_Type_Deep_Blue_Land_Ocean": {
       "title": "Deep Blue Aerosol Type (Land and Ocean, VIIRS, NOAA-20)",
@@ -4336,7 +4336,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Aerosol_Type_Deep_Blue_Land_Ocean": {
       "title": "Deep Blue Aerosol Type (Land and Ocean, VIIRS, NOAA-21)",
@@ -4347,7 +4347,7 @@
         "image/png"
       ],
       "earliest": "2023-02-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Aerosol_Type_Deep_Blue_Land_Ocean": {
       "title": "Deep Blue Aerosol Type (Land and Ocean, VIIRS, Suomi NPP)",
@@ -4358,7 +4358,7 @@
         "image/png"
       ],
       "earliest": "2012-03-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_Aerosol_Type_Deep_Blue_Best_Estimate": {
       "title": "Deep Blue Aerosol Type (VIIRS, NOAA-20)",
@@ -4644,7 +4644,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Dust_Score_Night": {
       "title": "Dust Score (L2, Night, AIRS, Aqua)",
@@ -4655,7 +4655,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MERRA2_Dust_Surface_Mass_Concentration_Monthly": {
       "title": "Dust Surface Mass Concentration (Monthly, MERRA2)",
@@ -4688,7 +4688,7 @@
         "image/png"
       ],
       "earliest": "2016-01-07",
-      "latest": "2026-10-25"
+      "latest": "2026-11-05"
     },
     "OPERA_L3_Dynamic_Surface_Water_Extent-Sentinel-1": {
       "title": "Dynamic Surface Water Extent (Best, OPERA_L3_DSWx-S1)",
@@ -4699,7 +4699,7 @@
         "image/png"
       ],
       "earliest": "2023-12-15",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_CityLights_2012": {
       "title": "Earth at Night (2012, VIIRS, Suomi NPP)",
@@ -4721,7 +4721,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-08"
+      "latest": "2026-10-24"
     },
     "MODIS_Terra_L3_EVI_16Day": {
       "title": "Enhanced Vegetation Index (16-Day, MODIS, Terra)",
@@ -4732,7 +4732,7 @@
         "image/png"
       ],
       "earliest": "2000-03-05",
-      "latest": "2026-09-30"
+      "latest": "2026-10-16"
     },
     "VIIRS_NOAA20_L3_EVI_16Day": {
       "title": "Enhanced Vegetation Index (L3, 16-Day, VIIRS, NOAA-20)",
@@ -4743,7 +4743,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-08"
+      "latest": "2026-10-16"
     },
     "VIIRS_SNPP_L3_EVI_16Day": {
       "title": "Enhanced Vegetation Index (L3, 16-Day, VIIRS, Suomi NPP)",
@@ -4753,8 +4753,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2024-08-12",
-      "latest": "2026-10-08"
+      "earliest": "2024-08-28",
+      "latest": "2026-10-24"
     },
     "MODIS_Terra_L3_EVI_Monthly": {
       "title": "Enhanced Vegetation Index (L3, Monthly, MODIS, Terra)",
@@ -4765,7 +4765,7 @@
         "image/png"
       ],
       "earliest": "2000-03-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "VIIRS_NOAA20_L3_EVI_Monthly": {
       "title": "Enhanced Vegetation Index (L3, Monthly, VIIRS, NOAA-20)",
@@ -4787,7 +4787,7 @@
         "image/png"
       ],
       "earliest": "2012-01-01",
-      "latest": "2026-09-01"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_EVI_Monthly": {
       "title": "Enhanced Vegetation Index (Monthly, MODIS, Aqua)",
@@ -4798,7 +4798,7 @@
         "image/png"
       ],
       "earliest": "2002-07-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Terra_EVI_8Day": {
       "title": "Enhanced Vegetation Index (rolling 8-Day, MODIS, Terra)",
@@ -4809,7 +4809,7 @@
         "image/png"
       ],
       "earliest": "2025-02-12",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_NOAA20_EVI_8Day": {
       "title": "Enhanced Vegetation Index (rolling 8-day, VIIRS, NOAA-20)",
@@ -4820,7 +4820,7 @@
         "image/png"
       ],
       "earliest": "2025-09-22",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_NOAA21_EVI_8Day": {
       "title": "Enhanced Vegetation Index (rolling 8-day, VIIRS, NOAA-21)",
@@ -4831,7 +4831,7 @@
         "image/png"
       ],
       "earliest": "2026-09-27",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_SNPP_EVI_8Day": {
       "title": "Enhanced Vegetation Index (rolling 8-day, VIIRS, Suomi NPP)",
@@ -4842,7 +4842,7 @@
         "image/png"
       ],
       "earliest": "2025-07-01",
-      "latest": "2026-10-26"
+      "latest": "2026-11-02"
     },
     "OMI_UV_Erythemal_Daily_Dose": {
       "title": "Erythemal Daily Dose (Local Noon, OMI, Aura)",
@@ -4853,7 +4853,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-22"
+      "latest": "2026-11-07"
     },
     "OMI_UV_Erythemal_Dose_Rate": {
       "title": "Erythemal Dose Rate (Local Noon, OMI, Aura)",
@@ -4864,7 +4864,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-22"
+      "latest": "2026-11-07"
     },
     "Estimated_Net_Migration_1970-1980": {
       "title": "Estimated Net Migration by Decade (1970-1980)",
@@ -4930,7 +4930,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Faraday_Rotation_Fore": {
       "title": "Faraday Rotation Angle (L1, Passive, Fore, Radiometer, SMAP)",
@@ -4941,7 +4941,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "GOES-East_ABI_FireTemp": {
       "title": "Fire Temperature ( ABI, GOES-East)",
@@ -5128,7 +5128,7 @@
         "image/png"
       ],
       "earliest": "2021-01-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_Combined_Flood_1-Day": {
       "title": "Flood (1-Day Window, VIIRS, NOAA-20 + NOAA-21)",
@@ -5139,7 +5139,7 @@
         "image/png"
       ],
       "earliest": "2025-06-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Combined_Flood_2-Day": {
       "title": "Flood (2-Day Window, MODIS, Terra + Aqua)",
@@ -5150,7 +5150,7 @@
         "image/png"
       ],
       "earliest": "2021-01-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_Combined_Flood_2-Day": {
       "title": "Flood (2-Day Window, VIIRS, NOAA-20 + NOAA-21)",
@@ -5161,7 +5161,7 @@
         "image/png"
       ],
       "earliest": "2025-06-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Combined_Flood_3-Day": {
       "title": "Flood (3-Day Window, MODIS, Terra + Aqua)",
@@ -5172,7 +5172,7 @@
         "image/png"
       ],
       "earliest": "2021-01-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_Combined_Flood_3-Day": {
       "title": "Flood (3-Day Window, VIIRS, NOAA-20 + NOAA-21)",
@@ -5183,7 +5183,7 @@
         "image/png"
       ],
       "earliest": "2025-06-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "NDH_Flood_Hazard_Frequency_Distribution_1985-2003": {
       "title": "Flood Hazard (Global Flood Hazard Frequency and Distribution, 1985-2003)",
@@ -5249,7 +5249,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-20"
+      "latest": "2026-11-05"
     },
     "MODIS_Aqua_L4_FPAR_8Day": {
       "title": "Fraction of Photosynthetically Active Radiation (L4, 8-Day, MODIS, Aqua)",
@@ -5260,7 +5260,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Combined_L4_FPAR_8Day": {
       "title": "Fraction of Photosynthetically Active Radiation (L4, 8-Day, MODIS, Aqua+Terra)",
@@ -5270,8 +5270,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2024-08-04",
-      "latest": "2026-10-16"
+      "earliest": "2024-08-12",
+      "latest": "2026-10-24"
     },
     "MODIS_Terra_L4_FPAR_8Day": {
       "title": "Fraction of Photosynthetically Active Radiation (L4, 8-Day, MODIS, Terra)",
@@ -5282,7 +5282,7 @@
         "image/png"
       ],
       "earliest": "2000-02-26",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L4_FPAR_8Day": {
       "title": "Fraction of Photosynthetically Active Radiation (L4, 8-Day, VIIRS, NOAA-20)",
@@ -5293,7 +5293,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L4_FPAR_8Day": {
       "title": "Fraction of Photosynthetically Active Radiation (L4, 8-Day, VIIRS, Suomi NPP)",
@@ -5304,7 +5304,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MEaSUREs_Daily_Landscape_Freeze_Thaw_AMSRE": {
       "title": "Freeze Thaw (Daily Landscape, AMSR-E, MEaSUREs)",
@@ -5337,7 +5337,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L3_Passive_Enhanced_Night_Freeze_Thaw": {
       "title": "Freeze/Thaw (L3, Passive Enhanced, Night, Radiometer, SMAP)",
@@ -5348,7 +5348,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L3_Passive_Day_Freeze_Thaw": {
       "title": "Freeze/Thaw (L3, Passive, Day, Radiometer, SMAP)",
@@ -5359,7 +5359,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-24"
+      "latest": "2026-11-11"
     },
     "SMAP_L3_Passive_Night_Freeze_Thaw": {
       "title": "Freeze/Thaw (L3, Passive, Night, Radiometer, SMAP)",
@@ -5370,7 +5370,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-24"
+      "latest": "2026-11-11"
     },
     "VIIRS_CrIS_NOAA20_BT_Band33_Fusion_Day": {
       "title": "Fusion Brightness Temperature Band 33 (Day, VIIRS+CrIS, NOAA-20)",
@@ -5381,7 +5381,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "VIIRS_CrIS_SNPP_BT_Band33_Fusion_Day": {
       "title": "Fusion Brightness Temperature Band 33 (Day, VIIRS+CrIS, Suomi NPP)",
@@ -5403,7 +5403,7 @@
         "image/png"
       ],
       "earliest": "2018-02-17",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "VIIRS_CrIS_SNPP_BT_Band33_Fusion_Night": {
       "title": "Fusion Brightness Temperature Band 33 (Night, VIIRS+CrIS, Suomi NPP)",
@@ -5425,7 +5425,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_NOAA21_GapFilled_BRDF_Corrected_DayNightBand_Radiance": {
       "title": "Gap-Filled BRDF Corrected Radiance (Day/Night Band, NOAA-21)",
@@ -5435,8 +5435,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": null,
-      "latest": null
+      "earliest": "2023-02-10",
+      "latest": "2026-11-13"
     },
     "VIIRS_SNPP_GapFilled_BRDF_Corrected_DayNightBand_Radiance": {
       "title": "Gap-Filled BRDF Corrected Radiance (Day/Night Band, VIIRS, Suomi NPP)",
@@ -5447,7 +5447,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-26"
+      "latest": "2026-11-02"
     },
     "GOES-East_ABI_GeoColor": {
       "title": "Geo Color ( ABI, GOES-East)",
@@ -5491,7 +5491,7 @@
         "image/png"
       ],
       "earliest": "2002-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L4_Gross_Primary_Productivity_8Day": {
       "title": "Gross Primary Production (L4, 8-Day, MODIS, Terra)",
@@ -5502,7 +5502,7 @@
         "image/png"
       ],
       "earliest": "2000-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L4_Gross_Primary_Productivity_8Day": {
       "title": "Gross Primary Production (L4, 8-Day, VIIRS, NOAA-20)",
@@ -5513,7 +5513,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L4_Gross_Primary_Productivity_8Day": {
       "title": "Gross Primary Production (L4, 8-Day, VIIRS, Suomi NPP)",
@@ -5524,7 +5524,7 @@
         "image/png"
       ],
       "earliest": "2012-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "SMAP_L4_Mean_Gross_Primary_Productivity": {
       "title": "Gross Primary Production (L4, 9 km Grid Cell Mean, Model Value-Added, SMAP)",
@@ -5535,7 +5535,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-23"
+      "latest": "2026-10-31"
     },
     "GEDI_ISS_L3_Elevation_Mean_Lowest_Mode_201904-202010": {
       "title": "Ground Elevation Mean (L3, Lowest Mode, 201904-202010, GEDI, ISS)",
@@ -5678,7 +5678,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-23"
+      "latest": "2026-10-31"
     },
     "Landsat_Human_Built-up_And_Settlement_Extent": {
       "title": "Human Built-up And Settlement Extent (Global Human Built-up And Settlement Extent (HBASE) Dataset From Landsat, 2010)",
@@ -5722,7 +5722,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Ice_Surface_Temp_Day": {
       "title": "Ice Surface Temperature (Day, MODIS, Terra)",
@@ -5733,7 +5733,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Ice_Surface_Temp_Day": {
       "title": "Ice Surface Temperature (Day, VIIRS, NOAA-20)",
@@ -5744,7 +5744,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Ice_Surface_Temp_Day": {
       "title": "Ice Surface Temperature (Day, VIIRS, NOAA-21)",
@@ -5754,8 +5754,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-28"
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Ice_Surface_Temp_Day": {
       "title": "Ice Surface Temperature (Day, VIIRS, Suomi NPP)",
@@ -5766,7 +5766,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_L3_Ice_Surface_Temp_Daily_Day": {
       "title": "Ice Surface Temperature (L3, Daily, Day, MODIS, Aqua)",
@@ -5777,7 +5777,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L3_Ice_Surface_Temp_Daily_Day": {
       "title": "Ice Surface Temperature (L3, Daily, Day, MODIS, Terra)",
@@ -5788,7 +5788,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_NOAA20_L3_Ice_Surface_Temp_Daily_Day": {
       "title": "Ice Surface Temperature (L3, Daily, Day, VIIRS, NOAA-20)",
@@ -5799,7 +5799,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-26"
+      "latest": "2026-11-06"
     },
     "VIIRS_SNPP_L3_Ice_Surface_Temp_Daily_Day": {
       "title": "Ice Surface Temperature (L3, Daily, Day, VIIRS, Suomi NPP)",
@@ -5810,7 +5810,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-25"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_L3_Ice_Surface_Temp_Daily_Night": {
       "title": "Ice Surface Temperature (L3, Daily, Night, MODIS, Aqua)",
@@ -5821,7 +5821,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L3_Ice_Surface_Temp_Daily_Night": {
       "title": "Ice Surface Temperature (L3, Daily, Night, MODIS, Terra)",
@@ -5832,7 +5832,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_NOAA20_L3_Ice_Surface_Temp_Daily_Night": {
       "title": "Ice Surface Temperature (L3, Daily, Night, VIIRS, NOAA-20)",
@@ -5843,7 +5843,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-26"
+      "latest": "2026-11-06"
     },
     "VIIRS_SNPP_L3_Ice_Surface_Temp_Daily_Night": {
       "title": "Ice Surface Temperature (L3, Daily, Night, VIIRS, Suomi NPP)",
@@ -5854,7 +5854,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-25"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Ice_Surface_Temp_Night": {
       "title": "Ice Surface Temperature (Night, MODIS, Aqua)",
@@ -5865,7 +5865,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Ice_Surface_Temp_Night": {
       "title": "Ice Surface Temperature (Night, MODIS, Terra)",
@@ -5876,7 +5876,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Ice_Surface_Temp_Night": {
       "title": "Ice Surface Temperature (Night, VIIRS, NOAA-20)",
@@ -5887,7 +5887,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Ice_Surface_Temp_Night": {
       "title": "Ice Surface Temperature (Night, VIIRS, NOAA-21)",
@@ -5897,8 +5897,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-27"
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Ice_Surface_Temp_Night": {
       "title": "Ice Surface Temperature (Night, VIIRS, Suomi NPP)",
@@ -5909,7 +5909,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "Landsat_Global_Man-made_Impervious_Surface": {
       "title": "Impervious Surface Percentage (Global Man-made Impervious Surface (GMIS) Dataset From Landsat, 2010)",
@@ -6162,7 +6162,7 @@
         "image/jpeg"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L3_SurfaceReflectance_Bands143_8Day": {
       "title": "Land Surface Reflectance (8-Day, True Color, MODIS, Terra)",
@@ -6173,7 +6173,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-26",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_SurfaceReflectance_Bands121": {
       "title": "Land Surface Reflectance (Bands 1-2-1, MODIS, Aqua)",
@@ -6184,7 +6184,7 @@
         "image/jpeg"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_SurfaceReflectance_Bands121": {
       "title": "Land Surface Reflectance (Bands 1-2-1, MODIS, Terra)",
@@ -6195,7 +6195,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_SurfaceReflectance_Bands721": {
       "title": "Land Surface Reflectance (Bands 7-2-1, MODIS, Aqua)",
@@ -6206,7 +6206,7 @@
         "image/jpeg"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_SurfaceReflectance_Bands721": {
       "title": "Land Surface Reflectance (Bands 7-2-1, MODIS, Terra)",
@@ -6217,7 +6217,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_SurfaceReflectance_BandsI1-I2-I1": {
       "title": "Land Surface Reflectance (Bands I1-I2-I1 VIIRS, NOAA-20)",
@@ -6228,7 +6228,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_SurfaceReflectance_BandsI1-I2-I1": {
       "title": "Land Surface Reflectance (Bands I1-I2-I1 VIIRS, Suomi NPP)",
@@ -6239,7 +6239,7 @@
         "image/jpeg"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA21_SurfaceReflectance_BandsI1-I2-I1": {
       "title": "Land Surface Reflectance (Bands I1-I2-I1, VIIRS, NOAA-21)",
@@ -6249,8 +6249,8 @@
       "formats": [
         "image/jpeg"
       ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-27"
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_SurfaceReflectance_BandsM5-M4-M3": {
       "title": "Land Surface Reflectance (Bands I1-M4-M3, VIIRS, NOAA-20)",
@@ -6261,18 +6261,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
-    },
-    "VIIRS_NOAA21_SurfaceReflectance_BandsM11-M7-M5": {
-      "title": "Land Surface Reflectance (Bands M11-M7-M5, Near Real Time, VIIRS, NOAA-21)",
-      "tileMatrixSets": [
-        "GoogleMapsCompatible_Level8"
-      ],
-      "formats": [
-        "image/jpeg"
-      ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_SurfaceReflectance_BandsM11-M7-M5": {
       "title": "Land Surface Reflectance (Bands M11-M7-M5, VIIRS, NOAA-20)",
@@ -6283,7 +6272,18 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
+    },
+    "VIIRS_NOAA21_SurfaceReflectance_BandsM11-M7-M5": {
+      "title": "Land Surface Reflectance (Bands M11-M7-M5, VIIRS, NOAA-21)",
+      "tileMatrixSets": [
+        "GoogleMapsCompatible_Level8"
+      ],
+      "formats": [
+        "image/jpeg"
+      ],
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_SurfaceReflectance_BandsM11-M7-M5": {
       "title": "Land Surface Reflectance (Bands M11-M7-M5, VIIRS, Suomi NPP)",
@@ -6294,7 +6294,7 @@
         "image/jpeg"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_L2G_SurfaceReflectance_Bands143_Daily": {
       "title": "Land Surface Reflectance (L2G, Daily, True Color, MODIS, Aqua)",
@@ -6305,7 +6305,7 @@
         "image/jpeg"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-24"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L2G_SurfaceReflectance_Bands143_Daily": {
       "title": "Land Surface Reflectance (L2G, Daily, True Color, MODIS, Terra)",
@@ -6316,7 +6316,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-25"
+      "latest": "2026-11-12"
     },
     "VIIRS_NOAA20_L3_SurfaceReflectance_BandsI1-I2-I1_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, Bands I1-I2-I1, VIIRS, NOAA-20)",
@@ -6327,7 +6327,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L3_SurfaceReflectance_BandsI1-I2-I1_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, Bands I1-I2-I1, VIIRS, Suomi NPP)",
@@ -6338,7 +6338,7 @@
         "image/jpeg"
       ],
       "earliest": "2012-01-17",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L3_SurfaceReflectance_BandsM11-M7-M5_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, Bands M11-M7-M5, VIIRS, NOAA-20)",
@@ -6349,7 +6349,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L3_SurfaceReflectance_BandsM11-M7-M5_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, Bands M11-M7-M5, VIIRS, Suomi NPP)",
@@ -6360,18 +6360,7 @@
         "image/jpeg"
       ],
       "earliest": "2012-01-17",
-      "latest": "2026-10-16"
-    },
-    "MODIS_Aqua_L3_SurfaceReflectance_Bands121_8Day": {
-      "title": "Land Surface Reflectance (L3, 8-Day, True Color, MODIS, Aqua)",
-      "tileMatrixSets": [
-        "GoogleMapsCompatible_Level9"
-      ],
-      "formats": [
-        "image/jpeg"
-      ],
-      "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_SurfaceReflectance_Bands721_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, True Color, MODIS, Aqua)",
@@ -6382,7 +6371,18 @@
         "image/jpeg"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
+    },
+    "MODIS_Aqua_L3_SurfaceReflectance_Bands121_8Day": {
+      "title": "Land Surface Reflectance (L3, 8-Day, True Color, MODIS, Aqua)",
+      "tileMatrixSets": [
+        "GoogleMapsCompatible_Level9"
+      ],
+      "formats": [
+        "image/jpeg"
+      ],
+      "earliest": "2002-07-04",
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L3_SurfaceReflectance_Bands721_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, True Color, MODIS, Terra)",
@@ -6393,7 +6393,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-26",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L3_SurfaceReflectance_Bands121_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, True Color, MODIS, Terra)",
@@ -6404,7 +6404,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-26",
-      "latest": "2026-10-08"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L3_SurfaceReflectance_BandsM5-M4-M3_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, True Color, VIIRS, NOAA-20)",
@@ -6415,7 +6415,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L3_SurfaceReflectance_BandsM5-M4-M3_8Day": {
       "title": "Land Surface Reflectance (L3, 8-Day, True Color, VIIRS, Suomi NPP)",
@@ -6426,7 +6426,7 @@
         "image/jpeg"
       ],
       "earliest": "2012-01-17",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L3_SurfaceReflectance_BandsM5-M4-M3_Daily": {
       "title": "Land Surface Reflectance (L3, Daily, True Color, VIIRS, NOAA-20)",
@@ -6437,7 +6437,7 @@
         "image/jpeg"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-26"
+      "latest": "2026-11-06"
     },
     "VIIRS_SNPP_L3_SurfaceReflectance_BandsM5-M4-M3_Daily": {
       "title": "Land Surface Reflectance (L3, Daily, True Color, VIIRS, Suomi NPP)",
@@ -6448,7 +6448,7 @@
         "image/jpeg"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-25"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_SurfaceReflectance_Bands143": {
       "title": "Land Surface Reflectance (True Color, MODIS, Aqua)",
@@ -6459,7 +6459,7 @@
         "image/jpeg"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_SurfaceReflectance_Bands143": {
       "title": "Land Surface Reflectance (True Color, MODIS, Terra)",
@@ -6470,18 +6470,18 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_SurfaceReflectance_BandsM5-M4-M3": {
-      "title": "Land Surface Reflectance (True Color, Near Real Time, VIIRS, NOAA-21)",
+      "title": "Land Surface Reflectance (True Color, VIIRS, NOAA-21)",
       "tileMatrixSets": [
         "GoogleMapsCompatible_Level8"
       ],
       "formats": [
         "image/jpeg"
       ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-27"
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_SurfaceReflectance_BandsM5-M4-M3": {
       "title": "Land Surface Reflectance (True Color, VIIRS, Suomi NPP)",
@@ -6492,7 +6492,7 @@
         "image/jpeg"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_8Day_Day": {
       "title": "Land Surface Temperature (8-Day, Day, MODIS, Terra)",
@@ -6503,7 +6503,7 @@
         "image/png"
       ],
       "earliest": "2000-02-26",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_8Day_Day_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, 8-Day, Day, MODIS, Aqua)",
@@ -6514,7 +6514,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_8Day_Day_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, 8-Day, Day, MODIS, Terra)",
@@ -6525,7 +6525,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_8Day_Night_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, 8-Day, Night, MODIS, Aqua)",
@@ -6536,7 +6536,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_8Day_Night_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, 8-Day, Night, MODIS, Terra)",
@@ -6547,7 +6547,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_Daily_Day_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, Daily, Day, MODIS, Aqua)",
@@ -6558,7 +6558,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_Daily_Day_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, Daily, Day, MODIS, Terra)",
@@ -6569,7 +6569,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_Daily_Night_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, Daily, Night, MODIS, Aqua)",
@@ -6580,7 +6580,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_Daily_Night_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, Daily, Night, MODIS, Terra)",
@@ -6591,7 +6591,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_Monthly_CMG_Day_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, Monthly, Day, MODIS, Aqua)",
@@ -6602,7 +6602,7 @@
         "image/png"
       ],
       "earliest": "2002-07-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_Monthly_CMG_Day_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, Monthly, Day, MODIS, Terra)",
@@ -6613,7 +6613,7 @@
         "image/png"
       ],
       "earliest": "2000-02-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_Monthly_CMG_Night_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, Monthly, Night, MODIS, Aqua)",
@@ -6624,7 +6624,7 @@
         "image/png"
       ],
       "earliest": "2002-07-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_Monthly_CMG_Night_TES": {
       "title": "Land Surface Temperature (ASTER TES L3, Monthly, Night, MODIS, Terra)",
@@ -6635,7 +6635,7 @@
         "image/png"
       ],
       "earliest": "2000-02-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Terra_Land_Surface_Temp_Day_TES": {
       "title": "Land Surface Temperature (ASTER TES, Day, MODIS, Terra)",
@@ -6646,7 +6646,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Land_Surface_Temp_Night_TES": {
       "title": "Land Surface Temperature (ASTER TES, Night, MODIS, Terra)",
@@ -6657,7 +6657,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Land_Surface_Temp_Day": {
       "title": "Land Surface Temperature (Day, MODIS, Aqua)",
@@ -6668,7 +6668,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Land_Surface_Temp_Day_TES": {
       "title": "Land Surface Temperature (Day, MODIS, Aqua, ASTER TES)",
@@ -6679,7 +6679,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Land_Surface_Temp_Day": {
       "title": "Land Surface Temperature (Day, MODIS, Terra)",
@@ -6690,7 +6690,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Land_Surface_Temp_Day": {
       "title": "Land Surface Temperature (Day, VIIRS, NOAA-20)",
@@ -6701,7 +6701,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Land_Surface_Temp_Day": {
       "title": "Land Surface Temperature (Day, VIIRS, NOAA-21)",
@@ -6711,8 +6711,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-28"
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Land_Surface_Temp_Day": {
       "title": "Land Surface Temperature (Day, VIIRS, Suomi NPP)",
@@ -6723,7 +6723,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_8Day_Day": {
       "title": "Land Surface Temperature (L3, 8-Day, Day, MODIS, Aqua)",
@@ -6734,7 +6734,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L3_Land_Surface_Temp_8Day_Day": {
       "title": "Land Surface Temperature (L3, 8-Day, Day, VIIRS, NOAA-20)",
@@ -6745,7 +6745,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L3_Land_Surface_Temp_8Day_Day": {
       "title": "Land Surface Temperature (L3, 8-Day, Day, VIIRS, Suomi NPP)",
@@ -6756,7 +6756,7 @@
         "image/png"
       ],
       "earliest": "2012-01-25",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_8Day_Night": {
       "title": "Land Surface Temperature (L3, 8-Day, Night, MODIS, Aqua)",
@@ -6767,7 +6767,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_8Day_Night": {
       "title": "Land Surface Temperature (L3, 8-Day, Night, MODIS, Terra)",
@@ -6778,7 +6778,7 @@
         "image/png"
       ],
       "earliest": "2000-02-26",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L3_Land_Surface_Temp_8Day_Night": {
       "title": "Land Surface Temperature (L3, 8-Day, Night, VIIRS, NOAA-20)",
@@ -6789,7 +6789,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L3_Land_Surface_Temp_8Day_Night": {
       "title": "Land Surface Temperature (L3, 8-Day, Night, VIIRS, Suomi NPP)",
@@ -6800,7 +6800,7 @@
         "image/png"
       ],
       "earliest": "2012-01-25",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_Daily_Day": {
       "title": "Land Surface Temperature (L3, Daily, Day, MODIS, Aqua)",
@@ -6811,7 +6811,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_Daily_Day": {
       "title": "Land Surface Temperature (L3, Daily, Day, MODIS, Terra)",
@@ -6822,7 +6822,7 @@
         "image/png"
       ],
       "earliest": "2000-02-25",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_NOAA20_L3_Land_Surface_Temp_Daily_Day": {
       "title": "Land Surface Temperature (L3, Daily, Day, VIIRS, NOAA-20)",
@@ -6833,7 +6833,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-26"
+      "latest": "2026-11-06"
     },
     "VIIRS_SNPP_L3_Land_Surface_Temp_Daily_Day": {
       "title": "Land Surface Temperature (L3, Daily, Day, VIIRS, Suomi NPP)",
@@ -6844,7 +6844,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-25"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_Daily_Night": {
       "title": "Land Surface Temperature (L3, Daily, Night, MODIS, Aqua)",
@@ -6855,7 +6855,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_Daily_Night": {
       "title": "Land Surface Temperature (L3, Daily, Night, MODIS, Terra)",
@@ -6866,7 +6866,7 @@
         "image/png"
       ],
       "earliest": "2000-02-25",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_NOAA20_L3_Land_Surface_Temp_Daily_Night": {
       "title": "Land Surface Temperature (L3, Daily, Night, VIIRS, NOAA-20)",
@@ -6877,7 +6877,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-26"
+      "latest": "2026-11-06"
     },
     "VIIRS_SNPP_L3_Land_Surface_Temp_Daily_Night": {
       "title": "Land Surface Temperature (L3, Daily, Night, VIIRS, Suomi NPP)",
@@ -6888,7 +6888,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-25"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_Monthly_Day": {
       "title": "Land Surface Temperature (L3, Monthly, Day, MODIS, Aqua)",
@@ -6899,7 +6899,7 @@
         "image/png"
       ],
       "earliest": "2002-07-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_Monthly_Day": {
       "title": "Land Surface Temperature (L3, Monthly, Day, MODIS, Terra)",
@@ -6910,7 +6910,7 @@
         "image/png"
       ],
       "earliest": "2000-03-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "VIIRS_NOAA20_L3_Land_Surface_Temp_Monthly_Day": {
       "title": "Land Surface Temperature (L3, Monthly, Day, VIIRS, NOAA-20)",
@@ -6921,7 +6921,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "VIIRS_SNPP_L3_Land_Surface_Temp_Monthly_Day": {
       "title": "Land Surface Temperature (L3, Monthly, Day, VIIRS, Suomi NPP)",
@@ -6932,7 +6932,7 @@
         "image/png"
       ],
       "earliest": "2012-02-01",
-      "latest": "2026-09-01"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_Land_Surface_Temp_Monthly_Night": {
       "title": "Land Surface Temperature (L3, Monthly, Night, MODIS, Aqua)",
@@ -6943,7 +6943,7 @@
         "image/png"
       ],
       "earliest": "2002-07-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Terra_L3_Land_Surface_Temp_Monthly_Night": {
       "title": "Land Surface Temperature (L3, Monthly, Night, MODIS, Terra)",
@@ -6954,7 +6954,7 @@
         "image/png"
       ],
       "earliest": "2000-03-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "VIIRS_NOAA20_L3_Land_Surface_Temp_Monthly_Night": {
       "title": "Land Surface Temperature (L3, Monthly, Night, VIIRS, NOAA-20)",
@@ -6965,7 +6965,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "VIIRS_SNPP_L3_Land_Surface_Temp_Monthly_Night": {
       "title": "Land Surface Temperature (L3, Monthly, Night, VIIRS, Suomi NPP)",
@@ -6976,18 +6976,7 @@
         "image/png"
       ],
       "earliest": "2012-02-01",
-      "latest": "2026-09-01"
-    },
-    "MODIS_Aqua_Land_Surface_Temp_Night": {
-      "title": "Land Surface Temperature (Night, MODIS, Aqua)",
-      "tileMatrixSets": [
-        "GoogleMapsCompatible_Level7"
-      ],
-      "formats": [
-        "image/png"
-      ],
-      "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_Land_Surface_Temp_Night_TES": {
       "title": "Land Surface Temperature (Night, MODIS, Aqua)",
@@ -6998,7 +6987,18 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
+    },
+    "MODIS_Aqua_Land_Surface_Temp_Night": {
+      "title": "Land Surface Temperature (Night, MODIS, Aqua)",
+      "tileMatrixSets": [
+        "GoogleMapsCompatible_Level7"
+      ],
+      "formats": [
+        "image/png"
+      ],
+      "earliest": "2002-07-03",
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Land_Surface_Temp_Night": {
       "title": "Land Surface Temperature (Night, MODIS, Terra)",
@@ -7009,7 +7009,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Land_Surface_Temp_Night": {
       "title": "Land Surface Temperature (Night, VIIRS, NOAA-20)",
@@ -7020,7 +7020,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Land_Surface_Temp_Night": {
       "title": "Land Surface Temperature (Night, VIIRS, NOAA-21)",
@@ -7030,8 +7030,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-27"
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Land_Surface_Temp_Night": {
       "title": "Land Surface Temperature (Night, VIIRS, Suomi NPP)",
@@ -7042,7 +7042,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "OSM_Land_Water_Map": {
       "title": "Land Water Map (OSM)",
@@ -7097,7 +7097,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-20"
+      "latest": "2026-11-05"
     },
     "MODIS_Aqua_L4_LAI_8Day": {
       "title": "Leaf Area Index (L4, 8-Day, MODIS, Aqua)",
@@ -7108,7 +7108,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Combined_L4_LAI_8Day": {
       "title": "Leaf Area Index (L4, 8-Day, MODIS, Aqua+Terra)",
@@ -7118,8 +7118,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2024-08-12",
-      "latest": "2026-10-16"
+      "earliest": "2024-08-20",
+      "latest": "2026-10-24"
     },
     "MODIS_Terra_L4_LAI_8Day": {
       "title": "Leaf Area Index (L4, 8-Day, MODIS, Terra)",
@@ -7130,7 +7130,7 @@
         "image/png"
       ],
       "earliest": "2000-02-26",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L4_LAI_8Day": {
       "title": "Leaf Area Index (L4, 8-Day, VIIRS, NOAA-20)",
@@ -7141,7 +7141,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L4_LAI_8Day": {
       "title": "Leaf Area Index (L4, 8-Day, VIIRS, Suomi NPP)",
@@ -7152,7 +7152,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "OTD_High_Resolution_Full_Climatology_OTD_Flash_Rate_Climatology": {
       "title": "Lightning Flash Rate (, OrbView-1 / OTD)",
@@ -7295,7 +7295,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Combined_MAIAC_L2G_ColumnWaterVapor": {
       "title": "MAIAC Columnar Water Vapor (MODIS, Combined Aqua and Terra)",
@@ -7306,7 +7306,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Combined_MAIAC_L3_IsotropicKernelParameters": {
       "title": "MAIAC Isotropic Kernel Parameters (RTLS Model, Daily, MODIS, Combined Aqua and Terra)",
@@ -7317,7 +7317,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "MODIS_Combined_MAIAC_L2G_BidirectionalReflectance_Bands143": {
       "title": "MAIAC Reflectance (BRDF-Adjusted, MODIS, Combined Aqua and Terra)",
@@ -7328,7 +7328,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "HLS_MGRS_Granule_Grid": {
       "title": "MGRS/HLS Grid",
@@ -7427,7 +7427,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_AOD_Deep_Blue_Combined": {
       "title": "Merged Aerosol Optical Depth (Deep Blue, Land and Ocean, MODIS, Terra)",
@@ -7438,7 +7438,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Methane_400hPa_Volume_Mixing_Ratio_Day": {
       "title": "Methane (L2, 400 hPa, Day, AIRS, Aqua)",
@@ -7449,7 +7449,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Methane_400hPa_Volume_Mixing_Ratio_Night": {
       "title": "Methane (L2, 400 hPa, Night, AIRS, Aqua)",
@@ -7460,7 +7460,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L3_Methane_400hPa_Volume_Mixing_Ratio_Daily_Day": {
       "title": "Methane Volume Mixing Ratio at 400hPa (L3, Daytime/Ascending, Daily, AIRS, Aqua)",
@@ -7471,7 +7471,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-09"
     },
     "AIRS_L3_Methane_400hPa_Volume_Mixing_Ratio_Monthly_Day": {
       "title": "Methane Volume Mixing Ratio at 400hPa (L3, Daytime/Ascending, Monthly, AIRS, Aqua)",
@@ -7482,7 +7482,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "AIRS_L3_Methane_400hPa_Volume_Mixing_Ratio_Daily_Night": {
       "title": "Methane Volume Mixing Ratio at 400hPa (L3, Nighttime/Descending, Daily, AIRS, Aqua)",
@@ -7493,7 +7493,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-06"
     },
     "AIRS_L3_Methane_400hPa_Volume_Mixing_Ratio_Monthly_Night": {
       "title": "Methane Volume Mixing Ratio at 400hPa (L3, Nighttime/Descending, Monthly, AIRS, Aqua)",
@@ -7504,7 +7504,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "AIRS_L3_Carbon_Dioxide_AIRS_AMSU_Monthly": {
       "title": "Mole Fraction of Carbon Dioxide in Free Troposphere (L3, Monthly, AIRS, Aqua)",
@@ -7537,7 +7537,7 @@
         "image/png"
       ],
       "earliest": "2025-10-29",
-      "latest": "2026-10-23"
+      "latest": "2026-11-11"
     },
     "SMAP_L4_Mean_Net_Ecosystem_Exchange": {
       "title": "Net Ecosystem CO2 Exchange (L4, 9 km Grid Cell Mean, Model Value-Added, SMAP)",
@@ -7548,7 +7548,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-23"
+      "latest": "2026-10-31"
     },
     "SMAP_L4_Uncertainty_Mean_Net_Ecosystem_Exchange": {
       "title": "Net Ecosystem CO2 Exchange Uncertainty (L4, 9 km Grid Cell Mean, Model Value-Added, SMAP)",
@@ -7559,7 +7559,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-23"
+      "latest": "2026-10-31"
     },
     "MODIS_Aqua_L4_Net_Photosynthesis_8Day": {
       "title": "Net Photosynthesis (L4, 8-Day, MODIS, Aqua)",
@@ -7570,7 +7570,7 @@
         "image/png"
       ],
       "earliest": "2002-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L4_Net_Photosynthesis_8Day": {
       "title": "Net Photosynthesis (L4, 8-Day, MODIS, Terra)",
@@ -7581,7 +7581,7 @@
         "image/png"
       ],
       "earliest": "2000-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "VIIRS_NOAA20_L4_Net_Photosynthesis_8Day": {
       "title": "Net Photosynthesis (L4, 8-Day, VIIRS, NOAA-20)",
@@ -7592,7 +7592,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_SNPP_L4_Net_Photosynthesis_8Day": {
       "title": "Net Photosynthesis (L4, 8-Day, VIIRS, Suomi NPP)",
@@ -7603,7 +7603,7 @@
         "image/png"
       ],
       "earliest": "2012-01-01",
-      "latest": "2026-10-16"
+      "latest": "2026-10-24"
     },
     "VIIRS_Night_Lights": {
       "title": "Night Lights (VIIRS, Suomi NPP)",
@@ -7636,7 +7636,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MLS_HNO3_46hPa_Night": {
       "title": "Nitric Acid (46 hPa, Night, MLS, Aura)",
@@ -7647,7 +7647,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "TROPOMI_L2_Nitrogen_Dioxide_Tropospheric_Column": {
       "title": "Nitrogen Dioxide (L2, Tropospheric Column, TROPOMI, Sentinel-5P)",
@@ -7658,7 +7658,7 @@
         "image/png"
       ],
       "earliest": "2018-05-06",
-      "latest": "2026-10-28"
+      "latest": "2026-11-13"
     },
     "TEMPO_L2_NO2_Vertical_Column_Stratosphere_Granule": {
       "title": "Nitrogen Dioxide (L2, Vertical Column Stratosphere, Subdaily, TEMPO)",
@@ -7713,7 +7713,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-22"
+      "latest": "2026-11-09"
     },
     "ASIA-AQ_DC-8_NO2": {
       "title": "Nitrogen Dioxide and Flight Track (Per Flight, LN-251 INS/GPS, CANOE, DC-8)",
@@ -7735,7 +7735,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MLS_N2O_46hPa_Night": {
       "title": "Nitrous Oxide (46 hPa, Night, MLS, Aura)",
@@ -7746,7 +7746,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_NDVI_8Day": {
       "title": "Normalized Difference Vegetation Index (rolling 8-Day, VIIRS, NOAA-20)",
@@ -7757,7 +7757,7 @@
         "image/png"
       ],
       "earliest": "2025-09-22",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_SNPP_NDVI_8Day": {
       "title": "Normalized Difference Vegetation Index (rolling 8-Day, VIIRS, Suomi NPP)",
@@ -7768,7 +7768,7 @@
         "image/png"
       ],
       "earliest": "2025-07-01",
-      "latest": "2026-10-26"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA21_NDVI_8Day": {
       "title": "Normalized Difference Vegetation Index (rolling 8-day, VIIRS, NOAA-21)",
@@ -7779,7 +7779,7 @@
         "image/png"
       ],
       "earliest": "2026-09-27",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "GEDI_ISS_L4B_Number_of_Samples_201904-202303": {
       "title": "Number of High-quality Waveforms (L4B, 201904-202303, GEDI, ISS)",
@@ -7801,7 +7801,7 @@
         "image/png"
       ],
       "earliest": "2025-01-10",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "AMSRU_Ocean_Wind_Speed_Night": {
       "title": "Ocean Wind Speed ( Night, AMSRU, GCOM-W1)",
@@ -7900,7 +7900,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2002-07-07",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Aura_Ascending": {
       "title": "Orbit Tracks (Ascending, Aura)",
@@ -7911,7 +7911,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2004-07-15",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_CYGNSS_Ascending": {
       "title": "Orbit Tracks (Ascending, CYGNSS)",
@@ -7922,7 +7922,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2016-12-16",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Calipso_Ascending": {
       "title": "Orbit Tracks (Ascending, Calipso)",
@@ -7933,7 +7933,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2006-04-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_CloudSat_Ascending": {
       "title": "Orbit Tracks (Ascending, CloudSat)",
@@ -7944,7 +7944,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2006-04-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_EarthCARE_Ascending": {
       "title": "Orbit Tracks (Ascending, EarthCARE)",
@@ -7955,7 +7955,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-05-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GCOM-C_Ascending": {
       "title": "Orbit Tracks (Ascending, GCOM-C)",
@@ -7966,7 +7966,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2017-12-23",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GCOM-W1_Ascending": {
       "title": "Orbit Tracks (Ascending, GCOM-W1)",
@@ -7977,7 +7977,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2012-05-17",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GOSAT_Ascending": {
       "title": "Orbit Tracks (Ascending, GOSAT)",
@@ -7988,7 +7988,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2009-01-23",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GOSAT-2_Ascending": {
       "title": "Orbit Tracks (Ascending, GOSAT-2)",
@@ -7999,7 +7999,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-10-29",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GPM_Ascending": {
       "title": "Orbit Tracks (Ascending, GPM)",
@@ -8010,7 +8010,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2014-02-27",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_ICESAT-2_Ascending": {
       "title": "Orbit Tracks (Ascending, ICESAT-2)",
@@ -8021,7 +8021,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-09-15",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_ISS_Ascending": {
       "title": "Orbit Tracks (Ascending, ISS)",
@@ -8032,7 +8032,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "1998-11-20",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Landsat-7_Ascending": {
       "title": "Orbit Tracks (Ascending, Landsat-7)",
@@ -8043,7 +8043,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "1999-04-15",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Landsat-8_Ascending": {
       "title": "Orbit Tracks (Ascending, Landsat-8)",
@@ -8054,7 +8054,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2013-02-11",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Landsat-9_Ascending": {
       "title": "Orbit Tracks (Ascending, Landsat-9)",
@@ -8065,7 +8065,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2021-09-27",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_METOP-A_Ascending": {
       "title": "Orbit Tracks (Ascending, METOP-A)",
@@ -8076,7 +8076,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2006-10-19",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_METOP-B_Ascending": {
       "title": "Orbit Tracks (Ascending, METOP-B)",
@@ -8087,7 +8087,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2012-09-17",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_METOP-C_Ascending": {
       "title": "Orbit Tracks (Ascending, METOP-C)",
@@ -8098,7 +8098,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-11-07",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_NISAR_Ascending": {
       "title": "Orbit Tracks (Ascending, NISAR)",
@@ -8109,7 +8109,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2025-07-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_NOAA-20_Ascending": {
       "title": "Orbit Tracks (Ascending, NOAA-20)",
@@ -8120,7 +8120,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2017-11-18",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_NOAA-21_Ascending": {
       "title": "Orbit Tracks (Ascending, NOAA-21)",
@@ -8131,7 +8131,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2022-11-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_OCO-2_Ascending": {
       "title": "Orbit Tracks (Ascending, OCO-2)",
@@ -8142,7 +8142,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2014-07-02",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_PACE_Ascending": {
       "title": "Orbit Tracks (Ascending, PACE)",
@@ -8153,7 +8153,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-02-08",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_SAOCOM1-A_Ascending": {
       "title": "Orbit Tracks (Ascending, SAOCOM1-A)",
@@ -8164,7 +8164,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-10-08",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_SMAP_Ascending": {
       "title": "Orbit Tracks (Ascending, SMAP)",
@@ -8175,7 +8175,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2015-01-31",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-1A_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-1A)",
@@ -8186,7 +8186,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2014-04-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-1B_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-1B)",
@@ -8197,7 +8197,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2016-04-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-1C_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-1C)",
@@ -8208,7 +8208,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-12-05",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-2A_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-2A)",
@@ -8219,7 +8219,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2014-06-23",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-2B_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-2B)",
@@ -8230,7 +8230,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2017-03-07",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-2C_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-2C)",
@@ -8241,7 +8241,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-09-05",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-3A_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-3A)",
@@ -8252,7 +8252,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2016-02-16",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-3B_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-3B)",
@@ -8263,7 +8263,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-04-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-5P_Ascending": {
       "title": "Orbit Tracks (Ascending, Sentinel-5P)",
@@ -8274,7 +8274,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2017-10-13",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Suomi_NPP_Ascending": {
       "title": "Orbit Tracks (Ascending, Suomi NPP)",
@@ -8285,7 +8285,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2011-10-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_TRMM_Ascending": {
       "title": "Orbit Tracks (Ascending, TRMM)",
@@ -8307,7 +8307,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "1999-12-18",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Aqua_Descending": {
       "title": "Orbit Tracks (Descending, Aqua)",
@@ -8318,7 +8318,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2002-07-07",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Aura_Descending": {
       "title": "Orbit Tracks (Descending, Aura)",
@@ -8329,7 +8329,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2004-07-15",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_CYGNSS_Descending": {
       "title": "Orbit Tracks (Descending, CYGNSS)",
@@ -8340,7 +8340,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2016-12-16",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Calipso_Descending": {
       "title": "Orbit Tracks (Descending, Calipso)",
@@ -8351,7 +8351,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2006-04-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_CloudSat_Descending": {
       "title": "Orbit Tracks (Descending, CloudSat)",
@@ -8362,7 +8362,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2006-04-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_EarthCARE_Descending": {
       "title": "Orbit Tracks (Descending, EarthCARE)",
@@ -8373,7 +8373,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-05-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GCOM-C_Descending": {
       "title": "Orbit Tracks (Descending, GCOM-C)",
@@ -8384,7 +8384,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2017-12-23",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GCOM-W1_Descending": {
       "title": "Orbit Tracks (Descending, GCOM-W1)",
@@ -8395,7 +8395,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2012-05-17",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GOSAT_Descending": {
       "title": "Orbit Tracks (Descending, GOSAT)",
@@ -8406,7 +8406,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2009-01-23",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GOSAT-2_Descending": {
       "title": "Orbit Tracks (Descending, GOSAT-2)",
@@ -8417,7 +8417,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-10-29",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_GPM_Descending": {
       "title": "Orbit Tracks (Descending, GPM)",
@@ -8428,7 +8428,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2014-02-27",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_ICESAT-2_Descending": {
       "title": "Orbit Tracks (Descending, ICESAT-2)",
@@ -8439,7 +8439,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-09-15",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_ISS_Descending": {
       "title": "Orbit Tracks (Descending, ISS)",
@@ -8450,7 +8450,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "1998-11-20",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Landsat-7_Descending": {
       "title": "Orbit Tracks (Descending, Landsat-7)",
@@ -8461,7 +8461,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "1999-04-15",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Landsat-8_Descending": {
       "title": "Orbit Tracks (Descending, Landsat-8)",
@@ -8472,7 +8472,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2013-02-11",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Landsat-9_Descending": {
       "title": "Orbit Tracks (Descending, Landsat-9)",
@@ -8483,7 +8483,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2021-09-27",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_METOP-A_Descending": {
       "title": "Orbit Tracks (Descending, METOP-A)",
@@ -8494,7 +8494,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2006-10-19",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_METOP-B_Descending": {
       "title": "Orbit Tracks (Descending, METOP-B)",
@@ -8505,7 +8505,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2012-09-17",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_METOP-C_Descending": {
       "title": "Orbit Tracks (Descending, METOP-C)",
@@ -8516,7 +8516,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-11-07",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_NISAR_Descending": {
       "title": "Orbit Tracks (Descending, NISAR)",
@@ -8527,7 +8527,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2025-07-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_NOAA-20_Descending": {
       "title": "Orbit Tracks (Descending, NOAA-20)",
@@ -8538,7 +8538,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2017-11-18",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_NOAA-21_Descending": {
       "title": "Orbit Tracks (Descending, NOAA-21)",
@@ -8549,7 +8549,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2022-11-10",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_OCO-2_Descending": {
       "title": "Orbit Tracks (Descending, OCO-2)",
@@ -8560,7 +8560,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2014-07-02",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_PACE_Descending": {
       "title": "Orbit Tracks (Descending, PACE)",
@@ -8571,7 +8571,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-02-08",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_SAOCOM1-A_Descending": {
       "title": "Orbit Tracks (Descending, SAOCOM1-A)",
@@ -8582,7 +8582,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-10-08",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_SMAP_Descending": {
       "title": "Orbit Tracks (Descending, SMAP)",
@@ -8593,7 +8593,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2015-01-31",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-1A_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-1A)",
@@ -8604,7 +8604,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2014-04-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-1B_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-1B)",
@@ -8615,7 +8615,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2016-04-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-1C_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-1C)",
@@ -8626,7 +8626,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-12-05",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-2A_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-2A)",
@@ -8637,7 +8637,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2014-06-23",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-2B_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-2B)",
@@ -8648,7 +8648,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2017-03-07",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-2C_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-2C)",
@@ -8659,7 +8659,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-09-05",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-3A_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-3A)",
@@ -8670,7 +8670,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2016-02-16",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-3B_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-3B)",
@@ -8681,7 +8681,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2018-04-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Sentinel-5P_Descending": {
       "title": "Orbit Tracks (Descending, Sentinel-5P)",
@@ -8692,7 +8692,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2017-10-13",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_Suomi_NPP_Descending": {
       "title": "Orbit Tracks (Descending, Suomi NPP)",
@@ -8703,7 +8703,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2011-10-28",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OrbitTracks_TRMM_Descending": {
       "title": "Orbit Tracks (Descending, TRMM)",
@@ -8725,7 +8725,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "1999-12-18",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L3_All_Sky_Outgoing_Longwave_Radiation_Daily_Day": {
       "title": "Outgoing Longwave Radiation (L3, Daytime/Ascending, Daily, AIRS, Aqua)",
@@ -8736,7 +8736,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-09"
     },
     "AIRS_L3_All_Sky_Outgoing_Longwave_Radiation_Monthly_Day": {
       "title": "Outgoing Longwave Radiation (L3, Daytime/Ascending, Monthly, AIRS, Aqua)",
@@ -8747,7 +8747,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "AIRS_L3_All_Sky_Outgoing_Longwave_Radiation_Daily_Night": {
       "title": "Outgoing Longwave Radiation (L3, Nighttime/Descending, Daily, AIRS, Aqua)",
@@ -8758,7 +8758,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_All_Sky_Outgoing_Longwave_Radiation_Monthly_Night": {
       "title": "Outgoing Longwave Radiation (L3, Nighttime/Descending, Monthly, AIRS, Aqua)",
@@ -8769,7 +8769,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "PREFIRE_SAT1_Outgoing_Longwave_Radiative_Flux": {
       "title": "Outgoing Longwave Radiative Flux (LEO TIRS, PREFIRE-Satellite 1)",
@@ -8802,7 +8802,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MLS_O3_46hPa_Night": {
       "title": "Ozone (46 hPa, Night, MLS, Aura)",
@@ -8813,7 +8813,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMI_Ozone_DOAS_Total_Column": {
       "title": "Ozone (DOAS, v3, Standard, OMI, Aura)",
@@ -8824,7 +8824,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-24"
+      "latest": "2026-11-09"
     },
     "TEMPO_L2_Ozone_Cloud_Fraction_Granule": {
       "title": "Ozone (L2, Cloud Fraction, Subdaily, TEMPO)",
@@ -8901,7 +8901,7 @@
         "image/png"
       ],
       "earliest": "2012-01-26",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMI_Ozone_TOMS_Total_Column": {
       "title": "Ozone (TOMS-Like, v3, Standard, OMI, Aura)",
@@ -8912,7 +8912,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-24"
+      "latest": "2026-11-08"
     },
     "MERRA2_Ozone_Mixing_Ratio_50hPa_Monthly": {
       "title": "Ozone Mixing Ratio at 50hPa (Monthly, MERRA2)",
@@ -9066,7 +9066,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-23"
+      "latest": "2026-10-31"
     },
     "SMAP_L4_Emult_Average": {
       "title": "Percent of Potential Vegetation Light Use Efficiency (L4, 9 km Grid Cell Mean, Model Value-Added, SMAP)",
@@ -9077,7 +9077,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-23"
+      "latest": "2026-10-31"
     },
     "MODIS_Aqua_L2_Photosynthetically_Available_Radiation": {
       "title": "Photosynthetically Available Radiation (L2, MODIS, Aqua)",
@@ -9088,7 +9088,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L2_Photosynthetically_Available_Radiation": {
       "title": "Photosynthetically Available Radiation (L2, MODIS, Terra)",
@@ -9099,7 +9099,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_L2_Photosynthetically_Available_Radiation": {
       "title": "Photosynthetically Available Radiation (L2, VIIRS, Suomi NPP)",
@@ -9110,7 +9110,7 @@
         "image/png"
       ],
       "earliest": "2012-01-02",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "OCI_PACE_Photosynthetically_Available_Radiation": {
       "title": "Photosynthetically Available Radiation (OCI, PACE)",
@@ -9121,7 +9121,7 @@
         "image/png"
       ],
       "earliest": "2024-02-25",
-      "latest": "2026-10-26"
+      "latest": "2026-11-11"
     },
     "VIIRS_NOAA20_Photosynthetically_Available_Radiation": {
       "title": "Photosynthetically Available Radiation (VIIRS, NOAA-20)",
@@ -9132,7 +9132,7 @@
         "image/png"
       ],
       "earliest": "2017-12-13",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "VIIRS_NOAA21_Photosynthetically_Available_Radiation": {
       "title": "Photosynthetically Available Radiation (VIIRS, NOAA-21)",
@@ -9143,7 +9143,7 @@
         "image/png"
       ],
       "earliest": "2023-03-31",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "GPW_Population_Density_2000": {
       "title": "Population Density (GPW, 2000)",
@@ -9231,7 +9231,7 @@
         "image/png"
       ],
       "earliest": "2012-05-08",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_Precipitation_Night": {
       "title": "Precipitation (Night, AIRS, Aqua)",
@@ -9242,7 +9242,7 @@
         "image/png"
       ],
       "earliest": "2012-05-08",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "GMI_Precipitation_Rate_Asc": {
       "title": "Precipitation Rate (Ascending,  GMI, GPM)",
@@ -9253,7 +9253,7 @@
         "image/png"
       ],
       "earliest": "2014-03-04",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "TRMM_Precipitation_Rate_Asc": {
       "title": "Precipitation Rate (Ascending, TMI, TRMM)",
@@ -9275,7 +9275,7 @@
         "image/png"
       ],
       "earliest": "2014-03-04",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "TRMM_Precipitation_Rate_Dsc": {
       "title": "Precipitation Rate (Descending, TMI, TRMM)",
@@ -9297,7 +9297,7 @@
         "image/png"
       ],
       "earliest": "2000-06-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-13"
     },
     "IMERG_Precipitation_Rate_30min": {
       "title": "Precipitation Rate, 30-minute avg. (IMERG)",
@@ -9319,7 +9319,7 @@
         "image/png"
       ],
       "earliest": "2000-04-16",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "Probabilities_of_Urban_Expansion_2000-2030": {
       "title": "Probabilities of Urban Expansion to 2030 (2000-2030)",
@@ -9451,7 +9451,7 @@
         "image/png"
       ],
       "earliest": "2003-10-26",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F17_Rain_Rate_Over_Oceans_Ascending": {
       "title": "Rain Rate (Ascending, Local PM, DMSP-F17 / SSMIS)",
@@ -9462,7 +9462,7 @@
         "image/png"
       ],
       "earliest": "2006-12-14",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F10_Rain_Rate_Over_Oceans_Descending": {
       "title": "Rain Rate (Descending, Local AM, DMSP-F10 / SSMI)",
@@ -9528,7 +9528,7 @@
         "image/png"
       ],
       "earliest": "2003-10-26",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F17_Rain_Rate_Over_Oceans_Descending": {
       "title": "Rain Rate (Descending, Local AM, DMSP-F17 / SSMIS)",
@@ -9539,7 +9539,7 @@
         "image/png"
       ],
       "earliest": "2006-12-14",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F8_Rain_Rate_Over_Oceans_Descending": {
       "title": "Rain Rate (Descending, Local PM, DMSP-F8 / SSMI)",
@@ -9638,7 +9638,7 @@
         "image/jpeg"
       ],
       "earliest": "2000-05-18",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "HLS_L30_Nadir_BRDF_Adjusted_Reflectance": {
       "title": "Reflectance (Nadir BRDF-Adjusted,  Landsat-8/9 / OLI)",
@@ -9649,7 +9649,7 @@
         "image/png"
       ],
       "earliest": "2013-03-22",
-      "latest": "2026-10-26"
+      "latest": "2026-11-05"
     },
     "HLS_S30_Nadir_BRDF_Adjusted_Reflectance": {
       "title": "Reflectance (Nadir BRDF-Adjusted,  Sentinel-2 / MSI)",
@@ -9660,7 +9660,7 @@
         "image/png"
       ],
       "earliest": "2015-11-28",
-      "latest": "2026-10-26"
+      "latest": "2026-11-06"
     },
     "AIRS_L2_RelativeHumidity_500hPa_Day": {
       "title": "Relative Humidity (L2, 500 hPa, Day, AIRS, Aqua)",
@@ -9671,7 +9671,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_RelativeHumidity_500hPa_Night": {
       "title": "Relative Humidity (L2, 500 hPa, Night, AIRS, Aqua)",
@@ -9682,7 +9682,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_RelativeHumidity_700hPa_Day": {
       "title": "Relative Humidity (L2, 700 hPa, Day, AIRS, Aqua)",
@@ -9693,7 +9693,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_RelativeHumidity_700hPa_Night": {
       "title": "Relative Humidity (L2, 700 hPa, Night, AIRS, Aqua)",
@@ -9704,7 +9704,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_RelativeHumidity_850hPa_Day": {
       "title": "Relative Humidity (L2, 850 hPa, Day, AIRS, Aqua)",
@@ -9715,7 +9715,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_RelativeHumidity_850hPa_Night": {
       "title": "Relative Humidity (L2, 850 hPa, Night, AIRS, Aqua)",
@@ -9726,7 +9726,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MERRA2_Relative_Humidity_After_Moist_700hPa_Monthly": {
       "title": "Relative Humidity After Moist at 700hPa (Monthly, MERRA2)",
@@ -9748,7 +9748,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Surface_Relative_Humidity_Monthly_Day": {
       "title": "Relative Humidity at Surface (L3, Daytime/Ascending, Monthly, AIRS, Aqua)",
@@ -9759,7 +9759,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "AIRS_L3_Surface_Relative_Humidity_Daily_Night": {
       "title": "Relative Humidity at Surface (L3, Nighttime/Descending, Daily, AIRS, Aqua)",
@@ -9770,7 +9770,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Surface_Relative_Humidity_Monthly_Night": {
       "title": "Relative Humidity at Surface (L3, Nighttime/Descending, Monthly, AIRS, Aqua)",
@@ -9781,7 +9781,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "GRanD_Reservoirs": {
       "title": "Reservoirs (Global Reservoir and Dam Database)",
@@ -9803,7 +9803,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-24"
+      "latest": "2026-11-10"
     },
     "SMAP_L4_Uncertainty_Analyzed_Root_Zone_Soil_Moisture": {
       "title": "Root Zone Soil Moisture Uncertainty (L4, 12z Instantaneous, Model Value-Added, SMAP)",
@@ -9814,7 +9814,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-24"
+      "latest": "2026-11-10"
     },
     "MERRA2_SO2_Column_Mass_Density_Monthly": {
       "title": "SO2 Column Mass Density ENSEMBLE (Monthly, MERRA2)",
@@ -9902,7 +9902,7 @@
         "image/png"
       ],
       "earliest": "2002-06-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-13"
     },
     "GHRSST_L4_MUR25_Sea_Ice_Concentration": {
       "title": "Sea Ice Concentration (L4,  MUR25, GHRSST)",
@@ -9913,7 +9913,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_L3_Sea_Ice_Daily": {
       "title": "Sea Ice Extent (L3, Daily, MODIS, Aqua)",
@@ -9924,7 +9924,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L3_Sea_Ice_Daily": {
       "title": "Sea Ice Extent (L3, Daily, MODIS, Terra)",
@@ -9935,7 +9935,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "VIIRS_NOAA20_L3_Sea_Ice_Daily": {
       "title": "Sea Ice Extent (L3, Daily, VIIRS, NOAA-20)",
@@ -9946,7 +9946,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-26"
+      "latest": "2026-11-06"
     },
     "VIIRS_SNPP_L3_Sea_Ice_Daily": {
       "title": "Sea Ice Extent (L3, Daily, VIIRS, Suomi NPP)",
@@ -9957,7 +9957,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-25"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Sea_Ice": {
       "title": "Sea Ice Extent (MODIS, Aqua)",
@@ -9968,7 +9968,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Sea_Ice": {
       "title": "Sea Ice Extent (MODIS, Terra)",
@@ -9979,7 +9979,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_Sea_Ice": {
       "title": "Sea Ice Extent (VIIRS, NOAA-20)",
@@ -9990,7 +9990,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Sea_Ice": {
       "title": "Sea Ice Extent (VIIRS, NOAA-21)",
@@ -10000,8 +10000,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-28"
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Sea_Ice": {
       "title": "Sea Ice Extent (VIIRS, Suomi NPP)",
@@ -10012,7 +10012,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-28"
+      "latest": "2026-11-03"
     },
     "TOPEX-Poseidon_JASON_Sea_Surface_Currents_Meridional_US_West_Coast_GAFECC": {
       "title": "Sea Surface Currents (Meridional, US West Coast, GAFECC, TOPEX/Poseidon, JASON)",
@@ -10025,7 +10025,7 @@
       "earliest": "1992-10-14",
       "latest": "2011-01-19"
     },
-    "OSCAR_Sea_Surface_Currents_Zonal": {
+    "OSCAR_Sea_Surface_Currents_Meridional": {
       "title": "Sea Surface Currents (Zonal, OSCAR)",
       "tileMatrixSets": [
         "GoogleMapsCompatible_Level6"
@@ -10036,7 +10036,7 @@
       "earliest": "2014-10-22",
       "latest": "2024-07-17"
     },
-    "OSCAR_Sea_Surface_Currents_Meridional": {
+    "OSCAR_Sea_Surface_Currents_Zonal": {
       "title": "Sea Surface Currents (Zonal, OSCAR)",
       "tileMatrixSets": [
         "GoogleMapsCompatible_Level6"
@@ -10144,7 +10144,7 @@
         "image/png"
       ],
       "earliest": "2015-05-08",
-      "latest": "2026-10-24"
+      "latest": "2026-11-10"
     },
     "SMAP_L3_Sea_Surface_Salinity_CAP_Monthly": {
       "title": "Sea Surface Salinity (L3, CAP, Monthly, Radiometer, SMAP)",
@@ -10210,7 +10210,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L2_Sea_Surface_Temp_Day": {
       "title": "Sea Surface Temperature (Day, L2, MODIS, Terra)",
@@ -10221,7 +10221,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_L2_Sea_Surface_Temp_Day": {
       "title": "Sea Surface Temperature (Day, L2, VIIRS, Suomi NPP)",
@@ -10232,7 +10232,7 @@
         "image/png"
       ],
       "earliest": "2012-01-02",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_L3_SST_Thermal_4km_Day_8Day": {
       "title": "Sea Surface Temperature (L3, Day, 8-Day, Thermal, 4 km, MODIS, Aqua)",
@@ -10782,7 +10782,7 @@
         "image/png"
       ],
       "earliest": "2012-10-19",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "AVHRR_MetOp-C_L3U_Sea_Surface_Temperature": {
       "title": "Sea Surface Temperature (L3U,  AVHRR, Metop-C, NOAA)",
@@ -10793,7 +10793,7 @@
         "image/png"
       ],
       "earliest": "2018-12-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "GHRSST_L4_AVHRR-OI_Sea_Surface_Temperature": {
       "title": "Sea Surface Temperature (L4,  AVHRR-OI)",
@@ -10815,7 +10815,7 @@
         "image/png"
       ],
       "earliest": "2008-07-23",
-      "latest": "2026-10-27"
+      "latest": "2026-11-11"
     },
     "GHRSST_L4_GAMSSA_GDS2_Sea_Surface_Temperature": {
       "title": "Sea Surface Temperature (L4,  GAMSSA GDS2, GHRSST)",
@@ -10826,7 +10826,7 @@
         "image/png"
       ],
       "earliest": "2008-07-23",
-      "latest": "2026-10-27"
+      "latest": "2026-11-11"
     },
     "GHRSST_L4_MUR25_Sea_Surface_Temperature": {
       "title": "Sea Surface Temperature (L4,  MUR25, GHRSST)",
@@ -10837,7 +10837,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-13"
     },
     "GHRSST_L4_MUR_Sea_Surface_Temperature": {
       "title": "Sea Surface Temperature (L4, MUR, GHRSST)",
@@ -10848,7 +10848,7 @@
         "image/png"
       ],
       "earliest": "2002-06-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-13"
     },
     "MODIS_Aqua_L2_Sea_Surface_Temp_Night": {
       "title": "Sea Surface Temperature (Night, L2, MODIS, Aqua)",
@@ -10859,7 +10859,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-28"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L2_Sea_Surface_Temp_Night": {
       "title": "Sea Surface Temperature (Night, L2, MODIS, Terra)",
@@ -10870,7 +10870,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-12"
     },
     "VIIRS_SNPP_L2_Sea_Surface_Temp_Night": {
       "title": "Sea Surface Temperature (Night, L2, VIIRS, Suomi NPP)",
@@ -10881,7 +10881,7 @@
         "image/png"
       ],
       "earliest": "2012-01-02",
-      "latest": "2026-10-27"
+      "latest": "2026-11-03"
     },
     "GHRSST_L4_MUR_Sea_Surface_Temperature_Anomalies": {
       "title": "Sea Surface Temperature Anomalies (L4,  MUR, GHRSST)",
@@ -10892,7 +10892,7 @@
         "image/png"
       ],
       "earliest": "2019-07-23",
-      "latest": "2026-10-27"
+      "latest": "2026-11-13"
     },
     "GHRSST_L4_MUR25_Sea_Surface_Temperature_Anomalies": {
       "title": "Sea Surface Temperature Anomalies (L4,  MUR25, GHRSST)",
@@ -10903,7 +10903,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-13"
     },
     "GRUMP_Settlements": {
       "title": "Settlements (Global Rural-Urban Mapping Project, Best Available)",
@@ -11035,7 +11035,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Terra_L3_Snow_Cover_Monthly_Average_Pct": {
       "title": "Snow Cover (L3, Monthly Average Percent, MODIS, Terra)",
@@ -11046,7 +11046,7 @@
         "image/png"
       ],
       "earliest": "2000-03-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Aqua_L3_NDSI_Snow_Cover_Daily": {
       "title": "Snow Cover (Normalized Difference Snow Index, L3, Daily, MODIS, Aqua)",
@@ -11057,7 +11057,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Terra_L3_NDSI_Snow_Cover_Daily": {
       "title": "Snow Cover (Normalized Difference Snow Index, L3, Daily, MODIS, Terra)",
@@ -11068,7 +11068,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "MODIS_Aqua_NDSI_Snow_Cover": {
       "title": "Snow Cover (Normalized Difference Snow Index, MODIS, Aqua)",
@@ -11079,7 +11079,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_NDSI_Snow_Cover": {
       "title": "Snow Cover (Normalized Difference Snow Index, MODIS, Terra)",
@@ -11090,7 +11090,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA20_NDSI_Snow_Cover": {
       "title": "Snow Cover (Normalized Difference Snow Index, VIIRS, NOAA-20)",
@@ -11101,7 +11101,7 @@
         "image/png"
       ],
       "earliest": "2018-01-05",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_NDSI_Snow_Cover": {
       "title": "Snow Cover (Normalized Difference Snow Index, VIIRS, NOAA-21)",
@@ -11111,8 +11111,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2026-09-21",
-      "latest": "2026-10-28"
+      "earliest": "2023-02-10",
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_NDSI_Snow_Cover": {
       "title": "Snow Cover (Normalized Difference Snow Index, VIIRS, Suomi NPP)",
@@ -11123,7 +11123,7 @@
         "image/png"
       ],
       "earliest": "2012-01-19",
-      "latest": "2026-10-28"
+      "latest": "2026-11-03"
     },
     "MERRA2_Snow_Depth_Over_Glaciated_Surface_Monthly": {
       "title": "Snow Depth Over Glaciated Surface (Monthly, MERRA2)",
@@ -11156,7 +11156,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "MODIS_Terra_L3_Snow_Extent_8Day": {
       "title": "Snow Extent (L3, 8-Day, MODIS, Terra)",
@@ -11167,7 +11167,7 @@
         "image/png"
       ],
       "earliest": "2000-02-26",
-      "latest": "2026-10-16"
+      "latest": "2026-11-01"
     },
     "SMAP_L4_Snow_Mass": {
       "title": "Snow Mass (L4, 12z-3z Average, Model Value-Added, SMAP)",
@@ -11178,7 +11178,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-24"
+      "latest": "2026-11-10"
     },
     "AMSRUE_Snow_Water_Equivalent_5Day": {
       "title": "Snow Water Equivalent (25 km, 5-Day, AMSR2 (GCOM-W1), AMSRE (Aqua))",
@@ -11288,7 +11288,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Enhanced_Day_Soil_Moisture_Option1": {
       "title": "Soil Moisture (L2, Passive Enhanced, Day, Single Channel Algorithm, H Polarization, Radiometer, SMAP)",
@@ -11299,7 +11299,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Enhanced_Day_Soil_Moisture_Option2": {
       "title": "Soil Moisture (L2, Passive Enhanced, Day, Single Channel Algorithm, V Polarization, Radiometer, SMAP)",
@@ -11310,7 +11310,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Enhanced_Night_Soil_Moisture_Option3": {
       "title": "Soil Moisture (L2, Passive Enhanced, Night, Dual Channel Algorithm, Radiometer, SMAP)",
@@ -11321,7 +11321,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Enhanced_Night_Soil_Moisture_Option1": {
       "title": "Soil Moisture (L2, Passive Enhanced, Night, Single Channel Algorithm, H Polarization, Radiometer, SMAP)",
@@ -11332,7 +11332,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Enhanced_Night_Soil_Moisture_Option2": {
       "title": "Soil Moisture (L2, Passive Enhanced, Night, Single Channel Algorithm, V Polarization, Radiometer, SMAP)",
@@ -11343,7 +11343,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Day_Soil_Moisture_Option3": {
       "title": "Soil Moisture (L2, Passive, Day, Dual Channel Algorithm, Radiometer, SMAP)",
@@ -11354,7 +11354,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Day_Soil_Moisture_Option1": {
       "title": "Soil Moisture (L2, Passive, Day, Single Channel Algorithm, H Polarization, Radiometer, SMAP)",
@@ -11365,7 +11365,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Day_Soil_Moisture_Option2": {
       "title": "Soil Moisture (L2, Passive, Day, Single Channel Algorithm, V Polarization, Radiometer, SMAP)",
@@ -11376,7 +11376,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Night_Soil_Moisture_Option3": {
       "title": "Soil Moisture (L2, Passive, Night, Dual Channel Algorithm, Radiometer, SMAP)",
@@ -11387,7 +11387,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Night_Soil_Moisture_Option1": {
       "title": "Soil Moisture (L2, Passive, Night, Single Channel Algorithm, H Polarization, Radiometer, SMAP)",
@@ -11398,7 +11398,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L2_Passive_Night_Soil_Moisture_Option2": {
       "title": "Soil Moisture (L2, Passive, Night, Single Channel Algorithm, V Polarization, Radiometer, SMAP)",
@@ -11409,7 +11409,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L3_Active_Soil_Moisture": {
       "title": "Soil Moisture (L3, Active, Radar, SMAP)",
@@ -11453,7 +11453,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L3_Passive_Enhanced_Night_Soil_Moisture": {
       "title": "Soil Moisture (L3, Passive Enhanced, Night, Radiometer, SMAP)",
@@ -11464,7 +11464,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L3_Passive_Day_Soil_Moisture": {
       "title": "Soil Moisture (L3, Passive, Day, Radiometer, SMAP)",
@@ -11475,7 +11475,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L3_Passive_Night_Soil_Moisture": {
       "title": "Soil Moisture (L3, Passive, Night, Radiometer, SMAP)",
@@ -11486,7 +11486,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "NLDAS_Underground_Soil_Moisture_Noah_Monthly": {
       "title": "Soil Moisture (Monthly, 0 - 100 cm, Noah LSM,  NLDAS)",
@@ -11497,7 +11497,7 @@
         "image/png"
       ],
       "earliest": "1979-01-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "GLDAS_Underground_Soil_Moisture_Monthly": {
       "title": "Soil Moisture (Monthly, 0-10 cm, Noah LSM, GLDAS)",
@@ -11739,7 +11739,7 @@
         "image/png"
       ],
       "earliest": "2023-02-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SNPP_LimbProfiler_Aerosol_OpticalDepth": {
       "title": "Stratospheric Aerosol Optical Depth (OMPS Limb Profiler, Suomi NPP)",
@@ -11750,7 +11750,7 @@
         "image/png"
       ],
       "earliest": "2013-11-25",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "MLS_SO2_147hPa_Day": {
       "title": "Sulfur Dioxide (147 hPa, Day, MLS, Aura)",
@@ -11761,7 +11761,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MLS_SO2_147hPa_Night": {
       "title": "Sulfur Dioxide (147 hPa, Night, MLS, Aura)",
@@ -11772,7 +11772,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "TROPOMI_L2_Sulfur_Dioxide_Total_Vertical_Column": {
       "title": "Sulfur Dioxide (L2, Total Vertical Column, TROPOMI, Sentinel-5P)",
@@ -11783,7 +11783,7 @@
         "image/png"
       ],
       "earliest": "2018-05-06",
-      "latest": "2026-10-28"
+      "latest": "2026-11-13"
     },
     "OMI_SO2_Lower_Troposphere": {
       "title": "Sulfur Dioxide (Lower Troposphere, OMI, Aura)",
@@ -11794,7 +11794,7 @@
         "image/png"
       ],
       "earliest": "2005-01-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_NOAA20_SO2_Lower_Troposphere": {
       "title": "Sulfur Dioxide (Lower Troposphere, OMPS, NOAA-20)",
@@ -11805,7 +11805,7 @@
         "image/png"
       ],
       "earliest": "2024-10-31",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SO2_Lower_Troposphere": {
       "title": "Sulfur Dioxide (Lower Troposphere, OMPS, Suomi NPP)",
@@ -11816,7 +11816,7 @@
         "image/png"
       ],
       "earliest": "2012-01-26",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMI_SO2_Middle_Troposphere": {
       "title": "Sulfur Dioxide (Middle Troposphere, OMI, Aura)",
@@ -11827,7 +11827,7 @@
         "image/png"
       ],
       "earliest": "2005-01-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_NOAA20_SO2_Middle_Troposphere": {
       "title": "Sulfur Dioxide (Middle Troposphere, OMPS, NOAA-20)",
@@ -11838,7 +11838,7 @@
         "image/png"
       ],
       "earliest": "2024-10-31",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SO2_Middle_Troposphere": {
       "title": "Sulfur Dioxide (Middle Troposphere, OMPS, Suomi NPP)",
@@ -11849,7 +11849,7 @@
         "image/png"
       ],
       "earliest": "2012-01-26",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "OMI_SO2_Planetary_Boundary_Layer": {
       "title": "Sulfur Dioxide (Planetary Boundary Layer, OMI, Aura)",
@@ -11860,7 +11860,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_NOAA20_SO2_Planetary_Boundary_Layer": {
       "title": "Sulfur Dioxide (Planetary Boundary Layer, OMPS, NOAA-20)",
@@ -11871,7 +11871,7 @@
         "image/png"
       ],
       "earliest": "2024-10-31",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SO2_Planetary_Boundary_Layer": {
       "title": "Sulfur Dioxide (Planetary Boundary Layer, OMPS, Suomi NPP)",
@@ -11882,7 +11882,7 @@
         "image/png"
       ],
       "earliest": "2012-01-26",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "AIRS_Prata_SO2_Index_Day": {
       "title": "Sulfur Dioxide (Prata, Day, AIRS, Aqua)",
@@ -11893,7 +11893,7 @@
         "image/png"
       ],
       "earliest": "2012-05-08",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_Prata_SO2_Index_Night": {
       "title": "Sulfur Dioxide (Prata, Night, AIRS, Aqua)",
@@ -11904,7 +11904,7 @@
         "image/png"
       ],
       "earliest": "2012-05-08",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMI_SO2_Upper_Troposphere_and_Stratosphere": {
       "title": "Sulfur Dioxide (Upper Troposphere and Stratosphere, OMI, Aura)",
@@ -11915,7 +11915,7 @@
         "image/png"
       ],
       "earliest": "2005-01-01",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_NOAA20_SO2_Upper_Troposphere_and_Stratosphere": {
       "title": "Sulfur Dioxide (Upper Troposphere and Stratosphere, OMPS, NOAA-20)",
@@ -11926,7 +11926,7 @@
         "image/png"
       ],
       "earliest": "2024-10-31",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "OMPS_SO2_Upper_Troposphere_and_Stratosphere": {
       "title": "Sulfur Dioxide (Upper Troposphere and Stratosphere, OMPS, Suomi NPP)",
@@ -11937,7 +11937,7 @@
         "image/png"
       ],
       "earliest": "2012-01-26",
-      "latest": "2026-10-28"
+      "latest": "2026-11-02"
     },
     "AIRS_L2_Sulfur_Dioxide_Brightness_Temperature_Difference_Day": {
       "title": "Sulfur Dioxide Brightness Temperature Difference (L2, Day, AIRS, Aqua)",
@@ -11948,7 +11948,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Sulfur_Dioxide_Brightness_Temperature_Difference_Night": {
       "title": "Sulfur Dioxide Brightness Temperature Difference (L2, Night, AIRS, Aqua)",
@@ -11959,7 +11959,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "Summer_Day_Max_Land_Surface_Temp_2013": {
       "title": "Summer Daytime Maximum Temperature (Global Summer LST Grids, 2013)",
@@ -12014,7 +12014,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Surface_Air_Temperature_Night": {
       "title": "Surface Air Temperature (L2, Night, AIRS, Aqua)",
@@ -12025,7 +12025,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MERRA2_Surface_Albedo_Monthly": {
       "title": "Surface Albedo (Monthly, MERRA2)",
@@ -12366,7 +12366,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Surface_Relative_Humidity_Night": {
       "title": "Surface Relative Humidity (L2, Night, AIRS, Aqua)",
@@ -12377,7 +12377,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "CERES_EBAF_Surface_Shortwave_Flux_Down_All_Sky_Monthly": {
       "title": "Surface Shortwave Flux (Monthly, Energy Balanced and Filled, Down, All-Sky, CERES, Terra, Aqua, NOAA-20)",
@@ -12432,7 +12432,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Surface_Skin_Temperature_Night": {
       "title": "Surface Skin Temperature (L2, Night, AIRS, Aqua)",
@@ -12443,7 +12443,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L3_Surface_Skin_Temperature_Daily_Day": {
       "title": "Surface Skin Temperature (L3, Daytime/Ascending, Daily, AIRS, Aqua)",
@@ -12454,7 +12454,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Surface_Skin_Temperature_Monthly_Day": {
       "title": "Surface Skin Temperature (L3, Daytime/Ascending, Monthly, AIRS, Aqua)",
@@ -12465,7 +12465,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "AIRS_L3_Surface_Skin_Temperature_Daily_Night": {
       "title": "Surface Skin Temperature (L3, Nighttime/Descending, Daily, AIRS, Aqua)",
@@ -12476,7 +12476,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-10-20"
+      "latest": "2026-11-08"
     },
     "AIRS_L3_Surface_Skin_Temperature_Monthly_Night": {
       "title": "Surface Skin Temperature (L3, Nighttime/Descending, Monthly, AIRS, Aqua)",
@@ -12487,7 +12487,7 @@
         "image/png"
       ],
       "earliest": "2002-09-01",
-      "latest": "2026-08-01"
+      "latest": "2026-09-01"
     },
     "MERRA_Surface_Skin_Temperature_Monthly": {
       "title": "Surface Skin Temperature (Monthly, MERRA)",
@@ -12520,7 +12520,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-24"
+      "latest": "2026-11-10"
     },
     "LPRM_AMSRE_Surface_Soil_Moisture_C_Band_Day_Daily": {
       "title": "Surface Soil Moisture C-band (Day, L3, LPRM, AMSR-E, Aqua)",
@@ -12553,7 +12553,7 @@
         "image/png"
       ],
       "earliest": "2012-07-03",
-      "latest": "2026-10-17"
+      "latest": "2026-11-08"
     },
     "LPRM_AMSR2_Downscaled_Surface_Soil_Moisture_C1_Band_Day_Daily": {
       "title": "Surface Soil Moisture C1-band (Downscaled, Day, L3, LPRM, AMSR2, GCOM-W1)",
@@ -12564,7 +12564,7 @@
         "image/png"
       ],
       "earliest": "2012-07-03",
-      "latest": "2026-10-17"
+      "latest": "2026-11-08"
     },
     "LPRM_AMSR2_Downscaled_Surface_Soil_Moisture_C1_Band_Night_Daily": {
       "title": "Surface Soil Moisture C1-band (Downscaled, Night, L3, LPRM, AMSR2, GCOM-W1)",
@@ -12575,7 +12575,7 @@
         "image/png"
       ],
       "earliest": "2012-07-03",
-      "latest": "2026-10-18"
+      "latest": "2026-11-08"
     },
     "LPRM_AMSR2_Surface_Soil_Moisture_C1_Band_Night_Daily": {
       "title": "Surface Soil Moisture C1-band (Night, L3, LPRM, AMSR2, GCOM-W1)",
@@ -12586,7 +12586,7 @@
         "image/png"
       ],
       "earliest": "2012-07-03",
-      "latest": "2026-10-18"
+      "latest": "2026-11-08"
     },
     "SMAP_L4_Uncertainty_Analyzed_Surface_Soil_Moisture": {
       "title": "Surface Soil Moisture Uncertainty (L4, 12z Instantaneous, Model Value-Added, SMAP)",
@@ -12597,7 +12597,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-24"
+      "latest": "2026-11-10"
     },
     "LPRM_TMI_Surface_Soil_Moisture_X_Band_Day_Daily": {
       "title": "Surface Soil Moisture X-band (Day, L3, LPRM, TMI, TRMM)",
@@ -12630,7 +12630,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-24"
+      "latest": "2026-11-10"
     },
     "CERES_Combined_Surface_UV_Index_All_Sky_Daily": {
       "title": "Surface UV Index (Daily, All-Sky, v4B, Standard, CERES, Geostationary Satellites, Terra, Aqua, NOAA-20)",
@@ -12740,7 +12740,7 @@
         "image/png"
       ],
       "earliest": "2003-10-26",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F17_Wind_Speed_Over_Oceans_Ascending": {
       "title": "Surface Wind Speed (Ascending, Local PM, DMSP-F17 / SSMIS)",
@@ -12751,7 +12751,7 @@
         "image/png"
       ],
       "earliest": "2006-12-14",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F10_Wind_Speed_Over_Oceans_Descending": {
       "title": "Surface Wind Speed (Descending, Local AM, DMSP-F10 / SSMI)",
@@ -12817,7 +12817,7 @@
         "image/png"
       ],
       "earliest": "2003-10-26",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F17_Wind_Speed_Over_Oceans_Descending": {
       "title": "Surface Wind Speed (Descending, Local AM, DMSP-F17 / SSMIS)",
@@ -12828,7 +12828,7 @@
         "image/png"
       ],
       "earliest": "2006-12-14",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F8_Wind_Speed_Over_Oceans_Descending": {
       "title": "Surface Wind Speed (Descending, Local PM, DMSP-F8 / SSMI)",
@@ -13028,7 +13028,7 @@
       "earliest": null,
       "latest": null
     },
-    "CERES_Combined_TOA_Window_Region_Flux_All_Sky_Monthly": {
+    "CERES_Combined_TOA_Shortwave_Flux_All_Sky_Monthly": {
       "title": "TOA Shortwave Flux (Monthly, All-Sky, CERES, Geostationary Satellites, Terra, Aqua, NOAA-20)",
       "tileMatrixSets": [
         "GoogleMapsCompatible_Level6"
@@ -13039,7 +13039,7 @@
       "earliest": "2002-07-01",
       "latest": "2021-07-01"
     },
-    "CERES_Combined_TOA_Shortwave_Flux_All_Sky_Monthly": {
+    "CERES_Combined_TOA_Window_Region_Flux_All_Sky_Monthly": {
       "title": "TOA Shortwave Flux (Monthly, All-Sky, CERES, Geostationary Satellites, Terra, Aqua, NOAA-20)",
       "tileMatrixSets": [
         "GoogleMapsCompatible_Level6"
@@ -13169,7 +13169,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Temperature_500hPa_Night": {
       "title": "Temperature (L2, 500 hPa, Night, AIRS, Aqua)",
@@ -13180,7 +13180,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Temperature_700hPa_Day": {
       "title": "Temperature (L2, 700 hPa, Day, AIRS, Aqua)",
@@ -13191,7 +13191,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Temperature_700hPa_Night": {
       "title": "Temperature (L2, 700 hPa, Night, AIRS, Aqua)",
@@ -13202,7 +13202,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Temperature_850hPa_Day": {
       "title": "Temperature (L2, 850 hPa, Day, AIRS, Aqua)",
@@ -13213,7 +13213,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Temperature_850hPa_Night": {
       "title": "Temperature (L2, 850 hPa, Night, AIRS, Aqua)",
@@ -13224,7 +13224,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "DISCOVER-AQ_TX_P3B_Ozone": {
       "title": "Texas Ozone and Flight Track (Per Flight, P-3B Data System (PDS), NCAR-4, DISCOVER-AQ)",
@@ -13246,7 +13246,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2020-01-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Thermal_Anomalies_375m_All": {
       "title": "Thermal Anomalies and Fires (375m, All, VIIRS, NOAA-21)",
@@ -13257,7 +13257,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-01-17",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Thermal_Anomalies_375m_All": {
       "title": "Thermal Anomalies and Fires (375m, All, VIIRS, Suomi NPP)",
@@ -13268,7 +13268,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2012-01-20",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_Thermal_Anomalies_375m_Day": {
       "title": "Thermal Anomalies and Fires (375m, Day, VIIRS, NOAA-20)",
@@ -13279,7 +13279,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2020-01-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Thermal_Anomalies_375m_Day": {
       "title": "Thermal Anomalies and Fires (375m, Day, VIIRS, NOAA-21)",
@@ -13290,7 +13290,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-01-17",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Thermal_Anomalies_375m_Day": {
       "title": "Thermal Anomalies and Fires (375m, Day, VIIRS, Suomi NPP)",
@@ -13301,7 +13301,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2015-11-26",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "VIIRS_NOAA20_Thermal_Anomalies_375m_Night": {
       "title": "Thermal Anomalies and Fires (375m, Night, VIIRS, NOAA-20)",
@@ -13312,7 +13312,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2020-01-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_NOAA21_Thermal_Anomalies_375m_Night": {
       "title": "Thermal Anomalies and Fires (375m, Night, VIIRS, NOAA-21)",
@@ -13323,7 +13323,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2024-01-17",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "VIIRS_SNPP_Thermal_Anomalies_375m_Night": {
       "title": "Thermal Anomalies and Fires (375m, Night, VIIRS, Suomi NPP)",
@@ -13334,7 +13334,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2015-11-26",
-      "latest": "2026-10-27"
+      "latest": "2026-11-02"
     },
     "MODIS_Aqua_Thermal_Anomalies_All": {
       "title": "Thermal Anomalies and Fires (All, MODIS, Aqua)",
@@ -13345,7 +13345,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Combined_Thermal_Anomalies_All": {
       "title": "Thermal Anomalies and Fires (All, MODIS, Aqua+Terra)",
@@ -13356,7 +13356,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Thermal_Anomalies_All": {
       "title": "Thermal Anomalies and Fires (All, MODIS, Terra)",
@@ -13367,7 +13367,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2000-11-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Thermal_Anomalies_Day": {
       "title": "Thermal Anomalies and Fires (Day, MODIS, Aqua)",
@@ -13378,7 +13378,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Combined_Thermal_Anomalies_Day": {
       "title": "Thermal Anomalies and Fires (Day, MODIS, Aqua+Terra)",
@@ -13389,7 +13389,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Thermal_Anomalies_Day": {
       "title": "Thermal Anomalies and Fires (Day, MODIS, Terra)",
@@ -13400,7 +13400,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2000-11-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Thermal_Anomalies_Night": {
       "title": "Thermal Anomalies and Fires (Night, MODIS, Aqua)",
@@ -13411,7 +13411,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Combined_Thermal_Anomalies_Night": {
       "title": "Thermal Anomalies and Fires (Night, MODIS, Aqua+Terra)",
@@ -13422,7 +13422,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Thermal_Anomalies_Night": {
       "title": "Thermal Anomalies and Fires (Night, MODIS, Terra)",
@@ -13433,7 +13433,7 @@
         "application/vnd.mapbox-vector-tile"
       ],
       "earliest": "2000-11-01",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MERRA2_Total_Aerosol_Optical_Thickness_550nm_Extinction_Monthly": {
       "title": "Total Aerosol Optical Thickness Extinction 550nm (Monthly, MERRA2)",
@@ -13466,7 +13466,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "AIRS_L2_Total_Cloud_Fraction_Night": {
       "title": "Total Cloud Fraction (L2, Night, AIRS, Aqua)",
@@ -13477,7 +13477,7 @@
         "image/png"
       ],
       "earliest": "2002-08-30",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MERRA2_Total_Dust_Deposition_Dry_Wet_Monthly": {
       "title": "Total Dust Deposition, Dry+Wet All Bins (Monthly, MERRA2)",
@@ -13642,7 +13642,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-18"
+      "latest": "2026-11-08"
     },
     "OMI_UV_Index": {
       "title": "UV Index (Local Noon, OMI, Aura)",
@@ -13653,7 +13653,7 @@
         "image/png"
       ],
       "earliest": "2004-10-01",
-      "latest": "2026-10-22"
+      "latest": "2026-11-07"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Aft_H": {
       "title": "Uncorrected Brightness Temperature (L1, Passive Enhanced, Aft, H Polarization, Radiometer, SMAP)",
@@ -13664,7 +13664,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Aft_V": {
       "title": "Uncorrected Brightness Temperature (L1, Passive Enhanced, Aft, V Polarization, Radiometer, SMAP)",
@@ -13675,7 +13675,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Fore_H": {
       "title": "Uncorrected Brightness Temperature (L1, Passive Enhanced, Fore, H Polarization, Radiometer, SMAP)",
@@ -13686,7 +13686,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Fore_V": {
       "title": "Uncorrected Brightness Temperature (L1, Passive Enhanced, Fore, V Polarization, Radiometer, SMAP)",
@@ -13697,7 +13697,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Aft_H": {
       "title": "Uncorrected Brightness Temperature (L1, Passive, Aft, H Polarization, Radiometer, SMAP)",
@@ -13708,7 +13708,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Aft_V": {
       "title": "Uncorrected Brightness Temperature (L1, Passive, Aft, V Polarization, Radiometer, SMAP)",
@@ -13719,7 +13719,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Fore_H": {
       "title": "Uncorrected Brightness Temperature (L1, Passive, Fore, H Polarization, Radiometer, SMAP)",
@@ -13730,7 +13730,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Fore_V": {
       "title": "Uncorrected Brightness Temperature (L1, Passive, Fore, V Polarization, Radiometer, SMAP)",
@@ -13741,7 +13741,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Aft_H_QA": {
       "title": "Uncorrected Brightness Temperature QA (L1, Passive Enhanced, Aft, H Polarization, Radiometer, SMAP)",
@@ -13752,7 +13752,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Aft_V_QA": {
       "title": "Uncorrected Brightness Temperature QA (L1, Passive Enhanced, Aft, V Polarization, Radiometer, SMAP)",
@@ -13763,7 +13763,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Fore_H_QA": {
       "title": "Uncorrected Brightness Temperature QA (L1, Passive Enhanced, Fore, H Polarization, Radiometer, SMAP)",
@@ -13774,7 +13774,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Fore_V_QA": {
       "title": "Uncorrected Brightness Temperature QA (L1, Passive Enhanced, Fore, V Polarization, Radiometer, SMAP)",
@@ -13785,7 +13785,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Aft_H_QA": {
       "title": "Uncorrected Brightness Temperature QA (L1, Passive, Aft, H Polarization, Radiometer, SMAP)",
@@ -13796,7 +13796,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Aft_V_QA": {
       "title": "Uncorrected Brightness Temperature QA (L1, Passive, Aft, V Polarization, Radiometer, SMAP)",
@@ -13807,7 +13807,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Fore_H_QA": {
       "title": "Uncorrected Brightness Temperature QA (L1, Passive, Fore, H Polarization, Radiometer, SMAP)",
@@ -13818,7 +13818,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Fore_V_QA": {
       "title": "Uncorrected Brightness Temperature QA (L1, Passive, Fore, V Polarization, Radiometer, SMAP)",
@@ -13829,7 +13829,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Aft_H_RFI": {
       "title": "Uncorrected Brightness Temperature RFI (L1, Passive Enhanced, Aft, H Polarization, Radiometer, SMAP)",
@@ -13840,7 +13840,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Aft_V_RFI": {
       "title": "Uncorrected Brightness Temperature RFI (L1, Passive Enhanced, Aft, V Polarization, Radiometer, SMAP)",
@@ -13851,7 +13851,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Fore_H_RFI": {
       "title": "Uncorrected Brightness Temperature RFI (L1, Passive Enhanced, Fore, H Polarization, Radiometer, SMAP)",
@@ -13862,7 +13862,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Enhanced_Brightness_Temp_Fore_V_RFI": {
       "title": "Uncorrected Brightness Temperature RFI (L1, Passive Enhanced, Fore, V Polarization, Radiometer, SMAP)",
@@ -13873,7 +13873,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Aft_H_RFI": {
       "title": "Uncorrected Brightness Temperature RFI (L1, Passive, Aft, H Polarization, Radiometer, SMAP)",
@@ -13884,7 +13884,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Aft_V_RFI": {
       "title": "Uncorrected Brightness Temperature RFI (L1, Passive, Aft, V Polarization, Radiometer, SMAP)",
@@ -13895,7 +13895,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Fore_H_RFI": {
       "title": "Uncorrected Brightness Temperature RFI (L1, Passive, Fore, H Polarization, Radiometer, SMAP)",
@@ -13906,7 +13906,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "SMAP_L1_Passive_Brightness_Temp_Fore_V_RFI": {
       "title": "Uncorrected Brightness Temperature RFI (L1, Passive, Fore, V Polarization, Radiometer, SMAP)",
@@ -13917,7 +13917,7 @@
         "image/png"
       ],
       "earliest": "2015-03-31",
-      "latest": "2026-10-25"
+      "latest": "2026-11-11"
     },
     "CERES_Terra_Surface_Longwave_Flux_Down_All_Sky_Monthly": {
       "title": "Untuned Longwave Surface Flux (Monthly, Down, All-Sky, CERES, Aqua+Terra)",
@@ -14093,7 +14093,7 @@
         "image/png"
       ],
       "earliest": "2023-01-01",
-      "latest": "2026-10-26"
+      "latest": "2026-11-05"
     },
     "OPERA_L3_DIST-ANN-HLS_Color_Index": {
       "title": "Vegetation Disturbance Status (Color Index, OPERA_L3_DIST-ANN-HLS)",
@@ -14115,7 +14115,7 @@
         "image/png"
       ],
       "earliest": "2002-07-04",
-      "latest": "2026-10-08"
+      "latest": "2026-10-24"
     },
     "MODIS_Terra_L3_NDVI_16Day": {
       "title": "Vegetation Index (16-Day, MODIS, Terra)",
@@ -14126,7 +14126,7 @@
         "image/png"
       ],
       "earliest": "2000-03-05",
-      "latest": "2026-09-30"
+      "latest": "2026-10-16"
     },
     "VIIRS_NOAA20_L3_NDVI_16Day": {
       "title": "Vegetation Index (L3, 16-Day, VIIRS, NOAA-20)",
@@ -14137,7 +14137,7 @@
         "image/png"
       ],
       "earliest": "2018-01-01",
-      "latest": "2026-10-08"
+      "latest": "2026-10-16"
     },
     "VIIRS_SNPP_L3_NDVI_16Day": {
       "title": "Vegetation Index (L3, 16-Day, VIIRS, Suomi NPP)",
@@ -14147,8 +14147,8 @@
       "formats": [
         "image/png"
       ],
-      "earliest": "2024-08-12",
-      "latest": "2026-10-08"
+      "earliest": "2024-08-28",
+      "latest": "2026-10-24"
     },
     "MODIS_Terra_L3_NDVI_Monthly": {
       "title": "Vegetation Index (L3, Monthly, MODIS, Terra)",
@@ -14159,7 +14159,7 @@
         "image/png"
       ],
       "earliest": "2000-03-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "VIIRS_NOAA20_L3_NDVI_Monthly": {
       "title": "Vegetation Index (L3, Monthly, VIIRS, NOAA-20)",
@@ -14181,7 +14181,7 @@
         "image/png"
       ],
       "earliest": "2012-01-01",
-      "latest": "2026-09-01"
+      "latest": "2026-11-01"
     },
     "MODIS_Aqua_L3_NDVI_Monthly": {
       "title": "Vegetation Index (Monthly, MODIS, Aqua)",
@@ -14192,7 +14192,7 @@
         "image/png"
       ],
       "earliest": "2002-07-01",
-      "latest": "2026-09-01"
+      "latest": "2026-10-01"
     },
     "MODIS_Terra_NDVI_8Day": {
       "title": "Vegetation Index (rolling 8-Day, MODIS, Terra)",
@@ -14203,7 +14203,7 @@
         "image/png"
       ],
       "earliest": "2025-02-12",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "NDH_Volcano_Proportional_Economic_Loss_Risk_Deciles_2000": {
       "title": "Volcano Hazard: Economic Risk (Global Volcano Proportional Economic Loss Risk Deciles, 2000, Best)",
@@ -14258,7 +14258,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MLS_H2O_46hPa_Night": {
       "title": "Water Vapor (46 hPa, Night, MLS, Aura)",
@@ -14269,7 +14269,7 @@
         "image/png"
       ],
       "earliest": "2013-05-09",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "SSMI_DMSP_F8_Water_Vapor_Over_Oceans_Ascending": {
       "title": "Water Vapor (Ascending, Local AM, DMSP-F8 / SSMI)",
@@ -14346,7 +14346,7 @@
         "image/png"
       ],
       "earliest": "2003-10-26",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F17_Water_Vapor_Over_Oceans_Ascending": {
       "title": "Water Vapor (Ascending, Local PM, DMSP-F17 / SSMIS)",
@@ -14357,7 +14357,7 @@
         "image/png"
       ],
       "earliest": "2006-12-14",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F10_Water_Vapor_Over_Oceans_Descending": {
       "title": "Water Vapor (Descending, Local AM, DMSP-F10 / SSMI)",
@@ -14423,7 +14423,7 @@
         "image/png"
       ],
       "earliest": "2003-10-26",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F17_Water_Vapor_Over_Oceans_Descending": {
       "title": "Water Vapor (Descending, Local AM, DMSP-F17 / SSMIS)",
@@ -14434,7 +14434,7 @@
         "image/png"
       ],
       "earliest": "2006-12-14",
-      "latest": "2026-10-26"
+      "latest": "2026-11-12"
     },
     "SSMI_DMSP_F8_Water_Vapor_Over_Oceans_Descending": {
       "title": "Water Vapor (Descending, Local PM, DMSP-F8 / SSMI)",
@@ -14478,7 +14478,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Water_Vapor_5km_Day": {
       "title": "Water Vapor Infrared (Day, MODIS, Terra)",
@@ -14489,7 +14489,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-28"
+      "latest": "2026-11-14"
     },
     "MODIS_Aqua_Water_Vapor_5km_Night": {
       "title": "Water Vapor Infrared (Night, MODIS, Aqua)",
@@ -14500,7 +14500,7 @@
         "image/png"
       ],
       "earliest": "2002-07-03",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Terra_Water_Vapor_5km_Night": {
       "title": "Water Vapor Infrared (Night, MODIS, Terra)",
@@ -14511,7 +14511,7 @@
         "image/png"
       ],
       "earliest": "2000-02-24",
-      "latest": "2026-10-27"
+      "latest": "2026-11-14"
     },
     "MODIS_Combined_L3_White_Sky_Albedo_Daily": {
       "title": "White Sky Albedo (L3, Daily, MODIS, Aqua+Terra)",
@@ -14522,7 +14522,7 @@
         "image/png"
       ],
       "earliest": "2000-05-18",
-      "latest": "2026-10-26"
+      "latest": "2026-11-13"
     },
     "AMSRU2_Wind_Speed_Day": {
       "title": "Wind Speed ( Day, AMSRU2, GCOM-W1)",
