@@ -65,6 +65,8 @@ export interface DomainReading {
     coverage: number | null;
     source?: string; sourceUrl?: string; provenance?: string; period?: string | null;
     resolutionM?: number | null; nativeResolutionM?: number | null; nativeResolutionDegrees?: number | null;
+    /** The ground the sampled window covers, in metres. */
+    windowM?: number | null;
     sampling?: Measurement["sampling"]; censored?: boolean;
   } | null;
   status: "ok" | "unavailable";
@@ -474,6 +476,9 @@ function readDomain(
       coverage: best.coverage,
       source: best.source, sourceUrl: best.sourceUrl, provenance: best.provenance, period: best.period,
       resolutionM: best.resolutionM, nativeResolutionM: best.nativeResolutionM, nativeResolutionDegrees: best.nativeResolutionDegrees, sampling: best.sampling, censored: best.censored,
+      // How much ground the reading covers. The pixel spacing says how far
+      // apart the samples are; the window says how much city they describe.
+      windowM: best.windowM ?? null,
     },
     status: "ok",
     reasonCode: null,
