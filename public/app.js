@@ -153,10 +153,15 @@
       desc_bn: "দৈনিক নাসা ভিআইআইআরএস যৌথ বন্যা শনাক্তকরণ, ১ দিনের জানালা — বাংলাদেশ বদ্বীপ।"
     },
     walk: {
-      title: "Street level",
-      title_bn: "রাস্তার ধরনে",
-      desc: "Street-scale view of the mapped city. The massing is the map provider's computed height, not a survey, and the ground is the map's flat plane. Move with the keys; this is not a walking route.",
-      desc_bn: "মানচিত্রের রাস্তার ধরনে দৃশ্য। গঠন দেখানো হয় মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপকৃত নয়; মাটি মানচিত্রের সমতলেই থাকে। কী চাপলে সরান; এটি হাঁটার পথ নয়।"
+      // The name of the lens is the same in the picker, in the story and in
+      // the paper, and it is the cautious one: a low-angle map. The camera
+      // is a projection-model estimate, not a surveyed street position, so
+      // the lens does not call itself a street view. What it does say is in
+      // the panel, where the reader can check it.
+      title: "Low-angle map",
+      title_bn: "নিচু কোণের মানচিত্র",
+      desc: "A street-scale view of the mapped city, walked with the keys. The massing is the map provider's computed height, not a survey, and the ground is the map's flat plane. This is not a walking route and does not establish street access.",
+      desc_bn: "মানচিত্রের রাস্তার ধরনে দৃশ্য, কী চাপে হেঁটে দেখা যায়। গঠন দেখানো হয় মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপকৃত নয়; মাটি মানচিত্রের সমতলেই থাকে। এটি হাঁটার পথ নয় এবং রাস্তায় প্রবেশযোগ্যতা প্রমাণ করে না।"
     }
   };
 
