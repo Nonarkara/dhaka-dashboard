@@ -259,9 +259,11 @@ const GIBS_LAYERS: GibsLayerSpec[] = [
     probe: { z: 7, y: 55, x: 96 },
   },
   {
-    id: "VIIRS_SNPP_DayNightBand",
+    // Suomi NPP Day/Night Band last published on 2026-11-02, outside the
+    // four-day probe. NOAA-20 publishes the same Level-7 PNG product.
+    id: "VIIRS_NOAA20_DayNightBand",
     name: "VIIRS Day/Night Band Night-Time Radiance",
-    provider: "NASA GIBS / Suomi NPP",
+    provider: "NASA GIBS / NOAA-20",
     tileLevel: 7,
     format: "png",
     probe: { z: 7, y: 55, x: 96 },

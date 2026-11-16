@@ -101,7 +101,7 @@ assert.equal(map.lastRasterBefore,'city-buildings','raster under blocks');
 for(const [lens,layer,level] of [
   ['cloud','VIIRS_NOAA20_CorrectedReflectance_TrueColor','GoogleMapsCompatible_Level9'],
   ['aerosol','MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth','GoogleMapsCompatible_Level7'],
-  ['night','VIIRS_SNPP_DayNightBand','GoogleMapsCompatible_Level7'],
+  ['night','VIIRS_NOAA20_DayNightBand','GoogleMapsCompatible_Level7'],
   ['water','VIIRS_Combined_Flood_1-Day','GoogleMapsCompatible_Level9'],
 ]) {
   api.applyLens(lens);
