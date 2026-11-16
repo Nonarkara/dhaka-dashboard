@@ -143,8 +143,8 @@
     night: {
       title: "NASA VIIRS Night Lights",
       title_bn: "নাসার ভিআইআইআরএস রাতের আলো",
-      desc: "Daily night-time radiance from the Suomi NPP VIIRS Day/Night Band over Greater Dhaka.",
-      desc_bn: "সুওমি এনপিপি ভিআইআইআরএস ডে/নাইট ব্যান্ড থেকে বৃহত্তর ঢাকার দৈনিক রাতের দীপ্তি।"
+      desc: "Daily night-time radiance from the NOAA-20 VIIRS Day/Night Band over Greater Dhaka.",
+      desc_bn: "নোয়া-২০ ভিআইআইআরএস ডে/নাইট ব্যান্ড থেকে বৃহত্তর ঢাকার দৈনিক রাতের দীপ্তি।"
     },
     water: {
       title: "Satellite Observed Flood Inundation",
@@ -946,10 +946,13 @@
       label: ["NASA MODIS MAIAC · aerosol optical depth (AOD)", "নাসা মডিস মায়াক · এরোসল অপটিক্যাল ডেপথ (AOD)"]
     },
     night: {
-      layer: "VIIRS_SNPP_DayNightBand",
+      // Suomi NPP Day/Night Band last published on 2026-11-02, twelve days
+      // before the 2026-11-14 catalogue capture and outside the four-day probe.
+      // NOAA-20 publishes the same Level-7 PNG product inside that window.
+      layer: "VIIRS_NOAA20_DayNightBand",
       level: 7, ext: "png", maxzoom: 7,
       probe: { z: 7, y: 55, x: 96 },
-      label: ["NASA VIIRS Day/Night Band · night-time radiance", "নাসা ভিআইআইআরএস ডে/নাইট ব্যান্ড · রাতের দীপ্তি"],
+      label: ["NASA VIIRS NOAA-20 Day/Night Band · night-time radiance", "নাসা ভিআইআইআরএস নোয়া-২০ ডে/নাইট ব্যান্ড · রাতের দীপ্তি"],
       // Night radiance over a daylight basemap reads as fog. The raster is
       // opaque enough to carry the image on its own, and the basemap is dimmed
       // for this lens so the lit city stands against a dark ground.

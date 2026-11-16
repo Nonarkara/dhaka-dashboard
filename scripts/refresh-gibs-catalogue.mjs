@@ -103,7 +103,7 @@ console.log(`✓ Captured ${count} layers to scripts/fixtures/gibs-catalogue.jso
 const LAYERS_IN_USE = [
   "VIIRS_NOAA20_CorrectedReflectance_TrueColor",
   "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth",
-  "VIIRS_SNPP_DayNightBand",
+  "VIIRS_NOAA20_DayNightBand",
   "VIIRS_Combined_Flood_1-Day",
   // The measured layers. These publish on different cycles — a 16-day
   // vegetation composite, a daily radiometer — so the Worker needs each

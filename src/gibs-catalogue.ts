@@ -12,7 +12,7 @@ export const GIBS_CATALOGUE_CAPTURED = "2026-11-14";
 export const GIBS_CATALOGUE_LATEST: Record<string, string> = {
   "VIIRS_NOAA20_CorrectedReflectance_TrueColor": "2026-11-14",
   "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth": "2026-11-13",
-  "VIIRS_SNPP_DayNightBand": "2026-11-02",
+  "VIIRS_NOAA20_DayNightBand": "2026-11-14",
   "VIIRS_Combined_Flood_1-Day": "2026-11-14",
   "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance": "2026-11-02",
   "MODIS_Terra_Land_Surface_Temp_Day_TES": "2026-11-14",
