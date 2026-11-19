@@ -83,7 +83,7 @@ const sample=samplingWindow(23.81,90.412,12,7);assert.equal(sample.radiusPx,7);a
 assert.ok(Math.abs(groundResolutionM(7,60)/groundResolutionM(7,0)-0.5)<1e-9);
 const good={header:{range:'January 2001 - December 2025',sources:['SYN1DEG']},parameters:{ALLSKY_SFC_SW_DWN:{units:'kW-hr/m^2/day'}},geometry:{coordinates:[90.412,23.81]},properties:{parameter:{ALLSKY_SFC_SW_DWN:{ANN:4.5}}}};
 assert.equal(selectSolar(good).period,good.header.range);assert.throws(()=>selectSolar({...good,parameters:{}}),/invalid-units/);assert.throws(()=>selectSolar({...good,header:{sources:['SYN1DEG']}}),/missing-period/);
-const example=(value,date,censored=false)=>({layerId:'VIIRS_SNPP_DayNightBand_At_Sensor_Radiance',label:'Light',label_bn:'আলো',value,unit:'nW',status:'ok',observationDate:date,coverage:1,censored});
+const example=(value,date,censored=false)=>({layerId:'VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance',label:'Light',label_bn:'আলো',value,unit:'nW',status:'ok',observationDate:date,coverage:1,censored});
 const bounded=readingsFromMeasurements(new Map([['a',[example(10,'2026-10-29',true)]],['b',[example(12,'2026-10-29')]]]),['a','b']).get('a').find(r=>r.domain==='economy');
 assert.equal(bounded.basis.rank,null);assert.ok(bounded.reading.includes('≥')&&bounded.reading.includes('lower bound'));
 const dates=readingsFromMeasurements(new Map([['a',[example(10,'2026-10-28')]],['b',[example(12,'2026-10-29')]]]),['a','b']);

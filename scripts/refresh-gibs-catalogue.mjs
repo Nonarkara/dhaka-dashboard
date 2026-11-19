@@ -103,12 +103,12 @@ console.log(`✓ Captured ${count} layers to scripts/fixtures/gibs-catalogue.jso
 const LAYERS_IN_USE = [
   "VIIRS_NOAA20_CorrectedReflectance_TrueColor",
   "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth",
-  "VIIRS_SNPP_DayNightBand",
+  "VIIRS_NOAA20_DayNightBand",
   "VIIRS_Combined_Flood_1-Day",
   // The measured layers. These publish on different cycles — a 16-day
   // vegetation composite, a daily radiometer — so the Worker needs each
   // one's own authoritative date, not a shared window of recent days.
-  "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance",
+  "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance",
   "MODIS_Terra_Land_Surface_Temp_Day_TES",
   "MODIS_Terra_Land_Surface_Temp_Night_TES",
   "MODIS_Terra_L3_NDVI_16Day",

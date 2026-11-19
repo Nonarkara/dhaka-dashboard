@@ -10,7 +10,15 @@ const raster=snapshot.districts.flatMap(d=>d.measurements).filter(m=>m.status===
 assert.ok(raster.every(m=>m.sampling?.bbox?.length===4&&m.resolutionM>0&&m.nativeResolutionM===null));
 const history=await get('/api/atlas/history');assert.ok(history.records.length);
 const historic=await get(history.records[0].snapshotUrl);assert.equal(historic.status,'historical');assert.ok(historic.data.districts[0].measurements[0].sampling);
-const rows=await get('/api/atlas/history?place=parliament&signal=VIIRS_SNPP_DayNightBand_At_Sensor_Radiance');assert.ok(rows.records.length&&rows.records[0].snapshotUrl);
+// The history check follows the snapshot rather than naming a product: the
+// signal the live atlas publishes is the signal whose history must exist, and
+// the layer id behind it changes when NASA moves a product. Naming a layer
+// here would keep a retired product alive in the release path.
+const district=snapshot.districts.find(d=>d.measurements.some(m=>m.domain==='economy'&&m.status==='ok'));
+assert.ok(district,'the collage carries no economy reading to check history for');
+const economy=district.measurements.find(m=>m.domain==='economy'&&m.status==='ok');
+const rows=await get(`/api/atlas/history?place=${encodeURIComponent(district.id)}&signal=${encodeURIComponent(economy.layerId)}`);
+assert.ok(rows.records.length&&rows.records[0].snapshotUrl,`no stored history for ${economy.layerId} at ${district.id}`);
 const after=await get('/api/atlas/sources');assert.equal(after.collector.last_attempt_at,state.collector.last_attempt_at,'GET requests started acquisition');
 const watch=await get('/api/atlas/watch');assert.equal(watch.indicators.floodRisk.status,'unavailable');
 console.log(`✓ Persistent snapshot ${snapshot.delivery.snapshotId}: ${snapshot.measured}/${snapshot.total} readings; original solar period, sampling, history and source health; no visitor acquisition. Read ${(performance.now()-start).toFixed(0)}ms including history checks.`);

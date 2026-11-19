@@ -79,6 +79,40 @@ export interface MeasuredLayer {
   radiusPx?: number;
   /** The vintage of a static layer, which has no observation date. */
   vintage?: string;
+  /**
+   * How old an observation may be and still describe the city as it is now.
+   *
+   * A daily product that has not published for several days has stopped, and
+   * a reading from it describes a night the reader is not looking at. The
+   * atlas refuses such a reading and names the reason, rather than publishing
+   * an old number under a current date. Layers on a longer cycle declare
+   * their own — a 16-day vegetation composite cannot be fresher than its
+   * cycle — and a static layer has no observation date to age at all.
+   */
+  maxObservationAgeDays?: number;
+}
+
+/**
+ * How old an observation may be before the atlas refuses to publish it.
+ *
+ * Four days is the width of the window the collector probes for a daily
+ * product. Past it, a reading is not a reading of the city as it is now — it
+ * is a reading of a night the reader is not looking at — so it is reported as
+ * unavailable with a reason code instead of as a current figure.
+ */
+export const DEFAULT_MAX_OBSERVATION_AGE_DAYS = 4;
+
+/**
+ * The age of an observation date, in whole days, as of today.
+ *
+ * Calendar days, not elapsed hours: an observation made last night is one day
+ * old this morning, whatever time either was taken.
+ */
+export function observationAgeDays(date: string, today = new Date()): number {
+  const then = Date.parse(`${date}T00:00:00Z`);
+  if (Number.isNaN(then)) return Number.POSITIVE_INFINITY;
+  const midnight = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  return Math.round((midnight - then) / 86400000);
 }
 
 /**
@@ -88,12 +122,17 @@ export interface MeasuredLayer {
  * what it means. The catalogue in scripts/fixtures/gibs-catalogue.json is the
  * authority for whether each of these ids and levels exist; the contract test
  * checks that.
- */
-export const MEASURED_LAYERS: MeasuredLayer[] = [
+ */export const MEASURED_LAYERS: MeasuredLayer[] = [
   {
-    id: "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance",
-    name: "Night-time radiance (VIIRS Day/Night Band, at sensor)",
-    provider: "NASA GIBS / Suomi NPP",
+    // NASA stopped publishing the Suomi NPP Day/Night Band on 2026-11-02.
+    // NOAA-20 carries the same product forward on the same orbit and the same
+    // colour map, so the measurement is the same measurement — but it is a
+    // different sensor, and the layer id says so. A stored reading therefore
+    // names the satellite that produced it, and no series is quietly spliced
+    // across the handover.
+    id: "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance",
+    name: "Night-time radiance (VIIRS Day/Night Band, NOAA-20, at sensor)",
+    provider: "NASA GIBS / NOAA-20",
     tileLevel: 8,
     unit: "nW/(cm² sr)",
     label: "Night radiance",
@@ -139,6 +178,9 @@ export const MEASURED_LAYERS: MeasuredLayer[] = [
     label: "Vegetation index",
     label_bn: "উদ্ভিদ সূচক",
     domain: "environment",
+    // A 16-day composite cannot be fresher than its cycle, and the contract
+    // test holds the catalogue to the same 45 days.
+    maxObservationAgeDays: 45,
   },
   {
     id: "Landsat_Human_Built-up_And_Settlement_Extent",
@@ -703,6 +745,19 @@ export async function measureLayer(
         ),
       };
     }
+    // The tile behind this date carried data, but data from a night that has
+    // passed is not a reading of the city as it is now. An upstream product
+    // that stopped publishing — or paused publishing — must not be published
+    // as a current figure with a date nobody reads.
+    const maxAgeDays = layer.maxObservationAgeDays ?? DEFAULT_MAX_OBSERVATION_AGE_DAYS;
+    if (observationAgeDays(chosen) > maxAgeDays) {
+      return {
+        date: chosen,
+        measurements: points.map((p) =>
+          unavailableMeasurement(layer, p, "stale-observation", chosen, radiusPx),
+        ),
+      };
+    }
   }
 
   const measurements = await Promise.all(
@@ -892,6 +947,34 @@ export async function measureLayerAt(
       static: layer.static === true,
       censored: false,
       reasonCode: "no-observation-in-window",
+      sampling: {
+        type: "point-window" as const,
+        radiusPx,
+        bbox,
+        scope: `square window ${radiusPx * 2 + 1}px across around ${point.id}`,
+      },
+    };
+  }
+
+  // The same refusal as in measureLayer: a reading from a night that has
+  // passed is not a reading of the city as it is now.
+  const maxAgeDays = layer.maxObservationAgeDays ?? DEFAULT_MAX_OBSERVATION_AGE_DAYS;
+  if (observationAgeDays(resolved.date) > maxAgeDays) {
+    const bbox = sampleWindowBbox(point.lat, point.lng, layer.tileLevel, radiusPx);
+    return {
+      ...base,
+      status: "unavailable",
+      value: null,
+      min: null,
+      max: null,
+      mean: null,
+      coverage: 0,
+      samples: 0,
+      observationDate: resolved.date,
+      vintage: layer.vintage ?? null,
+      static: layer.static === true,
+      censored: false,
+      reasonCode: "stale-observation",
       sampling: {
         type: "point-window" as const,
         radiusPx,

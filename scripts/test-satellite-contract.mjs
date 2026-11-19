@@ -17,6 +17,46 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { readdirSync } from "node:fs";
+import { deflateSync } from "node:zlib";
+
+/**
+ * A GIBS palette PNG whose every pixel carries the same palette index.
+ *
+ * The decoder under test reads palette indices, so a tile built this way
+ * exercises the whole chain — fetch, decode, look up the colour map, resolve
+ * the quantity — without asking NASA for anything.
+ */
+function palettePng(index, size = 256) {
+  const chunk = (type, data) => {
+    const b = Buffer.alloc(data.length + 12);
+    b.writeUInt32BE(data.length, 0);
+    b.write(type, 4);
+    data.copy(b, 8);
+    return b;
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(size, 0);
+  ihdr.writeUInt32BE(size, 4);
+  ihdr[8] = 8; // bit depth
+  ihdr[9] = 3; // colour type: palette
+  const plte = Buffer.alloc(256 * 3);
+  for (let i = 0; i < 256; i++) {
+    plte[i * 3] = i;
+    plte[i * 3 + 1] = i;
+    plte[i * 3 + 2] = i;
+  }
+  const row = Buffer.alloc(size + 1);
+  row[0] = 0; // filter: none
+  row.fill(index, 1);
+  const raw = Buffer.concat(Array.from({ length: size }, () => row));
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk("IHDR", ihdr),
+    chunk("PLTE", plte),
+    chunk("IDAT", deflateSync(raw)),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
+}
 
 const catalogue = JSON.parse(readFileSync("scripts/fixtures/gibs-catalogue.json", "utf8"));
 const { MEASURED_LAYERS, DOMAINS, measureLayer, groundResolutionM, tileForPoint, globalPixelForPoint, tilesForWindow, resolveIndexValue, candidateDates, windowWidthM, TILE_SIZE } =
@@ -43,6 +83,37 @@ ok("every measured layer exists in the GIBS catalogue", () => {
       entry.formats.includes("image/png"),
       `layer ${layer.id} is not published as PNG`,
     );
+  }
+});
+
+// ── 1b. Every measured layer must still be publishing ──────────────────────
+// A layer can still exist in the catalogue and still have stopped publishing:
+// NASA moved the Suomi NPP Day/Night Band to NOAA-20 on 2026-11-02, and the
+// atlas went on naming the dead product — publishing a three-week-old night
+// as if it were tonight's. The catalogue is the authority on when a layer
+// stopped, and a measured layer whose last observation is older than its own
+// allowance is a layer the atlas must not be publishing at all.
+ok("every measured layer is still publishing inside its own window", () => {
+  const now = new Date();
+  const midnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const allowance = catalogue.observationWindowDays ?? 4;
+  for (const layer of MEASURED_LAYERS) {
+    // A static map has no observation date to age.
+    if (layer.static === true) continue;
+    const entry = catalogue.layers[layer.id];
+    assert.ok(entry?.latest, `layer ${layer.id} publishes no dated observations in the catalogue`);
+    const ageDays = Math.round((midnight - Date.parse(`${entry.latest}T00:00:00Z`)) / 86400000);
+    const limit = layer.maxObservationAgeDays ?? allowance;
+    assert.ok(
+      ageDays <= limit,
+      `layer ${layer.id} stopped publishing observations on ${entry.latest} — ${ageDays} days ago, ` +
+        `beyond the ${limit}-day window it may be published in. Refresh the catalogue with ` +
+        `\`npm run catalogue:gibs\`; if the product is still gone, move the atlas to its successor ` +
+        `rather than widening the window.`,
+    );
+    // The Worker's own date summary must know the layer, or the collector
+    // never probes the date the catalogue names.
+    assert.ok(GIBS_CATALOGUE_LATEST[layer.id], `the Worker has no catalogue date for ${layer.id}`);
   }
 });
 
@@ -147,7 +218,7 @@ ok("the sampled window is wider than one pixel and stated on every reading", () 
 
 // ── 6. The colour map turns an index into a physical quantity ─────────────
 ok("a palette index resolves to the quantity its colour map states", () => {
-  const radiance = GIBS_COLORMAPS["VIIRS_SNPP_DayNightBand_At_Sensor_Radiance"];
+  const radiance = GIBS_COLORMAPS["VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance"];
   assert.equal(radiance.units, "nW/(cm² sr)");
   // The first measurable bin of the radiance map is 0 to 0.1 nW/(cm² sr).
   const low = resolveIndexValue(radiance, 1);
@@ -186,6 +257,43 @@ ok("a layer that cannot be measured reports unavailable with a reason", async ()
   assert.equal(m.mean, null);
   assert.equal(m.reasonCode, "colormap-unresolved");
   assert.ok(m.windowM && m.windowM > 0, "an unmeasurable layer still states its window width");
+});
+
+// ── 7b. A reading from a night that has passed is refused ─────────────────
+// NASA moved the Suomi NPP Day/Night Band to NOAA-20 on 2026-11-02. For a
+// fortnight the atlas went on publishing a three-week-old night as if it were
+// tonight's, because the tile behind that date still carried data and the
+// collector measured whatever it found. A reading that old is not a reading of
+// the city as it is now: it must be refused, and the refusal must say why.
+ok("an observation older than its window is refused, not published", async () => {
+  const layer = MEASURED_LAYERS.find(l => l.id === "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance");
+  assert.ok(layer, "the night radiance layer is not declared");
+  const png = palettePng(1);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(png, { headers: { "content-type": "image/png" } });
+  try {
+    const point = [{ id: "parliament", lat: 23.7605, lng: 90.4018 }];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const old = "2026-10-27";
+
+    // Last night's tile is a reading.
+    const fresh = await measureLayer(layer, point, 2, [yesterday]);
+    assert.equal(fresh.measurements[0].status, "ok", "last night's tile was not read");
+    assert.ok(fresh.measurements[0].value > 0, "last night's tile produced no value");
+
+    // The same tile from three weeks ago is not.
+    const stale = await measureLayer(layer, point, 2, [old]);
+    assert.equal(
+      stale.measurements[0].status,
+      "unavailable",
+      "a 23-day-old night was published as a current figure",
+    );
+    assert.equal(stale.measurements[0].reasonCode, "stale-observation");
+    assert.equal(stale.measurements[0].value, null, "a refused night still carried a value");
+    assert.equal(stale.measurements[0].observationDate, old, "the refused night was not named");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 // ── 8. The catalogue date is used for layers on a slow cycle ───────────────
@@ -233,9 +341,9 @@ ok("the collage ranks districts against the whole city", () => {
   });
 
   const perDistrict = new Map([
-    ["a", [layer("MODIS_Terra_L3_NDVI_16Day", 0.9, "Vegetation index"), layer("VIIRS_SNPP_DayNightBand_At_Sensor_Radiance", 10, "Night radiance")]],
-    ["b", [layer("MODIS_Terra_Land_Surface_Temp_Day_TES", 305.0, "Daytime surface heat"), layer("VIIRS_SNPP_DayNightBand_At_Sensor_Radiance", 30, "Night radiance")]],
-    ["c", [layer("MODIS_Terra_L3_NDVI_16Day", 0.1, "Vegetation index"), layer("VIIRS_SNPP_DayNightBand_At_Sensor_Radiance", 20, "Night radiance")]],
+    ["a", [layer("MODIS_Terra_L3_NDVI_16Day", 0.9, "Vegetation index"), layer("VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance", 10, "Night radiance")]],
+    ["b", [layer("MODIS_Terra_Land_Surface_Temp_Day_TES", 305.0, "Daytime surface heat"), layer("VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance", 30, "Night radiance")]],
+    ["c", [layer("MODIS_Terra_L3_NDVI_16Day", 0.1, "Vegetation index"), layer("VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance", 20, "Night radiance")]],
   ]);
   const readings = readingsFromMeasurements(perDistrict, ["a", "b", "c"]);
 

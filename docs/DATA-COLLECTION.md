@@ -14,7 +14,7 @@ Read APIs:
 - /api/atlas/collage: published data plus collection age/fresh-or-stale envelope.
 - /api/atlas/sources: collection and source health, including unavailable failures.
 - /api/atlas/history: latest 30 collected snapshot records.
-- /api/atlas/history?place=parliament&signal=VIIRS_SNPP_DayNightBand_At_Sensor_Radiance: up to 60 original records.
+- /api/atlas/history?place=parliament&signal=`VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance`: up to 60 original records. The night-radiance series moved from Suomi NPP to NOAA-20 on 2026-11-02; the earlier records remain under the Suomi NPP layer id and are not spliced into the new series.
 - /api/atlas/history?snapshot=UUID: original immutable snapshot, explicitly historical.
 
 Data older than 4 hours is stale; older than 7 days is unavailable as current but remains historical. A fresh collection is not a new acquisition: source observation dates, climatology period and static vintage remain separate. No interval interpolation or inferred local flood warning is supplied. The collector's minimum-half completeness gate is not a hazard threshold. History begins with this release; equal acquisition values across multiple collection runs are not independent observations.

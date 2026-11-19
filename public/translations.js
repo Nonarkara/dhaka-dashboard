@@ -379,8 +379,6 @@ window.ATLAS_BN = {
   "375m active thermal detections over brick kiln clusters in Savar, Gazipur, and Keraniganj": "সাভার, গাজীপুর ও কেরানিগঞ্জের ইটের চুলার ধারাগুলোতে ৩৭৫ মিটার সক্রিয় তাপীয় শনাক্তকরণ",
   "Daily satellite pass": "দৈনিক উপগ্রহ উত্তরণ",
   "Night Radiance": "রাতের দীপ্তি",
-  "NASA GIBS (Suomi NPP Black Marble)": "নাসা GIBS (সুওমি এনপিপি ব্ল্যাক মার্বেল)",
-  "VNP46A2 day/night band nighttime lights and urban electrification": "VNP46A2 ডে/নাইট ব্যান্ডের রাতের আলো ও নগরের বিদ্যুৎায়ন",
   "Daily composite": "দৈনিক সমন্বয়",
   "Rapid Transit": "দ্রুত যাত্রা",
   "Dhaka Mass Transit Company (DMTCL) / RAJUK": "ঢাকা ম্যাস ট্রানজিট কোম্পানি (DMTCL) / রাজুক",

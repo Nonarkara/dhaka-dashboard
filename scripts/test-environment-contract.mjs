@@ -39,6 +39,12 @@ const catalogue = JSON.parse(
 
 const FORMAT_BY_EXT = { png: "image/png", jpg: "image/jpeg" };
 
+// The registries that can name a GIBS layer. The overlay lists live in the
+// client and the Worker; the measured layers and the collage's reading of
+// them live in the two server modules below.
+const satelliteTs = readFileSync(join(root, "src", "satellite.ts"), "utf8");
+const collageTs = readFileSync(join(root, "src", "collage.ts"), "utf8");
+
 // ── Client registry (public/app.js) ────────────────────────────────────────
 const appJs = readFileSync(join(root, "public", "app.js"), "utf8");
 const clientRegion = appJs.slice(
@@ -97,9 +103,21 @@ if (clientLayers.length === 0) fail("public/app.js: GIBS_LAYERS registry not fou
 if (serverLayers.length === 0) fail("src/index.ts: GIBS_LAYERS registry not found or empty");
 
 // ── Catalogue validation ───────────────────────────────────────────────────
-const captured = new Date(`${catalogue.captured}T00:00:00Z`).getTime();
 const windowDays = catalogue.observationWindowDays || 4;
-const windowMs = windowDays * 86400000;
+
+/**
+ * The age of a catalogue date, in whole days, as of today.
+ *
+ * Calendar days, so an observation made last night is one day old this
+ * morning whatever hour it was taken.
+ */
+function catalogueAgeDays(date) {
+  const then = Date.parse(`${date}T00:00:00Z`);
+  if (Number.isNaN(then)) return Number.POSITIVE_INFINITY;
+  const now = new Date();
+  const midnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.round((midnight - then) / 86400000);
+}
 
 function validateLayers(label, layers) {
   for (const spec of layers) {
@@ -126,12 +144,19 @@ function validateLayers(label, layers) {
       );
     }
     if (layer.latest) {
-      const age = captured - new Date(`${layer.latest}T00:00:00Z`).getTime();
-      if (age > windowMs) {
+      // The age is measured against today, not against the capture date. A
+      // product that stopped publishing after the catalogue was taken is just
+      // as dead as one that had already died when it was taken, and the atlas
+      // would serve a stale reading either way. A catalogue that has fallen
+      // behind therefore blocks the release until it is refreshed: the fix is
+      // a fresh catalogue or a different product, never a wider window.
+      const ageDays = catalogueAgeDays(layer.latest);
+      if (ageDays > windowDays) {
         fail(
           `${label}: GIBS layer "${spec.id}" stopped publishing observations on ${layer.latest} ` +
-            `— ${Math.round(age / 86400000)} days before the catalogue capture, beyond the ` +
-            `${windowDays}-day window the app probes.`,
+            `— ${ageDays} days ago, beyond the ${windowDays}-day window the app probes. ` +
+            `Refresh the catalogue with \`npm run catalogue:gibs\`; if the product is still gone, ` +
+            `move the atlas to its successor rather than widening the window.`,
         );
       }
     } else {
@@ -193,18 +218,30 @@ for (const [id, date] of Object.entries(summaryEntries)) {
 
 // ── Retired layer ids must not reappear ────────────────────────────────────
 // These are layer ids that were once written into this codebase. One never
-// existed in GIBS; the other was retired by NASA in 2023. Both return 404/400
-// on every tile and every date, so the overlay renders blank.
+// existed in GIBS; one was retired by NASA in 2023; and the Suomi NPP
+// Day/Night Band stopped publishing observations on 2026-11-02, when NASA
+// moved the product to NOAA-20. All of them return a blank tile or a 404 on
+// every date, so an overlay that still names one renders nothing and a
+// measurement that still names one reports a stale night as if it were fresh.
+//
+// The scan covers every registry that can name a layer: the client's overlay
+// list, the Worker's overlay list, and the two files that hold the measured
+// layers and the collage's reading of them.
 const RETIRED = {
   MODIS_Combined_Flood_Water_250m: "never existed in the GIBS catalogue",
   VIIRS_SNPP_Aerosol_Optical_Depth_Deep_Blue_Daily: "never existed in the GIBS catalogue",
   VIIRS_SNPP_DayNightBand_ENCC: "retired by NASA on 2023-07-07",
+  VIIRS_SNPP_DayNightBand:
+    "stopped publishing observations on 2026-11-02 — NASA moved the product to VIIRS_NOAA20_DayNightBand",
 };
+const retiredScan = [
+  ["public/app.js", appJs],
+  ["src/index.ts", srcIndex],
+  ["src/satellite.ts", satelliteTs],
+  ["src/collage.ts", collageTs],
+];
 for (const [id, why] of Object.entries(RETIRED)) {
-  for (const [label, src] of [
-    ["public/app.js", appJs],
-    ["src/index.ts", srcIndex],
-  ]) {
+  for (const [label, src] of retiredScan) {
     if (src.includes(id)) {
       fail(`${label}: references GIBS layer "${id}" which ${why}.`);
     }

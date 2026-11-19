@@ -42,7 +42,7 @@ const OUT = join(ROOT, "src", "gibs-colormaps.ts");
  */
 export const MEASURED_LAYERS = [
   {
-    id: "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance",
+    id: "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance",
     colormap: "VIIRS_DayNightBand_At_Sensor_Radiance.xml",
     units: "nW/(cm² sr)",
   },

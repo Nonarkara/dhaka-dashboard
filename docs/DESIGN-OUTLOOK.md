@@ -25,7 +25,7 @@ GIBS also publishes a date directory before the observation behind it has been i
 
 - **NASA Aerosol Optical Depth (AOD)**: NASA MODIS MAIAC L2G (1 km product, served on GIBS `GoogleMapsCompatible_Level7` tiles) daily atmospheric aerosol column density, measuring transboundary particulate loading and winter smoke over the Bengal Basin.
 - **Satellite Cloud Reflectance**: NASA VIIRS NOAA-20 corrected true-colour surface reflectance (`Level 9`, JPEG), daily.
-- **Night-Time Radiance**: NASA VIIRS Suomi NPP Day/Night Band radiance (`Level 7`), the Black Marble family product, daily.
+- **Night-Time Radiance**: NASA VIIRS NOAA-20 Day/Night Band radiance (`Level 7`), daily. NASA stopped publishing the Suomi NPP product on 2026-11-02 and moved it to NOAA-20; a reading older than four days is refused rather than published as current.
 - **Flood Inundation**: NASA VIIRS combined flood detection, 1-day window (`Level 9`), daily.
 - **Doppler Rain Radar Playback**: Dynamic RainViewer Doppler radar loop cycling past observation frames with BST timestamps, displaying precipitation movement across the delta.
 - **Catchment Rainfall Modeling**: Modeled 24-hour precipitation accumulation across 5 Greater Dhaka drainage basins (Buriganga, Turag, Balu, Tongi North, Savar West) with intensity-coded badges and interactive hydrologic observation cards.

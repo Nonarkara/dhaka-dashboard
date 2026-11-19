@@ -24,7 +24,7 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 | **Rain · next 24 h** | Validated 24-hour precipitation totals at five query points; not catchment averages or flood risk | Open-Meteo High-Resolution Precipitation Models |
 | **Rain radar** | Live Doppler radar precipitation loop over the Bengal Delta | RainViewer Doppler Radar Mosaic |
 | **Satellite clouds** | Daily true-color atmospheric cloud reflectance | NASA GIBS / NOAA-20 VIIRS True Color |
-| **Night lights** | Nighttime radiance and urban electrification patterns | NASA GIBS / Suomi NPP VIIRS Black Marble (VNP 46A2) |
+| **Night lights** | Nighttime radiance and urban electrification patterns, measured by the NOAA-20 VIIRS Day/Night Band (Suomi NPP's product was retired by NASA on 2026-11-02) | NASA GIBS / NOAA-20 VIIRS Day/Night Band |
 | **Satellite flood detection** | Dated VIIRS combined one-day flood-detection imagery; not a forecast of local arrival or field impacts | NASA GIBS |
 | **Satellite aerosol (AOD)** | Dated MODIS MAIAC atmospheric aerosol column; not ground-level PM 2.5 | NASA GIBS |
 

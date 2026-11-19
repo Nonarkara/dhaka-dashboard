@@ -84,6 +84,12 @@ const MUTATIONS = [
     replace: "  tileCache.set(key, {value:result, expires:Date.now() + (result ? 30*60000 : 3600*60000)});",
   },
   {
+    name: "the refusal of an observation that has aged out",
+    file: "src/satellite.ts",
+    find: "    if (observationAgeDays(chosen) > maxAgeDays) {",
+    replace: "    if (false && observationAgeDays(chosen) > maxAgeDays) {",
+  },
+  {
     name: "an unsourced workforce figure back in the economy registry",
     file: "public/dhaka-economy.geojson",
     // Replace the null in place. Inserting a second key with the same name

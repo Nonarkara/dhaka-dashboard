@@ -41,7 +41,7 @@ for(const l of [{...unavailable(),reasonCode:null},{...unavailable(),template:ti
 assert.ok((await verify(body([]))).failures.length,'missing expected source fails');
 assert.ok((await verify(body([layer(),layer()]))).failures.length,'duplicate source fails');
 assert.ok((await verify(body([layer(),{...layer(),id:'invented-source'}]))).failures.length,'unregistered source fails');
-const second={...spec,id:'VIIRS_SNPP_DayNightBand'};
+const second={...spec,id:'VIIRS_NOAA21_DayNightBand'};
 const mixed=body([layer(),{...unavailable(),id:second.id}]);
 result=await verifyDeployedEnvironment(mixed,[spec,second],{readTile,now});assert.deepEqual(result.failures,[]);assert.equal(result.verified.length,1);assert.equal(result.degraded.length,1);
 assert.ok((await verifyDeployedEnvironment({...mixed,status:'ok'},[spec,second],{readTile,now})).failures.length,'partial outage cannot claim overallok');

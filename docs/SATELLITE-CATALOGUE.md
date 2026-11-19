@@ -62,7 +62,7 @@ availability and its observation dates are read from it, never guessed.
 
 | Layer | Quantity | Unit | Level | Ground resolution over Dhaka | Cadence |
 |---|---|---|---|---|---|
-| `VIIRS_SNPP_DayNightBand_At_Sensor_Radiance` | Night-time radiance | nW/(cm² sr) | 8 | 559 m | daily |
+| `VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance` | Night-time radiance | nW/(cm² sr) | 8 | 559 m | daily |
 | `MODIS_Terra_Land_Surface_Temp_Day_TES` | Land surface temperature, day | K | 7 | 1.12 km | daily |
 | `MODIS_Terra_Land_Surface_Temp_Night_TES` | Land surface temperature, night | K | 7 | 1.12 km | daily |
 | `MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth` | Aerosol optical depth | 1 | 7 | 1.12 km | daily |
@@ -87,7 +87,6 @@ rather than asserted.
 | `VIIRS_Combined_Flood_1/2/3-Day` | Multi-sensor flood detection | 9 |
 | `MODIS_Combined_Flood_1/2/3-Day` | MODIS flood detection | 9 |
 | `VIIRS_Black_Marble` | Night lights, gap-filled, VNP 46A2 | 8 |
-| `VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance` | Night radiance, NOAA-20 | 8 |
 | `MODIS_Combined_L3_IGBP_Land_Cover_Type_Annual` | Land cover classification | 8 |
 | `MODIS_Aqua_L3_NDVI_Monthly`, `MODIS_Terra_L3_NDVI_16Day` | Vegetation | 7, 9 |
 | `OMI_Aerosol_Optical_Depth` | Aerosol, higher precision | 6 |
@@ -258,6 +257,40 @@ introduced before claiming district statistics. That is the right long-term
 answer and it is not done: `dhaka-areas.json` still holds district *centres*,
 and every district reading is a sample around that centre. The atlas says so
 rather than implying otherwise, and the polygons remain open work.
+
+## 4c · The sensor handover, 2026-11-02
+
+On 2026-11-02 NASA stopped publishing the Suomi NPP Day/Night Band. The
+capabilities document ends that layer's time dimension there; the tiles for
+later dates return 404, and the tile for the final date is the blank
+placeholder GIBS serves before an ingest. NOAA-20 carries the same product
+forward, on the same orbit, with the same colour map
+(`VIIRS_DayNightBand_At_Sensor_Radiance.xml`) and the same units.
+
+The atlas measured the dead product for a fortnight after it died, and nothing
+caught it: the last night it could read was 2026-10-27, and that reading was
+published as `status: ok` with a date three weeks in the past. The map's night
+lens, meanwhile, was blank — `unavailable · gibs-no-observation` — because it
+named the retired layer outright.
+
+Three changes follow from it, and they are the standing rules now:
+
+- **The atlas follows the upstream.** The night-lights layers are
+  `VIIRS_NOAA20_DayNightBand` and `VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance`.
+  The Suomi NPP ids are in the contract test's retired list, so no registry may
+  name them again.
+- **A sensor change is a series break, not a splice.** The readings before the
+  handover stay under the old layer id in the stored history, and the readings
+  after it carry the new one. Nothing joins them into one series, because they
+  are two satellites' measurements and a reader deserves to know which is which.
+- **An observation that has aged out is refused.** A daily product's reading
+  is only published while it is within four days of today. Past that the
+  measurement is `unavailable` with the reason `stale-observation` and the
+  date it refused. A night three weeks old is not a reading of the city as it
+  is now, and the atlas would rather say it has none.
+
+The catalogue is the authority for all of it, and it is refreshed with
+`npm run catalogue:gibs` — never by widening the window.
 
 ## 5 · What the collage is for
 

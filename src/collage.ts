@@ -177,8 +177,8 @@ export const SIGNAL_READINGS: Record<string, SignalReading> = {
     display: (v) => `${v.toFixed(2)} kWh/m²/day`,
     displayBn: (v) => `${v.toFixed(2)} kWh/m²/দিন`,
   },
-  VIIRS_SNPP_DayNightBand_At_Sensor_Radiance: {
-    layerId: "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance",
+  VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance: {
+    layerId: "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance",
     higherIs: "more",
     highNote: "the brightest night-time light in the city",
     highNote_bn: "শহরের সবচেয়ে উজ্জ্বল রাতের আলো",
@@ -280,7 +280,7 @@ const DOMAIN_SIGNALS: Record<string, string[]> = {
   // measurement as their own finding. Seven instruments, seven domains.
   environment: ["MODIS_Terra_Land_Surface_Temp_Day_TES"],
   energy: ["NASA_POWER_ALLSKY_SFC_SW_DWN"],
-  economy: ["VIIRS_SNPP_DayNightBand_At_Sensor_Radiance"],
+  economy: ["VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance"],
   mobility: ["Landsat_Human_Built-up_And_Settlement_Extent"],
   people: ["MODIS_Terra_L3_NDVI_16Day"],
   "smart-living": ["MODIS_Terra_Land_Surface_Temp_Night_TES"],
@@ -655,7 +655,7 @@ export async function buildCollage(
 async function measureCorridors(points: CorridorPoint[]): Promise<CorridorReading[]> {
   if (!points.length) return [];
   const layer = MEASURED_LAYERS.find(
-    (l) => l.id === "VIIRS_SNPP_DayNightBand_At_Sensor_Radiance",
+    (l) => l.id === "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance",
   );
   if (!layer) return [];
   const { measurements } = await measureLayer(
