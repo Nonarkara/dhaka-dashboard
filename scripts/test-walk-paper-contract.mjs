@@ -165,4 +165,136 @@ ok("the paper renders its own translations", () => {
   assert.ok(research.includes("atlas:language"), "the paper does not follow the atlas's language");
 });
 
-console.log(`✓ Walk and paper contract: ${checks} checks passed — camera ownership, stated limits, bilingual itinerary, bilingual paper and flat diagram geometry`);
+// ── The paper's counts must match the system it describes ──────────────────
+// A number in the paper is a claim about the code. Each count below is
+// derived from the source it describes, then the paper's own words — in
+// both languages — and the diagram's digits are held to it. This is the
+// check that would have caught "seventeen lenses" over a fifteen-lens
+// atlas and "fifteen test suites" over twenty-four.
+const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+const collageSrc = readFileSync("src/collage.ts", "utf8");
+const satelliteSrc = readFileSync("src/satellite.ts", "utf8");
+
+const EN_NUM = {
+  zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7,
+  eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13,
+  fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18,
+  nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60,
+  seventy: 70, eighty: 80, ninety: 90,
+};
+// 0-30 covers every count this paper states. Extend it when a count passes 30.
+const BN_NUM = ["শূন্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়",
+  "দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ",
+  "বিশ", "একুশ", "বাইশ", "তেইশ", "চব্বিশ", "পঁচিশ", "ছাব্বিশ", "সাতাশ", "আটাশ",
+  "ঊনত্রিশ", "ত্রিশ"];
+
+const enNumber = (word) => {
+  let n = 0;
+  for (const part of word.toLowerCase().split("-")) {
+    if (!(part in EN_NUM)) return NaN;
+    n += EN_NUM[part];
+  }
+  return n;
+};
+
+/** Every English statement of `phrase` anywhere in the paper, attribute or body. */
+const enClaims = (phrase) =>
+  [...research.matchAll(new RegExp(`\\b([a-z-]+) ${phrase}`, "gi"))].map((m) => ({
+    word: m[1], n: enNumber(m[1]),
+  }));
+
+/** The bilingual pair whose English carries `needle`. */
+const pairFor = (needle) => {
+  const hit = [...research.matchAll(/data-en="([^"]*)"[^>]*data-bn="([^"]*)"/g)]
+    .find(([, en]) => en.includes(needle));
+  assert.ok(hit, `no bilingual pair mentions "${needle}"`);
+  return { en: hit[1], bn: hit[2] };
+};
+
+const assertEnClaims = (phrase, expected) => {
+  const claims = enClaims(phrase);
+  assert.ok(claims.length > 0, `the paper no longer states a count before "${phrase}"`);
+  for (const c of claims) {
+    assert.equal(c.n, expected,
+      `the paper says "${c.word} ${phrase}" but the code says ${expected}`);
+  }
+};
+
+const assertBnClaim = (pair, phraseBn, expected) => {
+  assert.ok(BN_NUM[expected] !== undefined,
+    `extend BN_NUM in this test: the count is now ${expected}`);
+  const want = `${BN_NUM[expected]}টি ${phraseBn}`;
+  assert.ok(pair.bn.includes(want),
+    `the Bengali twin says "${pair.bn.slice(0, 70)}…" — expected "${want}"`);
+};
+
+ok("the paper's lens count matches the atlas", () => {
+  const story = app.match(/const LENS_STORIES = \{([\s\S]*?)\n {2}\};/);
+  assert.ok(story, "LENS_STORIES did not parse");
+  const lenses = [...story[1].matchAll(/^[ \t]{4}(?:"([^"]+)"|([a-z][a-z0-9-]*)): \{/gm)]
+    .map((m) => m[1] || m[2]);
+  assert.ok(lenses.length > 0, "no lens stories parsed");
+
+  // The menu offers exactly those lenses, no more, no fewer.
+  const menu = index.match(/<select id="atlas-lens"[\s\S]*?<\/select>/);
+  assert.ok(menu, "the atlas has no lens select");
+  const offered = [...menu[0].matchAll(/<option value="([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual([...offered].sort(), [...lenses].sort(),
+    "the lens menu and LENS_STORIES disagree");
+
+  // The paper states the count in words, in both languages, everywhere it
+  // states it — and the diagram states it in digits.
+  assertEnClaims("map lenses", lenses.length);
+  assertBnClaim(pairFor("map lenses"), "মানচিত্র লেন্স", lenses.length);
+  assert.ok(research.includes(`>${lenses.length} lenses</text>`),
+    `the diagram does not say "${lenses.length} lenses"`);
+});
+
+ok("the paper's test-suite count matches the release gate", () => {
+  const suites = pkg.scripts.test.match(/scripts\/test-[\w-]+\.mjs/g) || [];
+  assert.ok(suites.length > 0, "the test script names no suites");
+  assertEnClaims("test suites", suites.length);
+  assertBnClaim(pairFor("test suites run on every release"), "পরীক্ষা-স্যুট", suites.length);
+});
+
+ok("the paper's GIBS instrument count matches the collage", () => {
+  const signals = collageSrc.match(/const DOMAIN_SIGNALS[^=]*= \{([\s\S]*?)\n\};/);
+  assert.ok(signals, "DOMAIN_SIGNALS did not parse");
+  const instruments = [...signals[1].matchAll(/\[\s*"([^"]+)"\s*\]/g)].map((m) => m[1]);
+  assert.ok(instruments.length > 0, "no collage instruments parsed");
+
+  // An instrument counts as "from NASA GIBS" only when satellite.ts actually
+  // serves it from GIBS — NASA POWER is a model point, not a GIBS layer.
+  const fromGibs = instruments.filter((id) => {
+    const at = satelliteSrc.indexOf(`id: "${id}"`);
+    return at >= 0 && /provider: "NASA GIBS/.test(satelliteSrc.slice(at, at + 600));
+  });
+
+  assertEnClaims("satellite instruments from NASA GIBS", fromGibs.length);
+  assertBnClaim(pairFor("satellite instruments from NASA GIBS"), "উপগ্রহ যন্ত্র", fromGibs.length);
+});
+
+ok("the paper's collage counts match the code", () => {
+  const signals = collageSrc.match(/const DOMAIN_SIGNALS[^=]*= \{([\s\S]*?)\n\};/);
+  assert.ok(signals, "DOMAIN_SIGNALS did not parse");
+  const domains = [...signals[1].matchAll(/^[ \t]{2}(?:"([^"]+)"|([a-z][a-z0-9-]*)):[ \t]*\[/gm)]
+    .map((m) => m[1] || m[2]);
+  const instruments = [...signals[1].matchAll(/\[\s*"([^"]+)"\s*\]/g)].map((m) => m[1]);
+
+  const claims = [...research.matchAll(/\b([a-z-]+) domains and ([a-z-]+) instruments/gi)];
+  assert.ok(claims.length > 0, "the paper no longer states the collage's domain count");
+  for (const c of claims) {
+    assert.equal(enNumber(c[1]), domains.length,
+      `the paper says "${c[1]} domains" but DOMAIN_SIGNALS has ${domains.length}`);
+    assert.equal(enNumber(c[2]), instruments.length,
+      `the paper says "${c[2]} instruments" but the collage measures ${instruments.length}`);
+  }
+
+  assert.ok(BN_NUM[domains.length] !== undefined && BN_NUM[instruments.length] !== undefined,
+    `extend BN_NUM: domains=${domains.length}, instruments=${instruments.length}`);
+  const want = `${BN_NUM[domains.length]}টি ক্ষেত্র ও ${BN_NUM[instruments.length]}টি যন্ত্র`;
+  const pair = pairFor("side by side for one district");
+  assert.ok(pair.bn.includes(want), `the Bengali twin does not say "${want}"`);
+});
+
+console.log(`✓ Walk and paper contract: ${checks} checks passed — camera ownership, stated limits, bilingual itinerary, bilingual paper, flat diagram geometry and code-derived counts`);
