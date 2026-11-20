@@ -1,5 +1,5 @@
 {
-  "auditedAt": "2026-11-20T02:12:18.298Z",
+  "auditedAt": "2026-11-20T02:34:36.823Z",
   "url": "https://dhaka.nonarkara.org",
   "viewports": [
     "390x844",
@@ -91,8 +91,8 @@
           "visible": true
         },
         {
-          "text": "↑\nWIND\n7.4 km/h · model",
-          "label": "Wind: 7.4 km/h · model · Modelled wind at 10 m · from 56° · 2026-11-20T08:00",
+          "text": "↑\nWIND\n7.6 km/h · model",
+          "label": "Wind: 7.6 km/h · model · Modelled wind at 10 m · from 63° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": false,
           "visible": true
@@ -130,8 +130,8 @@
         "pitch": 85,
         "walkCounts": "3 buildings in view · 3 carry a provider-computed height, not a survey",
         "sun": {
-          "altitudeDeg": 22.52506352011651,
-          "azimuthDeg": 125.47044766895677
+          "altitudeDeg": 26.605633810761763,
+          "azimuthDeg": 129.1555321039321
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-walk/walk-390-en.png"
@@ -215,8 +215,8 @@
           "visible": true
         },
         {
-          "text": "↑\nবাতাস\n৭.৪ কিমি/ঘ · মডেল",
-          "label": "বাতাস: ৭.৪ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৫৬° · 2026-11-20T08:00",
+          "text": "↑\nবাতাস\n৭.৬ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭.৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৬৩° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": true,
           "visible": true
@@ -254,8 +254,8 @@
         "pitch": 85,
         "walkCounts": "৩টি ভবন দৃশ্যমান · ৩টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়",
         "sun": {
-          "altitudeDeg": 22.548356408019213,
-          "azimuthDeg": 125.4899472626709
+          "altitudeDeg": 26.618213204812907,
+          "azimuthDeg": 129.16781887119834
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-walk/walk-390-bn.png"
@@ -339,8 +339,8 @@
           "visible": true
         },
         {
-          "text": "↑\nWIND\n7.4 km/h · model",
-          "label": "Wind: 7.4 km/h · model · Modelled wind at 10 m · from 56° · 2026-11-20T08:00",
+          "text": "↑\nWIND\n7.6 km/h · model",
+          "label": "Wind: 7.6 km/h · model · Modelled wind at 10 m · from 63° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": false,
           "visible": true
@@ -378,8 +378,8 @@
         "pitch": 85,
         "walkCounts": "4 buildings in view · 4 carry a provider-computed height, not a survey",
         "sun": {
-          "altitudeDeg": 22.57010466899386,
-          "azimuthDeg": 125.50816817815728
+          "altitudeDeg": 26.635360449139856,
+          "azimuthDeg": 129.1845774092036
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-walk/walk-1024-en.png"
@@ -405,9 +405,9 @@
         "bottom": 768
       },
       "watch": {
-        "x": 154,
+        "x": 153,
         "y": 698,
-        "width": 716,
+        "width": 718,
         "height": 28,
         "bottom": 726
       },
@@ -446,7 +446,7 @@
         "map": true,
         "allInFirstScreen": true
       },
-      "unobscuredRatio": 0.8631,
+      "unobscuredRatio": 0.863,
       "readings": [
         {
           "text": "≋\nবন্যা\nঅনুপলব্ধ",
@@ -463,8 +463,8 @@
           "visible": true
         },
         {
-          "text": "↑\nবাতাস\n৭.৪ কিমি/ঘ · মডেল",
-          "label": "বাতাস: ৭.৪ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৫৬° · 2026-11-20T08:00",
+          "text": "↑\nবাতাস\n৭.৬ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭.৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৬৩° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": true,
           "visible": true
@@ -502,8 +502,8 @@
         "pitch": 85,
         "walkCounts": "৪টি ভবন দৃশ্যমান · ৪টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়",
         "sun": {
-          "altitudeDeg": 22.583342410610637,
-          "azimuthDeg": 125.5192657124694
+          "altitudeDeg": 26.644086131163004,
+          "azimuthDeg": 129.1931098042786
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-walk/walk-1024-bn.png"
@@ -587,8 +587,8 @@
           "visible": true
         },
         {
-          "text": "↑\nWIND\n7.4 km/h · model",
-          "label": "Wind: 7.4 km/h · model · Modelled wind at 10 m · from 56° · 2026-11-20T08:00",
+          "text": "↑\nWIND\n7.6 km/h · model",
+          "label": "Wind: 7.6 km/h · model · Modelled wind at 10 m · from 63° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": false,
           "visible": true
@@ -626,8 +626,8 @@
         "pitch": 85,
         "walkCounts": "4 buildings in view · 4 carry a provider-computed height, not a survey",
         "sun": {
-          "altitudeDeg": 22.603237450359764,
-          "azimuthDeg": 125.53595394641374
+          "altitudeDeg": 26.6619714010602,
+          "azimuthDeg": 129.21060841462548
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-walk/walk-1440-en.png"
@@ -653,9 +653,9 @@
         "bottom": 900
       },
       "watch": {
-        "x": 362,
+        "x": 361,
         "y": 830,
-        "width": 716,
+        "width": 718,
         "height": 28,
         "bottom": 858
       },
@@ -711,8 +711,8 @@
           "visible": true
         },
         {
-          "text": "↑\nবাতাস\n৭.৪ কিমি/ঘ · মডেল",
-          "label": "বাতাস: ৭.৪ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৫৬° · 2026-11-20T08:00",
+          "text": "↑\nবাতাস\n৭.৬ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭.৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৬৩° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": true,
           "visible": true
@@ -750,8 +750,8 @@
         "pitch": 85,
         "walkCounts": "৪টি ভবন দৃশ্যমান · ৪টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়",
         "sun": {
-          "altitudeDeg": 22.61758387611259,
-          "azimuthDeg": 125.54799517649927
+          "altitudeDeg": 26.672072646086374,
+          "azimuthDeg": 129.22049694585434
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-walk/walk-1440-bn.png"

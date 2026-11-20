@@ -1,0 +1,71 @@
+City massing — before and after
+===============================
+
+Captured 2026-11-20 against https://dhaka.nonarkara.org, in headless Chrome
+(scripts/lib/cdp.mjs), at the same camera for each pair: Dhaka city centre,
+90.4125 E / 23.8103 N, bearing 20°, pitch 55°.
+
+The change
+----------
+The city lens drew every building as a footprint: a fill with no height. The
+lens was called "City in 3D" and the 3D/2D control changed almost nothing a
+reader could see. The streamed tiles do carry a height — the provider's
+computed render_height — and the atlas was standing on the truth of its own
+excuse while drawing nothing. The description under the lens read "streamed
+tiles do not expose source height tags". They do.
+
+The city lens now draws that massing, the way the street lens always did, and
+says where it comes from. The height is the map provider's computed height,
+not a survey; a building with no height in the source stays flat.
+
+Measured, same camera, before and after
+---------------------------------------
+Before (build 0cc7857):
+  rendered features in city-buildings     93
+  features carrying a provider height      92
+  median provider height                   15 m
+  lens description  "Zoom in for building footprints; select a feature for
+                     source details. OSM footprints; streamed tiles do not
+                     expose source height tags."
+
+After (build f061144):
+  rendered features in city-buildings     93
+  features carrying a provider height      92
+  median provider height                   15 m
+  lens description  "Zoom in for the building massing and footprints; select
+                     a feature for source details. 3D: the massing is the map
+                     provider's computed height, not a survey; a building with
+                     no height in the source stays flat."
+
+The feature count and the heights are identical — the data did not change.
+What changed is that the atlas stands on it, and says what it stands on.
+
+The images
+----------
+city-z14-6-before-build-0cc7857.png   city lens, z14.6, before
+city-z14-6-after-build-f061144.png    city lens, z14.6, after
+city-z16-3-after-build-f061144.png    city lens, z16.3, after
+
+At z14.6 the difference is small: the buildings are a few pixels tall in a
+metropolitan view, and the satellite imagery still reads. At z16.3 the massing
+is what a reader actually sees — the dense fabric of Old Dhaka reads as a
+city with walls and a sun on them, the industrial sheds of Mirpur read as low
+blocks, and the imagery shows between them. That is the scale the change is
+for.
+
+What did not change
+-------------------
+The metropolitan view (the lens's default camera, z12.5) is untouched: the
+tiles carry no buildings below z14, so the overview of the river ring, the
+metro lines and the industrial belts is exactly as it was. The 2D view still
+shows flat footprints. The street lens draws its own massing and is
+unchanged.
+
+Provenance
+----------
+Heights: OpenStreetMap via OpenFreeMap / OpenMapTiles, `render_height` and
+`render_min_height`, clamped to 1–500 m; a building with no height in the
+source stays flat.
+Footprints: OpenStreetMap ODbL · OpenFreeMap.
+Solar light: NOAA solar position for Dhaka, map-anchored.
+Colour: the atlas's own Palette 1 by mapped use.

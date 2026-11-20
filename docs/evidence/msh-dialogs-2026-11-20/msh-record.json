@@ -1,5 +1,5 @@
 {
-  "auditedAt": "2026-11-20T02:15:45.547Z",
+  "auditedAt": "2026-11-20T02:38:48.099Z",
   "url": "https://dhaka.nonarkara.org",
   "viewports": [
     "390x844",
@@ -58,11 +58,11 @@
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "viewport": "1024x768",
       "lang": "en",
-      "ready": false,
+      "ready": true,
       "splashGone": true,
       "splashText": "DHKx Loading Dhaka 3D Atlas & Layers…",
       "mapFailed": false,
-      "watchFilled": false,
+      "watchFilled": true,
       "issue": null
     },
     {
@@ -108,9 +108,9 @@
       "splashGone": true,
       "watchFilled": false,
       "watchStrip": {
-        "height": 89,
+        "height": 116,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 13.74,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -127,22 +127,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "Flood",
-            "value": "—"
+            "value": "n/a"
           },
           {
             "id": "atlas-watch-air",
             "label": "Air",
-            "value": "—"
+            "value": "AQI 115 · model · Unhealthy for Sensitive Groups"
           },
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "—"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "Economy",
-            "value": "—"
+            "value": "n/a"
           }
         ]
       }
@@ -155,9 +155,9 @@
       "splashGone": true,
       "watchFilled": false,
       "watchStrip": {
-        "height": 89,
+        "height": 133,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 15.76,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -174,22 +174,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "বন্যা",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           },
           {
             "id": "atlas-watch-air",
             "label": "বায়ু",
-            "value": "—"
+            "value": "AQI ১১৫ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর"
           },
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "—"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "অর্থনীতি",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           }
         ]
       }
@@ -198,9 +198,9 @@
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "viewport": "1024x768",
       "lang": "en",
-      "ready": false,
+      "ready": true,
       "splashGone": true,
-      "watchFilled": false,
+      "watchFilled": true,
       "watchStrip": {
         "height": 23,
         "width": 707,
@@ -231,7 +231,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -250,7 +250,7 @@
       "watchFilled": true,
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.65,
         "items": 4,
         "clipped": [],
@@ -278,7 +278,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -325,7 +325,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -344,7 +344,7 @@
       "watchFilled": false,
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.11,
         "items": 4,
         "clipped": [],
@@ -372,7 +372,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -461,25 +461,25 @@
           "chars": 100,
           "tag": "DD",
           "id": "",
-          "preview": "124.48 BDT/USDPeriod: 2026-11-19 · Retrieved: 2026-11-20T02:14:44.158ZFawaz Ahme"
+          "preview": "124.48 BDT/USDPeriod: 2026-11-19 · Retrieved: 2026-11-20T02:37:04.237ZFawaz Ahme"
         },
         {
           "chars": 88,
           "tag": "DD",
           "id": "",
-          "preview": "456,319,229,255.58 USDPeriod: 2025 · Retrieved: 2026-11-20T02:14:44.158ZWorld Ba"
+          "preview": "456,319,229,255.58 USDPeriod: 2025 · Retrieved: 2026-11-20T02:37:04.237ZWorld Ba"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "33,879,048,131.61 USDPeriod: 2025 · Retrieved: 2026-11-20T02:14:44.158ZWorld Ban"
+          "preview": "33,879,048,131.61 USDPeriod: 2025 · Retrieved: 2026-11-20T02:37:04.237ZWorld Ban"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "0.72 per 1,000 peoplePeriod: 2023 · Retrieved: 2026-11-20T02:14:44.158ZWorld Ban"
+          "preview": "0.72 per 1,000 peoplePeriod: 2023 · Retrieved: 2026-11-20T02:37:04.237ZWorld Ban"
         }
       ],
       "clipped": [],
@@ -534,9 +534,9 @@
       "headingCount": 8,
       "digest": "Bangladesh data | ECONOMY | PEOPLE | ENERGY | MOBILITY | SMART LIVING | ENVIRONMENT | GOVERNANCE",
       "watchStrip": {
-        "height": 89,
+        "height": 116,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 13.74,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -553,22 +553,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "Flood",
-            "value": "—"
+            "value": "n/a"
           },
           {
             "id": "atlas-watch-air",
             "label": "Air",
-            "value": "—"
+            "value": "AQI 115 · model · Unhealthy for Sensitive Groups"
           },
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "—"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "Economy",
-            "value": "—"
+            "value": "n/a"
           }
         ]
       },
@@ -642,14 +642,14 @@
         "tag": "P",
         "id": "",
         "cls": "collage-foot",
-        "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.48 h. Observation dates differ by instrumen"
+        "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.85 h. Observation dates differ by instrumen"
       },
       "topBlocks": [
         {
           "chars": 146,
           "tag": "P",
           "id": "",
-          "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.48 "
+          "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.85 "
         },
         {
           "chars": 142,
@@ -718,9 +718,9 @@
       "headingCount": 8,
       "digest": "Satellite samples by place | ENVIRONMENT | ENERGY | ECONOMY | MOBILITY | PEOPLE | SMART LIVING | GOVERNANCE",
       "watchStrip": {
-        "height": 89,
+        "height": 116,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 13.74,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -737,22 +737,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "Flood",
-            "value": "—"
+            "value": "n/a"
           },
           {
             "id": "atlas-watch-air",
             "label": "Air",
-            "value": "—"
+            "value": "AQI 115 · model · Unhealthy for Sensitive Groups"
           },
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "—"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "Economy",
-            "value": "—"
+            "value": "n/a"
           }
         ]
       },
@@ -901,9 +901,9 @@
       "headingCount": 1,
       "digest": "Quick jump to Dhaka districts",
       "watchStrip": {
-        "height": 89,
+        "height": 116,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 13.74,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -920,22 +920,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "Flood",
-            "value": "—"
+            "value": "n/a"
           },
           {
             "id": "atlas-watch-air",
             "label": "Air",
-            "value": "—"
+            "value": "AQI 115 · model · Unhealthy for Sensitive Groups"
           },
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "—"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "Economy",
-            "value": "—"
+            "value": "n/a"
           }
         ]
       },
@@ -1074,9 +1074,9 @@
       "headingCount": 1,
       "digest": "Rivers & Flood Desk (BWDB / FFWC)",
       "watchStrip": {
-        "height": 89,
+        "height": 116,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 13.74,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -1093,22 +1093,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "Flood",
-            "value": "—"
+            "value": "n/a"
           },
           {
             "id": "atlas-watch-air",
             "label": "Air",
-            "value": "—"
+            "value": "AQI 115 · model · Unhealthy for Sensitive Groups"
           },
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "—"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "Economy",
-            "value": "—"
+            "value": "n/a"
           }
         ]
       },
@@ -1215,7 +1215,7 @@
           "chars": 59,
           "tag": "P",
           "id": "",
-          "preview": "Modeled weather · Open-Meteo · Asia/Dhaka: 2026-11-20T08:00"
+          "preview": "Modeled weather · Open-Meteo · Asia/Dhaka: 2026-11-20T08:30"
         }
       ],
       "clipped": [],
@@ -1246,9 +1246,9 @@
       "headingCount": 1,
       "digest": "Air Quality & Winter Smoke Timeline (CAMS / Open-Meteo)",
       "watchStrip": {
-        "height": 89,
+        "height": 116,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 13.74,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -1265,22 +1265,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "Flood",
-            "value": "—"
+            "value": "n/a"
           },
           {
             "id": "atlas-watch-air",
             "label": "Air",
-            "value": "—"
+            "value": "AQI 115 · model · Unhealthy for Sensitive Groups"
           },
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "—"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "Economy",
-            "value": "—"
+            "value": "n/a"
           }
         ]
       },
@@ -1428,9 +1428,9 @@
       "headingCount": 12,
       "digest": "Macroeconomic & Industrial Engine Desk | INDUSTRIAL CORRIDORS · MEASURED NIGHT RADIANCE | DHAKA EXPORT PROCESSING ZONE (DEPZ) | ADAMJEE EXPORT PROCESSING ZONE | ASHULIA-ZIRABO RMG BELT | HEMAYETPUR TANNERY INDUSTRIAL ESTATE | TEJGAON LIGHT INDUSTRIAL DISTRICT | MOTIJHEEL & DILKUSHA FINANCIAL CORE | KAWRAN BAZAR WHOLESALE PRODUCE TERMINAL | CHAWKBAZAR WHOLESALE MERCHANDISE DISTRICT | ISLAMPUR WHOLE",
       "watchStrip": {
-        "height": 89,
+        "height": 116,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 13.74,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -1447,22 +1447,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "Flood",
-            "value": "—"
+            "value": "n/a"
           },
           {
             "id": "atlas-watch-air",
             "label": "Air",
-            "value": "—"
+            "value": "AQI 115 · model · Unhealthy for Sensitive Groups"
           },
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "—"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "Economy",
-            "value": "—"
+            "value": "n/a"
           }
         ]
       },
@@ -1587,9 +1587,9 @@
       "headingCount": 1,
       "digest": "Dhaka Metro Rail & Mobility Network",
       "watchStrip": {
-        "height": 89,
+        "height": 116,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 13.74,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -1606,22 +1606,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "Flood",
-            "value": "—"
+            "value": "n/a"
           },
           {
             "id": "atlas-watch-air",
             "label": "Air",
-            "value": "—"
+            "value": "AQI 115 · model · Unhealthy for Sensitive Groups"
           },
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "—"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "Economy",
-            "value": "—"
+            "value": "n/a"
           }
         ]
       },
@@ -1695,14 +1695,14 @@
         "tag": "DD",
         "id": "",
         "cls": "",
-        "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:14:53.229Zফাওয়াজ আহমেদ কারেন্সি API · CC0"
+        "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:37:18.198Zফাওয়াজ আহমেদ কারেন্সি API · CC0"
       },
       "topBlocks": [
         {
           "chars": 103,
           "tag": "DD",
           "id": "",
-          "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:14:53.229Zফাওয়াজ আ"
+          "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:37:18.198Zফাওয়াজ আ"
         },
         {
           "chars": 90,
@@ -1714,19 +1714,19 @@
           "chars": 90,
           "tag": "DD",
           "id": "",
-          "preview": "৪,৫৬,৩১,৯২,২৯,২৫৫.৫৮ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:14:53.229Zবিশ্বব্"
+          "preview": "৪,৫৬,৩১,৯২,২৯,২৫৫.৫৮ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:18.198Zবিশ্বব্"
         },
         {
           "chars": 88,
           "tag": "DD",
           "id": "",
-          "preview": "৩৩,৮৭,৯০,৪৮,১৩১.৬১ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:14:53.229Zবিশ্বব্যা"
+          "preview": "৩৩,৮৭,৯০,৪৮,১৩১.৬১ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:18.198Zবিশ্বব্যা"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "৫২,২৫,০১,২৭,৮৯৪.৫ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:14:53.229Zবিশ্বব্যাং"
+          "preview": "৫২,২৫,০১,২৭,৮৯৪.৫ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:18.198Zবিশ্বব্যাং"
         }
       ],
       "clipped": [],
@@ -1801,9 +1801,9 @@
       "headingCount": 8,
       "digest": "বাংলাদেশের উপাত্ত | অর্থনীতি | জনগণ | জ্বালানি | চলাচল | স্মার্ট জীবনযাপন | পরিবেশ | শাসন",
       "watchStrip": {
-        "height": 89,
+        "height": 133,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 15.76,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -1820,22 +1820,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "বন্যা",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           },
           {
             "id": "atlas-watch-air",
             "label": "বায়ু",
-            "value": "—"
+            "value": "AQI ১১৫ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর"
           },
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "—"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "অর্থনীতি",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           }
         ]
       },
@@ -1909,7 +1909,7 @@
         "tag": "P",
         "id": "",
         "cls": "collage-foot",
-        "preview": "৯৪/৯৮টি পাঠ · সাম্প্রতিক সংরক্ষিত তথ্য · সংগ্রহ 2026-11-20T00:46:12.064Z · বয়স ১.৪৮ ঘণ্টা। যন্ত্রভেদে পর্যবেক্ষণের তারি"
+        "preview": "৯৪/৯৮টি পাঠ · সাম্প্রতিক সংরক্ষিত তথ্য · সংগ্রহ 2026-11-20T00:46:12.064Z · বয়স ১.৮৫ ঘণ্টা। যন্ত্রভেদে পর্যবেক্ষণের তারি"
       },
       "topBlocks": [
         {
@@ -2065,9 +2065,9 @@
       "headingCount": 8,
       "digest": "স্থানভিত্তিক উপগ্রহের নমুনা | পরিবেশ | জ্বালানি | অর্থনীতি | চলাচল | জনগণ | স্মার্ট লিভিং | শাসন",
       "watchStrip": {
-        "height": 89,
+        "height": 133,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 15.76,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -2084,22 +2084,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "বন্যা",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           },
           {
             "id": "atlas-watch-air",
             "label": "বায়ু",
-            "value": "—"
+            "value": "AQI ১১৫ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর"
           },
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "—"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "অর্থনীতি",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           }
         ]
       },
@@ -2248,9 +2248,9 @@
       "headingCount": 1,
       "digest": "ঢাকার এলাকায় দ্রুত যান",
       "watchStrip": {
-        "height": 89,
+        "height": 133,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 15.76,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -2267,22 +2267,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "বন্যা",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           },
           {
             "id": "atlas-watch-air",
             "label": "বায়ু",
-            "value": "—"
+            "value": "AQI ১১৫ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর"
           },
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "—"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "অর্থনীতি",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           }
         ]
       },
@@ -2501,9 +2501,9 @@
       "headingCount": 1,
       "digest": "নদী ও বন্যা তথ্য (BWDB / FFWC)",
       "watchStrip": {
-        "height": 89,
+        "height": 133,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 15.76,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -2520,22 +2520,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "বন্যা",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           },
           {
             "id": "atlas-watch-air",
             "label": "বায়ু",
-            "value": "—"
+            "value": "AQI ১১৫ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর"
           },
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "—"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "অর্থনীতি",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           }
         ]
       },
@@ -2636,7 +2636,7 @@
           "chars": 58,
           "tag": "P",
           "id": "",
-          "preview": "মডেলভিত্তিক আবহাওয়া · Open-Meteo · ঢাকা: 2026-11-20T08:00"
+          "preview": "মডেলভিত্তিক আবহাওয়া · Open-Meteo · ঢাকা: 2026-11-20T08:30"
         },
         {
           "chars": 56,
@@ -2683,9 +2683,9 @@
       "headingCount": 1,
       "digest": "বায়ুমান ও শীতকালীন ধোঁয়ার সময়রেখা (CAMS / Open-Meteo)",
       "watchStrip": {
-        "height": 89,
+        "height": 133,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 15.76,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -2702,22 +2702,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "বন্যা",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           },
           {
             "id": "atlas-watch-air",
             "label": "বায়ু",
-            "value": "—"
+            "value": "AQI ১১৫ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর"
           },
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "—"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "অর্থনীতি",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           }
         ]
       },
@@ -2865,9 +2865,9 @@
       "headingCount": 12,
       "digest": "সামষ্টিক অর্থনীতি ও শিল্প তথ্য | শিল্প করিডোর · মাপা রাতের আলোক্ষেত্র | ঢাকা রপ্তানি প্রক্রিয়াকরণ এলাকা (ডিইপিজেড) | আদমজী রপ্তানি প্রক্রিয়াকরণ এলাকা | আশুলিয়া-জিরাবো তৈরি পোশাক করিডোর | হেমায়েতপুর চামড়া শিল্প নগরী (সাভার) | তেজগাঁও শিল্প এলাকা | মতিঝিল ও দিলকুশা আর্থিক কেন্দ্র | কাওরান বাজার পাইকারি আড়ত | চকবাজার পাইকারি বাজার | ইসলামপুর পাইকারি কাপড়ের বাজার | বাদামতলী ফল পাইকারি ঘাট",
       "watchStrip": {
-        "height": 89,
+        "height": 133,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 15.76,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -2884,22 +2884,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "বন্যা",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           },
           {
             "id": "atlas-watch-air",
             "label": "বায়ু",
-            "value": "—"
+            "value": "AQI ১১৫ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর"
           },
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "—"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "অর্থনীতি",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           }
         ]
       },
@@ -3035,9 +3035,9 @@
       "headingCount": 1,
       "digest": "ঢাকার মেট্রোরেল ও পরিবহন নেটওয়ার্ক",
       "watchStrip": {
-        "height": 89,
+        "height": 133,
         "width": 282,
-        "heightPct": 10.55,
+        "heightPct": 15.76,
         "items": 4,
         "clipped": [],
         "clippedCount": 0,
@@ -3054,22 +3054,22 @@
           {
             "id": "atlas-watch-flood",
             "label": "বন্যা",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           },
           {
             "id": "atlas-watch-air",
             "label": "বায়ু",
-            "value": "—"
+            "value": "AQI ১১৫ · মডেল · সংবেদনশীলদের জন্য অস্বাস্থ্যকর"
           },
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "—"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
             "label": "অর্থনীতি",
-            "value": "—"
+            "value": "অনুপলব্ধ"
           }
         ]
       },
@@ -3090,10 +3090,10 @@
       "lang": "en",
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "lens": "city",
-      "pageReady": false,
+      "pageReady": true,
       "splashGone": true,
       "splashText": "DHKx Loading Dhaka 3D Atlas & Layers…",
-      "watchFilled": false,
+      "watchFilled": true,
       "opened": true,
       "openReason": null,
       "clickMethod": "dom-click",
@@ -3156,25 +3156,25 @@
           "chars": 100,
           "tag": "DD",
           "id": "",
-          "preview": "124.48 BDT/USDPeriod: 2026-11-19 · Retrieved: 2026-11-20T02:15:02.559ZFawaz Ahme"
+          "preview": "124.48 BDT/USDPeriod: 2026-11-19 · Retrieved: 2026-11-20T02:37:31.302ZFawaz Ahme"
         },
         {
           "chars": 88,
           "tag": "DD",
           "id": "",
-          "preview": "456,319,229,255.58 USDPeriod: 2025 · Retrieved: 2026-11-20T02:15:02.559ZWorld Ba"
+          "preview": "456,319,229,255.58 USDPeriod: 2025 · Retrieved: 2026-11-20T02:37:31.302ZWorld Ba"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "33,879,048,131.61 USDPeriod: 2025 · Retrieved: 2026-11-20T02:15:02.559ZWorld Ban"
+          "preview": "33,879,048,131.61 USDPeriod: 2025 · Retrieved: 2026-11-20T02:37:31.302ZWorld Ban"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "0.72 per 1,000 peoplePeriod: 2023 · Retrieved: 2026-11-20T02:15:02.559ZWorld Ban"
+          "preview": "0.72 per 1,000 peoplePeriod: 2023 · Retrieved: 2026-11-20T02:37:31.302ZWorld Ban"
         }
       ],
       "clipped": [],
@@ -3258,7 +3258,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -3284,10 +3284,10 @@
       "lang": "en",
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "lens": "city",
-      "pageReady": false,
+      "pageReady": true,
       "splashGone": true,
       "splashText": "DHKx Loading Dhaka 3D Atlas & Layers…",
-      "watchFilled": false,
+      "watchFilled": true,
       "opened": true,
       "openReason": null,
       "clickMethod": "dom-click",
@@ -3337,14 +3337,14 @@
         "tag": "P",
         "id": "",
         "cls": "collage-foot",
-        "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.48 h. Observation dates differ by instrumen"
+        "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.86 h. Observation dates differ by instrumen"
       },
       "topBlocks": [
         {
           "chars": 146,
           "tag": "P",
           "id": "",
-          "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.48 "
+          "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.86 "
         },
         {
           "chars": 142,
@@ -3442,7 +3442,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -3468,10 +3468,10 @@
       "lang": "en",
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "lens": "city",
-      "pageReady": false,
+      "pageReady": true,
       "splashGone": true,
       "splashText": "DHKx Loading Dhaka 3D Atlas & Layers…",
-      "watchFilled": false,
+      "watchFilled": true,
       "opened": true,
       "openReason": null,
       "clickMethod": "dom-click",
@@ -3614,7 +3614,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -3640,10 +3640,10 @@
       "lang": "en",
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "lens": "city",
-      "pageReady": false,
+      "pageReady": true,
       "splashGone": true,
       "splashText": "DHKx Loading Dhaka 3D Atlas & Layers…",
-      "watchFilled": false,
+      "watchFilled": true,
       "opened": true,
       "openReason": null,
       "clickMethod": "dom-click",
@@ -3787,7 +3787,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -3813,10 +3813,10 @@
       "lang": "en",
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "lens": "city",
-      "pageReady": false,
+      "pageReady": true,
       "splashGone": true,
       "splashText": "DHKx Loading Dhaka 3D Atlas & Layers…",
-      "watchFilled": false,
+      "watchFilled": true,
       "opened": true,
       "openReason": null,
       "clickMethod": "dom-click",
@@ -3899,7 +3899,7 @@
           "chars": 59,
           "tag": "P",
           "id": "",
-          "preview": "Modeled weather · Open-Meteo · Asia/Dhaka: 2026-11-20T08:15"
+          "preview": "Modeled weather · Open-Meteo · Asia/Dhaka: 2026-11-20T08:30"
         }
       ],
       "clipped": [],
@@ -3948,7 +3948,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -3974,10 +3974,10 @@
       "lang": "en",
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "lens": "city",
-      "pageReady": false,
+      "pageReady": true,
       "splashGone": true,
       "splashText": "DHKx Loading Dhaka 3D Atlas & Layers…",
-      "watchFilled": false,
+      "watchFilled": true,
       "opened": true,
       "openReason": null,
       "clickMethod": "dom-click",
@@ -4160,7 +4160,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -4186,10 +4186,10 @@
       "lang": "en",
       "url": "https://dhaka.nonarkara.org/?lang=en",
       "lens": "city",
-      "pageReady": false,
+      "pageReady": true,
       "splashGone": true,
       "splashText": "DHKx Loading Dhaka 3D Atlas & Layers…",
-      "watchFilled": false,
+      "watchFilled": true,
       "opened": true,
       "openReason": null,
       "clickMethod": "dom-click",
@@ -4319,7 +4319,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -4398,14 +4398,14 @@
         "tag": "DD",
         "id": "",
         "cls": "",
-        "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:14:53.229Zফাওয়াজ আহমেদ কারেন্সি API · CC0"
+        "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:37:45.493Zফাওয়াজ আহমেদ কারেন্সি API · CC0"
       },
       "topBlocks": [
         {
           "chars": 103,
           "tag": "DD",
           "id": "",
-          "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:14:53.229Zফাওয়াজ আ"
+          "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:37:45.493Zফাওয়াজ আ"
         },
         {
           "chars": 90,
@@ -4417,19 +4417,19 @@
           "chars": 90,
           "tag": "DD",
           "id": "",
-          "preview": "৪,৫৬,৩১,৯২,২৯,২৫৫.৫৮ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:14:53.229Zবিশ্বব্"
+          "preview": "৪,৫৬,৩১,৯২,২৯,২৫৫.৫৮ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:45.493Zবিশ্বব্"
         },
         {
           "chars": 88,
           "tag": "DD",
           "id": "",
-          "preview": "৩৩,৮৭,৯০,৪৮,১৩১.৬১ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:14:53.229Zবিশ্বব্যা"
+          "preview": "৩৩,৮৭,৯০,৪৮,১৩১.৬১ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:45.493Zবিশ্বব্যা"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "৫২,২৫,০১,২৭,৮৯৪.৫ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:14:53.229Zবিশ্বব্যাং"
+          "preview": "৫২,২৫,০১,২৭,৮৯৪.৫ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:45.493Zবিশ্বব্যাং"
         }
       ],
       "clipped": [],
@@ -4485,7 +4485,7 @@
       "digest": "বাংলাদেশের উপাত্ত | অর্থনীতি | জনগণ | জ্বালানি | চলাচল | স্মার্ট জীবনযাপন | পরিবেশ | শাসন",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.65,
         "items": 4,
         "clipped": [],
@@ -4513,7 +4513,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -4592,7 +4592,7 @@
         "tag": "P",
         "id": "",
         "cls": "collage-foot",
-        "preview": "৯৪/৯৮টি পাঠ · সাম্প্রতিক সংরক্ষিত তথ্য · সংগ্রহ 2026-11-20T00:46:12.064Z · বয়স ১.৪৮ ঘণ্টা। যন্ত্রভেদে পর্যবেক্ষণের তারি"
+        "preview": "৯৪/৯৮টি পাঠ · সাম্প্রতিক সংরক্ষিত তথ্য · সংগ্রহ 2026-11-20T00:46:12.064Z · বয়স ১.৮৬ ঘণ্টা। যন্ত্রভেদে পর্যবেক্ষণের তারি"
       },
       "topBlocks": [
         {
@@ -4739,7 +4739,7 @@
       "digest": "স্থানভিত্তিক উপগ্রহের নমুনা | পরিবেশ | জ্বালানি | অর্থনীতি | চলাচল | জনগণ | স্মার্ট লিভিং | শাসন",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.65,
         "items": 4,
         "clipped": [],
@@ -4767,7 +4767,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -4911,7 +4911,7 @@
       "digest": "ঢাকার এলাকায় দ্রুত যান",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.65,
         "items": 4,
         "clipped": [],
@@ -4939,7 +4939,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -5144,7 +5144,7 @@
       "digest": "নদী ও বন্যা তথ্য (BWDB / FFWC)",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.65,
         "items": 4,
         "clipped": [],
@@ -5172,7 +5172,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -5278,7 +5278,7 @@
           "chars": 58,
           "tag": "P",
           "id": "",
-          "preview": "মডেলভিত্তিক আবহাওয়া · Open-Meteo · ঢাকা: 2026-11-20T08:00"
+          "preview": "মডেলভিত্তিক আবহাওয়া · Open-Meteo · ঢাকা: 2026-11-20T08:30"
         },
         {
           "chars": 56,
@@ -5316,7 +5316,7 @@
       "digest": "বায়ুমান ও শীতকালীন ধোঁয়ার সময়রেখা (CAMS / Open-Meteo)",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.65,
         "items": 4,
         "clipped": [],
@@ -5344,7 +5344,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -5538,7 +5538,7 @@
       "digest": "সামষ্টিক অর্থনীতি ও শিল্প তথ্য | শিল্প করিডোর · মাপা রাতের আলোক্ষেত্র | ঢাকা রপ্তানি প্রক্রিয়াকরণ এলাকা (ডিইপিজেড) | আদমজী রপ্তানি প্রক্রিয়াকরণ এলাকা | আশুলিয়া-জিরাবো তৈরি পোশাক করিডোর | হেমায়েতপুর চামড়া শিল্প নগরী (সাভার) | তেজগাঁও শিল্প এলাকা | মতিঝিল ও দিলকুশা আর্থিক কেন্দ্র | কাওরান বাজার পাইকারি আড়ত | চকবাজার পাইকারি বাজার | ইসলামপুর পাইকারি কাপড়ের বাজার | বাদামতলী ফল পাইকারি ঘাট",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.65,
         "items": 4,
         "clipped": [],
@@ -5566,7 +5566,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -5708,7 +5708,7 @@
       "digest": "ঢাকার মেট্রোরেল ও পরিবহন নেটওয়ার্ক",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.65,
         "items": 4,
         "clipped": [],
@@ -5736,7 +5736,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -5828,25 +5828,25 @@
           "chars": 100,
           "tag": "DD",
           "id": "",
-          "preview": "124.48 BDT/USDPeriod: 2026-11-19 · Retrieved: 2026-11-20T02:15:02.559ZFawaz Ahme"
+          "preview": "124.48 BDT/USDPeriod: 2026-11-19 · Retrieved: 2026-11-20T02:37:45.493ZFawaz Ahme"
         },
         {
           "chars": 88,
           "tag": "DD",
           "id": "",
-          "preview": "456,319,229,255.58 USDPeriod: 2025 · Retrieved: 2026-11-20T02:15:02.559ZWorld Ba"
+          "preview": "456,319,229,255.58 USDPeriod: 2025 · Retrieved: 2026-11-20T02:37:45.493ZWorld Ba"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "33,879,048,131.61 USDPeriod: 2025 · Retrieved: 2026-11-20T02:15:02.559ZWorld Ban"
+          "preview": "33,879,048,131.61 USDPeriod: 2025 · Retrieved: 2026-11-20T02:37:45.493ZWorld Ban"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "0.72 per 1,000 peoplePeriod: 2023 · Retrieved: 2026-11-20T02:15:02.559ZWorld Ban"
+          "preview": "0.72 per 1,000 peoplePeriod: 2023 · Retrieved: 2026-11-20T02:37:45.493ZWorld Ban"
         }
       ],
       "clipped": [],
@@ -5930,7 +5930,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -6009,14 +6009,14 @@
         "tag": "P",
         "id": "",
         "cls": "collage-foot",
-        "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.49 h. Observation dates differ by instrumen"
+        "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.87 h. Observation dates differ by instrumen"
       },
       "topBlocks": [
         {
           "chars": 146,
           "tag": "P",
           "id": "",
-          "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.49 "
+          "preview": "94/98 readings · fresh snapshot · collected 2026-11-20T00:46:12.064Z · age 1.87 "
         },
         {
           "chars": 142,
@@ -6114,7 +6114,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -6286,7 +6286,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -6459,7 +6459,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -6571,7 +6571,7 @@
           "chars": 59,
           "tag": "P",
           "id": "",
-          "preview": "Modeled weather · Open-Meteo · Asia/Dhaka: 2026-11-20T08:15"
+          "preview": "Modeled weather · Open-Meteo · Asia/Dhaka: 2026-11-20T08:30"
         }
       ],
       "clipped": [],
@@ -6620,7 +6620,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -6832,7 +6832,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -6991,7 +6991,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "Wind",
-            "value": "7.4 km/h · model"
+            "value": "7.6 km/h · model"
           },
           {
             "id": "atlas-watch-traffic",
@@ -7070,14 +7070,14 @@
         "tag": "DD",
         "id": "",
         "cls": "",
-        "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:15:38.885Zফাওয়াজ আহমেদ কারেন্সি API · CC0"
+        "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:37:04.237Zফাওয়াজ আহমেদ কারেন্সি API · CC0"
       },
       "topBlocks": [
         {
           "chars": 103,
           "tag": "DD",
           "id": "",
-          "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:15:38.885Zফাওয়াজ আ"
+          "preview": "১২৪.৪৮ টাকা/ডলারতথ্যকাল: 2026-11-19 · সংগৃহীত: 2026-11-20T02:37:04.237Zফাওয়াজ আ"
         },
         {
           "chars": 90,
@@ -7089,19 +7089,19 @@
           "chars": 90,
           "tag": "DD",
           "id": "",
-          "preview": "৪,৫৬,৩১,৯২,২৯,২৫৫.৫৮ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:15:38.885Zবিশ্বব্"
+          "preview": "৪,৫৬,৩১,৯২,২৯,২৫৫.৫৮ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:04.237Zবিশ্বব্"
         },
         {
           "chars": 88,
           "tag": "DD",
           "id": "",
-          "preview": "৩৩,৮৭,৯০,৪৮,১৩১.৬১ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:15:38.885Zবিশ্বব্যা"
+          "preview": "৩৩,৮৭,৯০,৪৮,১৩১.৬১ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:04.237Zবিশ্বব্যা"
         },
         {
           "chars": 87,
           "tag": "DD",
           "id": "",
-          "preview": "৫২,২৫,০১,২৭,৮৯৪.৫ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:15:38.885Zবিশ্বব্যাং"
+          "preview": "৫২,২৫,০১,২৭,৮৯৪.৫ USDতথ্যকাল: 2025 · সংগৃহীত: 2026-11-20T02:37:04.237Zবিশ্বব্যাং"
         }
       ],
       "clipped": [],
@@ -7157,7 +7157,7 @@
       "digest": "বাংলাদেশের উপাত্ত | অর্থনীতি | জনগণ | জ্বালানি | চলাচল | স্মার্ট জীবনযাপন | পরিবেশ | শাসন",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.11,
         "items": 4,
         "clipped": [],
@@ -7185,7 +7185,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -7264,7 +7264,7 @@
         "tag": "P",
         "id": "",
         "cls": "collage-foot",
-        "preview": "৯৪/৯৮টি পাঠ · সাম্প্রতিক সংরক্ষিত তথ্য · সংগ্রহ 2026-11-20T00:46:12.064Z · বয়স ১.৪৯ ঘণ্টা। যন্ত্রভেদে পর্যবেক্ষণের তারি"
+        "preview": "৯৪/৯৮টি পাঠ · সাম্প্রতিক সংরক্ষিত তথ্য · সংগ্রহ 2026-11-20T00:46:12.064Z · বয়স ১.৮৮ ঘণ্টা। যন্ত্রভেদে পর্যবেক্ষণের তারি"
       },
       "topBlocks": [
         {
@@ -7411,7 +7411,7 @@
       "digest": "স্থানভিত্তিক উপগ্রহের নমুনা | পরিবেশ | জ্বালানি | অর্থনীতি | চলাচল | জনগণ | স্মার্ট লিভিং | শাসন",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.11,
         "items": 4,
         "clipped": [],
@@ -7439,7 +7439,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -7583,7 +7583,7 @@
       "digest": "ঢাকার এলাকায় দ্রুত যান",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.11,
         "items": 4,
         "clipped": [],
@@ -7611,7 +7611,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -7816,7 +7816,7 @@
       "digest": "নদী ও বন্যা তথ্য (BWDB / FFWC)",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.11,
         "items": 4,
         "clipped": [],
@@ -7844,7 +7844,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -7950,7 +7950,7 @@
           "chars": 58,
           "tag": "P",
           "id": "",
-          "preview": "মডেলভিত্তিক আবহাওয়া · Open-Meteo · ঢাকা: 2026-11-20T08:15"
+          "preview": "মডেলভিত্তিক আবহাওয়া · Open-Meteo · ঢাকা: 2026-11-20T08:30"
         },
         {
           "chars": 56,
@@ -7988,7 +7988,7 @@
       "digest": "বায়ুমান ও শীতকালীন ধোঁয়ার সময়রেখা (CAMS / Open-Meteo)",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.11,
         "items": 4,
         "clipped": [],
@@ -8016,7 +8016,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -8210,7 +8210,7 @@
       "digest": "সামষ্টিক অর্থনীতি ও শিল্প তথ্য | শিল্প করিডোর · মাপা রাতের আলোক্ষেত্র | ঢাকা রপ্তানি প্রক্রিয়াকরণ এলাকা (ডিইপিজেড) | আদমজী রপ্তানি প্রক্রিয়াকরণ এলাকা | আশুলিয়া-জিরাবো তৈরি পোশাক করিডোর | হেমায়েতপুর চামড়া শিল্প নগরী (সাভার) | তেজগাঁও শিল্প এলাকা | মতিঝিল ও দিলকুশা আর্থিক কেন্দ্র | কাওরান বাজার পাইকারি আড়ত | চকবাজার পাইকারি বাজার | ইসলামপুর পাইকারি কাপড়ের বাজার | বাদামতলী ফল পাইকারি ঘাট",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.11,
         "items": 4,
         "clipped": [],
@@ -8238,7 +8238,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",
@@ -8380,7 +8380,7 @@
       "digest": "ঢাকার মেট্রোরেল ও পরিবহন নেটওয়ার্ক",
       "watchStrip": {
         "height": 28,
-        "width": 716,
+        "width": 718,
         "heightPct": 3.11,
         "items": 4,
         "clipped": [],
@@ -8408,7 +8408,7 @@
           {
             "id": "atlas-watch-wind",
             "label": "বাতাস",
-            "value": "৭.৪ কিমি/ঘ · মডেল"
+            "value": "৭.৬ কিমি/ঘ · মডেল"
           },
           {
             "id": "atlas-watch-traffic",

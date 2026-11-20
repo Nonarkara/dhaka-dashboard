@@ -1,0 +1,79 @@
+Night lights — the sensor handover
+==================================
+
+Captured 2026-11-20 against https://dhaka.nonarkara.org.
+
+What happened
+-------------
+NASA stopped publishing the Suomi NPP Day/Night Band on 2026-11-02. The GIBS
+capabilities document ends that layer's time dimension there; later dates
+answer 404 and the final date serves the blank placeholder GIBS ships before
+an ingest. The atlas kept naming the dead product, and the cost was paid in
+silence:
+
+  - the map's night lens was blank — `unavailable · gibs-no-observation`;
+  - the economy desk published a night from 2026-10-27 as `status: ok`,
+    three weeks old, because the tile behind that date still carried data and
+    the collector measured whatever it found.
+
+The release gate refused the deploy on this, correctly. The gate was right
+and the atlas was wrong.
+
+The live environment, before (build c8d7472)
+--------------------------------------------
+  VIIRS_NOAA20_CorrectedReflectance_TrueColor | ok        | 2026-11-18
+  MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth | ok        | 2026-11-18
+  VIIRS_SNPP_DayNightBand                       | unavailable | — gibs-no-observation
+  VIIRS_Combined_Flood_1-Day                   | ok        | 2026-11-17
+  rainviewer-radar                             | ok        | 2026-11-19
+
+The live environment, after (build f061144)
+--------------------------------------------
+  VIIRS_NOAA20_CorrectedReflectance_TrueColor | ok | 2026-11-19
+  MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth | ok | 2026-11-18
+  VIIRS_NOAA20_DayNightBand                    | ok | 2026-11-19
+  VIIRS_Combined_Flood_1-Day                   | ok | 2026-11-17
+  rainviewer-radar                             | ok | 2026-11-20
+
+environment-live.json is the live response, captured after the handover.
+gibs-live-verification.txt is the independent decode of every advertised tile:
+the night layer now answers 62,921 bytes of imagery, where the dead product's
+last tile answered 1,611 bytes of blank placeholder.
+
+The economy desk, before and after
+----------------------------------
+Before, the live collage carried:
+  VIIRS_SNPP_DayNightBand_At_Sensor_Radiance | ok | 32.656 nW/(cm² sr) | 2026-10-27
+After, it carries:
+  VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance | ok | 13.804 nW/(cm² sr) | 2026-11-18
+
+The night is two decades fresher and it is a different satellite's reading.
+The series is not spliced: the readings before the handover stay under the
+Suomi NPP layer id in the stored history, and the readings after it carry the
+NOAA-20 one. A reader can tell which satellite produced which row.
+
+Why the values are not comparable across the handover
+-----------------------------------------------------
+They are two satellites' measurements of the same quantity, on the same orbit,
+with the same colour map and the same units — but not one continuous series.
+The atlas therefore refuses to publish a reading that has aged past four days
+(`stale-observation`, with the date it refused) instead of passing an old
+night off as tonight's, and it publishes a reading only when the catalogue
+says the product is still flying.
+
+The gate
+---------
+scripts/test-environment-contract.mjs now measures each layer's last
+observation against TODAY, not against the catalogue's own capture date: a
+product that died after the catalogue was taken is as dead as one that had
+already died when it was taken. The measured layers — the registry that feeds
+numbers, which was never covered — get the same rule, and the Suomi NPP ids
+are in the retired list so no registry may name them again.
+
+Provenance
+----------
+NASA GIBS WMTS, no key. Night radiance: VIIRS NOAA-20 Day/Night Band at
+sensor, Level 8, nW/(cm² sr), colour map
+VIIRS_DayNightBand_At_Sensor_Radiance.xml, sampled over a five-pixel window
+(about 2.8 km over Dhaka) around each district centre — a sampled window, not
+a district average.

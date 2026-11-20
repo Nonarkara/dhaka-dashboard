@@ -1,5 +1,5 @@
 {
-  "auditedAt": "2026-11-20T02:13:41.046Z",
+  "auditedAt": "2026-11-20T02:36:00.128Z",
   "url": "https://dhaka.nonarkara.org",
   "viewports": [
     "390x844",
@@ -91,8 +91,8 @@
           "visible": true
         },
         {
-          "text": "↑\nWIND\n7.4 km/h · model",
-          "label": "Wind: 7.4 km/h · model · Modelled wind at 10 m · from 56° · 2026-11-20T08:00",
+          "text": "↑\nWIND\n7.6 km/h · model",
+          "label": "Wind: 7.6 km/h · model · Modelled wind at 10 m · from 63° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": false,
           "visible": true
@@ -130,8 +130,8 @@
         "pitch": 50,
         "walkCounts": "—",
         "sun": {
-          "altitudeDeg": 22.81977521066674,
-          "azimuthDeg": 125.71834800124907
+          "altitudeDeg": 26.864965383101534,
+          "azimuthDeg": 129.41011692026885
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-city/city-390-en.png"
@@ -215,8 +215,8 @@
           "visible": true
         },
         {
-          "text": "↑\nবাতাস\n৭.৪ কিমি/ঘ · মডেল",
-          "label": "বাতাস: ৭.৪ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৫৬° · 2026-11-20T08:00",
+          "text": "↑\nবাতাস\n৭.৬ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭.৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৬৩° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": true,
           "visible": true
@@ -254,8 +254,8 @@
         "pitch": 50,
         "walkCounts": "—",
         "sun": {
-          "altitudeDeg": 22.829670651924335,
-          "azimuthDeg": 125.72671654708758
+          "altitudeDeg": 26.878249886182047,
+          "azimuthDeg": 129.42323155902645
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-city/city-390-bn.png"
@@ -339,8 +339,8 @@
           "visible": true
         },
         {
-          "text": "↑\nWIND\n7.4 km/h · model",
-          "label": "Wind: 7.4 km/h · model · Modelled wind at 10 m · from 56° · 2026-11-20T08:00",
+          "text": "↑\nWIND\n7.6 km/h · model",
+          "label": "Wind: 7.6 km/h · model · Modelled wind at 10 m · from 63° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": false,
           "visible": true
@@ -378,8 +378,8 @@
         "pitch": 50,
         "walkCounts": "—",
         "sun": {
-          "altitudeDeg": 22.840251884440054,
-          "azimuthDeg": 125.73566831422352
+          "altitudeDeg": 26.88522381980496,
+          "azimuthDeg": 129.43011920042107
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-city/city-1024-en.png"
@@ -405,9 +405,9 @@
         "bottom": 768
       },
       "watch": {
-        "x": 154,
+        "x": 153,
         "y": 698,
-        "width": 716,
+        "width": 718,
         "height": 28,
         "bottom": 726
       },
@@ -446,7 +446,7 @@
         "map": true,
         "allInFirstScreen": true
       },
-      "unobscuredRatio": 0.9513,
+      "unobscuredRatio": 0.9512,
       "readings": [
         {
           "text": "≋\nবন্যা\nঅনুপলব্ধ",
@@ -463,8 +463,8 @@
           "visible": true
         },
         {
-          "text": "↑\nবাতাস\n৭.৪ কিমি/ঘ · মডেল",
-          "label": "বাতাস: ৭.৪ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৫৬° · 2026-11-20T08:00",
+          "text": "↑\nবাতাস\n৭.৬ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭.৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৬৩° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": true,
           "visible": true
@@ -502,8 +502,8 @@
         "pitch": 50,
         "walkCounts": "—",
         "sun": {
-          "altitudeDeg": 22.850392592165786,
-          "azimuthDeg": 125.74425054945344
+          "altitudeDeg": 26.895384544151447,
+          "azimuthDeg": 129.4401577539169
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-city/city-1024-bn.png"
@@ -587,8 +587,8 @@
           "visible": true
         },
         {
-          "text": "↑\nWIND\n7.4 km/h · model",
-          "label": "Wind: 7.4 km/h · model · Modelled wind at 10 m · from 56° · 2026-11-20T08:00",
+          "text": "↑\nWIND\n7.6 km/h · model",
+          "label": "Wind: 7.6 km/h · model · Modelled wind at 10 m · from 63° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": false,
           "visible": true
@@ -626,8 +626,8 @@
         "pitch": 50,
         "walkCounts": "—",
         "sun": {
-          "altitudeDeg": 22.86123742586337,
-          "azimuthDeg": 125.75343211556303
+          "altitudeDeg": 26.90464929086321,
+          "azimuthDeg": 129.44931477859876
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-city/city-1440-en.png"
@@ -653,9 +653,9 @@
         "bottom": 900
       },
       "watch": {
-        "x": 362,
+        "x": 361,
         "y": 830,
-        "width": 716,
+        "width": 718,
         "height": 28,
         "bottom": 858
       },
@@ -711,8 +711,8 @@
           "visible": true
         },
         {
-          "text": "↑\nবাতাস\n৭.৪ কিমি/ঘ · মডেল",
-          "label": "বাতাস: ৭.৪ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৫৬° · 2026-11-20T08:00",
+          "text": "↑\nবাতাস\n৭.৬ কিমি/ঘ · মডেল",
+          "label": "বাতাস: ৭.৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ৬৩° · 2026-11-20T08:30",
           "tier": "neutral",
           "clipped": true,
           "visible": true
@@ -750,8 +750,8 @@
         "pitch": 50,
         "walkCounts": "—",
         "sun": {
-          "altitudeDeg": 22.8732562272248,
-          "azimuthDeg": 125.76361172906213
+          "altitudeDeg": 26.915598836686804,
+          "azimuthDeg": 129.46014153741612
         }
       },
       "screenshot": "docs/evidence/msh-2026-11-20-city/city-1440-bn.png"
