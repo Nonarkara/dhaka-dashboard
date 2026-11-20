@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261112-1794502544-c8d7472";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261119-1795081041-0cc7857";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -77,8 +77,8 @@
     city: {
       title: "Read the city, from skyline to street",
       title_bn: "আকাশরেখা থেকে অলিগলি: ঢাকার প্রতিটি স্তরের পাঠ",
-      desc: "Zoom in for building footprints; select a feature for source details.",
-      desc_bn: "ভবনের রূপ দেখতে জুম করুন; উৎসের তথ্য পেতে স্থাপনা নির্বাচন করুন।"
+      desc: "Zoom in for the building massing and footprints; select a feature for source details.",
+      desc_bn: "ভবনের গঠন ও রূপ দেখতে জুম করুন; উৎসের তথ্য পেতে স্থাপনা নির্বাচন করুন।"
     },
     rivers: {
       title: "Northeast River Outlook & Dhaka References",
@@ -234,25 +234,34 @@
     styleSpec.layers.push({
       id: "city-buildings", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 14,
       filter: ["!", ["has", "hide_3d"]],
-      paint: buildingPaint("source_height_unavailable", "source_base_unavailable")
+      // The city's massing. The streamed tiles carry no surveyed height — what
+      // they carry is the provider's computed render_height, the same value
+      // the street-level massing is drawn from. It is therefore an
+      // ILLUSTRATIVE massing and never a measured building: the height is the
+      // map provider's computed height, not a survey, and the lens says so
+      // wherever a reader can meet it. A building with no height in the source
+      // stays flat, because a flat footprint is true and an invented storey is
+      // not.
+      //
+      // The colour is the atlas's own Palette 1, because the use of a building
+      // IS mapped even when its height is not. The walls are solid: a
+      // translucent block standing on a filled footprint double-draws the
+      // ground and turns the street into mud.
+      paint: {
+        ...buildingPaint("render_height", "render_min_height"),
+        "fill-extrusion-opacity": 1
+      }
     });
-    // The street-level massing. The streamed tile carries no surveyed
-    // height, only the provider's computed render_height — so this layer is
-    // drawn as an explicitly ILLUSTRATIVE massing, never as a measured
-    // building. It stays hidden until the street lens asks for it.
-    //
-    // The colour is the atlas's own Palette 1, because the use of a building
-    // IS mapped even when its height is not. The walls are solid: a
-    // translucent block standing on a filled footprint double-draws the
-    // ground and turns the street into mud.
+    // The street-level massing, drawn from the same provider height at the
+    // scale where a reader walks it. The clamp in buildingPaint applies here
+    // too: a corrupt tag must not become a hundred-kilometre tower, and a
+    // height below one metre leaves the footprint flat.
     styleSpec.layers.push({
       id: "walk-massing", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 16,
       filter: ["!", ["has", "hide_3d"]],
       layout: { visibility: "none" },
       paint: {
         ...buildingPaint("render_height", "render_min_height"),
-        "fill-extrusion-height": ["to-number", ["get", "render_height"], 0],
-        "fill-extrusion-base": ["to-number", ["get", "render_min_height"], 0],
         "fill-extrusion-opacity": 1
       }
     });
@@ -522,7 +531,11 @@
     // Source footprints remain visible in both views; only tagged heights extrude.
     const parliamentVisible = is3D && useSnapshot;
     // Flat source footprints stay visible while exploring at low pitch.
-    for (const [id, visible] of [["city-buildings", is3D && !useSnapshot], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
+    // The street lens draws its own massing, so the city's layer steps aside
+    // there: two extrusions of the same footprint at the same height fight
+    // each other and the walls shimmer.
+    const cityVisible = is3D && !useSnapshot && currentLens !== "walk";
+    for (const [id, visible] of [["city-buildings", cityVisible], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
       const visibility = visible ? "visible" : "none";
       if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
     }
@@ -530,9 +543,13 @@
     if (desc) {
       const story = LENS_STORIES[currentLens] || LENS_STORIES.city;
       const base = tr(story.desc, story.desc_bn);
-      const note = is3D ? useSnapshot
+      // The note states what the 3D view is actually standing on. The street
+      // lens already says it in its own story, so it is not repeated there.
+      const note = !is3D ? "" : useSnapshot
         ? tr("3D: explicit OSM heights only; unknown heights stay flat.", "৩ডি: শুধু OSM-এ নথিভুক্ত উচ্চতা; অজানা উচ্চতা সমতল থাকে।")
-        : tr("OSM footprints; streamed tiles do not expose source height tags.", "OSM ভবনের সীমারেখা; স্ট্রিম করা টাইলে উৎসের উচ্চতা নেই।") : "";
+        : currentLens === "walk" ? ""
+        : tr("3D: the massing is the map provider's computed height, not a survey; a building with no height in the source stays flat.",
+             "৩ডি: গঠন দেখানো হয় মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপ নয়; উৎসে উচ্চতা নেই ভবন সমতল থাকে।");
       const text = base + (note ? " " + note : "");
       if (desc.textContent !== text) desc.textContent = text;
     }

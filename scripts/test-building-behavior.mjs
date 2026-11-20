@@ -170,6 +170,21 @@ assert.equal(evaluate(paint['fill-extrusion-height'],{render_min_height:10}),0);
 // rather than extruding a hundred-kilometre tower over the city.
 assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:99999}),500,'an absurd height is clamped');
 assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:-12}),0,'a negative height stays flat');
+
+// The layers the map actually draws must go THROUGH that clamp, not around
+// it. A raw height expression on the layer would let a corrupt tag extrude a
+// hundred-kilometre tower while the clamp sat unused in a helper, which is
+// exactly what the street-level massing did until this test existed.
+for(const layerId of ['city-buildings','walk-massing']){
+  const layerPaint=map.getLayer(layerId)?.paint;
+  assert.ok(layerPaint,`${layerId} has no paint`);
+  assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:35.7}),35.7,`${layerId} does not read the provider height`);
+  assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:99999}),500,`${layerId} bypasses the height clamp`);
+  assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:-12}),0,`${layerId} extrudes a negative height`);
+  assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:0}),0,`${layerId} invents a height for a flat footprint`);
+  assert.equal(evaluate(layerPaint['fill-extrusion-base'],{render_min_height:0}),0,`${layerId} invents a base`);
+  assert.equal(layerPaint['fill-extrusion-opacity'],1,`${layerId} draws translucent walls over a filled footprint`);
+}
 console.log(`✓ Building behavior: ${detail.features.length} real footprints, Parliament courtyards, all lenses, exclusive detail switch, pan/offline/2D fallback and authored camera`);
 
 ({api,map}=app());

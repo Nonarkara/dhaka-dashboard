@@ -111,7 +111,7 @@
       { key: 'industry', color: colors.industry, en: 'Industry / RMG / EPZ', bn: 'শিল্প ও তৈরি পোশাক' },
       { key: 'unknown', color: colors.unknown, en: 'Use unknown', bn: 'ব্যবহার অজানা' },
     ];
-    node.innerHTML = `<details><summary>${bn ? 'ভবনের ধরন (প্যালেট ১)' : 'Building types (Palette 1)'}</summary><div class="building-swatches">${items.map(it => `<span><i style="background:${it.color}"></i>${bn ? it.bn : it.en}</span>`).join('')}</div><p>${bn ? 'সানজো ওয়াদা প্যালেট ১-এর রং। OSM-এর নথিভুক্ত ব্যবহার অনুযায়ী রং; ট্যাগহীন স্ট্রিম করা ভবনের ব্যবহার অজানা। উচ্চতা নথিভুক্ত বা আনুমানিক।' : 'Sanzo Wada Palette 1 tone (English Red & Cerulian Blue). Colors follow mapped OSM use tags. Untagged streamed buildings remain unknown; heights mapped or estimated.'}</p></details>`;
+    node.innerHTML = `<details><summary>${bn ? 'ভবনের ধরন (প্যালেট ১)' : 'Building types (Palette 1)'}</summary><div class="building-swatches">${items.map(it => `<span><i style="background:${it.color}"></i>${bn ? it.bn : it.en}</span>`).join('')}</div><p>${bn ? 'সানজো ওয়াদা প্যালেট ১-এর রং। OSM-এর নথিভুক্ত ব্যবহার অনুযায়ী রং; ট্যাগহীন স্ট্রিম করা ভবনের ব্যবহার অজানা। স্ট্রিম করা উচ্চতা মানচিত্র সরবরাহকারীর গণনাকৃত, জরিপকৃত নয়; সংসদের উচ্চতা OSM-এ নথিভুক্ত।' : 'Sanzo Wada Palette 1 tone (English Red & Cerulian Blue). Colors follow mapped OSM use tags. Untagged streamed buildings remain unknown. A streamed height is the map provider\'s computed height, not a survey; the parliament\'s are mapped OSM heights.'}</p></details>`;
   }
 
   document.addEventListener('DOMContentLoaded', render);

@@ -17,8 +17,19 @@ assert.match(app,/AtlasWalk\?\.attach/);
 assert.match(app,/maxPitch: 85/);
 const layer=app.slice(app.indexOf('id: "walk-massing"'),app.indexOf('\n    try {',app.indexOf('id: "walk-massing"')));
 assert.match(layer,/buildingPaint\("render_height", "render_min_height"\)/);
-assert.match(layer,/\["get", "render_height"\]/);
-assert.match(layer,/\["get", "render_min_height"\]/);
+// The massing must go through the clamp, not around it. A raw height
+// expression on the layer would let a corrupt tag extrude a hundred-
+// kilometre tower, and the clamp would sit unused in a helper.
+assert.doesNotMatch(layer,/\["to-number",\s*\["get",\s*"render_height"\]/);
+assert.doesNotMatch(layer,/\["to-number",\s*\["get",\s*"render_min_height"\]/);
+// The city lens draws the same provider massing at the scale where the
+// tiles carry buildings, rather than a footprint with no height in it.
+const cityLayer=app.slice(app.indexOf('id: "city-buildings"'),app.indexOf('id: "walk-massing"'));
+assert.match(cityLayer,/buildingPaint\("render_height", "render_min_height"\)/);
+assert.doesNotMatch(cityLayer,/source_height_unavailable/);
+// And the lens must say where that massing comes from, in both languages.
+assert.match(app,/the map provider's computed height, not a survey/);
+assert.match(app,/মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপ নয়/);
 assert.match(css,/\.atlas-walk\[hidden\]\s*\{\s*display:none/);
 assert.match(html,/id="atlas-walk-route"/,'authored bookmarks remain');
 assert.match(html,/id="atlas-walk-prev"/);
