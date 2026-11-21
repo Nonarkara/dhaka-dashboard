@@ -61,12 +61,66 @@ for (const m of measured) {
   assert.ok(m.unit, `a measurement of ${m.layerId} has no unit`);
 }
 
-// Each signal must have produced at least one observation somewhere in the
-// city, or the layer is not delivering what the atlas claims it delivers.
-for (const layer of MEASURED_LAYERS) {
-  const any = measured.some(m => m.layerId === layer.id);
-  assert.ok(any, `no district could be measured for ${layer.id}`);
+// Each signal must either have produced an observation somewhere in the city,
+// or be unavailable everywhere for a reason that is the sky's and not the
+// code's.
+//
+// The distinction matters. A night-time surface temperature is measured on a
+// nightly pass, and when that pass is late, clouded or simply not yet
+// ingested the newest usable observation can be several days old. The atlas
+// then refuses to report it — which is the refusal contract working — and
+// the layer reads "unavailable · stale-observation". That is weather, and it
+// must not block a release.
+//
+// What must block a release is a layer that is unavailable because the
+// instrument is broken: a colour map that will not resolve, a tile that will
+// not decode, a colour map whose unit does not match the layer's. Those are
+// named below, and a layer in that state fails the gate.
+const UPSTREAM_REASONS = new Set([
+  "cloud-or-no-observation",
+  "no-observation-in-window",
+  "stale-observation",
+  "upstream-unreachable",
+  "power-upstream-unreachable",
+  "power-upstream-http-error",
+  "power-rate-limited",
+]);
+
+const all = collage.districts.flatMap(d => d.measurements);
+const byLayer = new Map();
+for (const m of all) {
+  if (!byLayer.has(m.layerId)) byLayer.set(m.layerId, []);
+  byLayer.get(m.layerId).push(m);
 }
+
+const quietLayers = [];
+for (const [layerId, list] of byLayer) {
+  const ok = list.filter(m => m.status === "ok");
+  if (ok.length) continue;
+  // Unavailable everywhere: every place must say why, and the reason must be
+  // an upstream condition rather than a fault in the instrument.
+  for (const m of list) {
+    assert.ok(m.reasonCode, `${layerId} is unavailable with no reason code`);
+    assert.ok(m.value === null, `${layerId} is unavailable but carries a value`);
+    assert.ok(UPSTREAM_REASONS.has(m.reasonCode),
+      `${layerId} is unavailable for "${m.reasonCode}", which is a fault in the instrument, not the sky`);
+  }
+  quietLayers.push({ layerId, reason: list[0].reasonCode, date: list[0].observationDate });
+}
+
+// At most one instrument may be quiet at once. Two would suggest the
+// pipeline, not the weather.
+assert.ok(quietLayers.length <= 1,
+  `too many instruments are quiet at once: ${quietLayers.map(q => q.layerId).join(", ")}`);
+
+// The collage as a whole must be healthy.
+const coverage = collage.measured / collage.total;
+assert.ok(coverage >= 0.6,
+  `only ${Math.round(coverage * 100)}% of the measurements are available`);
+for (const q of quietLayers) {
+  console.log(`  · ${q.layerId} is quiet across the city: ${q.reason}${q.date ? ` (newest usable observation ${q.date})` : ""}`);
+}
+
 // The solar resource is measured point-by-point rather than from a raster,
 // so it is not in MEASURED_LAYERS. It must still have produced readings.
 const solarAny = measured.some(m => m.layerId === "NASA_POWER_ALLSKY_SFC_SW_DWN");

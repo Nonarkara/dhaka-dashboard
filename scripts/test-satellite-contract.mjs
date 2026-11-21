@@ -628,6 +628,44 @@ ok("the prose audit reports no unsourced quantity in a description", () => {
   }
 });
 
+// ── Every reason code the system can emit must be classified ───────────────
+// The live release gate treats some reason codes as "the sky did this" and
+// others as "the instrument is broken". A code that appears in neither list
+// would either pass silently or fail every release, so the classification is
+// held to the source that produces the codes.
+ok("every reason code the system can emit is classified", async () => {
+  const { readdirSync } = await import("node:fs");
+  const sources = readdirSync("src").filter(f => f.endsWith(".ts"))
+    .map(f => readFileSync(`src/${f}`, "utf8")).join("\n");
+  const gate = readFileSync("scripts/verify-satellite-live.mjs", "utf8");
+  // The upstream set is read out of the gate itself, so a code added there is
+  // seen here — a regex that guessed at the shape of the names would miss
+  // exactly the mutation this check exists to catch.
+  const setBlock = gate.match(/const UPSTREAM_REASONS = new Set\(\[([\s\S]*?)\]\)/);
+  assert.ok(setBlock, "the live gate has no UPSTREAM_REASONS set");
+  const upstream = new Set([...setBlock[1].matchAll(/"([a-z][a-z0-9-]*)"/g)].map(m => m[1]));
+  assert.ok(upstream.size > 0, "the live gate's UPSTREAM_REASONS set is empty");
+  // Only the codes a MEASUREMENT can carry. A reading or a corridor has its
+  // own reason codes, and those never reach the live gate's classification.
+  const satSrc = readFileSync("src/satellite.ts", "utf8");
+  const measurementCodes = new Set([
+    ...[...satSrc.matchAll(/unavailableMeasurement\([^,]+,[^,]+,\s*"([a-z][a-z0-9-]*)"/g)].map(m => m[1]),
+    ...[...satSrc.matchAll(/reasonCode:\s*"([a-z][a-z0-9-]*)"/g)].map(m => m[1]),
+  ]);
+  assert.ok(measurementCodes.size > 0, "no measurement reason codes were found in the source");
+  for (const code of measurementCodes) {
+    const classified = upstream.has(code) || code.includes("unresolved") || code.includes("failed");
+    assert.ok(classified,
+      `the reason code "${code}" is classified by neither the live gate nor the fault list`);
+  }
+  // A code that means the instrument is broken must never be treated as the
+  // sky's fault, or a broken colour map would ship unnoticed.
+  assert.ok(!upstream.has("colormap-unresolved"),
+    "a broken colour map is being treated as an upstream condition");
+  assert.ok(upstream.has("stale-observation"),
+    "a stale observation is not treated as an upstream condition");
+});
+
 for (const { label, fn } of cases) {
   try {
     await fn();

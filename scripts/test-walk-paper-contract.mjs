@@ -63,8 +63,20 @@ ok("the model camera estimate is qualified", () => {
 
 // ── The walk is over a flat plane, and says so ─────────────────────────────
 ok("the walk says it moves over the map plane, not a surveyed terrain", () => {
-  assert.ok(walk.includes("map plane") || walk.includes("map-plane"),
-    "the exploration does not identify its map-plane model");
+  // The reader sees this in the panel, so the panel is where it must be.
+  const ground = index.match(/id="atlas-walk-ground"[^>]*>([^<]*)</);
+  assert.ok(ground, "the walk panel has no statement about its ground");
+  assert.ok(/flat plane/.test(ground[1]),
+    `the walk panel does not say the ground is the map's flat plane: ${ground[1]}`);
+  assert.ok(/no elevation model/.test(ground[1]),
+    "the walk panel does not say the atlas carries no elevation model");
+  assert.ok(/not a walking route/.test(ground[1]),
+    "the walk panel does not say the viewpoints are not a walking route");
+  assert.ok(/do not establish street access/.test(ground[1]),
+    "the walk panel does not say the viewpoints establish no street access");
+  // And the module must be honest about where its camera numbers come from.
+  assert.ok(/projection-model estimates, not surveyed/.test(walk),
+    "the walk module does not mark its camera values as estimates");
 });
 
 // ── The itinerary is authored and every stop is a real district ────────────
