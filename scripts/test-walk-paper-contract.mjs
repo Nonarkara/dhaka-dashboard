@@ -272,6 +272,14 @@ ok("the paper's GIBS instrument count matches the collage", () => {
 
   assertEnClaims("satellite instruments from NASA GIBS", fromGibs.length);
   assertBnClaim(pairFor("satellite instruments from NASA GIBS"), "উপগ্রহ যন্ত্র", fromGibs.length);
+
+  // The diagram states the same count in digits, and it counts only the GIBS
+  // layers. NASA POWER is a reanalysis model, not a satellite instrument, so
+  // it is named separately in the block rather than folded into the number.
+  assert.ok(research.includes(`>${fromGibs.length} satellite instruments</text>`),
+    `the diagram does not say "${fromGibs.length} satellite instruments"`);
+  assert.ok(research.includes("+ 1 climate reanalysis</text>"),
+    "the diagram does not name the reanalysis model separately from the satellites");
 });
 
 ok("the paper's collage counts match the code", () => {
