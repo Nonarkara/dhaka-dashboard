@@ -93,6 +93,12 @@ for (const m of all) {
   byLayer.get(m.layerId).push(m);
 }
 
+// A configured instrument that produced no rows at all is not quiet; it is
+// missing. The loop below only sees layers that appear, so check first.
+for (const layer of MEASURED_LAYERS) {
+  assert.ok(byLayer.has(layer.id), `${layer.id} is configured but absent from the collage`);
+}
+
 const quietLayers = [];
 for (const [layerId, list] of byLayer) {
   const ok = list.filter(m => m.status === "ok");

@@ -664,6 +664,10 @@ ok("every reason code the system can emit is classified", async () => {
     "a broken colour map is being treated as an upstream condition");
   assert.ok(upstream.has("stale-observation"),
     "a stale observation is not treated as an upstream condition");
+  // The quiet-layer loop only walks layers that appear in the collage, so a
+  // configured instrument with no rows at all must be caught before it.
+  assert.ok(/for \(const layer of MEASURED_LAYERS\)[\s\S]{0,80}byLayer\.has\(layer\.id\)/.test(gate),
+    "the live gate no longer fails when a configured instrument is absent from the collage");
 });
 
 for (const { label, fn } of cases) {
