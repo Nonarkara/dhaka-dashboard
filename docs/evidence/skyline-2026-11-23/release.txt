@@ -1,0 +1,12 @@
+Skyline source changes are deployed and exact-byte verified at dhaka.nonarkara.org.
+Source commit: 1a9ff31
+Build: dhaka-atlas-20261123-1795412953-1a9ff31
+Worker version: 2a58aacf-b44b-42c4-8f75-93d625f1b80c
+24 configured test suites, typecheck, preflight and independent review passed.
+Canonical bash scripts/deploy-live.sh uploaded successfully, passed 13 API smoke checks and exact SHA-256 for every asset including city-height-buildings.geojson.
+GIBS: 3 dated layers independently decoded; aerosol imagery explicitly unavailable.
+Canonical script then exited 1 at the satellite health gate: 2 instruments quiet, while policy permits at most 1. No gate was weakened or bypassed.
+Daytime surface heat: unavailable/stale-observation. Aerosol optical depth: unavailable/no-observation-in-window. Total collage 70/98 readings; missing values remain null.
+Remaining snapshot, population and planning live checks were run separately and passed. Snapshot validates the actual partial 70/98 dataset, not a healthy-source claim.
+Production browser confirms tower cluster, with final screenshot live-city-1440-en.jpg. Local source inspection exposes Pinnacle 152.3 m and OSM 120 m conflict.
+The skyline fix is live; the overall canonical health gate remains failed/degraded due to the 2 satellite inputs. This is not an all-feeds-healthy release.
