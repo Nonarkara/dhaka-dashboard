@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<osm version="0.6" copyright="OpenStreetMap contributors" license="ODbL-1.0">
+  <bounds minlat="23.7750000" minlon="90.4100000" maxlat="23.7980000" maxlon="90.4220000" />
+  <meta source_url="https://api.openstreetmap.org/api/0.6/map?bbox=90.4100000,23.7750000,90.4220000,23.7980000" source_sha256="a668204b13f98f9ec91b1a2125555bf0cf8a18014fd02dbfac7f4b5a36e8cf33" retrieved_at="2026-11-23T05:38:48.459454+00:00" building_objects="6915" height_objects="2" />
+  <node id="3731470008" version="4" timestamp="2021-08-14T17:41:07Z" lat="23.7788028" lon="90.4138440" />
+  <node id="3731470009" version="4" timestamp="2021-08-14T17:41:07Z" lat="23.7786286" lon="90.4138369" />
+  <node id="3731470010" version="4" timestamp="2021-08-14T17:41:07Z" lat="23.7786142" lon="90.4142594" />
+  <node id="3731470011" version="4" timestamp="2021-08-14T17:41:07Z" lat="23.7787884" lon="90.4142665" />
+  <node id="4903246812" version="3" timestamp="2025-04-05T07:39:58Z" lat="23.7812943" lon="90.4161603" />
+  <node id="4903246813" version="3" timestamp="2025-04-05T07:39:58Z" lat="23.7810830" lon="90.4161562" />
+  <node id="4903246814" version="3" timestamp="2025-04-05T07:39:58Z" lat="23.7810862" lon="90.4159584" />
+  <node id="4903246815" version="3" timestamp="2025-04-05T07:39:58Z" lat="23.7812975" lon="90.4159625" />
+  <way id="369350675" version="4" timestamp="2026-07-04T19:41:39Z">
+    <nd ref="3731470008" />
+    <nd ref="3731470009" />
+    <nd ref="3731470010" />
+    <nd ref="3731470011" />
+    <nd ref="3731470008" />
+    <tag k="addr:city" v="Dhaka" />
+    <tag k="addr:street" v="Road 7" />
+    <tag k="building" v="apartments" />
+    <tag k="building:levels" v="2" />
+    <tag k="height" v="20" />
+    <tag k="name" v="Infostation" />
+  </way>
+  <way id="498993241" version="3" timestamp="2018-05-28T05:58:19Z">
+    <nd ref="4903246815" />
+    <nd ref="4903246812" />
+    <nd ref="4903246813" />
+    <nd ref="4903246814" />
+    <nd ref="4903246815" />
+    <tag k="addr:city" v="Dhaka" />
+    <tag k="addr:housenumber" v="03" />
+    <tag k="addr:street" v="Road No. 20" />
+    <tag k="building" v="commercial" />
+    <tag k="building:levels" v="9" />
+    <tag k="height" v="30" />
+    <tag k="name" v="Bashati Dreams" />
+  </way>
+</osm>

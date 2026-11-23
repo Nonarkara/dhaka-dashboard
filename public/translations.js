@@ -2,6 +2,10 @@
 // Keys are the canonical English source strings.
 
 window.ATLAS_BN = {
+  "Low-angle map exploration": "নিচু কোণের মানচিত্র দেখা",
+  "Source heights only; unknown flat. Not a walking route.": "শুধু উৎসের উচ্চতা; অজানা সমতল। হাঁটার পথ নয়।",
+  "Published/source-tag heights; partial coverage, not surveyed": "প্রকাশিত/উৎসের উচ্চতা; আংশিক তথ্য, জরিপ নয়",
+
   "Heights are the map provider's, not surveyed.": "উচ্চতা মানচিত্র সরবরাহকারীর, জরিপকৃত নয়।",
   "The ground is the map's flat plane; the atlas carries no elevation model. These viewpoints are not a walking route and do not establish street access.": "মাটি মানচিত্রের সমতল; মানচিত্রে উচ্চতার মডেল নেই। এই দৃশ্যগুলো হাঁটার পথ নয় এবং রাস্তায় প্রবেশযোগ্যতা প্রমাণ করে না।",
   "Exploration tools & sources": "নিয়ন্ত্রণ ও উৎস",

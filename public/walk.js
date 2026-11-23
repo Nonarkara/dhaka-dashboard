@@ -65,6 +65,16 @@
       note_bn: 'পাইকারি কৃষিপণ্যের টার্মিনাল।',
     },
     {
+      id: 'parliament', bearing: -20,
+      note: 'National Parliament district reference viewpoint; not an entrance or walking route.',
+      note_bn: 'জাতীয় সংসদ এলাকার রেফারেন্স দৃশ্য; প্রবেশদ্বার বা হাঁটার পথ নয়।',
+    },
+    {
+      id: 'tejgaon', bearing: -25,
+      note: 'Tejgaon tower-cluster reference viewpoint; not a walking route.',
+      note_bn: 'তেজগাঁওয়ের বহুতল ভবনগুচ্ছের রেফারেন্স দৃশ্য; হাঁটার পথ নয়।',
+    },
+    {
       id: 'gulshan', bearing: 340,
       note: 'Gulshan district reference viewpoint.',
       note_bn: 'গুলশানের জেলা-রেফারেন্স দৃশ্য।',
@@ -78,6 +88,10 @@
   /** True once the camera has actually been put at a stop. */
   let standing = false;
   let stopIndex = 0;
+  // Consume the opening area only when the registry arrives. Subsequent
+  // language/data refreshes must never take the camera back from the reader.
+  let initialAreaPending = true;
+  const requestedArea = new URLSearchParams(window.location?.search || '').get('area');
   let atBookmark = false;
   let boundMap = null;
   let previousMaxPitch = null;
@@ -314,6 +328,7 @@
 
   /** Stand at a stop: move there and turn to face its bearing. */
   function goToStop(index) {
+    initialAreaPending = false;
     stopInput();
     stopIndex = (index + ROUTE.length) % ROUTE.length;
     atBookmark = false;
@@ -441,7 +456,12 @@
     renderStatus();
   }
 
-  function manualInput() { stopInput(); invalidateBookmark(); }
+  function manualInput() {
+    initialAreaPending = false;
+    standing = true;
+    stopInput();
+    invalidateBookmark();
+  }
   function onCanvasPointerDown() {
     manualInput();
     map?.getCanvas()?.focus?.({preventScroll:true});
@@ -460,6 +480,8 @@
     if (!['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) return;
     if (event.repeat && !keys.has(key)) return;
     event.preventDefault();
+    initialAreaPending = false;
+    standing = true;
     if (reducedMotion?.matches) {
       // Reduced motion uses one discrete user-requested step per key press.
       if (event.repeat) return;
@@ -571,6 +593,11 @@
       if (map !== mapInstance) { stopInput(); unbindMap(); standing = false; atBookmark = false; }
       map = mapInstance;
       areas = areasData || [];
+      if (initialAreaPending && areas.length) {
+        initialAreaPending = false;
+        const requestedStop = ROUTE.findIndex(stop => stop.id === requestedArea && areaById(stop.id));
+        if (requestedStop !== -1) stopIndex = requestedStop;
+      }
       bindMap();
       // The districts may have arrived after the walk was asked for. When
       // they do, the camera finally applies its authored bookmark.

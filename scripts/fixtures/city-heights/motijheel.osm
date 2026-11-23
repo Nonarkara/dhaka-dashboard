@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8'?>
+<osm version="0.6" copyright="OpenStreetMap contributors" license="ODbL-1.0">
+  <bounds minlat="23.7260000" minlon="90.4140000" maxlat="23.7350000" maxlon="90.4220000" />
+  <meta source_url="https://api.openstreetmap.org/api/0.6/map?bbox=90.4140000,23.7260000,90.4220000,23.7350000" source_sha256="d9fa6e7f53974c05cedc7178374b63b04408189734802c256b0441517f841c9b" retrieved_at="2026-11-23T05:37:52.961795+00:00" building_objects="1352" height_objects="4" />
+  <node id="4363341266" version="2" timestamp="2016-08-23T19:03:13Z" lat="23.7322825" lon="90.4215786" />
+  <node id="4363341267" version="1" timestamp="2016-08-23T17:41:44Z" lat="23.7320089" lon="90.4217351" />
+  <node id="4363341268" version="1" timestamp="2016-08-23T17:41:44Z" lat="23.7320645" lon="90.4218379" />
+  <node id="4363341269" version="1" timestamp="2016-08-23T17:41:44Z" lat="23.7323338" lon="90.4216744" />
+  <node id="4894765933" version="3" timestamp="2026-09-09T16:39:20Z" lat="23.7290192" lon="90.4176635" />
+  <node id="4894765934" version="3" timestamp="2026-09-09T16:39:20Z" lat="23.7292053" lon="90.4173294" />
+  <node id="4894765935" version="3" timestamp="2026-09-09T16:39:20Z" lat="23.7295295" lon="90.4175448" />
+  <node id="4894766021" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7264331" lon="90.4205922" />
+  <node id="4894766022" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7263542" lon="90.4204742" />
+  <node id="4894766023" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7262097" lon="90.4205922" />
+  <node id="4894766024" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7261966" lon="90.4205715" />
+  <node id="4894766025" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7261031" lon="90.4206257" />
+  <node id="4894766026" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7260724" lon="90.4205747" />
+  <node id="4894766027" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7260286" lon="90.4205922" />
+  <node id="4894766028" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7259907" lon="90.4206225" />
+  <node id="4894766029" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7259629" lon="90.4206752" />
+  <node id="4894766030" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7259571" lon="90.4207485" />
+  <node id="4894766031" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7259819" lon="90.4208091" />
+  <node id="4894766032" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7260067" lon="90.4208586" />
+  <node id="4894766033" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7260710" lon="90.4209224" />
+  <node id="4894766034" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7261469" lon="90.4209383" />
+  <node id="4894766035" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7262287" lon="90.4209000" />
+  <node id="4894766036" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7262725" lon="90.4208618" />
+  <node id="4894766037" version="1" timestamp="2017-06-04T07:17:03Z" lat="23.7262112" lon="90.4207693" />
+  <node id="4896533808" version="2" timestamp="2021-10-14T15:06:22Z" lat="23.7268668" lon="90.4218587" />
+  <node id="4896533809" version="2" timestamp="2021-10-14T15:06:22Z" lat="23.7268226" lon="90.4219123" />
+  <node id="4896533810" version="2" timestamp="2021-10-14T15:06:22Z" lat="23.7270727" lon="90.4222837" />
+  <node id="4896533811" version="2" timestamp="2021-10-14T15:06:22Z" lat="23.7273575" lon="90.4221040" />
+  <node id="6436874664" version="2" timestamp="2026-09-09T16:39:20Z" lat="23.7293434" lon="90.4178789" />
+  <way id="438612250" version="4" timestamp="2024-06-02T12:08:21Z">
+    <nd ref="4363341266" />
+    <nd ref="4363341267" />
+    <nd ref="4363341268" />
+    <nd ref="4363341269" />
+    <nd ref="4363341266" />
+    <tag k="building" v="residential" />
+    <tag k="building:levels" v="4" />
+    <tag k="height" v="50" />
+    <tag k="name" v="B-14" />
+  </way>
+  <way id="497984048" version="2" timestamp="2024-08-08T21:58:56Z">
+    <nd ref="4894766037" />
+    <nd ref="4894766036" />
+    <nd ref="4894766035" />
+    <nd ref="4894766034" />
+    <nd ref="4894766033" />
+    <nd ref="4894766032" />
+    <nd ref="4894766031" />
+    <nd ref="4894766030" />
+    <nd ref="4894766029" />
+    <nd ref="4894766028" />
+    <nd ref="4894766027" />
+    <nd ref="4894766026" />
+    <nd ref="4894766025" />
+    <nd ref="4894766024" />
+    <nd ref="4894766023" />
+    <nd ref="4894766022" />
+    <nd ref="4894766021" />
+    <nd ref="4894766037" />
+    <tag k="building" v="office" />
+    <tag k="building:levels" v="15" />
+    <tag k="height" v="69" />
+  </way>
+  <way id="498177610" version="4" timestamp="2024-08-08T11:22:20Z">
+    <nd ref="4896533811" />
+    <nd ref="4896533810" />
+    <nd ref="4896533809" />
+    <nd ref="4896533808" />
+    <nd ref="4896533811" />
+    <tag k="building" v="office" />
+    <tag k="building:levels" v="20" />
+    <tag k="height" v="90" />
+  </way>
+  <way id="686702285" version="3" timestamp="2026-09-09T16:39:20Z">
+    <nd ref="4894765934" />
+    <nd ref="4894765933" />
+    <nd ref="6436874664" />
+    <nd ref="4894765935" />
+    <nd ref="4894765934" />
+    <tag k="addr:street" v="মতিঝিল সড়ক" />
+    <tag k="building" v="commercial" />
+    <tag k="building:levels" v="47qrq" />
+    <tag k="height" v="118" />
+    <tag k="name" v="City center" />
+  </way>
+</osm>

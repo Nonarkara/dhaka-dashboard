@@ -12,7 +12,7 @@ DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and envi
 
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
-| **City in 3D** | OSM building footprints at zoom 14+ in every 3D lens; local Parliament detail preserves courtyards and eight explicit source heights; unknown heights stay flat, plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
+| **City in 3D** | OSM building footprints at zoom 14+ in every 3D lens; 276 source-height CBD footprints plus local Parliament detail preserving courtyards and eight explicit heights; unknown heights stay flat, plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
 | **Low-angle map** | A street-scale view walked with the keys, with an itinerary of six measured places and a camera height solved from the projection rather than asserted. Only explicit source heights extrude; unknown heights stay flat. Projection-model camera estimates are not surveyed eye height. Counts are unique identified rendered footprints, published only once the map has settled; the external scene link uses the map centre | OpenStreetMap / OpenFreeMap; credited external Location Scout link |
 | **River outlook** | Northeast GloFAS daily model reaches with ensemble quartiles and available-series maxima; Dhaka reference station registry has no connected observations or calibrated warnings | Bangladesh Water Development Board (BWDB) / FFWC |
 | **Population** | Dated WorldPop 2025 estimates in 1 km cells and 2,181 mapped school/healthcare objects; no census or capacity inference | WorldPop / OpenStreetMap |
@@ -142,3 +142,10 @@ The low-angle exploration lens preserves keyboard controls, authored viewpoints 
 Transit now labels 17 mapped registry stations including the Kamalapur extension, without claiming 17 operating stations. Failures retain their reason/time and a working Retry; stale language responses cannot overwrite the current desk. Export validates each layer and reports malformed/missing collections as partial or unavailable.
 
 The report's axial-grid claim is stale: protected STYLE.md and current CSS already specify modular map-edge instruments. There are 23 configured npm suites after adding executable exploration behavior. Deployment and live-build status are recorded separately in docs/evidence/audit-2026-11-06/; a successful test run does not prove a release, and an account API 503 alone does not establish a global Cloudflare outage.
+
+
+## Skyline audit · 23 November 2026
+
+The opening city camera now frames Tejgaon at building-visible zoom. A self-hosted layer adds 276 source-height footprints from captured OSM geometry in Tejgaon, Motijheel and part of Gulshan. This is partial coverage, not a complete skyline inventory or architectural model. Pinnacle uses the project manager’s published 152.3 m height, retains the conflicting OSM 120 m tag, and links both source records; its developer reports 40 storeys. No generic floor-to-metre conversion or provider default height is used.
+
+Reproduce with `python3 scripts/bake-city-heights.py`; privacy-filtered input captures, source URLs/hashes and limitations are committed. Source inspection, 2D/offline behavior and the opening camera have behavioral regressions. Walk links to Parliament and Tejgaon now honor their area without overriding later manual navigation. Evidence: docs/evidence/skyline-2026-11-23.

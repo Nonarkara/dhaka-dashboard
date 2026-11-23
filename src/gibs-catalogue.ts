@@ -8,14 +8,14 @@
 // status or byte check cannot tell it from a real raster. The capabilities
 // time dimension excludes those dates, which makes it the authority for the
 // observation date the Worker reports.
-export const GIBS_CATALOGUE_CAPTURED = "2026-11-19";
+export const GIBS_CATALOGUE_CAPTURED = "2026-11-23";
 export const GIBS_CATALOGUE_LATEST: Record<string, string> = {
-  "VIIRS_NOAA20_CorrectedReflectance_TrueColor": "2026-11-19",
-  "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth": "2026-11-18",
-  "VIIRS_NOAA20_DayNightBand": "2026-11-19",
-  "VIIRS_Combined_Flood_1-Day": "2026-11-18",
-  "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance": "2026-11-19",
-  "MODIS_Terra_Land_Surface_Temp_Day_TES": "2026-11-19",
-  "MODIS_Terra_Land_Surface_Temp_Night_TES": "2026-11-19",
-  "MODIS_Terra_L3_NDVI_16Day": "2026-10-16",
+  "VIIRS_NOAA20_CorrectedReflectance_TrueColor": "2026-11-23",
+  "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth": "2026-11-21",
+  "VIIRS_NOAA20_DayNightBand": "2026-11-23",
+  "VIIRS_Combined_Flood_1-Day": "2026-11-23",
+  "VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance": "2026-11-22",
+  "MODIS_Terra_Land_Surface_Temp_Day_TES": "2026-11-23",
+  "MODIS_Terra_Land_Surface_Temp_Night_TES": "2026-11-23",
+  "MODIS_Terra_L3_NDVI_16Day": "2026-11-01",
 };

@@ -77,11 +77,11 @@ function app({offline=false,search='',rainfall=null}={}) {
       const blank=isBlank(url);
       return {ok:true,status:200,headers:{get:()=>blank?'1611':'59778'},
         blob:async()=>({size:blank?1611:59778,blank}),
-        json:async()=>url.includes('/api/atlas/rainfall')&&rainfall?rainfall:url.includes('rainviewer')?{host:'https://tilecache.rainviewer.com',radar:{past:[{path:'/radar/1',time:1700000000},{path:'/radar/2',time:1700000300}]}}:url.includes('parliament-buildings')?detail:url.includes('dhaka-areas')?JSON.parse(read('public/dhaka-areas.json')):{status:'unavailable'}};
+        json:async()=>url.includes('/api/atlas/rainfall')&&rainfall?rainfall:url.includes('rainviewer')?{host:'https://tilecache.rainviewer.com',radar:{past:[{path:'/radar/1',time:1700000000},{path:'/radar/2',time:1700000300}]}}:url.includes('city-height-buildings')?JSON.parse(read('public/data/city-height-buildings.geojson')):url.includes('parliament-buildings')?detail:url.includes('dhaka-areas')?JSON.parse(read('public/dhaka-areas.json')):{status:'unavailable'}};
     },
   };
   let source=read('public/app.js');
-  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadDataLayers,loadParliamentBuildings,flyToArea,buildingPaint,showInspectionHUD,loadLensEvidence,pauseRadar,wireUIEvents};})();';
+  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadDataLayers,loadParliamentBuildings,loadCityHeights,flyToArea,buildingPaint,showInspectionHUD,loadLensEvidence,pauseRadar,wireUIEvents};})();';
   vm.runInNewContext(source,context);
   window.test.initMap();
   return {api:window.test,map,elements,maplibre:window.maplibregl,ticks,events,window,document:context.document};
@@ -178,8 +178,8 @@ assert.equal(evaluate(paint['fill-extrusion-height'],{render_height:-12}),0,'a n
 for(const layerId of ['city-buildings','walk-massing']){
   const layerPaint=map.getLayer(layerId)?.paint;
   assert.ok(layerPaint,`${layerId} has no paint`);
-  assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:35.7}),35.7,`${layerId} does not read the provider height`);
-  assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:99999}),500,`${layerId} bypasses the height clamp`);
+  assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:35.7}),0,`${layerId} must not turn a provider default into an explicit source height`);
+  assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:99999}),0,`${layerId} must ignore untraceable provider heights`);
   assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:-12}),0,`${layerId} extrudes a negative height`);
   assert.equal(evaluate(layerPaint['fill-extrusion-height'],{render_height:0}),0,`${layerId} invents a height for a flat footprint`);
   assert.equal(evaluate(layerPaint['fill-extrusion-base'],{render_min_height:0}),0,`${layerId} invents a base`);
@@ -241,3 +241,35 @@ console.log('✓ Rain map: missing values omitted, true zero retained, interval 
 
 api.showInspectionHUD('landmark',{name:'Reference tower',height_m:35.7},null);
 assert.match(elements.get('atlas-observation-hud').innerHTML,/Unverified registry height/,'legacy landmark registry values must not read as surveyed heights');
+
+// The skyline must come from source geometry/heights, including actual towers.
+const skyline=JSON.parse(read('public/data/city-height-buildings.geojson'));
+assert.equal(new Set(skyline.features.map(f=>f.id)).size,skyline.features.length);
+assert.ok(skyline.features.length>200);
+for(const f of skyline.features){
+  assert.ok(f.properties.height_m>0 && f.properties.height_m<=500);
+  assert.ok(f.properties.source_url.endsWith(f.id));
+  assert.ok(f.properties.osm_modified_at && f.properties.height_source_url);
+  assert.ok(['osm-height-tag','published-project-height'].includes(f.properties.height_method));
+  for(const polygon of f.geometry.type==='MultiPolygon'?f.geometry.coordinates:[f.geometry.coordinates])for(const ring of polygon){
+    assert.deepEqual(ring[0],ring.at(-1));assert.ok(ring.length>=4);
+    assert.ok(ring.every(p=>p.length===2 && p.every(Number.isFinite)));
+  }
+}
+const pinnacle=skyline.features.find(f=>f.id==='relation/12770867');
+assert.equal(pinnacle.properties.height_m,152.3);
+assert.equal(pinnacle.properties.osm_height_m,120,'source conflict must remain inspectable');
+assert.equal(pinnacle.properties.floors,40);
+assert.match(pinnacle.properties.height_source_url,/ascentis\.build/);
+assert.equal(skyline.features.find(f=>f.id==='way/686702285').properties.height_m,118);
+({api,map,elements}=app());await api.loadCityHeights();
+const sourcePaint=map.getLayer('city-height-buildings').paint;
+assert.equal(evaluate(sourcePaint['fill-extrusion-height'],pinnacle.properties),152.3);
+assert.equal(evaluate(sourcePaint['fill-extrusion-height'],{height_m:null,'building:levels':50}),0,'50 floors alone cannot invent metre height');
+assert.ok(map.options.zoom>=map.getLayer('city-footprints').minzoom,'opening view must actually reach building zoom floor');
+api.applyLens('city',{moveCamera:true});assert.ok(map.camera.zoom>=14);
+api.applyLens('walk');elements.get('atlas-view').value='2d';api.syncBuildingVisibility();
+assert.equal(map.getLayoutProperty('city-height-buildings','visibility'),'none');
+assert.equal(map.getLayoutProperty('walk-massing','visibility'),'none','2D must suppress every extrusion');
+({api,map}=app({offline:true}));await api.loadCityHeights();assert.ok(!map.getLayer('city-height-buildings'),'failed height feed cannot invent a skyline');
+console.log('✓ Skyline: source-backed tower geometry, height conflicts, visible opening zoom, 2D and offline refusal.');

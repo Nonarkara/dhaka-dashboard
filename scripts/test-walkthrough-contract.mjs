@@ -16,7 +16,7 @@ assert.match(app,/AtlasWalk\?\.activate/);
 assert.match(app,/AtlasWalk\?\.attach/);
 assert.match(app,/maxPitch: 85/);
 const layer=app.slice(app.indexOf('id: "walk-massing"'),app.indexOf('\n    try {',app.indexOf('id: "walk-massing"')));
-assert.match(layer,/buildingPaint\("render_height", "render_min_height"\)/);
+assert.match(layer,/buildingPaint\("source_height_unavailable", "source_base_unavailable"\)/);
 // The massing must go through the clamp, not around it. A raw height
 // expression on the layer would let a corrupt tag extrude a hundred-
 // kilometre tower, and the clamp would sit unused in a helper.
@@ -25,11 +25,11 @@ assert.doesNotMatch(layer,/\["to-number",\s*\["get",\s*"render_min_height"\]/);
 // The city lens draws the same provider massing at the scale where the
 // tiles carry buildings, rather than a footprint with no height in it.
 const cityLayer=app.slice(app.indexOf('id: "city-buildings"'),app.indexOf('id: "walk-massing"'));
-assert.match(cityLayer,/buildingPaint\("render_height", "render_min_height"\)/);
-assert.doesNotMatch(cityLayer,/source_height_unavailable/);
+assert.match(cityLayer,/buildingPaint\("source_height_unavailable", "source_base_unavailable"\)/);
+assert.match(cityLayer,/source_height_unavailable/);
 // And the lens must say where that massing comes from, in both languages.
-assert.match(app,/the map provider's computed height, not a survey/);
-assert.match(app,/মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপ নয়/);
+assert.match(app,/published\/source-tag heights only/);
+assert.match(app,/অজানা উচ্চতা সমতল/);
 assert.match(css,/\.atlas-walk\[hidden\]\s*\{\s*display:none/);
 assert.match(html,/id="atlas-walk-route"/,'authored bookmarks remain');
 assert.match(html,/id="atlas-walk-prev"/);
@@ -87,7 +87,7 @@ win.test.refreshWalkCount();
 assert.equal(elements.get('#atlas-walk-counts').textContent,'Reading the street…','one reading is not a settled reading');
 clock+=600;
 win.test.refreshWalkCount();
-assert.match(elements.get('#atlas-walk-counts').textContent,/2 buildings in view/,'a settled map publishes its count');
+assert.match(elements.get('#atlas-walk-counts').textContent,/2 unique identified rendered footprints/,'a settled map publishes its count');
 assert.equal(win.test.measureStreetLevel().total,2,'unique rendered IDs, not loaded tile fragments');
 assert.equal(win.test.measureStreetLevel().unidentified,1);
 assert.equal(queried.layers.join(','),'city-footprints,parliament-footprints');
@@ -100,13 +100,13 @@ win.test.refreshWalkCount();
 assert.equal(elements.get('#atlas-walk-counts').textContent,'Reading the street…','a changing view is not published');
 clock+=600;
 win.test.refreshWalkCount();
-assert.match(elements.get('#atlas-walk-counts').textContent,/1 building in view/,'the number and the words agree with each other');
+assert.match(elements.get('#atlas-walk-counts').textContent,/1 unique identified rendered footprints/,'the number and the words agree with each other');
 
 for(const lang of ['en','bn']) {
  doc.documentElement.lang=lang;win.test.show();
  assert.equal(elements.get('#atlas-walk').hidden,false);
- assert.match(elements.get('#atlas-walk-counts').textContent,lang==='en'?/Reading the street…|1 building in view/:/রাস্তা পড়া হচ্ছে…|১টি ভবন দৃশ্যমান/);
- assert.match(elements.get('#atlas-walk-note').textContent,lang==='en'?/map provider/:/মানচিত্র সরবরাহকারীর/);
+ assert.match(elements.get('#atlas-walk-counts').textContent,lang==='en'?/Reading the street…|1 unique identified rendered footprints/:/রাস্তা পড়া হচ্ছে…|১টি স্বতন্ত্র শনাক্তকৃত দৃশ্যমান সীমারেখা/);
+ assert.match(elements.get('#atlas-walk-note').textContent,lang==='en'?/Source heights only/:/শুধু উৎসের উচ্চতা/);
  assert.match(elements.get('#atlas-walk-scout').textContent,lang==='en'?/street scene/:/রাস্তার দৃশ্য/);
  const link=new URL(elements.get('#atlas-walk-scout').href);
  assert.equal(new URLSearchParams(link.hash.slice(1)).get('ll'),'23.750000,90.400000');

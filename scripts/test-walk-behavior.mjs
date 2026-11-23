@@ -19,14 +19,14 @@ class Element extends Events {
   setAttribute(name, value) { this.attrs[name] = value; }
   querySelectorAll() { return this.children; }
 }
-function harness({ reduced = false, delay = false } = {}) {
+function harness({ reduced = false, delay = false, search = '' } = {}) {
   const elements = new Map(['atlas-walk-place', 'atlas-walk-route', 'atlas-walk-status', 'atlas-walk-keys', 'atlas-walk-prev', 'atlas-walk-next', 'atlas-walk-itinerary-summary'].map(id => [id, new Element()]));
   const document = Object.assign(new Events(), { hidden: false, documentElement: { lang: 'en' }, querySelector: selector => elements.get(selector.slice(1)) || null, createElement: () => new Element() });
   const motion = Object.assign(new Events(), { matches: reduced });
-  const window = Object.assign(new Events(), { matchMedia: () => motion });
+  const window = Object.assign(new Events(), { matchMedia: () => motion, location: { search } });
   const raf = new Map(); let serial = 0, now = 1000, requests = 0, finishFetch;
   const response = { ok: true, json: async () => ({ districts: [{ id: 'old-dhaka', headline: 'Dated district evidence', headline_bn: 'তারিখযুক্ত জেলার তথ্য' }] }) };
-  vm.runInNewContext(source, { window, document, AbortSignal, console, fetch: () => { requests++; return delay ? new Promise(resolve => { finishFetch = () => resolve(response); }) : Promise.resolve(response); }, requestAnimationFrame: fn => { raf.set(++serial, fn); return serial; }, cancelAnimationFrame: id => raf.delete(id) });
+  vm.runInNewContext(source, { window, document, URLSearchParams, AbortSignal, console, fetch: () => { requests++; return delay ? new Promise(resolve => { finishFetch = () => resolve(response); }) : Promise.resolve(response); }, requestAnimationFrame: fn => { raf.set(++serial, fn); return serial; }, cancelAnimationFrame: id => raf.delete(id) });
   const mapEvents = new Events(), canvas = Object.assign(new Events(), { clientWidth: 1000, clientHeight: 800 });
   const map = {
     keyboard:{enabled:true,isEnabled(){return this.enabled;},disable(){this.enabled=false;},enable(){this.enabled=true;}},
@@ -122,3 +122,35 @@ console.log('✓ Walk behavior: direction, explicit-input lifecycle, delayed att
 
 const disabled = harness(); disabled.map.keyboard.enabled=false; disabled.api.attach(disabled.map,areaData); disabled.api.activate('walk'); disabled.api.activate('city');
 assert.equal(disabled.map.keyboard.enabled,false,'a previously disabled native handler stays disabled');
+
+// Opening area links wait for real registry coordinates, then are consumed once.
+for (const id of ['parliament', 'tejgaon']) {
+  const linked = harness({ search: `?area=${id}&lens=walk` });
+  linked.api.activate('walk');
+  linked.api.attach(linked.map, []);
+  assert.equal(linked.map.jumps.length, 0, 'empty late registry cannot substitute another district');
+  linked.api.attach(linked.map, areaData);
+  const area = areaData.find(a => a.id === id);
+  assert.equal(linked.map.center.lng, area.lng);
+  assert.equal(linked.map.center.lat, area.lat);
+  assert.match(linked.elements.get('atlas-walk-place').textContent, new RegExp(area.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  linked.key('w'); linked.tick(); linked.tick(); linked.release('w');
+  const explored = { ...linked.map.center };
+  linked.document.documentElement.lang = 'bn'; linked.window.emit('atlas:language');
+  linked.api.attach(linked.map, areaData); linked.api.activate('walk');
+  assert.deepEqual(linked.map.center, explored, 'language and reattachment cannot replay the opening area');
+}
+const invalidLink = harness({ search: '?area=missing&lens=walk' });
+invalidLink.api.attach(invalidLink.map, areaData); invalidLink.api.activate('walk');
+assert.equal(invalidLink.map.center.lng, old.lng, 'invalid area falls back to existing first bookmark');
+const lateManual = harness({ search: '?area=parliament&lens=walk' });
+lateManual.api.activate('walk'); lateManual.api.attach(lateManual.map, []);
+lateManual.key('w'); lateManual.tick(); lateManual.tick(); lateManual.release('w');
+const manualBeforeData = { ...lateManual.map.center };
+lateManual.api.attach(lateManual.map, areaData);
+assert.deepEqual(lateManual.map.center, manualBeforeData, 'late registry cannot override manual exploration');
+const lateSelection = harness({ search: '?area=parliament&lens=walk' });
+lateSelection.api.activate('walk'); lateSelection.api.attach(lateSelection.map, []); lateSelection.api.next();
+lateSelection.api.attach(lateSelection.map, areaData);
+assert.equal(lateSelection.map.center.lng, areaData.find(a => a.id === 'chawkbazar').lng, 'explicit next selection wins over the opening URL');
+console.log('✓ Walk area links: Parliament/Tejgaon registry coordinates, delayed attachment, invalid fallback, and manual/language/navigation ownership');

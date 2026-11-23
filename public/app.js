@@ -32,6 +32,7 @@
   let watchData = null;
   let parliamentSnapshot = null;
   let parliamentSourceReady = false;
+  let cityHeightReady = false;
   const tr = (en, bn) => document.documentElement.lang === "bn" ? bn : en;
 
   const $ = sel => document.querySelector(sel);
@@ -160,8 +161,8 @@
       // the panel, where the reader can check it.
       title: "Low-angle map",
       title_bn: "নিচু কোণের মানচিত্র",
-      desc: "A street-scale view of the mapped city, walked with the keys. The massing is the map provider's computed height, not a survey, and the ground is the map's flat plane. This is not a walking route and does not establish street access.",
-      desc_bn: "মানচিত্রের রাস্তার ধরনে দৃশ্য, কী চাপে হেঁটে দেখা যায়। গঠন দেখানো হয় মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপকৃত নয়; মাটি মানচিত্রের সমতলেই থাকে। এটি হাঁটার পথ নয় এবং রাস্তায় প্রবেশযোগ্যতা প্রমাণ করে না।"
+      desc: "Manual low-angle map exploration. Published/source-tag heights only; unknown heights stay flat. Partial skyline coverage, not a survey, walking route or proof of street access.",
+      desc_bn: "নিচু কোণের মানচিত্র হাতে নিয়ন্ত্রণ করে দেখুন। শুধু প্রকাশিত/উৎসে নথিভুক্ত উচ্চতা; অজানা সমতল। আংশিক ভবন-তথ্য, জরিপ বা হাঁটার পথ নয়।"
     }
   };
 
@@ -234,21 +235,10 @@
     styleSpec.layers.push({
       id: "city-buildings", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 14,
       filter: ["!", ["has", "hide_3d"]],
-      // The city's massing. The streamed tiles carry no surveyed height — what
-      // they carry is the provider's computed render_height, the same value
-      // the street-level massing is drawn from. It is therefore an
-      // ILLUSTRATIVE massing and never a measured building: the height is the
-      // map provider's computed height, not a survey, and the lens says so
-      // wherever a reader can meet it. A building with no height in the source
-      // stays flat, because a flat footprint is true and an invented storey is
-      // not.
-      //
-      // The colour is the atlas's own Palette 1, because the use of a building
-      // IS mapped even when its height is not. The walls are solid: a
-      // translucent block standing on a filled footprint double-draws the
-      // ground and turns the street into mud.
+      // Streamed render_height mixes defaults/level estimates with tags.
+      // Only the separate source-traceable height overlay may extrude.
       paint: {
-        ...buildingPaint("render_height", "render_min_height"),
+        ...buildingPaint("source_height_unavailable", "source_base_unavailable"),
         "fill-extrusion-opacity": 1
       }
     });
@@ -261,7 +251,7 @@
       filter: ["!", ["has", "hide_3d"]],
       layout: { visibility: "none" },
       paint: {
-        ...buildingPaint("render_height", "render_min_height"),
+        ...buildingPaint("source_height_unavailable", "source_base_unavailable"),
         "fill-extrusion-opacity": 1
       }
     });
@@ -270,8 +260,8 @@
       map = new maplibregl.Map({
         container: "atlas-map",
         style: styleSpec,
-        center: CITY_CENTER,
-        zoom: 12.5,
+        center: [90.4075, 23.7703],
+        zoom: 16.5,
         pitch: 50,
         bearing: 15,
         maxPitch: 85,
@@ -370,7 +360,7 @@
           keepTheSunMoving();
         }, 60000);
         keepTheSunMoving();
-        await Promise.all([loadDataLayers(), loadParliamentBuildings()]);
+        await Promise.all([loadDataLayers(), loadParliamentBuildings(), loadCityHeights()]);
       });
 
       // Reveal the map on its first frame after the style is parsed; imagery fills in progressively.
@@ -535,7 +525,7 @@
     // there: two extrusions of the same footprint at the same height fight
     // each other and the walls shimmer.
     const cityVisible = is3D && !useSnapshot && currentLens !== "walk";
-    for (const [id, visible] of [["city-buildings", cityVisible], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
+    for (const [id, visible] of [["city-height-buildings", is3D && cityHeightReady && !useSnapshot], ["walk-massing", is3D && !useSnapshot && currentLens === "walk"], ["city-buildings", cityVisible], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
       const visibility = visible ? "visible" : "none";
       if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
     }
@@ -548,10 +538,34 @@
       const note = !is3D ? "" : useSnapshot
         ? tr("3D: explicit OSM heights only; unknown heights stay flat.", "৩ডি: শুধু OSM-এ নথিভুক্ত উচ্চতা; অজানা উচ্চতা সমতল থাকে।")
         : currentLens === "walk" ? ""
-        : tr("3D: the massing is the map provider's computed height, not a survey; a building with no height in the source stays flat.",
-             "৩ডি: গঠন দেখানো হয় মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতায়, জরিপ নয়; উৎসে উচ্চতা নেই ভবন সমতল থাকে।");
+        : tr("3D: published/source-tag heights only; unknown heights stay flat. Partial skyline coverage, not a survey.",
+             "৩ডি: শুধু প্রকাশিত/উৎসে নথিভুক্ত উচ্চতা; অজানা উচ্চতা সমতল। আংশিক ভবন-তথ্য, জরিপ নয়।");
       const text = base + (note ? " " + note : "");
       if (desc.textContent !== text) desc.textContent = text;
+    }
+  }
+
+  async function loadCityHeights() {
+    try {
+      const response = await fetch("/data/city-height-buildings.geojson", {signal: AbortSignal.timeout(15000)});
+      if (!response.ok) throw new Error("city-heights-unavailable");
+      const data = await response.json();
+      if (data.type !== "FeatureCollection" || !Array.isArray(data.features) || !data.features.length ||
+          data.features.some(f => !f.geometry || !Number.isFinite(f.properties?.height_m) || f.properties.height_m <= 0 || f.properties.height_m > MAX_HEIGHT_M || !/^https:\/\//.test(f.properties.source_url || ""))) throw new Error("city-heights-invalid");
+      for (const feature of data.features) {
+        feature.properties.retrieved_at = data.metadata.retrieved_at;
+        feature.properties.use_class = window.DhakaDesign?.classify(feature.properties) || "unknown";
+      }
+      map.addSource("city-heights", {type: "geojson", data});
+      map.addLayer({id:"city-height-buildings",type:"fill-extrusion",source:"city-heights",minzoom:14,
+        paint:{...buildingPaint("height_m", "min_height_m"),"fill-extrusion-opacity":1}},"city-buildings");
+      cityHeightReady = true;
+      map.on("click","city-height-buildings", event => {if(event.features?.[0]) showInspectionHUD("building",event.features[0].properties);});
+      syncBuildingVisibility();
+    } catch (error) {
+      cityHeightReady = false;
+      syncBuildingVisibility();
+      console.warn("Source-height skyline unavailable; unknown footprints remain flat",error);
     }
   }
 
@@ -607,6 +621,8 @@
       map.on("click", layerId, event => {
         const feature = event.features?.[0];
         if (!feature) return;
+        // A source-backed tower owns its inspection over the flat tile beneath.
+        if (event.point && map.getLayer("city-height-buildings") && map.queryRenderedFeatures(event.point,{layers:["city-height-buildings"]}).length) return;
         showInspectionHUD("streamed-building", { ...feature.properties }, event.lngLat);
       });
       map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
@@ -860,10 +876,11 @@
       rowsHtml = `
         <div class="hud-row"><span class="hud-label">${tr("Mapped use", "নথিভুক্ত ব্যবহার")}</span><span class="hud-value">${use}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Block height", "ভবনের উচ্চতা")}</span><span class="hud-value">${Number.isFinite(props.height_m) ? props.height_m+" m" : tr("Unknown · flat footprint","অজানা · সমতল সীমারেখা")}</span></div>
-        <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${props.height_method === "osm-height-tag" ? tr("OSM height tag", "OSM উচ্চতার তথ্য") : tr("No source height; levels are not metres", "উৎসে উচ্চতা নেই; তলার সংখ্যা মিটার নয়")}</span></div>
-        <div class="hud-row"><span class="hud-label">${tr("Snapshot", "উপাত্ত সংগ্রহ")}</span><span class="hud-value">${parliamentSnapshot.metadata.retrieved_at.slice(0, 10)}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${props.height_method === "published-project-height" ? tr("Published project height; OSM value differs", "প্রকল্পের প্রকাশিত উচ্চতা; OSM মান ভিন্ন") : props.height_method === "osm-height-tag" ? tr("OSM height tag · not surveyed", "OSM উচ্চতার তথ্য · জরিপ নয়") : tr("No source height; levels are not metres", "উৎসে উচ্চতা নেই; তলার সংখ্যা মিটার নয়")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Snapshot", "উপাত্ত সংগ্রহ")}</span><span class="hud-value">${(props.retrieved_at || parliamentSnapshot?.metadata.retrieved_at || "").slice(0, 10)}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Source", "উৎস")}</span><span class="hud-value">${props.osm_id} · ODbL</span></div>
 
+        ${props.height_source_url ? `<p><a href="${props.height_source_url}" target="_blank" rel="noopener noreferrer">${tr("Height source", "উচ্চতার উৎস")}</a>${props.osm_height_m != null ? ` · OSM: ${props.osm_height_m} m` : ""}</p>` : ""}
         <p>${tr("Mapped footprint massing; not a surveyed architectural model.", "মানচিত্রভিত্তিক ভবনের রূপ; জরিপকৃত স্থাপত্য মডেল নয়।")}</p>
       `;
     } else if (type === "streamed-building") {
@@ -876,14 +893,14 @@
         ? `${lngLat.lng.toFixed(5)}, ${lngLat.lat.toFixed(5)}`
         : tr("Unknown", "অজানা");
       rowsHtml = `
-        <div class="hud-row"><span class="hud-label">${tr("Provider height", "সরবরাহকারীর উচ্চতা")}</span><span class="hud-value">${hasHeight ? `${providerHeight} m` : tr("None · flat footprint", "নেই · সমতল সীমারেখা")}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Unused provider value", "অব্যবহৃত সরবরাহকারীর মান")}</span><span class="hud-value">${hasHeight ? `${providerHeight} m` : tr("None · flat footprint", "নেই · সমতল সীমারেখা")}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${hasHeight
-          ? tr("Map provider's computed height — not surveyed", "মানচিত্র সরবরাহকারীর গণনাকৃত উচ্চতা — জরিপকৃত নয়")
+          ? tr("Computed provider value; not used for extrusion", "সরবরাহকারীর গণনাকৃত মান; ভবনের উচ্চতায় ব্যবহৃত নয়")
           : tr("No height in the source", "উৎসে উচ্চতা নেই")}</span></div>
         ${hasHeight && providerBase > 0 ? `<div class="hud-row"><span class="hud-label">${tr("Provider base", "সরবরাহকারীর ভিত্তি")}</span><span class="hud-value">${providerBase} m</span></div>` : ""}
         <div class="hud-row"><span class="hud-label">${tr("Footprint source", "সীমারেখার উৎস")}</span><span class="hud-value">${tr("OpenStreetMap ODbL · OpenFreeMap", "OpenStreetMap ODbL · OpenFreeMap")}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Coordinates", "স্থানাঙ্ক")}</span><span class="hud-value">${coordinates}</span></div>
-        <p>${tr("Illustrative massing from the map provider. This is not a surveyed building and not an architectural model.", "মানচিত্র সরবরাহকারীর চিত্রায় গঠন। এটি জরিপকৃত ভবন নয় এবং স্থাপত্যপত্রও নয়।")}</p>
+        <p>${tr("This streamed footprint stays flat without an explicit source height. Source-backed heights, where available, form a separate layer.", "উৎসের নির্দিষ্ট উচ্চতা ছাড়া এই সীমারেখা সমতল থাকে। উৎসসমর্থিত উচ্চতা থাকলে তা আলাদা স্তরে দেখানো হয়।")}</p>
       `;
     } else if (type === "landmark") {
       rowsHtml = `
@@ -1080,7 +1097,7 @@
 
   const LENS_VIEWPORTS = {
     people: { center: [90.40, 23.78], zoom: 11.8, pitch: 35, bearing: 0 },
-    city: { center: [90.4125, 23.8103], zoom: 13, pitch: 50, bearing: 15 },
+    city: { center: [90.4075, 23.7703], zoom: 16.5, pitch: 55, bearing: -25 },
     heritage: { center: [90.378, 23.762], zoom: 16.5, pitch: 60, bearing: 45 },
     transit: { center: [90.375, 23.785], zoom: 14, pitch: 55, bearing: 25 },
     rivers: { center: [91.35, 24.8], zoom: 8.8, pitch: 35, bearing: -5 },
@@ -1238,16 +1255,11 @@
     // The number and the words agree with each other. "1 buildings in view"
     // is the kind of line that makes a reader stop trusting the number.
     const total = walkNumber(reading.total);
-    const heights = walkNumber(reading.withProviderHeight);
     const unidentified = walkNumber(reading.unidentified);
-    const buildings = reading.total === 1 ? tr("building in view", "টি ভবন দৃশ্যমান") : tr("buildings in view", "টি ভবন দৃশ্যমান");
-    const carries = reading.withProviderHeight === 1 ? tr("carries", "টির") : tr("carry", "টির");
-    const fragments = reading.unidentified === 1
-      ? tr(" · 1 unidentified fragment excluded", " · ১টি অশনাক্ত অংশ বাদ")
-      : tr(" · ${unidentified} unidentified fragments excluded", " · ${unidentified}টি অশনাক্ত অংশ বাদ");
     countsEl.textContent = tr(
-      `${total} ${buildings} · ${heights} ${carries} a provider-computed height, not a survey${reading.unidentified ? fragments : ""}`,
-      `${total}টি ভবন দৃশ্যমান · ${heights}টির উচ্চতা মানচিত্র সরবরাহকারীর গণনা, জরিপ নয়${reading.unidentified ? ` · ${unidentified}টি অশনাক্ত অংশ বাদ` : ""}`);
+      `${total} unique identified rendered footprints${reading.unidentified ? ` · ${unidentified} unidentified fragments excluded` : ""}; not a census`,
+      `${total}টি স্বতন্ত্র শনাক্তকৃত দৃশ্যমান সীমারেখা${reading.unidentified ? ` · ${unidentified}টি অশনাক্ত অংশ বাদ` : ""}; ভবনশুমারি নয়`);
+
   }
 
   function renderWalkPanel() {
@@ -1267,13 +1279,13 @@
     if (summary) summary.textContent = isBn ? "কীভাবে মাপা হয়েছে" : "How this is measured";
 
     const note = $("#atlas-walk-note");
-    if (note) note.textContent = tr("Heights are the map provider's, not surveyed.","উচ্চতা মানচিত্র সরবরাহকারীর, জরিপকৃত নয়।");
+    if (note) note.textContent = tr("Source heights only; unknown flat. Not a walking route.","শুধু উৎসের উচ্চতা; অজানা সমতল। হাঁটার পথ নয়।");
     const ground = $("#atlas-walk-ground");
     if (ground) ground.textContent = tr(
       "The ground is the map's flat plane; the atlas carries no elevation model. These viewpoints are not a walking route and do not establish street access.",
       "মাটি মানচিত্রের সমতল; মানচিত্রে উচ্চতার মডেল নেই। এই দৃশ্যগুলো হাঁটার পথ নয় এবং রাস্তায় প্রবেশযোগ্যতা প্রমাণ করে না।");
     const legend = $("#atlas-walk-legend-text");
-    if (legend) legend.textContent = tr("Illustrative massing — height from the map provider, not surveyed","চিত্রায় গঠন — গণনাকৃত উচ্চতা, মানচিত্র সরবরাহকারীর, জরিপকৃত নয়");
+    if (legend) legend.textContent = tr("Published/source-tag heights; partial coverage, not surveyed","প্রকাশিত/উৎসের উচ্চতা; আংশিক তথ্য, জরিপ নয়");
 
     const scout = $("#atlas-walk-scout");
     if (scout) {
@@ -1283,8 +1295,8 @@
 
     const credit = $("#atlas-walk-credit");
     if (credit) credit.textContent = isBn
-      ? "রাস্তার দৃশ্য রেন্ডার: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · উচ্চতা Terrain Tiles। এর জ্যামিতি ও প্রবেশের অনুমান আলাদা। নতুন ট্যাবে খোলে।"
-      : "Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap · elevation Terrain Tiles. Its geometry and access assumptions are separate. Opens in a new tab.";
+      ? "রাস্তার দৃশ্য রেন্ডার: Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap। এর জ্যামিতি ও প্রবেশের অনুমান আলাদা। নতুন ট্যাবে খোলে।"
+      : "Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap. Its geometry and access assumptions are separate. Opens in a new tab.";
   }
 
   function applyLens(lensId, { moveCamera = lensId !== currentLens } = {}) {
