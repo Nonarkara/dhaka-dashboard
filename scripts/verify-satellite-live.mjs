@@ -14,22 +14,27 @@
  * Usage: node --import ./scripts/lib/ts-resolver.mjs scripts/verify-satellite-live.mjs
  */
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 
-const { buildCollage } = await import("../src/collage.ts");
+const { validateCollagePublication } = await import("../src/publication-contract.ts");
 const { MEASURED_LAYERS } = await import("../src/satellite.ts");
 
+function gateResult(result) {
+  if (process.env.DHAKA_GATE_RESULT_PATH) writeFileSync(process.env.DHAKA_GATE_RESULT_PATH, JSON.stringify({...result,checkedAt:new Date().toISOString()},null,2));
+}
+async function verify() {
 const areas = JSON.parse(readFileSync("public/dhaka-areas.json", "utf8"));
 const districts = areas.map(a => ({
   id: a.id, name: a.name, name_bn: a.name_bn,
   category: a.category ?? "", lat: a.lat, lng: a.lng,
 }));
 
-console.log(`Measuring ${districts.length} districts over ${MEASURED_LAYERS.length} satellite signals…`);
+console.log(`Reading stored measurements for ${districts.length} places over ${MEASURED_LAYERS.length} satellite signals…`);
 const started = Date.now();
-const response = await fetch('https://dhaka.nonarkara.org/api/atlas/collage');
+const response = await fetch(new URL('/api/atlas/collage',process.env.ATLAS_URL || 'https://dhaka.nonarkara.org'),{signal:AbortSignal.timeout(30000)});
 assert.ok(response.ok, 'published snapshot endpoint unavailable');
 const collage = await response.json();
+validateCollagePublication(collage);
 assert.equal(collage.delivery?.source,'persistent-snapshot');
 assert.ok(collage.delivery.ageSeconds>=0);
 const seconds = ((Date.now() - started) / 1000).toFixed(1);
@@ -116,13 +121,12 @@ for (const [layerId, list] of byLayer) {
 
 // At most one instrument may be quiet at once. Two would suggest the
 // pipeline, not the weather.
-assert.ok(quietLayers.length <= 1,
-  `too many instruments are quiet at once: ${quietLayers.map(q => q.layerId).join(", ")}`);
+const healthFailures = [];
+if (quietLayers.length > 1) healthFailures.push(`too many instruments are quiet at once: ${quietLayers.map(q=>q.layerId).join(", ")}`);
 
 // The collage as a whole must be healthy.
 const coverage = collage.measured / collage.total;
-assert.ok(coverage >= 0.6,
-  `only ${Math.round(coverage * 100)}% of the measurements are available`);
+if (coverage < 0.6) healthFailures.push(`only ${Math.round(coverage*100)}% of the measurements are available`);
 for (const q of quietLayers) {
   console.log(`  · ${q.layerId} is quiet across the city: ${q.reason}${q.date ? ` (newest usable observation ${q.date})` : ""}`);
 }
@@ -149,4 +153,14 @@ for (const d of collage.districts) {
 }
 assert.ok(withReading > 0, "no domain reading could be composed");
 
-console.log(`✓ Live satellite verification: ${collage.measured}/${collage.total} measurements, ${withReading} domain readings`);
+console.log(`Snapshot integrity validated: ${collage.measured}/${collage.total} measurements, ${withReading} domain readings; source health is evaluated separately`);
+
+if (healthFailures.length) {
+  gateResult({status:'degraded',reasonCode:'satellite-health-threshold-failed',coverage,quietLayers,failures:healthFailures});
+  console.error(healthFailures.join('\n')); process.exitCode=1;
+} else gateResult({status:collage.measured<collage.total?'degraded':'ok',reasonCode:collage.measured<collage.total?'some-signals-unavailable':null,coverage,quietLayers});
+}
+try { await verify(); } catch (error) {
+  gateResult({status:'failed',reasonCode:'satellite-integrity-or-transport-failed',coverage:null,quietLayers:[],error:String(error)});
+  console.error(error); process.exitCode=1;
+}
