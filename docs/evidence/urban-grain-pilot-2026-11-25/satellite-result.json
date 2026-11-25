@@ -1,0 +1,7 @@
+{
+  "status": "degraded",
+  "reasonCode": "some-signals-unavailable",
+  "coverage": 0.9897959183673469,
+  "quietLayers": [],
+  "checkedAt": "2026-11-25T14:17:49.059Z"
+}

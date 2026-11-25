@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-11-25T14:15:17.039Z",
+  "finishedAt": "2026-11-25T14:18:02.620Z",
+  "sourceCommit": "65e9678e8ff7978febcab75cfa9b126d0cfa4562",
+  "canonicalUrl": "https://dhaka.nonarkara.org",
+  "writer": "local-canonical",
+  "buildId": "dhaka-atlas-20261125-1795616225-65e9678",
+  "workerVersion": "d4f6f183-c4b2-42b4-af29-1532c14df3fa",
+  "previousDeployment": {
+    "id": "bc77ad23-ff3c-412a-ae9e-311749ddcd11",
+    "createdOn": "2026-11-25T08:59:53.90361Z",
+    "versions": [
+      {
+        "versionId": "007e0057-ca7b-4e75-9051-83258c1f3388",
+        "percentage": 100
+      }
+    ]
+  },
+  "deployment": "deployed",
+  "codeVerification": "passed",
+  "dataStatus": "degraded",
+  "releaseAccepted": true,
+  "outcome": "deployed-with-degraded-data",
+  "requiredStages": [
+    "writer-check",
+    "types",
+    "local-files",
+    "contracts",
+    "migrations",
+    "stamp",
+    "deploy",
+    "static-entry",
+    "api",
+    "live-bytes",
+    "gibs",
+    "satellite",
+    "snapshots",
+    "population",
+    "planning"
+  ],
+  "stages": [
+    {
+      "id": "writer-check",
+      "kind": "coordination",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:15:17.349Z",
+      "finishedAt": "2026-11-25T14:15:19.368Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/writer-check.log"
+    },
+    {
+      "id": "types",
+      "kind": "software",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:15:19.813Z",
+      "finishedAt": "2026-11-25T14:15:23.564Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/types.log"
+    },
+    {
+      "id": "local-files",
+      "kind": "software",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:15:23.845Z",
+      "finishedAt": "2026-11-25T14:15:25.599Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/local-files.log"
+    },
+    {
+      "id": "contracts",
+      "kind": "software",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:15:25.911Z",
+      "finishedAt": "2026-11-25T14:16:52.223Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/contracts.log"
+    },
+    {
+      "id": "previous-deployment",
+      "kind": "metadata",
+      "required": false,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:16:53.094Z",
+      "finishedAt": "2026-11-25T14:16:58.464Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/previous-deployment.log"
+    },
+    {
+      "id": "migrations",
+      "kind": "schema",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:16:59.027Z",
+      "finishedAt": "2026-11-25T14:17:04.652Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/migrations.log"
+    },
+    {
+      "id": "stamp",
+      "kind": "software",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:05.328Z",
+      "finishedAt": "2026-11-25T14:17:05.692Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/stamp.log"
+    },
+    {
+      "id": "deploy",
+      "kind": "deployment",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:06.273Z",
+      "finishedAt": "2026-11-25T14:17:20.685Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/deploy.log"
+    },
+    {
+      "id": "static-entry",
+      "kind": "software",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:20.878Z",
+      "finishedAt": "2026-11-25T14:17:22.051Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/static-entry.log"
+    },
+    {
+      "id": "api",
+      "kind": "software",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:22.657Z",
+      "finishedAt": "2026-11-25T14:17:29.726Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/api.log"
+    },
+    {
+      "id": "live-bytes",
+      "kind": "integrity",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:30.012Z",
+      "finishedAt": "2026-11-25T14:17:41.787Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/live-bytes.log"
+    },
+    {
+      "id": "gibs",
+      "kind": "data",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:41.985Z",
+      "finishedAt": "2026-11-25T14:17:46.475Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/gibs.log"
+    },
+    {
+      "id": "satellite",
+      "kind": "data",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:46.729Z",
+      "finishedAt": "2026-11-25T14:17:49.114Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/satellite.log"
+    },
+    {
+      "id": "snapshots",
+      "kind": "integrity",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:49.732Z",
+      "finishedAt": "2026-11-25T14:17:58.613Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/snapshots.log"
+    },
+    {
+      "id": "population",
+      "kind": "integrity",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:17:59.061Z",
+      "finishedAt": "2026-11-25T14:18:00.998Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/population.log"
+    },
+    {
+      "id": "planning",
+      "kind": "integrity",
+      "required": true,
+      "status": "passed",
+      "startedAt": "2026-11-25T14:18:01.198Z",
+      "finishedAt": "2026-11-25T14:18:02.373Z",
+      "exitCode": 0,
+      "log": "/tmp/dhaka-grain-canonical-20261125/planning.log"
+    }
+  ],
+  "rollback": {
+    "eligibility": "candidate-recorded",
+    "reasonCode": "compatibility-review-required",
+    "automatic": false,
+    "limitations": [
+      "Worker rollback does not restore D1 or R2 contents.",
+      "Previous code, bindings and asset URLs require compatibility review."
+    ]
+  },
+  "satellite": {
+    "status": "degraded",
+    "reasonCode": "some-signals-unavailable",
+    "coverage": 0.9897959183673469,
+    "quietLayers": []
+  },
+  "failedStages": [],
+  "missingStages": [],
+  "duplicateStages": [],
+  "exitCode": 0
+}

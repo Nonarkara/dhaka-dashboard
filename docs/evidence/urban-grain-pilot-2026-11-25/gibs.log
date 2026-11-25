@@ -1,0 +1,6 @@
+==> Running verify-gibs-live.mjs...
+  ✓ VIIRS_NOAA20_CorrectedReflectance_TrueColor: independently decoded advertised 2026-11-25, 4412 bytes
+  ✓ MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: independently decoded advertised 2026-11-24, 22094 bytes
+  ✓ VIIRS_NOAA20_DayNightBand: independently decoded advertised 2026-11-24, 51784 bytes
+  ✓ VIIRS_Combined_Flood_1-Day: independently decoded advertised 2026-11-25, 3684 bytes
+✓ Deployed imagery contract verified: 4 independently decoded dated GIBS layers; 0 sources explicitly unavailable/degraded. This is contract verification, not an all-sources-healthy claim.
