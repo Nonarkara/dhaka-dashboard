@@ -418,7 +418,9 @@ let restoredFocus = false;
 inspect.focus=()=>{restoredFocus=true;};
 inspect.click({currentTarget:inspect});
 assert.match(hud.innerHTML,/Reported storeys[\s\S]*?>8</);
-assert.match(hud.innerHTML,/Unknown · flat footprint/);
+// Parliament now has estimated height from OSM levels (8 * 3.5m = 28m)
+assert.match(hud.innerHTML,/Block height[\s\S]*?>28 m</);
+assert.match(hud.innerHTML,/No source height; levels are not metres/);
 assert.match(hud.innerHTML,/https:\/\/www.openstreetmap.org\/relation\/18085267/);
 hud.onkeydown({key:'Escape',preventDefault(){},stopPropagation(){}});
 assert.equal(hud.hidden,true);

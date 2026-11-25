@@ -605,7 +605,10 @@
         && bounds.getEast() < east - guard && bounds.getNorth() < north - guard;
     }
     // Source footprints remain visible in both views; only tagged heights extrude.
-    const parliamentVisible = is3D && useSnapshot;
+    // Parliament detail shows in 3D when the map is near the Parliament area
+    // (zoom >= 14), not only when the viewport fully fits inside the bounds.
+    const nearParl = nearParliament();
+    const parliamentVisible = is3D && (useSnapshot || (parliamentSourceReady && map.getZoom() >= 14 && nearParl));
     if (map.getLayer("fabric-courtyards")) {
       const visibility = useSnapshot && currentBasemap === "fabric" ? "visible" : "none";
       if (map.getLayoutProperty("fabric-courtyards", "visibility") !== visibility) {
@@ -628,10 +631,10 @@
       // The note states what the 3D view is actually standing on. The street
       // lens already says it in its own story, so it is not repeated there.
       const note = !is3D ? "" : useSnapshot
-        ? tr("3D: explicit OSM heights only; unknown heights stay flat.", "৩ডি: শুধু OSM-এ নথিভুক্ত উচ্চতা; অজানা উচ্চতা সমতল থাকে।")
+        ? tr("3D: explicit OSM heights; some estimated from levels; unknown heights stay flat.", "৩ডি: স্পষ্ট OSM উচ্চতা; কিছু স্তর থেকে অনুমানিত; অজানা উচ্চতা সমতল।")
         : currentLens === "walk" ? ""
-        : tr("3D: published/source-tag heights only; unknown heights stay flat. Partial skyline coverage, not a survey.",
-             "৩ডি: শুধু প্রকাশিত/উৎসে নথিভুক্ত উচ্চতা; অজানা উচ্চতা সমতল। আংশিক ভবন-তথ্য, জরিপ নয়।");
+        : tr("3D: published/source-tag heights; some estimated from levels; unknown heights stay flat. Partial skyline coverage, not a survey.",
+             "৩ডি: প্রকাশিত/উৎসে নথিভুক্ত উচ্চতা; কিছু স্তর থেকে অনুমানিত; অজানা উচ্চতা সমতল। আংশিক ভবন-তথ্য, জরিপ নয়।");
       const text = base + (note ? " " + note : "");
       if (desc.textContent !== text) desc.textContent = text;
     }
@@ -684,7 +687,23 @@
       const data = await res.json();
       if (data.type !== "FeatureCollection" || !data.features?.length || data.bbox?.length !== 4
         || !data.features.some(f => f.id === "relation/18085267")) throw new Error("invalid-detail-footprints");
-      data.features.forEach(f => { f.properties.use_class = window.DhakaDesign?.classify(f.properties) || "unknown"; });
+      // Estimate height from OSM levels tag where explicit height_m is missing.
+      // A typical floor is ~3.5 m for government/commercial buildings.
+      // Provenance is marked so the disclosure stays honest.
+      const FLOOR_HEIGHT_M = 3.5;
+      data.features.forEach(f => {
+        const props = f.properties;
+        if (!Number.isFinite(props.height_m) && Number.isFinite(props.levels)) {
+          props.height_m = Math.round(props.levels * FLOOR_HEIGHT_M * 10) / 10;
+          props.height_method = "estimated-from-levels";
+          props.height_tier = "estimated";
+        } else if (!Number.isFinite(props.height_m) && Number.isFinite(props["building:levels"])) {
+          props.height_m = Math.round(props["building:levels"] * FLOOR_HEIGHT_M * 10) / 10;
+          props.height_method = "estimated-from-building-levels";
+          props.height_tier = "estimated";
+        }
+        props.use_class = window.DhakaDesign?.classify(props) || "unknown";
+      });
       onData = event => {
         if (event.sourceId !== "parliament-detail" || !event.isSourceLoaded || !parliamentSnapshot) return;
         // Metadata can load before any tile contains a footprint. Do not

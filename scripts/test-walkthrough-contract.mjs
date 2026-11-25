@@ -28,7 +28,7 @@ const cityLayer=app.slice(app.indexOf('id: "city-buildings"'),app.indexOf('id: "
 assert.match(cityLayer,/buildingPaint\("source_height_unavailable", "source_base_unavailable"\)/);
 assert.match(cityLayer,/source_height_unavailable/);
 // And the lens must say where that massing comes from, in both languages.
-assert.match(app,/published\/source-tag heights only/);
+assert.match(app,/Published\/source-tag heights only/);
 assert.match(app,/অজানা উচ্চতা সমতল/);
 assert.match(css,/\.atlas-walk\[hidden\]\s*\{\s*display:none/);
 assert.match(html,/id="atlas-walk-route"/,'authored bookmarks remain');
@@ -183,6 +183,8 @@ assert.equal(new URLSearchParams(moved.hash.slice(1)).get('ll'),'23.800000,90.41
 const visibility=new Map();
 map.setLayoutProperty=(id,key,value)=>visibility.set(id,value);
 map.getLayoutProperty=id=>visibility.get(id)||"none";
+map.getZoom=()=>15; // nearParliament checks zoom >= 14
+map.getBounds=()=>({getWest:()=>90.37,getSouth:()=>23.76,getEast:()=>90.38,getNorth:()=>23.77}); // inside Parliament bounds
 win.test.syncBuildingVisibility();
 assert.equal(visibility.get('city-footprints'),'visible','low-angle exploration retains unknown flat footprints');
 assert.equal(map.getLayoutProperty('parliament-footprints'),'none','exclusive local/native coverage selection survives');
