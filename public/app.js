@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const ATLAS_BUILD_TAG = "dhaka-atlas-20261125-1795616225-65e9678";
+  const ATLAS_BUILD_TAG = "dhaka-atlas-20261125-1795624044-0a84c20";
   const CITY_CENTER = [90.4125, 23.8103];
   const ESRI_IMAGERY = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const OSM_STREETS = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -100,6 +100,12 @@
       desc: "Zoom in for the building massing and footprints; select a feature for source details.",
       desc_bn: "ভবনের গঠন ও রূপ দেখতে জুম করুন; উৎসের তথ্য পেতে স্থাপনা নির্বাচন করুন।"
     },
+    confidence: {
+      title: "Building height provenance",
+      title_bn: "ভবনের উচ্চতার উৎসের মানচিত্র",
+      desc: "Every Greater Dhaka footprint coloured by height source: Terracotta = OSM tag, Amber = floor count, Cobalt = Google Open Buildings 2.5D (2023), Sage = GHSL (2018), Neutral = unknown (flat).",
+      desc_bn: "উচ্চতার উৎস অনুযায়ী বৃহত্তর ঢাকার প্রতিটি ভবন: পোড়ামাটি = OSM ট্যাগ, অ্যাম্বার = তলার সংখ্যা, নীল = গুগল ২.৫ডি (২০২৩), সবুজ = GHSL (২০১৮), ধূসর = অজানা (সমতল)।"
+    },
     rivers: {
       title: "Northeast River Outlook & Dhaka References",
       title_bn: "উত্তর-পূর্বের নদী পূর্বাভাস ও ঢাকার তথ্যসূত্র",
@@ -185,6 +191,25 @@
     }
   };
 
+  const PMTILES_HEIGHT_COLOR = [
+    "interpolate", ["linear"], ["coalesce", ["to-number", ["get", "h"], 0], 0],
+    0, "#6d7470",
+    6, "#9c9686",
+    18, "#c7b897",
+    45, "#d9824b",
+    100, "#d9583b"
+  ];
+  const PMTILES_CONFIDENCE_COLOR = [
+    "match", ["get", "hs"],
+    "measured", "#d9583b",
+    "floors", "#e68a2e",
+    "google", "#257da4",
+    "ghsl", "#6e8c82",
+    "#47555e"
+  ];
+  let pmtilesProtocolRegistered = false;
+  let manualSunHourBst = null;
+
   function initMap() {
     const maplibregl = window.maplibregl;
     if (!maplibregl || typeof maplibregl.Map !== "function") {
@@ -192,6 +217,16 @@
       else showMapFailure();
       return;
     }
+
+    const hasPmtiles = Boolean(window.pmtiles && typeof maplibregl.addProtocol === "function");
+    if (hasPmtiles && !pmtilesProtocolRegistered) {
+      const protocol = new window.pmtiles.Protocol();
+      maplibregl.addProtocol("pmtiles", protocol.tile);
+      pmtilesProtocolRegistered = true;
+    }
+    const origin = (typeof window !== "undefined" && window.location?.origin && window.location.origin !== "null")
+      ? window.location.origin
+      : "";
 
     const styleSpec = {
       version: 8,
@@ -264,6 +299,44 @@
 
     styleSpec.layers.push({id:"city-footprints",type:"fill",source:"buildings","source-layer":"building",minzoom:14,
       paint:{"fill-color":window.DhakaDesign?.paint || "#b4b0a3","fill-opacity":0.65}});
+    if (hasPmtiles && origin) {
+      styleSpec.sources["dhaka-pmtiles"] = {
+        type: "vector",
+        url: `pmtiles://${origin}/dhaka-buildings.pmtiles`,
+        attribution: "© OpenStreetMap, Microsoft, Google via Overture Maps; heights Google Open Buildings 2.5D (2023), GHSL (EC JRC 2018)"
+      };
+      styleSpec.sources["dhaka-waterways"] = {
+        type: "vector",
+        url: `pmtiles://${origin}/dhaka-waterways.pmtiles`,
+        attribution: "© OpenStreetMap contributors"
+      };
+      styleSpec.layers.push({
+        id: "dhaka-waterways-lines",
+        type: "line",
+        source: "dhaka-waterways",
+        "source-layer": "waterways",
+        minzoom: 9,
+        paint: {
+          "line-color": "#257da4",
+          "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.8, 14, 2.4],
+          "line-opacity": 0.72
+        }
+      });
+      styleSpec.layers.push({
+        id: "dhaka-pmtiles-buildings",
+        type: "fill-extrusion",
+        source: "dhaka-pmtiles",
+        "source-layer": "buildings",
+        minzoom: 12,
+        filter: [">", ["to-number", ["get", "h"], 0], 0],
+        paint: {
+          "fill-extrusion-color": PMTILES_HEIGHT_COLOR,
+          "fill-extrusion-height": ["min", MAX_HEIGHT_M, ["max", 0, ["to-number", ["get", "h"], 0]]],
+          "fill-extrusion-base": ["min", MAX_HEIGHT_M, ["max", 0, ["to-number", ["get", "b"], 0]]],
+          "fill-extrusion-opacity": 0.92
+        }
+      });
+    }
     styleSpec.layers.push({
       id: "city-buildings", type: "fill-extrusion", source: "buildings", "source-layer": "building", minzoom: 14,
       filter: ["!", ["has", "hide_3d"]],
@@ -477,7 +550,19 @@
    */
   function applySolarLight() {
     if (!map || typeof map.setLight !== "function") return null;
-    const sun = sunOverDhaka(new Date());
+    let targetDate = new Date();
+    const readout = $("#atlas-sun-readout");
+    if (manualSunHourBst !== null) {
+      const now = new Date();
+      const bstDate = new Date(now.getTime() + 6 * 3600000);
+      const hh = Math.floor(manualSunHourBst);
+      const mm = Math.round((manualSunHourBst - hh) * 60);
+      targetDate = new Date(Date.UTC(bstDate.getUTCFullYear(), bstDate.getUTCMonth(), bstDate.getUTCDate(), hh - 6, mm, 0));
+      if (readout) readout.textContent = `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")} BST`;
+    } else if (readout) {
+      readout.textContent = tr("Live", "সরাসরি");
+    }
+    const sun = sunOverDhaka(targetDate);
     if (!sun) return null;
     const aboveHorizon = sun.altitudeDeg > -0.833; // the sun's own radius at the horizon
     const polar = Math.max(6, Math.min(90, 90 - sun.altitudeDeg));
@@ -620,9 +705,16 @@
     // there: two extrusions of the same footprint at the same height fight
     // each other and the walls shimmer.
     const cityVisible = is3D && !useSnapshot && currentLens !== "walk";
-    for (const [id, visible] of [["city-height-buildings", is3D && cityHeightReady && !useSnapshot], ["walk-massing", is3D && !useSnapshot && currentLens === "walk"], ["city-buildings", cityVisible], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
+    for (const [id, visible] of [["dhaka-pmtiles-buildings", is3D && !useSnapshot], ["city-height-buildings", is3D && cityHeightReady && !useSnapshot], ["walk-massing", is3D && !useSnapshot && currentLens === "walk"], ["city-buildings", cityVisible], ["city-footprints", !useSnapshot], ["parliament-buildings", parliamentVisible], ["parliament-footprints", useSnapshot]]) {
       const visibility = visible ? "visible" : "none";
       if (map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
+    }
+    if (map.getLayer("dhaka-pmtiles-buildings") && typeof map.setPaintProperty === "function") {
+      map.setPaintProperty(
+        "dhaka-pmtiles-buildings",
+        "fill-extrusion-color",
+        currentLens === "confidence" ? PMTILES_CONFIDENCE_COLOR : PMTILES_HEIGHT_COLOR
+      );
     }
     const desc = $("#atlas-lens-description");
     if (desc) {
@@ -776,7 +868,7 @@
     }
     const center = map.getCenter();
     const point = map.project(center);
-    const layers = ["parliament-buildings", "parliament-footprints", "city-height-buildings", "city-footprints"]
+    const layers = ["parliament-buildings", "parliament-footprints", "city-height-buildings", "dhaka-pmtiles-buildings", "city-footprints"]
       .filter(id => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
     const [feature] = layers.length ? map.queryRenderedFeatures(point, {layers}) : [];
     if (!feature) {
@@ -784,10 +876,26 @@
       return;
     }
     if (status) status.textContent = "";
-    showInspectionHUD(feature.layer.id === "city-footprints" ? "streamed-building" : "building", feature.properties, center, event.currentTarget);
+    const hudType = feature.layer.id === "city-footprints"
+      ? "streamed-building"
+      : feature.layer.id === "dhaka-pmtiles-buildings"
+        ? "pmtiles-building"
+        : "building";
+    showInspectionHUD(hudType, feature.properties, center, event.currentTarget);
   }
 
   function wireBuildingInspection() {
+    if (map.getLayer("dhaka-pmtiles-buildings")) {
+      map.on("click", "dhaka-pmtiles-buildings", event => {
+        const feature = event.features?.[0];
+        if (!feature) return;
+        if (event.point && map.getLayer("city-height-buildings") && map.queryRenderedFeatures(event.point, { layers: ["city-height-buildings"] }).length) return;
+        if (event.point && map.getLayer("parliament-buildings") && map.getLayoutProperty("parliament-buildings", "visibility") !== "none" && map.queryRenderedFeatures(event.point, { layers: ["parliament-buildings"] }).length) return;
+        showInspectionHUD("pmtiles-building", { ...feature.properties }, event.lngLat);
+      });
+      map.on("mouseenter", "dhaka-pmtiles-buildings", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "dhaka-pmtiles-buildings", () => { map.getCanvas().style.cursor = ""; });
+    }
     for (const layerId of ["city-footprints", "city-buildings", "walk-massing"]) {
       if (!map.getLayer(layerId)) continue;
       map.on("click", layerId, event => {
@@ -795,6 +903,7 @@
         if (!feature) return;
         // A source-backed tower owns its inspection over the flat tile beneath.
         if (event.point && map.getLayer("city-height-buildings") && map.queryRenderedFeatures(event.point,{layers:["city-height-buildings"]}).length) return;
+        if (event.point && map.getLayer("dhaka-pmtiles-buildings") && map.getLayoutProperty("dhaka-pmtiles-buildings", "visibility") !== "none" && map.queryRenderedFeatures(event.point,{layers:["dhaka-pmtiles-buildings"]}).length) return;
         showInspectionHUD("streamed-building", { ...feature.properties }, event.lngLat);
       });
       map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
@@ -945,6 +1054,26 @@
         transitData = await resTransit.json();
         if (!map.getSource("transit")) {
           map.addSource("transit", { type: "geojson", data: transitData });
+          try {
+            const resRail = await fetch("/data/dhaka-rail-osm.geojson", { signal: AbortSignal.timeout(10000) });
+            if (resRail.ok) {
+              const railGeo = await resRail.json();
+              if (!map.getSource("dhaka-rail-osm")) {
+                map.addSource("dhaka-rail-osm", { type: "geojson", data: railGeo });
+                map.addLayer({
+                  id: "dhaka-rail-osm-lines",
+                  type: "line",
+                  source: "dhaka-rail-osm",
+                  filter: ["==", ["geometry-type"], "LineString"],
+                  paint: {
+                    "line-color": ["match", ["get", "mode"], "subway", "#008751", "#c5a56e"],
+                    "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.2, 15, 3],
+                    "line-opacity": 0.85
+                  }
+                });
+              }
+            }
+          } catch {}
 
           map.addLayer({
             id: "mrt-track",
@@ -1122,6 +1251,29 @@
         ${/^https:\/\//.test(props.height_source_url || "") ? `<p><a href="${props.height_source_url}" target="_blank" rel="noopener noreferrer">${tr("Height source", "উচ্চতার উৎস")}</a>${props.osm_height_m != null ? ` · OSM: ${props.osm_height_m} m` : ""}</p>` : ""}
         <p>${tr("Mapped footprint massing; not a surveyed architectural model.", "মানচিত্রভিত্তিক ভবনের রূপ; জরিপকৃত স্থাপত্য মডেল নয়।")}</p>
       `;
+    } else if (type === "pmtiles-building") {
+      const h = Number(props.h || 0);
+      const b = Number(props.b || 0);
+      const hsLabel = ({
+        measured: tr("OSM height tag · not surveyed", "OSM উচ্চতার ট্যাগ · জরিপ নয়"),
+        floors: tr("OSM floor count × 3.3 m", "OSM তলার সংখ্যা × ৩.৩ মি."),
+        google: tr("Google Open Buildings 2.5D Temporal · 2023", "গুগল ওপেন বিল্ডিংস ২.৫ডি · ২০২৩"),
+        ghsl: tr("GHSL built-up height (EC JRC) · 2018", "GHSL উচ্চতা গড় (EC JRC) · ২০১৮"),
+        estimated: tr("Unknown height · flat footprint", "অজানা উচ্চতা · সমতল সীমারেখা")
+      })[props.hs] || tr("Unknown height", "অজানা উচ্চতা");
+      const srcLabel = ({
+        osm: "OpenStreetMap · ODbL",
+        ms: "Microsoft ML Buildings · ODbL",
+        google: "Google Open Buildings · CC BY 4.0"
+      })[props.src] || "Overture Maps";
+      rowsHtml = `
+        <div class="hud-row"><span class="hud-label">${tr("Height", "উচ্চতা")}</span><span class="hud-value">${h > 0 ? `${h} m` : tr("Unknown · flat", "অজানা · সমতল")}</span></div>
+        ${b > 0 ? `<div class="hud-row"><span class="hud-label">${tr("Base elevation", "ভিত্তির উচ্চতা")}</span><span class="hud-value">${b} m</span></div>` : ""}
+        <div class="hud-row"><span class="hud-label">${tr("Height source", "উচ্চতার উৎস")}</span><span class="hud-value">${hsLabel}</span></div>
+        <div class="hud-row"><span class="hud-label">${tr("Footprint source", "সীমারেখার উৎস")}</span><span class="hud-value">${srcLabel}</span></div>
+        ${props.cls ? `<div class="hud-row"><span class="hud-label">${tr("Building class", "ভবনের শ্রেণি")}</span><span class="hud-value">${props.cls}</span></div>` : ""}
+        <p>${tr("Greater Dhaka Overture Maps footprint; satellite heights are 2023/2018 estimates, not an architectural survey.", "বৃহত্তর ঢাকা Overture Maps সীমারেখা; উপগ্রহ উচ্চতা ২০২৩/২০১৮ অনুমান, স্থাপত্য জরিপ নয়।")}</p>
+      `;
     } else if (type === "streamed-building") {
       // The provider's own numbers, said plainly. A massing drawn from a
       // computed height must never read as a measured building.
@@ -1163,8 +1315,8 @@
 
     // A streamed building carries no name of its own. The panel must not
     // print "undefined" or leak an internal type name to the reader.
-    const title = name || (type === "streamed-building" ? tr("Building", "ভবন") : tr("Feature", "বৈশিষ্ট্য"));
-    const badge = (type === "building" || type === "streamed-building")
+    const title = name || ((type === "streamed-building" || type === "pmtiles-building") ? tr("Building", "ভবন") : tr("Feature", "বৈশিষ্ট্য"));
+    const badge = (type === "building" || type === "streamed-building" || type === "pmtiles-building")
       ? tr("building", "ভবন")
       : type;
     hud.innerHTML = `
@@ -1347,6 +1499,7 @@
   const LENS_VIEWPORTS = {
     people: { center: [90.40, 23.78], zoom: 11.8, pitch: 35, bearing: 0 },
     city: { center: [90.4075, 23.7703], zoom: 16.5, pitch: 55, bearing: -25 },
+    confidence: { center: [90.408, 23.782], zoom: 14.3, pitch: 55, bearing: -20 },
     heritage: { center: [90.378, 23.762], zoom: 16.5, pitch: 60, bearing: 45 },
     transit: { center: [90.375, 23.785], zoom: 14, pitch: 55, bearing: 25 },
     rivers: { center: [91.35, 24.8], zoom: 8.8, pitch: 35, bearing: -5 },
@@ -1556,6 +1709,12 @@
     }
     if (map.getLayer("rivers-gauges")) {
       map.setLayoutProperty("rivers-gauges", "visibility", (currentLens === "rivers" || currentLens === "city") ? "visible" : "none");
+    }
+    if (map.getLayer("dhaka-waterways-lines")) {
+      map.setLayoutProperty("dhaka-waterways-lines", "visibility", (currentLens === "rivers" || currentLens === "city" || currentLens === "confidence" || currentLens === "water") ? "visible" : "none");
+    }
+    if (map.getLayer("dhaka-rail-osm-lines")) {
+      map.setLayoutProperty("dhaka-rail-osm-lines", "visibility", (currentLens === "transit" || currentLens === "city" || currentLens === "confidence") ? "visible" : "none");
     }
     if (map.getLayer("mrt-track")) {
       map.setLayoutProperty("mrt-track", "visibility", (currentLens === "transit" || currentLens === "city") ? "visible" : "none");
@@ -1884,11 +2043,32 @@
     });
 
 
+    const searchForm = $("#atlas-search-form");
     const searchInput = $("#atlas-search-input");
-    searchInput?.addEventListener("keydown", async e => {
-      if (e.key === "Enter" && searchInput.value.trim().length >= 2) {
+    searchForm?.addEventListener("submit", e => {
+      e.preventDefault();
+      if (searchInput && searchInput.value.trim().length >= 2) {
         performSearch(searchInput.value.trim());
       }
+    });
+    searchInput?.addEventListener("keydown", async e => {
+      if (e.key === "Enter" && !searchForm && searchInput.value.trim().length >= 2) {
+        performSearch(searchInput.value.trim());
+      }
+    });
+
+    const sunScrubber = $("#atlas-sun-scrubber");
+    const sunLiveBtn = $("#atlas-sun-live");
+    sunScrubber?.addEventListener("input", e => {
+      const val = Number(e.target.value);
+      if (Number.isFinite(val)) {
+        manualSunHourBst = val;
+        applySolarLight();
+      }
+    });
+    sunLiveBtn?.addEventListener("click", () => {
+      manualSunHourBst = null;
+      applySolarLight();
     });
 
     window.addEventListener("atlas:language", () => {
@@ -1897,6 +2077,7 @@
       renderCityWatch();
       renderSkylineCoverage();
       renderReferenceStatus();
+      applySolarLight();
     });
 
     // The map's ground follows the theme, so the page is one surface.
@@ -1914,24 +2095,48 @@
     openingAreaIntent = false;
     searchController?.abort(); const controller = new AbortController(); searchController = controller;
     const revision = ++searchRevision;
+    const statusEl = $("#atlas-search-status");
+    const listEl = $("#atlas-search-results");
+    if (statusEl) { statusEl.hidden = false; statusEl.textContent = tr("Searching Greater Dhaka…", "বৃহত্তর ঢাকায় খোঁজা হচ্ছে…"); }
+    if (listEl) { listEl.hidden = true; listEl.textContent = ""; }
     try {
       const res = await fetch(`/api/atlas/search?q=${encodeURIComponent(query)}`, {signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)])});
-      if (!res.ok) return;
+      if (!res.ok) throw new Error("search-unavailable");
       const data = await res.json();
       if (revision !== searchRevision || controller.signal.aborted || document.hidden) return;
-      if (data.results && data.results.length > 0) {
-        const first = data.results[0];
+      const results = Array.isArray(data.results) ? data.results.slice(0, 5) : [];
+      if (!results.length) {
+        if (statusEl) statusEl.textContent = tr("No matching place in Greater Dhaka.", "বৃহত্তর ঢাকায় কোনো মিল পাওয়া যায়নি।");
+        return;
+      }
+      if (statusEl) statusEl.textContent = tr(`${results.length} matches · OpenStreetMap Nominatim`, `${results.length}টি ফলাফল · OpenStreetMap Nominatim`);
+      if (listEl && typeof document.createElement === "function") {
+        listEl.hidden = false;
+        for (const item of results) {
+          const li = document.createElement("li");
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = item.display_name || item.name || `${item.lat}, ${item.lon}`;
+          btn.addEventListener("click", () => {
+            const lon = Number(item.lon), lat = Number(item.lat);
+            if (map && Number.isFinite(lon) && Number.isFinite(lat)) {
+              const is3D = $("#atlas-view")?.value !== "2d";
+              map.flyTo({ center: [lon, lat], zoom: 16, pitch: is3D ? 55 : 0, duration: reducedMotion() ? 0 : 250 });
+              const menu = $("#atlas-menu"); if (menu) menu.open = false;
+            }
+          });
+          li.appendChild(btn);
+          listEl.appendChild(li);
+        }
+      } else {
+        const first = results[0];
         const lon = Number(first.lon), lat = Number(first.lat);
         if (map && Number.isFinite(lon) && Number.isFinite(lat) && lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90) {
-          map.flyTo({
-            center: [lon, lat],
-            zoom: 15,
-            pitch: 50,
-            duration: 250
-          });
+          map.flyTo({ center: [lon, lat], zoom: 15, pitch: 50, duration: 250 });
         }
       }
     } catch (err) {
+      if (statusEl) statusEl.textContent = tr("Search unavailable right now.", "অনুসন্ধান এখন অনুপলব্ধ।");
       console.warn("Search error:", err);
     }
   }

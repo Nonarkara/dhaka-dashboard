@@ -46,6 +46,8 @@ const REQUIRED_FILES = [
   "public/dhaka-economy.geojson",
   "public/vendor/maplibre-6.4.1/maplibre-gl.mjs",
   "public/vendor/maplibre-6.4.1/maplibre-gl.css",
+  "public/vendor/pmtiles-4.4.1/pmtiles.js",
+  "public/data/dhaka-rail-osm.geojson",
   "scripts/fixtures/gibs-catalogue.json",
   "scripts/verify-gibs-live.mjs",
   "scripts/refresh-gibs-catalogue.mjs"

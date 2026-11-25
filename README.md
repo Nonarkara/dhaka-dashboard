@@ -8,11 +8,12 @@ A 3D civic atlas and operational dashboard for Greater Metropolitan Dhaka where 
 
 ## 1. Capabilities & Lenses
 
-DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and environmental monitoring across 15 interactive lenses:
+DHKx bridges urban morphology, delta hydrology, macroeconomic industry, and environmental monitoring across 16 interactive lenses:
 
 | Lens | What you see | Data Provider / Sources |
 |---|---|---|
-| **City in 3D** | OSM building footprints at zoom 14+ in every 3D lens; 276 source-height CBD footprints plus local Parliament detail preserving courtyards and eight explicit heights; unknown heights stay flat, plus satellite imagery and landmark references | OpenStreetMap / OpenFreeMap, Esri Satellite |
+| **City in 3D** | Full Greater Dhaka Overture Maps 3D building PMTiles (OSM height tags → floor counts × 3.3 m → Google Open Buildings 2.5D Temporal 2023 → GHSL 2018 → unknown flat 0 m), plus 276 source-height CBD footprints, local Parliament detail preserving courtyards, 663 OSM waterway lines, satellite imagery, and landmark references | Overture Maps (OSM/Microsoft/Google), Google Open Buildings 2.5D (2023), GHSL (EC JRC 2018), OpenFreeMap, Esri Satellite |
+| **Height confidence** | Greater Dhaka building extrusions coloured by height source (OSM tag, floor count, Google 2.5D 2023, GHSL 2018, or unknown flat) | Overture Maps, Google Open Buildings 2.5D, GHSL |
 | **Low-angle map** | A street-scale view walked with the keys, with an itinerary of six measured places and a camera height solved from the projection rather than asserted. Only explicit source heights extrude; unknown heights stay flat. Projection-model camera estimates are not surveyed eye height. Counts are unique identified rendered footprints, published only once the map has settled; the external scene link uses the map centre | OpenStreetMap / OpenFreeMap; credited external Location Scout link |
 | **River outlook** | Northeast GloFAS daily model reaches with ensemble quartiles and available-series maxima; Dhaka reference station registry has no connected observations or calibrated warnings | Bangladesh Water Development Board (BWDB) / FFWC |
 | **Population** | Dated WorldPop 2025 estimates in 1 km cells and 2,181 mapped school/healthcare objects; no census or capacity inference | WorldPop / OpenStreetMap |
@@ -57,6 +58,7 @@ The dashboard runs on a Cloudflare Worker serving a zero-bundle-overhead static 
 | Endpoint | Method | Response & Description |
 |---|---|---|
 | `/api/health` | GET | Liveness, build stamp, and runtime status |
+| `/api/atlas/buildings` | GET | Greater Dhaka 3D buildings and waterways PMTiles pointers, bbox, height provenance hierarchy, and attributions |
 | `/api/atlas/areas` | GET | 14 curated districts with bilingual descriptions and camera coordinates |
 | `/api/atlas/districts` | GET | DNCC & DSCC municipal divisions and administrative thanas |
 | `/api/atlas/at-this-point?lat=&lng=` | GET | Nearest weather station, river gauge, and geographic bbox containment |

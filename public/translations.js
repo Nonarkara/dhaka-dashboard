@@ -2,6 +2,15 @@
 // Keys are the canonical English source strings.
 
 window.ATLAS_BN = {
+  "Height confidence": "উচ্চতার তথ্যের উৎস",
+  "Search a place in Dhaka": "ঢাকায় স্থান খুঁজুন",
+  "Search": "খুঁজুন",
+  "Address search": "ঠিকানা অনুসন্ধান",
+  "Search results": "অনুসন্ধানের ফলাফল",
+  "Sun position": "সূর্যের অবস্থান",
+  "Sun hour in Dhaka (BST)": "ঢাকায় সূর্যের সময় (বিএসটি)",
+  "Live": "সরাসরি",
+  "Live sun": "সরাসরি সূর্য",
   "Skyline coverage": "ভবনের উচ্চতার তথ্যের আওতা",
   "Source-height inventory loading…": "উচ্চতার তথ্য লোড হচ্ছে…",
   "Coverage & source review (JSON) ↗": "আওতা ও উৎস যাচাই (JSON) ↗",

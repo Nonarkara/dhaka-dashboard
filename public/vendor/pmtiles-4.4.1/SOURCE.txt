@@ -1,0 +1,3 @@
+pmtiles 4.4.1 (https://github.com/protomaps/PMTiles), BSD-3-Clause.
+Copied byte-identical from https://unpkg.com/pmtiles@4.4.1/dist/pmtiles.js;
+sha384-iS2/cbFYol4NsEeda4mW6N/8wPMOT6pv2eY+GNYSJRqVC4nbJECP1+mg6D2T8wT/ (the SRI the page pinned).

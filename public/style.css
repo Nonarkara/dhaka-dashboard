@@ -648,3 +648,90 @@ body {
 /* Watch strip: glyphs take the tier colour; neutral = no validated threshold. */
 .watch-symbol { display: inline-block; }
 .atlas-watch-item[data-tier="neutral"] strong { color: var(--ink); }
+
+/* Desktop-only header shortcut (phones keep the 4-control bar) */
+@media (max-width: 1023px) {
+  .atlas-desktop-only { display: none !important; }
+}
+
+/* Address search inside Map menu */
+.atlas-search-form {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.atlas-search-form input[type="search"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 5px 8px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+}
+.atlas-search-form input[type="search"]:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.atlas-search-status {
+  margin: 0 0 6px;
+  font-size: var(--text-micro);
+  color: var(--dim);
+}
+.atlas-search-results {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.atlas-search-results li + li {
+  border-top: 1px solid var(--line);
+}
+.atlas-search-results button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-micro);
+  cursor: pointer;
+}
+.atlas-search-results button:hover {
+  background: var(--bg-strong);
+}
+
+/* Sun position scrubber inside Map evidence */
+.atlas-sun-control {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.atlas-sun-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-micro);
+  color: var(--dim);
+}
+.atlas-sun-label output {
+  color: var(--ink);
+  font-weight: 600;
+}
+.atlas-sun-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.atlas-sun-row input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  accent-color: var(--accent);
+}

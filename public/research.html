@@ -6,9 +6,9 @@
   <title>DHKx · Architecture of a Civic Satellite Atlas</title>
   <meta name="description" content="The architecture of the Dhaka 3D Atlas: how a satellite pixel becomes a measured reading, how the reading is collected, archived and delivered, and the contracts that keep every number honest." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script src="/theme.js?v=dhaka-atlas-20261125-1795616225-65e9678"></script>
-  <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261125-1795616225-65e9678" />
-  <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261125-1795616225-65e9678" />
+  <script src="/theme.js?v=dhaka-atlas-20261125-1795624044-0a84c20"></script>
+  <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261125-1795624044-0a84c20" />
+  <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261125-1795624044-0a84c20" />
   <style>
     body { overflow-y: auto; height: auto; }
     .research-container {
@@ -265,13 +265,13 @@
               <text x="384" y="126">every upstream response</text>
               <text x="384" y="144">archived, then published</text>
 
-              <text x="552" y="108">Worker · 27 routes</text>
+              <text x="552" y="108">Worker · 28 routes</text>
               <text x="552" y="126">provenance envelope</text>
               <text x="552" y="144">rate limit · cache</text>
               <text x="552" y="162">R2 archive · D1 snapshot</text>
 
               <text x="720" y="108">MapLibre client</text>
-              <text x="720" y="126">15 lenses</text>
+              <text x="720" y="126">16 lenses</text>
               <text x="720" y="144">thin instrument band</text>
               <text x="720" y="162">collage panel</text>
             </g>
@@ -322,16 +322,16 @@
           </li>
           <li>
             <div class="plane-name"><span class="swatch swatch-edge"></span><span data-en="Edge plane — one envelope for every answer" data-bn="এজ স্তর — প্রতিটি উত্তরের একই আবরণ">Edge plane — one envelope for every answer</span></div>
-            <div class="plane-role" data-en="Twenty-seven routes on a single Worker, each answering JSON with the same shape: a status, a machine-readable reason, a timestamp, and a provenance tier. Rate limiting per client address, an expiring cache, a persistent snapshot store and an object-storage archive of raw upstream responses. Nothing escapes as an unhandled error page."
-              data-bn="একটি একক Worker-এ সাতাশটি রুট, প্রতিটি একই আকারে JSON দেয়: একটি অবস্থা, একটি যন্ত্র-পাঠযোগ্য কারণ, একটি সময়চিহ্ন এবং একটি প্রমাণ-স্তর। প্রতি ঠিকানায় হার, মেয়াদোত্তীর্ণ ক্যাশ, একটি স্থায়ী স্ন্যাপশট স্টোর এবং কাঁচা আপস্ট্রিম প্রতিক্রিয়ার অবজেক্ট-স্টোরেজ আর্কাইভ। কোনো অনিয়ন্ত্রিত ত্রুটি পৃষ্ঠা বাইরে যায় না।">
-              Twenty-seven routes on a single Worker, each answering JSON with the same shape: a status, a machine-readable reason, a timestamp, and a provenance tier. Rate limiting per client address, an expiring cache, a persistent snapshot store and an object-storage archive of raw upstream responses. Nothing escapes as an unhandled error page.
+            <div class="plane-role" data-en="Twenty-eight routes on a single Worker, each answering JSON with the same shape: a status, a machine-readable reason, a timestamp, and a provenance tier. Rate limiting per client address, an expiring cache, a persistent snapshot store and an object-storage archive of raw upstream responses. Nothing escapes as an unhandled error page."
+              data-bn="একটি একক Worker-এ আঠাশটি রুট, প্রতিটি একই আকারে JSON দেয়: একটি অবস্থা, একটি যন্ত্র-পাঠযোগ্য কারণ, একটি সময়চিহ্ন এবং একটি প্রমাণ-স্তর। প্রতি ঠিকানায় হার, মেয়াদোত্তীর্ণ ক্যাশ, একটি স্থায়ী স্ন্যাপশট স্টোর এবং কাঁচা আপস্ট্রিম প্রতিক্রিয়ার অবজেক্ট-স্টোরেজ আর্কাইভ। কোনো অনিয়ন্ত্রিত ত্রুটি পৃষ্ঠা বাইরে যায় না।">
+              Twenty-eight routes on a single Worker, each answering JSON with the same shape: a status, a machine-readable reason, a timestamp, and a provenance tier. Rate limiting per client address, an expiring cache, a persistent snapshot store and an object-storage archive of raw upstream responses. Nothing escapes as an unhandled error page.
             </div>
           </li>
           <li>
             <div class="plane-name"><span class="swatch swatch-presentation"></span><span data-en="Presentation plane — what a resident is asked to act on" data-bn="উপস্থাপনা স্তর — যে বিষয়ে বাসিন্দাকে পদক্ষেপ নিতে হয়">Presentation plane — what a resident is asked to act on</span></div>
-            <div class="plane-role" data-en="Fifteen map lenses over one canvas; a thin instrument band carrying the country's clock, the live exchange rate and the national readings; and a collage panel that puts seven domains and seven instruments side by side for one district at a time. The geometry is flat by rule — no rounded corners, no shadows, no gradients — and the language is Bengali first."
-              data-bn="একটি ক্যানভাসের উপরে পনেরোটি মানচিত্র লেন্স; দেশের ঘড়ি, লাভ বিনিময় হার ও জাতীয় রিডিং বহনকারী একটি সরু যন্ত্র-ব্যান্ড; এবং একটি কোলাজ প্যানেল, যেখানে সাতটি ক্ষেত্র ও সাতটি যন্ত্র একসঙ্গে, একবারে একটি এলাকার জন্য। নকশার নিয়মই সমতল — গোল কোণ নেই, ছায়া নেই, গ্রেডিয়েন্ট নেই — এবং ভাষা বাংলা প্রথম।">
-              Fifteen map lenses over one canvas; a thin instrument band carrying the country's clock, the live exchange rate and the national readings; and a collage panel that puts seven domains and seven instruments side by side for one district at a time. The geometry is flat by rule — no rounded corners, no shadows, no gradients — and the language is Bengali first.
+            <div class="plane-role" data-en="Sixteen map lenses over one canvas; a thin instrument band carrying the country's clock, the live exchange rate and the national readings; and a collage panel that puts seven domains and seven instruments side by side for one district at a time. The geometry is flat by rule — no rounded corners, no shadows, no gradients — and the language is Bengali first."
+              data-bn="একটি ক্যানভাসের উপরে ষোলোটি মানচিত্র লেন্স; দেশের ঘড়ি, লাভ বিনিময় হার ও জাতীয় রিডিং বহনকারী একটি সরু যন্ত্র-ব্যান্ড; এবং একটি কোলাজ প্যানেল, যেখানে সাতটি ক্ষেত্র ও সাতটি যন্ত্র একসঙ্গে, একবারে একটি এলাকার জন্য। নকশার নিয়মই সমতল — গোল কোণ নেই, ছায়া নেই, গ্রেডিয়েন্ট নেই — এবং ভাষা বাংলা প্রথম।">
+              Sixteen map lenses over one canvas; a thin instrument band carrying the country's clock, the live exchange rate and the national readings; and a collage panel that puts seven domains and seven instruments side by side for one district at a time. The geometry is flat by rule — no rounded corners, no shadows, no gradients — and the language is Bengali first.
             </div>
           </li>
         </ul>

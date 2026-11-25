@@ -6,12 +6,12 @@
   <title>DHKx 3D Atlas · Dhaka block by block</title>
   <meta name="description" content="Dhaka 3D urban atlas & operational civic dashboard: 3D urban form, river ring hydrology and BWDB flood risk, macroeconomic and industrial engine, MRT Line 6 metro transit, and live air quality and winter smoke plumes." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script src="/theme.js?v=dhaka-atlas-20261125-1795616225-65e9678"></script>
-  <script src="/translations.js?v=dhaka-atlas-20261125-1795616225-65e9678"></script>
-  <script src="/i18n.js?v=dhaka-atlas-20261125-1795616225-65e9678"></script>
+  <script src="/theme.js?v=dhaka-atlas-20261125-1795624044-0a84c20"></script>
+  <script src="/translations.js?v=dhaka-atlas-20261125-1795624044-0a84c20"></script>
+  <script src="/i18n.js?v=dhaka-atlas-20261125-1795624044-0a84c20"></script>
   <link href="/vendor/maplibre-6.4.1/maplibre-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261125-1795616225-65e9678" />
-  <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261125-1795616225-65e9678" />
+  <link rel="stylesheet" href="/style.css?v=dhaka-atlas-20261125-1795624044-0a84c20" />
+  <link rel="stylesheet" href="/dhaka-design.css?v=dhaka-atlas-20261125-1795624044-0a84c20" />
   <noscript>
     <style>
       .atlas-loading-screen { display: none !important; }
@@ -28,7 +28,7 @@
       <a href="/" class="atlas-wordmark" aria-label="Dhaka Civic Atlas">Dhaka</a>
       <label id="atlas-lenses" class="atlas-lens-choice"><span class="sr-only">Explore city conditions</span>
         <select id="atlas-lens" aria-label="Explore city conditions">
-          <option value="city">City in 3D</option><option value="rivers">River outlook</option>
+          <option value="city">City in 3D</option><option value="confidence">Height confidence</option><option value="rivers">River outlook</option>
           <option value="air">Air forecast</option><option value="people">Population</option><option value="economy">Economic engine</option>
           <option value="transit">Transit &amp; Metro</option><option value="heritage">Architectural heritage</option>
           <option value="walk">Low-angle map</option>
@@ -38,10 +38,17 @@
           <option value="night">Night lights</option><option value="water">Flood inundation</option>
         </select>
       </label>
+      <button type="button" id="atlas-quick-jump-shortcut" class="atlas-btn atlas-desktop-only" data-open="quick-jump-dialog">Quick jump</button>
       <button type="button" id="language-toggle" class="atlas-btn" aria-label="Switch language">EN</button>
       <details class="atlas-menu" id="atlas-menu">
         <summary class="atlas-menu-summary">Map menu</summary>
         <div class="atlas-menu-body">
+          <form id="atlas-search-form" class="atlas-search-form" role="search" aria-label="Address search">
+            <input type="search" id="atlas-search-input" autocomplete="off" maxlength="120" placeholder="Search a place in Dhaka" aria-label="Search a place in Dhaka" />
+            <button type="submit" class="atlas-btn">Search</button>
+          </form>
+          <p id="atlas-search-status" class="atlas-search-status" role="status" hidden></p>
+          <ul id="atlas-search-results" class="atlas-search-results" aria-label="Search results" hidden></ul>
           <button type="button" class="atlas-btn" data-open="national-data-dialog">Bangladesh data</button>
           <button type="button" class="atlas-btn" data-open="collage-dialog">Satellite samples by place</button>
           <button type="button" class="atlas-btn" data-open="quick-jump-dialog">Quick jump</button>
@@ -85,6 +92,13 @@
       <span id="atlas-reference-status" role="status" hidden></span>
       <button type="button" class="atlas-btn" id="atlas-centre-inspection" aria-describedby="atlas-centre-inspection-status">Inspect building at map centre</button>
       <span id="atlas-centre-inspection-status" role="status"></span>
+      <div class="atlas-sun-control" aria-label="Sun position">
+        <label class="atlas-sun-label" for="atlas-sun-scrubber"><span>Sun position</span> <output id="atlas-sun-readout">Live</output></label>
+        <div class="atlas-sun-row">
+          <input type="range" id="atlas-sun-scrubber" min="5.5" max="18.5" step="0.25" value="10" aria-label="Sun hour in Dhaka (BST)" />
+          <button type="button" id="atlas-sun-live" class="atlas-btn">Live sun</button>
+        </div>
+      </div>
       <details class="skyline-coverage"><summary>Skyline coverage</summary>
         <p id="atlas-skyline-coverage-summary">Source-height inventory loading…</p>
         <a href="/data/skyline-coverage.json" target="_blank" rel="noopener">Coverage &amp; source review (JSON) ↗</a>
@@ -256,14 +270,15 @@
     </div>
   </dialog>
 
-  <script type="module" src="/loader.js?v=dhaka-atlas-20261125-1795616225-65e9678"></script>
-  <script src="/design.js?v=dhaka-atlas-20261125-1795616225-65e9678" defer></script>
-  <script src="/forecast.js?v=dhaka-atlas-20261125-1795616225-65e9678" defer></script>
-  <script src="/people.js?v=dhaka-atlas-20261125-1795616225-65e9678" defer></script>
-  <script src="/instruments.js?v=dhaka-atlas-20261125-1795616225-65e9678" defer></script>
-  <script src="/collage.js?v=dhaka-atlas-20261125-1795616225-65e9678" defer></script>
-  <script src="/walk.js?v=dhaka-atlas-20261125-1795616225-65e9678" defer></script>
-  <script src="/app.js?v=dhaka-atlas-20261125-1795616225-65e9678" defer></script>
-  <script src="/dashboard.js?v=dhaka-atlas-20261125-1795616225-65e9678" defer></script>
+  <script src="/vendor/pmtiles-4.4.1/pmtiles.js" defer></script>
+  <script type="module" src="/loader.js?v=dhaka-atlas-20261125-1795624044-0a84c20"></script>
+  <script src="/design.js?v=dhaka-atlas-20261125-1795624044-0a84c20" defer></script>
+  <script src="/forecast.js?v=dhaka-atlas-20261125-1795624044-0a84c20" defer></script>
+  <script src="/people.js?v=dhaka-atlas-20261125-1795624044-0a84c20" defer></script>
+  <script src="/instruments.js?v=dhaka-atlas-20261125-1795624044-0a84c20" defer></script>
+  <script src="/collage.js?v=dhaka-atlas-20261125-1795624044-0a84c20" defer></script>
+  <script src="/walk.js?v=dhaka-atlas-20261125-1795624044-0a84c20" defer></script>
+  <script src="/app.js?v=dhaka-atlas-20261125-1795624044-0a84c20" defer></script>
+  <script src="/dashboard.js?v=dhaka-atlas-20261125-1795624044-0a84c20" defer></script>
 </body>
 </html>

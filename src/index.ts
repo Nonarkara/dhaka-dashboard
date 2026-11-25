@@ -28,6 +28,110 @@ const CITY_CENTER = {
   lng: 90.4125,
 } as const;
 
+const BUILDINGS_PMTILES_PATH = "/dhaka-buildings.pmtiles";
+const BUILDINGS_PMTILES_R2_KEY = "tiles/dhaka-buildings-v1.pmtiles";
+const WATERWAYS_PMTILES_PATH = "/dhaka-waterways.pmtiles";
+const WATERWAYS_PMTILES_R2_KEY = "tiles/dhaka-waterways-v1.pmtiles";
+
+function applyTileCors(headers: Headers) {
+  headers.set("access-control-allow-origin", "*");
+  headers.set("access-control-expose-headers", "Accept-Ranges, Content-Length, Content-Range, ETag");
+  headers.append("vary", "Range");
+}
+
+function parseRange(header: string | null):
+  | { offset: number; length?: number }
+  | { offset: number; length: number; suffix: true }
+  | null {
+  if (!header) return null;
+  const match = /^bytes=(-)?(\d+)(?:-(\d*))?$/.exec(header.trim());
+  if (!match) return null;
+  if (match[1] === "-") {
+    const suffix = Number.parseInt(match[2], 10);
+    if (!Number.isFinite(suffix) || suffix <= 0) return null;
+    return { offset: 0, length: suffix, suffix: true };
+  }
+  const offset = Number.parseInt(match[2], 10);
+  if (!Number.isFinite(offset) || offset < 0) return null;
+  if (match[3] === undefined || match[3] === "") return { offset };
+  const end = Number.parseInt(match[3], 10);
+  if (!Number.isFinite(end) || end < offset) return null;
+  return { offset, length: end - offset + 1 };
+}
+
+async function streamR2Range(
+  bucket: R2Bucket,
+  key: string,
+  offset: number,
+  length: number,
+  totalSize: number,
+): Promise<Response> {
+  const obj = await bucket.get(key, { range: { offset, length } });
+  if (obj === null || !("body" in obj) || obj.body === null) {
+    return new Response(null, { status: 304 });
+  }
+  const headers = new Headers();
+  headers.set("content-type", "application/octet-stream");
+  headers.set("accept-ranges", "bytes");
+  headers.set("cache-control", "public, max-age=31536000, immutable");
+  applyTileCors(headers);
+  if (obj.httpEtag) headers.set("etag", obj.httpEtag);
+  headers.set("x-dhkx-source", `R2 dhaka-observations/${key}`);
+  headers.set("content-range", `bytes ${offset}-${offset + length - 1}/${totalSize}`);
+  headers.set("content-length", String(length));
+  return new Response(obj.body, { status: 206, headers });
+}
+
+async function servePmtilesFromR2(request: Request, env: Env, key: string): Promise<Response> {
+  const bucket = env.OBSERVATION_ARCHIVE;
+  if (!bucket) return new Response("tile store unavailable", { status: 503 });
+  if (request.method === "HEAD") {
+    const head = await bucket.head(key);
+    if (!head) return new Response("not found", { status: 404 });
+    const headers = new Headers({
+      "content-type": "application/octet-stream",
+      "accept-ranges": "bytes",
+      "content-length": String(head.size),
+      "cache-control": "public, max-age=31536000, immutable",
+    });
+    if (head.httpEtag) headers.set("etag", head.httpEtag);
+    applyTileCors(headers);
+    return new Response(null, { headers });
+  }
+  const range = parseRange(request.headers.get("range"));
+  if (range && "suffix" in range && range.suffix) {
+    const head = await bucket.head(key);
+    if (head === null) return new Response("not found", { status: 404 });
+    const length = Math.min(range.length ?? 0, head.size);
+    return streamR2Range(bucket, key, head.size - length, length, head.size);
+  }
+  if (range) {
+    const head = await bucket.head(key);
+    if (head === null) return new Response("not found", { status: 404 });
+    if (range.offset >= head.size) {
+      const h = new Headers({ "content-range": `bytes */${head.size}`, "accept-ranges": "bytes" });
+      applyTileCors(h);
+      return new Response(null, { status: 416, headers: h });
+    }
+    const requestedEnd = range.offset + (range.length ?? (head.size - range.offset)) - 1;
+    const len = requestedEnd >= head.size ? head.size - range.offset : (range.length ?? (head.size - range.offset));
+    return streamR2Range(bucket, key, range.offset, len, head.size);
+  }
+  const obj = await bucket.get(key);
+  if (obj === null) return new Response("not found", { status: 404 });
+  if (!("body" in obj) || obj.body === null) return new Response(null, { status: 304 });
+  const headers = new Headers({
+    "content-type": "application/octet-stream",
+    "accept-ranges": "bytes",
+    "cache-control": "public, max-age=31536000, immutable",
+    "content-length": String(obj.size),
+    "x-dhkx-source": `R2 dhaka-observations/${key}`,
+  });
+  if (obj.httpEtag) headers.set("etag", obj.httpEtag);
+  applyTileCors(headers);
+  return new Response(obj.body, { status: 200, headers });
+}
+
 const RATE_LIMIT_CONFIG = {
   limit: 600,
   windowSeconds: 60,
@@ -460,6 +564,37 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         },
       );
     }
+  }
+
+  // ── PMTiles vector tile archives (HTTP Range passthrough from R2) ────────
+  if (url.pathname === BUILDINGS_PMTILES_PATH) {
+    return servePmtilesFromR2(request, env, BUILDINGS_PMTILES_R2_KEY);
+  }
+  if (url.pathname === WATERWAYS_PMTILES_PATH) {
+    return servePmtilesFromR2(request, env, WATERWAYS_PMTILES_R2_KEY);
+  }
+
+  // ── /api/atlas/buildings ────────────────────────────────────────────────
+  if (url.pathname === "/api/atlas/buildings") {
+    const head = env.OBSERVATION_ARCHIVE ? await env.OBSERVATION_ARCHIVE.head(BUILDINGS_PMTILES_R2_KEY) : null;
+    if (!head) {
+      return jsonResponse(
+        { status: "unavailable", reasonCode: "buildings-pmtiles-missing", timestamp: new Date().toISOString() },
+        { status: 503 },
+      );
+    }
+    return jsonResponse({
+      status: "ok",
+      city: "Dhaka",
+      url: BUILDINGS_PMTILES_PATH,
+      waterwaysUrl: WATERWAYS_PMTILES_PATH,
+      bytes: head.size,
+      bbox: [90.25, 23.61, 90.53, 23.93],
+      provenance: "reference",
+      heightHierarchy: ["measured (OSM height)", "floors (OSM num_floors × 3.3 m)", "google (Open Buildings 2.5D Temporal 2023)", "ghsl (EC JRC R2023A 2018)", "estimated (unknown · flat 0 m)"],
+      attribution: "© OpenStreetMap, Microsoft, Google via Overture Maps; heights Google Open Buildings 2.5D (2023), GHSL (EC JRC 2018)",
+      timestamp: new Date().toISOString(),
+    });
   }
 
   // ── /api/health ──────────────────────────────────────────────────────────
