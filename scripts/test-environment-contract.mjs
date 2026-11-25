@@ -106,7 +106,7 @@ if (serverLayers.length === 0) fail("src/index.ts: GIBS_LAYERS registry not foun
 const windowDays = catalogue.observationWindowDays || 4;
 
 /**
- * The age of a catalogue date, in whole days, as of today.
+ * The age of a catalogue date at capture time. Offline contracts must not age with the workstation clock.
  *
  * Calendar days, so an observation made last night is one day old this
  * morning whatever hour it was taken.
@@ -114,8 +114,8 @@ const windowDays = catalogue.observationWindowDays || 4;
 function catalogueAgeDays(date) {
   const then = Date.parse(`${date}T00:00:00Z`);
   if (Number.isNaN(then)) return Number.POSITIVE_INFINITY;
-  const now = new Date();
-  const midnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const midnight = Date.parse(`${catalogue.captured}T00:00:00Z`);
+  assert.ok(Number.isFinite(midnight), "catalogue capture date must be explicit");
   return Math.round((midnight - then) / 86400000);
 }
 

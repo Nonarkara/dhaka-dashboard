@@ -132,7 +132,7 @@ Current weather/air/wind validate source time, UTC offset, units and finite admi
 
 The inherited geometric Parliament sketch is preserved at `/parliament-reference.html` as a bilingual, manually turnable nongeographic design study. The map retains all 4,076 dated OSM footprints and 14 courtyard rings; eight explicit source heights extrude, while 4,068 unknown heights remain flat. Provider-derived streamed `render_height` is not treated as an explicit source height.
 
-Repository recovery and release proof: `docs/evidence/reconciliation-2026-11-04/`. CI without Cloudflare credentials reports validation only; authenticated release uses the same canonical `scripts/deploy-live.sh` gates as local shipping. There are 24 configured npm test suites, counted from package.json; previous 20- and 22-suite summaries were inaccurate.
+Repository recovery and release proof: `docs/evidence/reconciliation-2026-11-04/`. Push CI validates without deploying; explicit manual CI releases and local authenticated releases use the same canonical `scripts/deploy-live.sh` gates as local shipping. There are 27 configured npm test suites, counted from package.json; previous 20- and 22-suite summaries were inaccurate.
 
 
 ## MiniMax follow-up audit · 6 November 2026
@@ -149,3 +149,13 @@ The report's axial-grid claim is stale: protected STYLE.md and current CSS alrea
 The opening city camera now frames Tejgaon at building-visible zoom. A self-hosted layer adds 276 source-height footprints from captured OSM geometry in Tejgaon, Motijheel and part of Gulshan. This is partial coverage, not a complete skyline inventory or architectural model. Pinnacle uses the project manager’s published 152.3 m height, retains the conflicting OSM 120 m tag, and links both source records; its developer reports 40 storeys. No generic floor-to-metre conversion or provider default height is used.
 
 Reproduce with `python3 scripts/bake-city-heights.py`; privacy-filtered input captures, source URLs/hashes and limitations are committed. Source inspection, 2D/offline behavior and the opening camera have behavioral regressions. Walk links to Parliament and Tejgaon now honor their area without overriding later manual navigation. Evidence: docs/evidence/skyline-2026-11-23.
+
+## Reliability and evidence scope · 25 November 2026
+
+Local reference layers start at style readiness and load independently. Parliament detail is acquired only for its extent, explicit area link or heritage lens; a default Tejgaon visit avoids its 2,212,734-byte uncompressed body (230,851 bytes with local gzip). Bounded requests, cancellation and single-flight refresh protect camera intent, population and the national/satellite desks. Closed optional desks start no evidence acquisition.
+
+Publication validates exact instrument/place identities, dates, provenance, units, bounds and reading linkage. New snapshots record processing methods; original schema-3 archives keep their source IDs and missing metadata. Comparisons require compatible stored methods and sample geometry and refuse censored, static or incompatible observations. Source health and comparison controls are optional within the satellite desk. Skyline coverage is available in Map evidence; the ten-candidate review adds no unverified geometry.
+
+The canonical release writes a structured receipt and independent stage logs to `.wrangler/releases/` (or `DHAKA_RELEASE_DIR`). Required software checks block upload; post-deploy checks all run and distinguish integrity failure from upstream degradation. Push CI validates only; explicit manual CI releases serialize. The local lock and active-CI check coordinate known writers, not arbitrary simultaneous hosts. No automatic rollback or history purge occurs. Scientific coverage thresholds remain unchanged.
+
+Execution, measured geometry, independent reviews and measurement limits: `docs/evidence/next-scope-2026-11-25/verification.md`. Run `node scripts/check-ui-geometry.mjs docs/evidence/next-scope-2026-11-25/geometry.json docs/evidence/next-scope-2026-11-25/enlarged-geometry.json` for the captured-pixel budgets.
