@@ -59,6 +59,7 @@
             <select id="atlas-basemap" class="atlas-select" aria-label="Basemap">
               <option value="esri" selected>Esri satellite</option>
               <option value="osm">OpenStreetMap streets</option>
+              <option value="fabric">Street fabric</option>
             </select>
           </label>
           <label class="atlas-control-label"><span>Appearance</span>
@@ -80,7 +81,10 @@
       <aside class="atlas-map-key"><div id="building-key"></div><p id="atlas-layer-status" class="atlas-layer-status" role="status" hidden></p>    <details class="atlas-lens-story"><summary>Map evidence</summary>
       <strong id="atlas-lens-title">Read the city, from skyline to street</strong>
       <span id="atlas-lens-description">Choose a map lens. Sources and valid times stay with the evidence.</span>
+      <span id="atlas-fabric-note" hidden>Water outlines are generalized. A courtyard opening alone cannot establish water or access.</span>
       <span id="atlas-reference-status" role="status" hidden></span>
+      <button type="button" class="atlas-btn" id="atlas-centre-inspection" aria-describedby="atlas-centre-inspection-status">Inspect building at map centre</button>
+      <span id="atlas-centre-inspection-status" role="status"></span>
       <details class="skyline-coverage"><summary>Skyline coverage</summary>
         <p id="atlas-skyline-coverage-summary">Source-height inventory loading…</p>
         <a href="/data/skyline-coverage.json" target="_blank" rel="noopener">Coverage &amp; source review (JSON) ↗</a>

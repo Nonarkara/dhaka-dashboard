@@ -22,6 +22,9 @@ window.ATLAS_BN = {
   "Wind": "বাতাস",
   "Economy": "অর্থনীতি",
   "Sampled places": "নমুনার স্থানসমূহ",
+  "Inspect building at map centre": "মানচিত্রের কেন্দ্রের ভবন দেখুন",
+  "Water outlines are generalized. A courtyard opening alone cannot establish water or access.": "জলসীমা সরলীকৃত। আঙিনার ফাঁকা অংশ দেখে সেখানে জল বা প্রবেশপথ আছে ধরে নেওয়া যায় না।",
+  "Street fabric": "রাস্তা ও ভবনের বিন্যাস",
   "Satellite samples by place": "স্থানভিত্তিক উপগ্রহের নমুনা",
   "Seven instruments sampled near each place; these are not district averages or measures of domain performance. Dates and spatial scales differ.": "প্রতিটি স্থানের কাছে সাতটি যন্ত্রের নমুনা; এগুলো এলাকার গড় বা খাতের কর্মদক্ষতার পরিমাপ নয়। তারিখ ও স্থানিক মাপ আলাদা।",
 

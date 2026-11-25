@@ -129,7 +129,7 @@ document.documentElement.lang = bn ? 'bn' : 'en';
 const tr=(en,bnText)=>bn?bnText:en;
 document.title=tr('Parliament design reference · DHKx','সংসদের নকশার রেফারেন্স · DHKx');
 for (const el of document.querySelectorAll('[data-en]')) el.textContent=tr(el.dataset.en,el.dataset.bn);
-document.querySelector('#back').href=`/?area=parliament&lang=${bn?'bn':'en'}`;
+document.querySelector('#back').href=`/?area=parliament&basemap=fabric&lang=${bn?'bn':'en'}`;
 const canvas=document.querySelector('canvas');
 canvas.setAttribute('aria-label',tr('Nongeographic geometric Parliament design sketch','ভৌগোলিক নয় এমন সংসদের জ্যামিতিক নকশা'));
 document.querySelector('nav').setAttribute('aria-label',tr('Sketch view','নকশার দৃশ্য'));

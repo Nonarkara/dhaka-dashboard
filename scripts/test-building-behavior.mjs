@@ -25,7 +25,7 @@ for(const f of detail.features) {
   }
 }
 function app({offline=false,search='',rainfall=null,inside=true,fetchOverride=null}={}) {
-  const elements=new Map(['atlas-view','atlas-lens-title','atlas-lens-description','atlas-layer-status','atlas-observation-hud','radar-play','radar-output'].map(id=>[id,{value:'3d',textContent:'',hidden:true,classList:{remove(){}},addEventListener(){}}]));
+  const elements=new Map(['atlas-view','atlas-basemap','atlas-centre-inspection','atlas-centre-inspection-status','atlas-lens-title','atlas-lens-description','atlas-layer-status','atlas-observation-hud','radar-play','radar-output'].map(id=>[id,{value:'3d',textContent:'',hidden:true,classList:{remove(){}},addEventListener(type,handler){this[type]=handler;}}]));
   elements.get('atlas-layer-status').querySelector=s=>elements.get(s==='#radar-play'?'radar-play':'radar-output');
   const ticks=new Map(), timeouts=new Map(), events={},requests=[];let tickId=0;
   let map;
@@ -47,6 +47,7 @@ function app({offline=false,search='',rainfall=null,inside=true,fetchOverride=nu
     removeLayer(id){this.layers.delete(id);}
     removeSource(id){this.sources.delete(id);}
     isSourceLoaded(){return this.ready;}
+    querySourceFeatures(id){return this.ready && !this.metadataOnly ? this.sources.get(id)?.data.features || [] : [];}
     getZoom(){return this.zoom;}
     getContainer(){return {clientWidth:this.width||390};}
     getBounds(){const [w,s,e,n]=detail.bbox;return {getWest:()=>this.inside?w+.002:90.40,getSouth:()=>this.inside?s+.002:23.767,getEast:()=>this.inside?e-.002:90.414,getNorth:()=>this.inside?n-.002:23.775};}
@@ -130,6 +131,10 @@ assert.equal(map.getPaintProperty('basemap-esri','raster-opacity'),1,'other lens
 await api.loadParliamentBuildings();
 assert.equal(map.getLayoutProperty('parliament-buildings','visibility'),'none','no early switch');
 map.ready=true;
+map.metadataOnly=true;
+map.events.get('sourcedata')({sourceId:'parliament-detail',isSourceLoaded:true});
+assert.notEqual(map.getLayoutProperty('city-footprints','visibility'),'none','metadata without local features must retain streamed footprints');
+map.metadataOnly=false;
 map.events.get('sourcedata')({sourceId:'parliament-detail',isSourceLoaded:true});
 assert.equal(map.getLayoutProperty('city-buildings','visibility'),'none');
 assert.equal(map.getLayoutProperty('parliament-buildings','visibility'),'visible');
@@ -363,3 +368,59 @@ assert.equal([...restoredWatch.timeouts.values()].filter(t=>t.ms>60000&&t.ms<=5*
 restoredWatch.document.hidden=true;restoredWatch.events.visibilitychange();
 assert.equal([...restoredWatch.timeouts.values()].filter(t=>t.ms>=60000&&t.ms<=5*60000).length,0,'hidden restoration leaves no watch or solar timer');
 console.log('✓ Lens/watch generations: Rain→City→Rain, ignored aborts, visible return and repeated page restoration remain owned.');
+
+// Public controls select the existing vector channels and inspect real footprints.
+const fabricCase = app({search:'?area=parliament'});
+fabricCase.api.wireUIEvents();
+const basemap = fabricCase.elements.get('atlas-basemap');
+basemap.change({target:{value:'fabric'}});
+assert.equal(fabricCase.map.getLayer('fabric-water')['source-layer'],'water');
+assert.equal(fabricCase.map.getLayer('fabric-streets')['source-layer'],'transportation');
+for (const id of ['fabric-water','fabric-streets']) assert.equal(fabricCase.map.getLayoutProperty(id,'visibility'),'visible');
+for (const id of ['basemap-esri','basemap-osm']) assert.equal(fabricCase.map.getLayoutProperty(id,'visibility'),'none');
+fabricCase.api.applyLens('night');
+assert.equal(fabricCase.map.getPaintProperty('fabric-streets','line-opacity'),0.18);
+fabricCase.api.applyLens('city');
+assert.equal(fabricCase.map.getPaintProperty('fabric-streets','line-opacity'),1);
+basemap.change({target:{value:'osm'}});
+assert.equal(fabricCase.map.getLayoutProperty('fabric-water','visibility'),'none');
+assert.equal(fabricCase.map.getLayoutProperty('basemap-osm','visibility'),'visible');
+
+const inspect = fabricCase.elements.get('atlas-centre-inspection');
+const status = fabricCase.elements.get('atlas-centre-inspection-status');
+inspect.click({currentTarget:inspect});
+assert.match(status.textContent,/still loading/);
+fabricCase.map.getCenter=()=>({lng:90.3786,lat:23.76245});
+fabricCase.map.project=()=>({x:195,y:422});
+fabricCase.map.queryRenderedFeatures=()=>[];
+fabricCase.map.events.get('style.load')();
+inspect.click({currentTarget:inspect});
+assert.match(status.textContent,/No building visible/);
+await fabricCase.api.loadParliamentBuildings();
+fabricCase.map.ready=true;
+fabricCase.map.events.get('sourcedata')({sourceId:'parliament-detail',isSourceLoaded:true});
+fabricCase.map.queryRenderedFeatures=(_,options)=>{
+  assert.ok(options.layers.includes('parliament-footprints'));
+  assert.ok(!options.layers.includes('city-footprints'),'hidden streamed footprints cannot own campus inspection');
+  return [{layer:{id:'parliament-footprints'},properties:parliament.properties}];
+};
+assert.equal(fabricCase.map.getSource('fabric-openings').data.features.length,14);
+assert.equal(fabricCase.map.getLayoutProperty('fabric-courtyards','visibility'),'none');
+basemap.change({target:{value:'fabric'}});
+assert.equal(fabricCase.map.getLayoutProperty('fabric-courtyards','visibility'),'visible');
+fabricCase.map.inside=false;
+fabricCase.api.syncBuildingVisibility();
+assert.equal(fabricCase.map.getLayoutProperty('fabric-courtyards','visibility'),'none');
+fabricCase.map.inside=true;
+fabricCase.api.syncBuildingVisibility();
+const hud = fabricCase.elements.get('atlas-observation-hud');
+let restoredFocus = false;
+inspect.focus=()=>{restoredFocus=true;};
+inspect.click({currentTarget:inspect});
+assert.match(hud.innerHTML,/Reported storeys[\s\S]*?>8</);
+assert.match(hud.innerHTML,/Unknown · flat footprint/);
+assert.match(hud.innerHTML,/https:\/\/www.openstreetmap.org\/relation\/18085267/);
+hud.onkeydown({key:'Escape',preventDefault(){},stopPropagation(){}});
+assert.equal(hud.hidden,true);
+assert.equal(restoredFocus,true);
+console.log('✓ Street fabric and campus: source layers, basemap and night transitions, keyboard inspection and source evidence.');

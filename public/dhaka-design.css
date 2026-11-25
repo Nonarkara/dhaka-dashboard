@@ -611,7 +611,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-lens-choice { flex:1 1 9ch; }
 .atlas-lens-choice select { min-height:40px; height:auto; padding-top:4px; padding-bottom:4px; }
 .atlas-menu-summary,#language-toggle { height:auto; min-height:40px; line-height:1.3; }
-.atlas-lens-choice { min-width:min(100%,calc(var(--text-body) * 6)); }
+.atlas-lens-choice { min-width:min(100%,calc(var(--text-body) * 7.5)); }
 
 /* Source attribution owns a separate bottom row at every viewport size. */
 .atlas-watch { bottom:calc(var(--map-credit-height, 24px) + 18px); }
@@ -638,3 +638,14 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 
 /* Source failures share the scrollable map instrument; they cannot cover its controls. */
 .atlas-map-key .atlas-layer-status { position:static; margin:4px 8px; padding:4px 0; max-width:100%; border:0; border-top:1px solid var(--line); overflow-wrap:anywhere; }
+
+#atlas-centre-inspection {
+  min-height:32px;
+  max-width:calc(100% - 16px);
+  height:auto;
+  margin:4px 8px;
+  white-space:normal;
+  text-align:start;
+}
+#atlas-centre-inspection-status:empty { display:none; }
+#atlas-fabric-note[hidden] { display:none; }

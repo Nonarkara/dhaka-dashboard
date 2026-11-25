@@ -249,6 +249,19 @@
       ]
     };
 
+    // The street fabric uses the existing attributed OpenMapTiles source.
+    // Transport is a line network in the source, not surveyed road widths.
+    styleSpec.layers.push(
+      {id:"fabric-water", type:"fill", source:"buildings", "source-layer":"water",
+        layout:{visibility:"none"}, paint:{"fill-color":FABRIC_COLOURS.dark.water}},
+      {id:"fabric-streets", type:"line", source:"buildings", "source-layer":"transportation", minzoom:12,
+        layout:{visibility:"none", "line-cap":"round", "line-join":"round"},
+        filter:["all", ["match", ["get","class"], ["motorway","trunk","primary","secondary","tertiary","minor","service","path","track"], true, false],
+          ["!=", ["get","brunnel"], "tunnel"]],
+        paint:{"line-color":FABRIC_COLOURS.dark.street,
+          "line-width":["interpolate", ["linear"], ["zoom"], 12, 0.5, 18, ["match", ["get","class"], ["motorway","trunk","primary"], 3, 1]]}}
+    );
+
     styleSpec.layers.push({id:"city-footprints",type:"fill",source:"buildings","source-layer":"building",minzoom:14,
       paint:{"fill-color":window.DhakaDesign?.paint || "#b4b0a3","fill-opacity":0.65}});
     styleSpec.layers.push({
@@ -491,11 +504,42 @@
    * is told when the theme changes.
    */
   const THEME_GROUND = { dark: "#0d171d", light: "#fcf8ed", contrast: "#050a0d" };
+  const FABRIC_COLOURS = {
+    dark: {water:"#335b67", street:"#9c967c", edge:"#6d6d5f"},
+    light: {water:"#a9c9cd", street:"#6c6350", edge:"#777362"},
+    contrast: {water:"#326276", street:"#f1dec0", edge:"#e3dac7"}
+  };
+  function syncBasemap() {
+    if (!map) return;
+    for (const [id, selection] of [["basemap-esri", "esri"], ["basemap-osm", "osm"], ["fabric-water", "fabric"], ["fabric-streets", "fabric"]]) {
+      if (!map.getLayer(id)) continue;
+      const visibility = selection === currentBasemap ? "visible" : "none";
+      if (map.getLayoutProperty(id, "visibility") !== visibility) map.setLayoutProperty(id, "visibility", visibility);
+    }
+    const note = $("#atlas-fabric-note");
+    if (note) note.hidden = currentBasemap !== "fabric";
+    if (map.getLayer("fabric-courtyards")) map.setPaintProperty("fabric-courtyards", "fill-color",
+      THEME_GROUND[document.documentElement.dataset.theme] || THEME_GROUND.dark);
+    const theme = document.documentElement.dataset.theme || "dark";
+    const colours = FABRIC_COLOURS[theme] || FABRIC_COLOURS.dark;
+    for (const [id, key, colour] of [["fabric-water", "fill", colours.water], ["fabric-streets", "line", colours.street]]) {
+      if (map.getLayer(id)) {
+        map.setPaintProperty(id, key + "-color", colour);
+        map.setPaintProperty(id, key + "-opacity", currentLens === "night" ? 0.18 : 1);
+      }
+    }
+    for (const id of ["city-footprints", "parliament-footprints"]) {
+      if (map.getLayer(id)) map.setPaintProperty(id, "fill-outline-color",
+        currentBasemap === "fabric" ? colours.edge : window.DhakaDesign?.paint || "#b4b0a3");
+    }
+  }
+
   function applyGroundColour() {
     if (!map || typeof map.setPaintProperty !== "function") return;
     if (!map.getLayer("atlas-ground")) return;
     const theme = document.documentElement.dataset.theme || "dark";
     map.setPaintProperty("atlas-ground", "background-color", THEME_GROUND[theme] || THEME_GROUND.dark);
+    syncBasemap();
   }
 
   function showMapFailure() {
@@ -562,6 +606,12 @@
     }
     // Source footprints remain visible in both views; only tagged heights extrude.
     const parliamentVisible = is3D && useSnapshot;
+    if (map.getLayer("fabric-courtyards")) {
+      const visibility = useSnapshot && currentBasemap === "fabric" ? "visible" : "none";
+      if (map.getLayoutProperty("fabric-courtyards", "visibility") !== visibility) {
+        map.setLayoutProperty("fabric-courtyards", "visibility", visibility);
+      }
+    }
     // Flat source footprints stay visible while exploring at low pitch.
     // The street lens draws its own massing, so the city's layer steps aside
     // there: two extrusions of the same footprint at the same height fight
@@ -635,32 +685,48 @@
       if (data.type !== "FeatureCollection" || !data.features?.length || data.bbox?.length !== 4
         || !data.features.some(f => f.id === "relation/18085267")) throw new Error("invalid-detail-footprints");
       data.features.forEach(f => { f.properties.use_class = window.DhakaDesign?.classify(f.properties) || "unknown"; });
-      onData = async event => {
-        if (event.sourceId === "parliament-detail" && event.isSourceLoaded) {
-          parliamentSourceReady = true;
-          map.off("sourcedata", onData);
-          syncBuildingVisibility();
-        }
+      onData = event => {
+        if (event.sourceId !== "parliament-detail" || !event.isSourceLoaded || !parliamentSnapshot) return;
+        // Metadata can load before any tile contains a footprint. Do not
+        // switch away from the streamed map until local features are present.
+        if (!map.querySourceFeatures("parliament-detail").length) return;
+        parliamentSourceReady = true;
+        map.off("sourcedata", onData);
+        syncBuildingVisibility();
       };
       map.on("sourcedata", onData);
       map.addSource("parliament-detail", { type: "geojson", data,
         attribution: `© OpenStreetMap · detail ${data.metadata.retrieved_at.slice(0, 10)} · ODbL` });
+      // A transparent layer primes source tiles while visible footprints
+      // still come from the streamed basemap.
+      map.addLayer({id:"parliament-detail-prime", type:"fill", source:"parliament-detail",
+        minzoom:16, paint:{"fill-opacity":0}}, "city-buildings");
       map.addLayer({id:"parliament-footprints",type:"fill",source:"parliament-detail",minzoom:14,layout:{visibility:"none"},
         paint:{"fill-color":window.DhakaDesign?.paint || "#b4b0a3","fill-opacity":0.65}},"city-buildings");
       map.addLayer({ id: "parliament-buildings", type: "fill-extrusion", source: "parliament-detail", minzoom: 14,
         layout: { visibility: "none" }, paint: buildingPaint("height_m", "min_height_m") }, "city-buildings");
+      // The generalized water tile covers the entire Assembly outline. Show
+      // the exact captured holes as unclassified openings in fabric view.
+      const assembly = data.features.find(f => f.id === "relation/18085267").geometry;
+      const polygons = assembly.type === "MultiPolygon" ? assembly.coordinates : [assembly.coordinates];
+      const openings = polygons.flatMap(polygon => polygon.slice(1));
+      map.addSource("fabric-openings", {type:"geojson", data:{type:"FeatureCollection",
+        features:openings.map(ring => ({type:"Feature", properties:{}, geometry:{type:"Polygon", coordinates:[ring]}}))
+      }});
+      map.addLayer({id:"fabric-courtyards", type:"fill", source:"fabric-openings",
+        layout:{visibility:"none"}, paint:{"fill-color":THEME_GROUND[document.documentElement.dataset.theme] || THEME_GROUND.dark}},
+        "parliament-footprints");
       parliamentSnapshot = data;
+      syncBasemap();
       // The source can finish before the layer is attached.
-      if (map.isSourceLoaded("parliament-detail")) {
-        parliamentSourceReady = true;
-        syncBuildingVisibility();
-      }
+      onData({sourceId:"parliament-detail", isSourceLoaded:map.isSourceLoaded("parliament-detail")});
       map.on("click", "parliament-footprints", event => {
         if (event.features?.[0]) showInspectionHUD("building", event.features[0].properties);
       });
     } catch (error) {
       if (onData) map.off("sourcedata", onData);
-      for (const id of ["parliament-buildings","parliament-footprints"]) if (map.getLayer(id)) map.removeLayer(id);
+      for (const id of ["parliament-buildings","parliament-footprints","fabric-courtyards","parliament-detail-prime"]) if (map.getLayer(id)) map.removeLayer(id);
+      if (map.getSource("fabric-openings")) map.removeSource("fabric-openings");
       if (map.getSource("parliament-detail")) map.removeSource("parliament-detail");
       parliamentSnapshot = null;
       parliamentSourceReady = false;
@@ -683,6 +749,25 @@
    * what the provider did and did not give — otherwise the massing reads
    * as surveyed architecture when it is not.
    */
+  function inspectMapCentre(event) {
+    const status = $("#atlas-centre-inspection-status");
+    if (!map || !styleReady) {
+      if (status) status.textContent = tr("Map is still loading.", "মানচিত্র এখনো লোড হচ্ছে।");
+      return;
+    }
+    const center = map.getCenter();
+    const point = map.project(center);
+    const layers = ["parliament-buildings", "parliament-footprints", "city-height-buildings", "city-footprints"]
+      .filter(id => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
+    const [feature] = layers.length ? map.queryRenderedFeatures(point, {layers}) : [];
+    if (!feature) {
+      if (status) status.textContent = tr("No building visible at the centre. Move or zoom the map and try again.", "কেন্দ্রে কোনো ভবন দেখা যাচ্ছে না। মানচিত্র সরিয়ে বা জুম করে আবার চেষ্টা করুন।");
+      return;
+    }
+    if (status) status.textContent = "";
+    showInspectionHUD(feature.layer.id === "city-footprints" ? "streamed-building" : "building", feature.properties, center, event.currentTarget);
+  }
+
   function wireBuildingInspection() {
     for (const layerId of ["city-footprints", "city-buildings", "walk-massing"]) {
       if (!map.getLayer(layerId)) continue;
@@ -981,7 +1066,7 @@
     });
   }
 
-  function showInspectionHUD(type, props, lngLat) {
+  function showInspectionHUD(type, props, lngLat, opener) {
     // Map tags are public external data, not trusted HTML.
     props = Object.fromEntries(Object.entries(props).map(([key,value]) => [key, typeof value === 'string' ? value.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) : value]));
     const hud = $("#atlas-observation-hud");
@@ -1004,15 +1089,18 @@
         <div class="hud-row"><span class="hud-label">${tr('Status','অবস্থা')}:</span><span class="hud-value">${tr("Reference station · not a live reading", "তথ্যসূত্র স্টেশন · সরাসরি পর্যবেক্ষণ নয়")}</span></div>
       `;
     } else if (type === "building") {
+      const levels = props.floors ?? props.levels;
+      const sourceId = /^(way|relation)\/\d+$/.test(props.osm_id || "") ? props.osm_id : null;
       const use = ({apartments:tr("Apartments","অ্যাপার্টমেন্ট"), retail:tr("Retail / markets","খুচরা / বাজার"), mosque:tr("Religious use","ধর্মীয় ব্যবহার"), education:tr("Education","শিক্ষা"), healthcare:tr("Healthcare","স্বাস্থ্যসেবা"), civic:tr("Civic / community","নাগরিক / সামাজিক"), commerce:tr("Commerce","বাণিজ্য"), homes:tr("Homes","আবাসন"), industry:tr("Industry / utilities","শিল্প / পরিষেবা"), unknown:tr("Use unknown","ব্যবহার অজানা")})[props.use_class] || tr("Use unknown","ব্যবহার অজানা");
       rowsHtml = `
         <div class="hud-row"><span class="hud-label">${tr("Mapped use", "নথিভুক্ত ব্যবহার")}</span><span class="hud-value">${use}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Block height", "ভবনের উচ্চতা")}</span><span class="hud-value">${Number.isFinite(props.height_m) ? props.height_m+" m" : tr("Unknown · flat footprint","অজানা · সমতল সীমারেখা")}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Height method", "উচ্চতার পদ্ধতি")}</span><span class="hud-value">${props.height_method === "published-project-height" ? tr("Published project height; OSM value differs", "প্রকল্পের প্রকাশিত উচ্চতা; OSM মান ভিন্ন") : props.height_method === "osm-height-tag" ? tr("OSM height tag · not surveyed", "OSM উচ্চতার তথ্য · জরিপ নয়") : tr("No source height; levels are not metres", "উৎসে উচ্চতা নেই; তলার সংখ্যা মিটার নয়")}</span></div>
         <div class="hud-row"><span class="hud-label">${tr("Snapshot", "উপাত্ত সংগ্রহ")}</span><span class="hud-value">${(props.retrieved_at || parliamentSnapshot?.metadata.retrieved_at || "").slice(0, 10)}</span></div>
-        <div class="hud-row"><span class="hud-label">${tr("Source", "উৎস")}</span><span class="hud-value">${props.osm_id} · ODbL</span></div>
+        ${Number.isFinite(levels) && levels > 0 ? `<div class="hud-row"><span class="hud-label">${tr("Reported storeys", "উৎসে নথিভুক্ত তলা")}</span><span class="hud-value">${new Intl.NumberFormat(isBn ? "bn-BD" : "en").format(levels)}</span></div>` : ""}
+        <div class="hud-row"><span class="hud-label">${tr("Footprint source", "সীমারেখার উৎস")}</span><span class="hud-value">${sourceId ? `<a href="https://www.openstreetmap.org/${sourceId}" target="_blank" rel="noopener noreferrer">${sourceId}</a>` : "OpenStreetMap"} · ODbL</span></div>
 
-        ${props.height_source_url ? `<p><a href="${props.height_source_url}" target="_blank" rel="noopener noreferrer">${tr("Height source", "উচ্চতার উৎস")}</a>${props.osm_height_m != null ? ` · OSM: ${props.osm_height_m} m` : ""}</p>` : ""}
+        ${/^https:\/\//.test(props.height_source_url || "") ? `<p><a href="${props.height_source_url}" target="_blank" rel="noopener noreferrer">${tr("Height source", "উচ্চতার উৎস")}</a>${props.osm_height_m != null ? ` · OSM: ${props.osm_height_m} m` : ""}</p>` : ""}
         <p>${tr("Mapped footprint massing; not a surveyed architectural model.", "মানচিত্রভিত্তিক ভবনের রূপ; জরিপকৃত স্থাপত্য মডেল নয়।")}</p>
       `;
     } else if (type === "streamed-building") {
@@ -1066,12 +1154,22 @@
           <h4 class="hud-title">${title}</h4>
           <span class="hud-badge">${badge}</span>
         </div>
-        <button class="modal-close-btn" onclick="document.getElementById('atlas-observation-hud').hidden = true;">✕</button>
+        <button type="button" class="modal-close-btn" aria-label="${tr("Close feature details", "বৈশিষ্ট্যের তথ্য বন্ধ করুন")}">✕</button>
       </div>
       ${rowsHtml}
       <p style="margin:8px 0 0;font-size:var(--text-micro);color:var(--dim);">${desc}</p>
     `;
+    const close = hud.querySelector?.(".modal-close-btn");
+    if (close) close.onclick = () => { hud.hidden = true; opener?.focus(); };
+    hud.onkeydown = event => {
+      if (!opener || event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      hud.hidden = true;
+      opener.focus();
+    };
     hud.hidden = false;
+    if (opener) close?.focus();
   }
 
   let radarTimer = null;
@@ -1521,6 +1619,7 @@
         map.setPaintProperty(basemapId, "raster-opacity", lensId === "night" ? 0.18 : 1);
       }
     }
+    syncBasemap();
     syncBuildingVisibility();
 
     if (GIBS_LAYERS[lensId]) {
@@ -1745,13 +1844,12 @@
     window.addEventListener('pageshow', () => { if (!document.hidden) { scheduleWatch(); scheduleSolar(); } });
     window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', stopMapMotion);
     $("#atlas-lens")?.addEventListener("change", e => applyLens(e.target.value));
+    $("#atlas-centre-inspection")?.addEventListener("click", inspectMapCentre);
 
     $("#atlas-basemap")?.addEventListener("change", e => {
       currentBasemap = e.target.value;
-      if (map) {
-        if (map.getLayer("basemap-esri")) map.setLayoutProperty("basemap-esri", "visibility", currentBasemap === "esri" ? "visible" : "none");
-        if (map.getLayer("basemap-osm")) map.setLayoutProperty("basemap-osm", "visibility", currentBasemap === "osm" ? "visible" : "none");
-      }
+      syncBasemap();
+      syncBuildingVisibility();
     });
 
     $("#atlas-view")?.addEventListener("change", e => {
@@ -1825,9 +1923,13 @@
     lastRequestedArea = area.id;
     if (area.id === "parliament" && styleReady) loadParliamentBuildings();
     const is3D = $("#atlas-view")?.value !== "2d";
-    const zoom = (area.zoom || 15) + (area.id === "parliament" ? Math.max(0, Math.log2(map.getContainer().clientWidth / 768)) : 0);
-    map.flyTo({ center: [area.lng, area.lat], zoom,
-      pitch: is3D ? (area.pitch ?? 45) : 0, bearing: is3D ? (area.bearing ?? 0) : 0, duration });
+    const width = map.getContainer().clientWidth;
+    const zoom = (area.zoom || 15) + (area.id === "parliament" ? Math.max(0, Math.log2(width / 768)) : 0);
+    // Leave the Assembly above the phone's watch readings, including enlarged text.
+    const campusOffset = area.id === "parliament" && currentBasemap === "fabric" && width <= 768
+      ? {offset:[0, -104]} : {};
+    map.flyTo({ center: [area.lng, area.lat], zoom, ...campusOffset,
+      pitch: is3D ? (area.pitch ?? 45) : 0, bearing: is3D ? (area.bearing ?? 0) : 0, duration: reducedMotion() ? 0 : duration });
   }
 
   function populateQuickJump(areas) {
@@ -1961,6 +2063,11 @@
     // A linked lens is chosen before the map exists, so the first render is
     // already the view the reader asked for.
     currentLens = lensFromUrl() || "city";
+    const requestedBasemap = new URLSearchParams(window.location.search).get("basemap");
+    if (["esri", "osm", "fabric"].includes(requestedBasemap)) currentBasemap = requestedBasemap;
+    const basemap = $("#atlas-basemap");
+    if (basemap) basemap.value = currentBasemap;
+
 
     window.addEventListener('atlas:sampling', event => {
       const bbox = event.detail?.bbox;

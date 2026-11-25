@@ -1,0 +1,380 @@
+[
+  {
+    "credit": {
+      "bottom": 834,
+      "height": 44,
+      "width": 350,
+      "x": 30,
+      "y": 790
+    },
+    "header": {
+      "bottom": 41,
+      "height": 41,
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    "height": 844,
+    "key": {
+      "bottom": 115,
+      "height": 66,
+      "width": 156.7421875,
+      "x": 8,
+      "y": 49
+    },
+    "lang": "en",
+    "map": {
+      "bottom": 844,
+      "height": 803,
+      "width": 390,
+      "x": 0,
+      "y": 41
+    },
+    "overflow": false,
+    "readings": [
+      {
+        "clipped": false,
+        "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+        "text": "≋\nFLOOD\nn/a"
+      },
+      {
+        "clipped": false,
+        "label": "Air: AQI 181 · model · Unhealthy · Modelled, not a station reading · Unhealthy · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-25T20:00",
+        "text": "◍\nAIR\nAQI 181 · model · Unhealthy"
+      },
+      {
+        "clipped": false,
+        "label": "Wind: 6 km/h · model · Modelled wind at 10 m · from 299° · 2026-11-25T20:00",
+        "text": "↑\nWIND\n6 km/h · model"
+      },
+      {
+        "clipped": false,
+        "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+        "text": "৳\nECONOMY\nn/a"
+      }
+    ],
+    "watch": {
+      "bottom": 782,
+      "height": 131,
+      "width": 374,
+      "x": 8,
+      "y": 651
+    },
+    "width": 390
+  },
+  {
+    "credit": {
+      "bottom": 834,
+      "height": 44,
+      "width": 350,
+      "x": 30,
+      "y": 790
+    },
+    "header": {
+      "bottom": 41,
+      "height": 41,
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    "height": 844,
+    "key": {
+      "bottom": 115,
+      "height": 66,
+      "width": 146.9921875,
+      "x": 8,
+      "y": 49
+    },
+    "lang": "bn",
+    "map": {
+      "bottom": 844,
+      "height": 803,
+      "width": 390,
+      "x": 0,
+      "y": 41
+    },
+    "overflow": false,
+    "readings": [
+      {
+        "clipped": false,
+        "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+        "text": "≋\nবন্যা\nঅনুপলব্ধ"
+      },
+      {
+        "clipped": false,
+        "label": "বায়ু: AQI ১৮১ · মডেল · অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-25T20:00",
+        "text": "◍\nবায়ু\nAQI ১৮১ · মডেল · অস্বাস্থ্যকর"
+      },
+      {
+        "clipped": false,
+        "label": "বাতাস: ৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ২৯৯° · 2026-11-25T20:00",
+        "text": "↑\nবাতাস\n৬ কিমি/ঘ · মডেল"
+      },
+      {
+        "clipped": false,
+        "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+        "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ"
+      }
+    ],
+    "watch": {
+      "bottom": 782,
+      "height": 131,
+      "width": 374,
+      "x": 8,
+      "y": 651
+    },
+    "width": 390
+  },
+  {
+    "credit": {
+      "bottom": 758,
+      "height": 24,
+      "width": 575.1171875,
+      "x": 438.8828125,
+      "y": 734
+    },
+    "header": {
+      "bottom": 41,
+      "height": 41,
+      "width": 1024,
+      "x": 0,
+      "y": 0
+    },
+    "height": 768,
+    "key": {
+      "bottom": 115,
+      "height": 66,
+      "width": 156.7421875,
+      "x": 8,
+      "y": 49
+    },
+    "lang": "en",
+    "map": {
+      "bottom": 768,
+      "height": 727,
+      "width": 1024,
+      "x": 0,
+      "y": 41
+    },
+    "overflow": false,
+    "readings": [
+      {
+        "clipped": false,
+        "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+        "text": "≋\nFLOOD\nn/a"
+      },
+      {
+        "clipped": false,
+        "label": "Air: AQI 181 · model · Unhealthy · Modelled, not a station reading · Unhealthy · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-25T20:00",
+        "text": "◍\nAIR\nAQI 181 · model · Unhealthy"
+      },
+      {
+        "clipped": false,
+        "label": "Wind: 6 km/h · model · Modelled wind at 10 m · from 299° · 2026-11-25T20:00",
+        "text": "↑\nWIND\n6 km/h · model"
+      },
+      {
+        "clipped": false,
+        "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+        "text": "৳\nECONOMY\nn/a"
+      }
+    ],
+    "watch": {
+      "bottom": 726,
+      "height": 23.5,
+      "width": 565.1796875,
+      "x": 229.40625,
+      "y": 702.5
+    },
+    "width": 1024
+  },
+  {
+    "credit": {
+      "bottom": 758,
+      "height": 24,
+      "width": 575.1171875,
+      "x": 438.8828125,
+      "y": 734
+    },
+    "header": {
+      "bottom": 41,
+      "height": 41,
+      "width": 1024,
+      "x": 0,
+      "y": 0
+    },
+    "height": 768,
+    "key": {
+      "bottom": 115,
+      "height": 66,
+      "width": 146.9921875,
+      "x": 8,
+      "y": 49
+    },
+    "lang": "bn",
+    "map": {
+      "bottom": 768,
+      "height": 727,
+      "width": 1024,
+      "x": 0,
+      "y": 41
+    },
+    "overflow": false,
+    "readings": [
+      {
+        "clipped": false,
+        "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+        "text": "≋\nবন্যা\nঅনুপলব্ধ"
+      },
+      {
+        "clipped": false,
+        "label": "বায়ু: AQI ১৮১ · মডেল · অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-25T20:00",
+        "text": "◍\nবায়ু\nAQI ১৮১ · মডেল · অস্বাস্থ্যকর"
+      },
+      {
+        "clipped": false,
+        "label": "বাতাস: ৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ২৯৯° · 2026-11-25T20:00",
+        "text": "↑\nবাতাস\n৬ কিমি/ঘ · মডেল"
+      },
+      {
+        "clipped": false,
+        "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+        "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ"
+      }
+    ],
+    "watch": {
+      "bottom": 726,
+      "height": 27.5,
+      "width": 594.1796875,
+      "x": 214.90625,
+      "y": 698.5
+    },
+    "width": 1024
+  },
+  {
+    "credit": {
+      "bottom": 890,
+      "height": 24,
+      "width": 575.1171875,
+      "x": 854.8828125,
+      "y": 866
+    },
+    "header": {
+      "bottom": 41,
+      "height": 41,
+      "width": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "height": 900,
+    "key": {
+      "bottom": 115,
+      "height": 66,
+      "width": 156.7421875,
+      "x": 8,
+      "y": 49
+    },
+    "lang": "en",
+    "map": {
+      "bottom": 900,
+      "height": 859,
+      "width": 1440,
+      "x": 0,
+      "y": 41
+    },
+    "overflow": false,
+    "readings": [
+      {
+        "clipped": false,
+        "label": "Flood: n/a · No calibrated flood assessment · BWDB / FFWC gauge feed not connected",
+        "text": "≋\nFLOOD\nn/a"
+      },
+      {
+        "clipped": false,
+        "label": "Air: AQI 181 · model · Unhealthy · Modelled, not a station reading · Unhealthy · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-25T20:00",
+        "text": "◍\nAIR\nAQI 181 · model · Unhealthy"
+      },
+      {
+        "clipped": false,
+        "label": "Wind: 6 km/h · model · Modelled wind at 10 m · from 299° · 2026-11-25T20:00",
+        "text": "↑\nWIND\n6 km/h · model"
+      },
+      {
+        "clipped": false,
+        "label": "Economy: n/a · Economic data unavailable · no dated bulletin",
+        "text": "৳\nECONOMY\nn/a"
+      }
+    ],
+    "watch": {
+      "bottom": 858,
+      "height": 23.5,
+      "width": 565.1796875,
+      "x": 437.40625,
+      "y": 834.5
+    },
+    "width": 1440
+  },
+  {
+    "credit": {
+      "bottom": 890,
+      "height": 24,
+      "width": 575.1171875,
+      "x": 854.8828125,
+      "y": 866
+    },
+    "header": {
+      "bottom": 41,
+      "height": 41,
+      "width": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "height": 900,
+    "key": {
+      "bottom": 115,
+      "height": 66,
+      "width": 146.9921875,
+      "x": 8,
+      "y": 49
+    },
+    "lang": "bn",
+    "map": {
+      "bottom": 900,
+      "height": 859,
+      "width": 1440,
+      "x": 0,
+      "y": 41
+    },
+    "overflow": false,
+    "readings": [
+      {
+        "clipped": false,
+        "label": "বন্যা: অনুপলব্ধ · ক্যালিব্রেট করা বন্যা মূল্যায়ন নেই · বিউডব্লিউডি / এফএফডাব্লুসি গেজ পাঠন সংযুক্ত নয়",
+        "text": "≋\nবন্যা\nঅনুপলব্ধ"
+      },
+      {
+        "clipped": false,
+        "label": "বায়ু: AQI ১৮১ · মডেল · অস্বাস্থ্যকর · মডেল অনুমান, স্টেশনের পরিমাপ নয় · অস্বাস্থ্যকর · Copernicus Atmosphere Monitoring Service (CAMS) / Open-Meteo · 2026-11-25T20:00",
+        "text": "◍\nবায়ু\nAQI ১৮১ · মডেল · অস্বাস্থ্যকর"
+      },
+      {
+        "clipped": false,
+        "label": "বাতাস: ৬ কিমি/ঘ · মডেল · ১০ মিটারে মডেল বাতাস · দিক থেকে ২৯৯° · 2026-11-25T20:00",
+        "text": "↑\nবাতাস\n৬ কিমি/ঘ · মডেল"
+      },
+      {
+        "clipped": false,
+        "label": "অর্থনীতি: অনুপলব্ধ · অর্থনৈতিক তথ্য অনুপলব্ধ · কোনো তারিখযুক্ত বুলেটিন নেই",
+        "text": "৳\nঅর্থনীতি\nঅনুপলব্ধ"
+      }
+    ],
+    "watch": {
+      "bottom": 858,
+      "height": 27.5,
+      "width": 594.1796875,
+      "x": 422.90625,
+      "y": 830.5
+    },
+    "width": 1440
+  }
+]
