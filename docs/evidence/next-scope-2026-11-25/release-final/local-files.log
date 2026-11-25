@@ -1,0 +1,14 @@
+
+> dhaka-dashboard@1.0.0 verify
+> node scripts/verify-local.mjs
+
+==> Running verify-local.mjs preflight checks...
+  ✓ public/dhaka-areas.json: valid JSON
+  ✓ public/dhaka-landmarks.geojson: valid GeoJSON with 16 features
+  ✓ public/dhaka-rivers.geojson: valid GeoJSON with 15 features
+  ✓ public/dhaka-mrt.geojson: valid GeoJSON with 23 features
+  ✓ public/data/parliament-buildings.geojson: valid GeoJSON with 4076 features
+  ✓ public/data/city-height-buildings.geojson: valid GeoJSON with 276 features
+  ✓ public/data/skyline-coverage.json: valid JSON
+  ✓ public/dhaka-economy.geojson: valid GeoJSON with 10 features
+✓ verify-local.mjs passed: all files and datasets present and valid.

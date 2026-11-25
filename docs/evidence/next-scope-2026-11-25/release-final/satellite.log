@@ -1,0 +1,106 @@
+
+> dhaka-dashboard@1.0.0 verify:satellite
+> node --import ./scripts/lib/ts-resolver.mjs scripts/verify-satellite-live.mjs
+
+Reading stored measurements for 14 places over 6 satellite signals…
+status partial · 83/98 measurements · 0.5s
+  old-dhaka        Night radiance           32.256 nW/(cm² sr) · 2026-11-24 · 560 m
+  old-dhaka        Daytime surface heat     296.925 K · 2026-11-25 · 1120 m
+  old-dhaka        Night-time surface heat  296.324 K · 2026-11-24 · 1120 m
+  old-dhaka        Aerosol optical depth    unavailable · no-observation-in-window
+  old-dhaka        Vegetation index         0.21 1 · 2026-11-01 · 280 m
+  old-dhaka        Built-up ground          100 % of ground · static 2010 · 35 m
+  old-dhaka        Solar resource           4.5031 kWh/m²/day · static null · null m
+  motijheel        Night radiance           37.378 nW/(cm² sr) · 2026-11-24 · 560 m
+  motijheel        Daytime surface heat     296.756 K · 2026-11-25 · 1120 m
+  motijheel        Night-time surface heat  296.732 K · 2026-11-24 · 1120 m
+  motijheel        Aerosol optical depth    unavailable · no-observation-in-window
+  motijheel        Vegetation index         0.29 1 · 2026-11-01 · 280 m
+  motijheel        Built-up ground          100 % of ground · static 2010 · 35 m
+  motijheel        Solar resource           4.5031 kWh/m²/day · static null · null m
+  parliament       Night radiance           38.01 nW/(cm² sr) · 2026-11-24 · 560 m
+  parliament       Daytime surface heat     296.54 K · 2026-11-25 · 1119 m
+  parliament       Night-time surface heat  297.116 K · 2026-11-24 · 1119 m
+  parliament       Aerosol optical depth    unavailable · no-observation-in-window
+  parliament       Vegetation index         0.455 1 · 2026-11-01 · 280 m
+  parliament       Built-up ground          100 % of ground · static 2010 · 35 m
+  parliament       Solar resource           4.5031 kWh/m²/day · static null · null m
+  hatirjheel       Night radiance           35.114 nW/(cm² sr) · 2026-11-24 · 560 m
+  hatirjheel       Daytime surface heat     296.588 K · 2026-11-25 · 1119 m
+  hatirjheel       Night-time surface heat  296.684 K · 2026-11-24 · 1119 m
+  hatirjheel       Aerosol optical depth    unavailable · no-observation-in-window
+  hatirjheel       Vegetation index         0.31 1 · 2026-11-01 · 280 m
+  hatirjheel       Built-up ground          98.22 % of ground · static 2010 · 35 m
+  hatirjheel       Solar resource           4.5031 kWh/m²/day · static null · null m
+  gulshan          Night radiance           36.258 nW/(cm² sr) · 2026-11-24 · 560 m
+  gulshan          Daytime surface heat     296.18 K · 2026-11-25 · 1119 m
+  gulshan          Night-time surface heat  296.276 K · 2026-11-24 · 1119 m
+  gulshan          Aerosol optical depth    unavailable · no-observation-in-window
+  gulshan          Vegetation index         0.383 1 · 2026-11-01 · 280 m
+  gulshan          Built-up ground          100 % of ground · static 2010 · 35 m
+  gulshan          Solar resource           4.5031 kWh/m²/day · static null · null m
+  kawran-bazar     Night radiance           37.318 nW/(cm² sr) · 2026-11-24 · 560 m
+  kawran-bazar     Daytime surface heat     296.684 K · 2026-11-25 · 1119 m
+  kawran-bazar     Night-time surface heat  297.14 K · 2026-11-24 · 1119 m
+  kawran-bazar     Aerosol optical depth    unavailable · no-observation-in-window
+  kawran-bazar     Vegetation index         0.282 1 · 2026-11-01 · 280 m
+  kawran-bazar     Built-up ground          100 % of ground · static 2010 · 35 m
+  kawran-bazar     Solar resource           4.5031 kWh/m²/day · static null · null m
+  sadarghat        Night radiance           26.502 nW/(cm² sr) · 2026-11-24 · 560 m
+  sadarghat        Daytime surface heat     297.083 K · 2026-11-25 · 1120 m
+  sadarghat        Night-time surface heat  296.132 K · 2026-11-24 · 1120 m
+  sadarghat        Aerosol optical depth    unavailable · no-observation-in-window
+  sadarghat        Vegetation index         0.235 1 · 2026-11-01 · 280 m
+  sadarghat        Built-up ground          76.44 % of ground · static 2010 · 35 m
+  sadarghat        Solar resource           4.5031 kWh/m²/day · static null · null m
+  savar-ashulia    Night radiance           14.182 nW/(cm² sr) · 2026-11-24 · 559 m
+  savar-ashulia    Daytime surface heat     unavailable · cloud-or-no-observation
+  savar-ashulia    Night-time surface heat  293.736 K · 2026-11-24 · 1118 m
+  savar-ashulia    Aerosol optical depth    unavailable · no-observation-in-window
+  savar-ashulia    Vegetation index         0.523 1 · 2026-11-01 · 280 m
+  savar-ashulia    Built-up ground          45.78 % of ground · static 2010 · 35 m
+  savar-ashulia    Solar resource           4.5031 kWh/m²/day · static null · null m
+  uttara           Night radiance           28.828 nW/(cm² sr) · 2026-11-24 · 559 m
+  uttara           Daytime surface heat     295.1 K · 2026-11-25 · 1118 m
+  uttara           Night-time surface heat  295.124 K · 2026-11-24 · 1118 m
+  uttara           Aerosol optical depth    unavailable · no-observation-in-window
+  uttara           Vegetation index         0.305 1 · 2026-11-01 · 280 m
+  uttara           Built-up ground          71.11 % of ground · static 2010 · 35 m
+  uttara           Solar resource           4.5031 kWh/m²/day · static null · null m
+  mirpur           Night radiance           33.194 nW/(cm² sr) · 2026-11-24 · 559 m
+  mirpur           Daytime surface heat     295.85 K · 2026-11-25 · 1119 m
+  mirpur           Night-time surface heat  296.108 K · 2026-11-24 · 1119 m
+  mirpur           Aerosol optical depth    unavailable · no-observation-in-window
+  mirpur           Vegetation index         0.286 1 · 2026-11-01 · 280 m
+  mirpur           Built-up ground          100 % of ground · static 2010 · 35 m
+  mirpur           Solar resource           4.5031 kWh/m²/day · static null · null m
+  dhanmondi        Night radiance           37.302 nW/(cm² sr) · 2026-11-24 · 560 m
+  dhanmondi        Daytime surface heat     296.612 K · 2026-11-25 · 1119 m
+  dhanmondi        Night-time surface heat  296.972 K · 2026-11-24 · 1119 m
+  dhanmondi        Aerosol optical depth    unavailable · no-observation-in-window
+  dhanmondi        Vegetation index         0.322 1 · 2026-11-01 · 280 m
+  dhanmondi        Built-up ground          100 % of ground · static 2010 · 35 m
+  dhanmondi        Solar resource           4.5031 kWh/m²/day · static null · null m
+  tejgaon          Night radiance           35.114 nW/(cm² sr) · 2026-11-24 · 560 m
+  tejgaon          Daytime surface heat     296.588 K · 2026-11-25 · 1119 m
+  tejgaon          Night-time surface heat  296.684 K · 2026-11-24 · 1119 m
+  tejgaon          Aerosol optical depth    unavailable · no-observation-in-window
+  tejgaon          Vegetation index         0.32 1 · 2026-11-01 · 280 m
+  tejgaon          Built-up ground          100 % of ground · static 2010 · 35 m
+  tejgaon          Solar resource           4.5031 kWh/m²/day · static null · null m
+  chawkbazar       Night radiance           33.992 nW/(cm² sr) · 2026-11-24 · 560 m
+  chawkbazar       Daytime surface heat     296.804 K · 2026-11-25 · 1120 m
+  chawkbazar       Night-time surface heat  296.66 K · 2026-11-24 · 1120 m
+  chawkbazar       Aerosol optical depth    unavailable · no-observation-in-window
+  chawkbazar       Vegetation index         0.237 1 · 2026-11-01 · 280 m
+  chawkbazar       Built-up ground          100 % of ground · static 2010 · 35 m
+  chawkbazar       Solar resource           4.5031 kWh/m²/day · static null · null m
+  narayanganj      Night radiance           26.464 nW/(cm² sr) · 2026-11-24 · 560 m
+  narayanganj      Daytime surface heat     295.94 K · 2026-11-25 · 1121 m
+  narayanganj      Night-time surface heat  295.58 K · 2026-11-24 · 1121 m
+  narayanganj      Aerosol optical depth    unavailable · no-observation-in-window
+  narayanganj      Vegetation index         0.48 1 · 2026-11-01 · 280 m
+  narayanganj      Built-up ground          100 % of ground · static 2010 · 35 m
+  narayanganj      Solar resource           4.5031 kWh/m²/day · static null · null m
+  · MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth is quiet across the city: no-observation-in-window
+Snapshot integrity validated: 83/98 measurements, 83 domain readings; source health is evaluated separately

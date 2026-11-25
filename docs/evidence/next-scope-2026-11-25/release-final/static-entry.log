@@ -1,0 +1,6 @@
+
+> dhaka-dashboard@1.0.0 smoke
+> node scripts/smoke-atlas.mjs
+
+==> Running smoke-atlas.mjs static page checks...
+✓ smoke-atlas.mjs passed: Static app entry points verified.

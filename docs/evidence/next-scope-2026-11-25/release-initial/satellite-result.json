@@ -1,0 +1,13 @@
+{
+  "status": "degraded",
+  "reasonCode": "some-signals-unavailable",
+  "coverage": 0.8469387755102041,
+  "quietLayers": [
+    {
+      "layerId": "MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth",
+      "reason": "no-observation-in-window",
+      "date": null
+    }
+  ],
+  "checkedAt": "2026-11-25T08:57:09.988Z"
+}

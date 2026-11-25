@@ -1,0 +1,20 @@
+
+> dhaka-dashboard@1.0.0 smoke:api
+> node scripts/smoke-atlas-api.mjs
+
+==> DHKx 3D Atlas API smoke · https://dhaka.nonarkara.org
+  ✓ health check answers with build ID and status ok (status=200 buildId=dhaka-atlas-20261125-1795597188-b41633e)
+  ✓ areas returns 14 curated districts (status=200 count=14)
+  ✓ districts returns city corporations (DNCC and DSCC) (status=200)
+  ✓ at-this-point resolves Motijheel (status=200)
+  ✓ rivers returns 6 BWDB gauge stations (status=200 stations=6)
+  ✓ economy returns macroeconomic indicators (status=200 count=8)
+  ✓ city watch strip answers with flood and air indicators (status=200)
+  ✓ instruments answer with a live rate and dated national series (status=200 macro=17 fx=124.89628999)
+  ✓ every national reading carries its reporting period 
+  ✓ collage returns measured satellite signals for the districts (status=200 districts=14 measured=83)
+  ✓ every measured signal carries a unit, a date and a resolution 
+  ✓ the collage reads its domains in English and Bengali (readings=83)
+  ✓ economy corridors carry measured radiance, not registry figures (measured=10 corridors=10)
+
+✓ All 13 API smoke checks passed successfully.

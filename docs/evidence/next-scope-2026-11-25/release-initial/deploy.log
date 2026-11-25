@@ -1,0 +1,40 @@
+
+ ⛅️ wrangler 4.149.0 (update available 4.168.0)
+───────────────────────────────────────────────
+
+Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md
+🌀 Building list of assets...
+✨ Read 61 files from the assets directory /Users/nonarkara/Projects/dashboards/Dhaka/public
+🌀 Starting asset upload...
+🌀 Found 11 new or modified static assets to upload. Proceeding with upload...
++ /parliament-reference.html
++ /people.js
++ /collage.js
++ /research.html
++ /data/skyline-coverage.json
++ /instruments.js
++ /dhaka-design.css
++ /app.js
++ /index.html
++ /walk.js
++ /translations.js
+Uploaded 3 of 11 assets
+Uploaded 7 of 11 assets
+Uploaded 11 of 11 assets
+✨ Success! Uploaded 11 files (43 already uploaded) (0.96 sec)
+
+Total Upload: 263.31 KiB / gzip: 59.81 KiB
+Worker Startup Time: 13 ms
+Your Worker has access to the following bindings:
+Binding                                           Resource         
+env.OBSERVATION_DB (dhaka-observations)           D1 Database      
+env.OBSERVATION_ARCHIVE (dhaka-observations)      R2 Bucket        
+env.RATE_LIMITER (600 requests/60s)               Rate Limit       
+env.ASSETS                                        Assets           
+
+Uploaded dhaka-dashboard (5.25 sec)
+Deployed dhaka-dashboard triggers (1.47 sec)
+  https://dhaka-dashboard.drnon.workers.dev
+  dhaka.nonarkara.org (custom domain)
+  schedule: */15 * * * *
+Current Version ID: cc5af7a2-6cba-4a92-80e5-7731c711835e

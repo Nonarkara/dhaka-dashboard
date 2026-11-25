@@ -1,0 +1,31 @@
+
+ ⛅️ wrangler 4.149.0 (update available 4.168.0)
+───────────────────────────────────────────────
+🌀 Building list of assets...
+✨ Read 61 files from the assets directory /Users/nonarkara/Projects/dashboards/Dhaka/public
+🌀 Starting asset upload...
+🌀 Found 4 new or modified static assets to upload. Proceeding with upload...
++ /parliament-reference.html
++ /app.js
++ /index.html
++ /research.html
+Uploaded 1 of 4 assets
+Uploaded 3 of 4 assets
+Uploaded 4 of 4 assets
+✨ Success! Uploaded 4 files (50 already uploaded) (0.82 sec)
+
+Total Upload: 263.31 KiB / gzip: 59.81 KiB
+Worker Startup Time: 6 ms
+Your Worker has access to the following bindings:
+Binding                                           Resource         
+env.OBSERVATION_DB (dhaka-observations)           D1 Database      
+env.OBSERVATION_ARCHIVE (dhaka-observations)      R2 Bucket        
+env.RATE_LIMITER (600 requests/60s)               Rate Limit       
+env.ASSETS                                        Assets           
+
+Uploaded dhaka-dashboard (4.44 sec)
+Deployed dhaka-dashboard triggers (1.51 sec)
+  https://dhaka-dashboard.drnon.workers.dev
+  dhaka.nonarkara.org (custom domain)
+  schedule: */15 * * * *
+Current Version ID: 007e0057-ca7b-4e75-9051-83258c1f3388

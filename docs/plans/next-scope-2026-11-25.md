@@ -1,6 +1,6 @@
 # Dhaka next scope: dependable data, faster maps, complete user flows
 
-Status: approved by the owner on 25 November 2026 (“Sure.”). Executing phases 0–6 in reviewed increments.
+Status: approved by the owner on 25 November 2026 (“Sure.”). Implementation and canonical release complete; actual evidence, measurement limits and remaining source gaps are recorded in docs/evidence/next-scope-2026-11-25/verification.md.
 
 ## Outcome and approval boundary
 

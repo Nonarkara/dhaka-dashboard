@@ -1,0 +1,6 @@
+==> Running verify-gibs-live.mjs...
+  ✓ VIIRS_NOAA20_CorrectedReflectance_TrueColor: independently decoded advertised 2026-11-24, 8913 bytes
+  ✓ MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth: independently decoded advertised 2026-11-24, 22094 bytes
+  ✓ VIIRS_NOAA20_DayNightBand: independently decoded advertised 2026-11-24, 51784 bytes
+FAIL: live GIBS verification failed:
+  - VIIRS_Combined_Flood_1-Day: advertised 2026-11-25 has no decoded data (HTTP 200)
