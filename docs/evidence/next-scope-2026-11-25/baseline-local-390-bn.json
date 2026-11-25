@@ -1,0 +1,46 @@
+{
+  "credit": {
+    "bottom": 834,
+    "height": 44,
+    "left": 30,
+    "right": 380,
+    "top": 790,
+    "width": 350,
+    "x": 30,
+    "y": 790
+  },
+  "header": {
+    "bottom": 41,
+    "height": 41,
+    "left": 0,
+    "right": 390,
+    "top": 0,
+    "width": 390,
+    "x": 0,
+    "y": 0
+  },
+  "key": {
+    "bottom": 115,
+    "height": 66,
+    "left": 8,
+    "right": 154.9921875,
+    "top": 49,
+    "width": 146.9921875,
+    "x": 8,
+    "y": 49
+  },
+  "viewport": [
+    390,
+    844
+  ],
+  "watch": {
+    "bottom": 782,
+    "height": 131,
+    "left": 8,
+    "right": 382,
+    "top": 651,
+    "width": 374,
+    "x": 8,
+    "y": 651
+  }
+}
