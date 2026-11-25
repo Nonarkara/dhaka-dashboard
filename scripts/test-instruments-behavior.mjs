@@ -83,7 +83,10 @@ for(const language of ['en','bn']) {
 }
 console.log('✓ National ledger rendering: 17 series + daily FX, seven bilingual groups, fractional units, source periods, partial/offline rows and daily-reference wording');
 
-// The real header removed the optional band. The desk must not depend on it.
+// The header carries the band, and the desk does not depend on it. The desk
+// must render and stay honest with the band present and with it absent, so
+// that a future change to the header cannot take the national readings with
+// it.
 const actualHeaderHasBand=readFileSync('public/index.html','utf8').includes('id="atlas-instruments"');
 for(const language of ['en','bn']) {
   for(const withBand of new Set([false,actualHeaderHasBand])) {
@@ -98,4 +101,4 @@ for(const language of ['en','bn']) {
     assert.doesNotMatch(malformed.desk.textContent,/Invalid Date/);
   }
 }
-console.log('✓ National desk works without removed header band; clock basis names device time until valid synchronization and after failure');
+console.log('✓ National desk works with and without the header band; clock basis names device time until valid synchronization and after failure');

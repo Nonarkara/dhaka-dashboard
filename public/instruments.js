@@ -50,18 +50,21 @@
   ];
 
   /**
-   * Band order and the width at which each reading appears.
+   * Band order, most important first.
    *
-   * The clock and the rate are the two a person checks without meaning to, so
-   * they are never dropped. The rest arrive as the width allows.
+   * The clock is never dropped. The rest give way as the width runs out, in
+   * this order: the least important reading goes first, the live rate goes
+   * last, because a rate that changes while you watch is worth more room
+   * than a number that has not moved in a year. The stylesheet holds the
+   * width at which each one goes; the order here is the order they matter.
    */
   const BAND = [
-    { id: 'fx', from: 0 },
-    { id: 'gdp', from: 2 },
-    { id: 'population', from: 3 },
-    { id: 'inflation', from: 4 },
-    { id: 'exports', from: 5 },
-    { id: 'industry', from: 6 },
+    { id: 'fx' },
+    { id: 'gdp' },
+    { id: 'population' },
+    { id: 'inflation' },
+    { id: 'exports' },
+    { id: 'industry' },
   ];
 
   let data, started = false, pending = null, requestController = null;

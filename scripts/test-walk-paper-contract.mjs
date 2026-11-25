@@ -17,6 +17,9 @@ const walk = readFileSync("public/walk.js", "utf8");
 const app = readFileSync("public/app.js", "utf8");
 const research = readFileSync("public/research.html", "utf8");
 const index = readFileSync("public/index.html", "utf8");
+const style = readFileSync("public/style.css", "utf8");
+const i18n = readFileSync("public/i18n.js", "utf8");
+const instruments = readFileSync("public/instruments.js", "utf8");
 
 let checks = 0;
 const ok = (label, fn) => { fn(); checks++; };
@@ -115,7 +118,103 @@ ok("the walk leaves the keyboard alone while a field is focused", () => {
   assert.ok(walk.includes("isContentEditable"), "the walk does not respect a contenteditable field");
 });
 
-// ── The paper is bilingual and complete ────────────────────────────────────
+// ── The header must carry the instrument band ───────────────────────────────
+// The band was removed from the header on the premise that it was "empty,
+// wasted chrome". It was empty only because its markup had gone, while its
+// renderer and its stylesheet stayed: the readings were alive and unreachable.
+// The whole path is checked, so neither half can go again.
+ok("the header carries the instrument band, and the band is wired to it", () => {
+  const header = index.match(/<header class="atlas-header">([\s\S]*?)<\/header>/);
+  assert.ok(header, "the atlas has no header");
+  assert.ok(/id="atlas-instruments"/.test(header[1]),
+    "the header has no instrument band: the country's clock, the live rate and the national readings are gone from the top bar");
+  assert.ok(instruments.includes("#atlas-instruments"),
+    "the instruments module no longer looks for the band");
+  assert.ok(index.includes('src="/instruments.js'), "the instruments module is not loaded");
+
+  // The band's own list of readings, most important first.
+  const list = instruments.match(/const BAND = \[([\s\S]*?)\n {2}\];/);
+  assert.ok(list, "the instruments module has no band list");
+  const slots = [...list[1].matchAll(/id:\s*'([^']+)'/g)].map((m) => m[1]);
+  assert.ok(slots.length >= 4, `the band lists only ${slots.length} readings`);
+
+  // The width at which each reading is dropped. Each rule is one line, so the
+  // width is read from the same line that names the slot rather than from a
+  // window that might reach into the next rule.
+  const widthFor = (slot) => {
+    for (const line of style.split('\n')) {
+      const m = line.match(/@media\s*\(max-width:\s*(\d+)px\)/);
+      if (m && line.includes(`[data-slot="${slot}"]`)) return Number(m[1]);
+    }
+    return null;
+  };
+
+  for (const slot of slots) {
+    assert.ok(widthFor(slot) !== null,
+      `the band has no rule that drops the ${slot} reading when the width runs out`);
+  }
+
+  // The order matters as much as the presence: the reading listed first is
+  // the one that must survive longest, so each drop happens at a narrower
+  // width than the one before it. The live rate goes last, because a number
+  // that changes while you watch is worth more room than one that has not
+  // moved in a year.
+  const widths = slots.map(widthFor);
+  for (let i = 1; i < widths.length; i++) {
+    assert.ok(widths[i] > widths[i - 1],
+      `the ${slots[i]} reading is dropped at ${widths[i]}px, which is not narrower than the ${slots[i - 1]} reading at ${widths[i - 1]}px`);
+  }
+
+  // The clock is the one reading that is never dropped.
+  const clockDropped = style.split('\n').some((line) =>
+    /@media/.test(line) && /instrument-clock/.test(line));
+  assert.ok(!clockDropped, "there is a rule that drops the country's clock");
+
+  // The band must not carry data nothing reads: an attribute written into
+  // the DOM and never consumed is a claim the interface does not keep.
+  assert.ok(!/data-from/.test(instruments) && !/dataset\.from/.test(instruments),
+    "the band still writes a from attribute that nothing reads");
+  assert.ok(!/data-from/.test(style), "the stylesheet still keys off a data-from attribute");
+});
+
+ok("the band does not claim a reading is permanent when the width drops it", () => {
+  // The code said the clock and the rate "are never dropped" while the
+  // stylesheet dropped the rate at 559px. A comment that disagrees with the
+  // cascade is a lie a future editor will believe.
+  const doc = instruments.slice(0, instruments.indexOf("const BAND = ["));
+  // The comment sits above the list, so the slice starts before it.
+  const bandStart = instruments.lastIndexOf("/**", instruments.indexOf("const BAND = ["));
+  const bandDoc = instruments.slice(bandStart, instruments.indexOf("const BAND = [") + 400);
+
+  // Every sentence that claims something is never dropped must be talking
+  // about the clock and nothing else.
+  const claims = bandDoc.split(/[.\n]/).map((s) => s.trim()).filter((s) => /never dropped/.test(s));
+  assert.ok(claims.length > 0, "the band does not say which reading is never dropped");
+  for (const claim of claims) {
+    assert.ok(/clock/i.test(claim),
+      `the band claims something other than the clock is never dropped: "${claim}"`);
+    assert.ok(!/rate|exchange/i.test(claim),
+      `the band claims the rate is never dropped: "${claim}"`);
+  }
+
+  // And the module header must not carry the old claim either.
+  assert.ok(!/clock and the rate are the two/.test(doc),
+    "the module header still claims the rate is never dropped");
+});
+
+ok("the language control moves into the Map menu on a phone", () => {
+  assert.ok(/id="language-toggle-menu"/.test(index),
+    "the Map menu has no language control, so a phone header cannot give up the room for the band");
+  const menu = index.match(/id="atlas-menu"[\s\S]*?<\/details>/);
+  assert.ok(menu && /language-toggle-menu/.test(menu[0]),
+    "the menu's language control is not inside the menu");
+  assert.ok(/atlas-desktop-only/.test(index),
+    "the header's language control is not marked desktop-only");
+  // The menu's control must actually be wired to the switch — not merely
+  // present in the markup.
+  assert.ok(/getElementById\('language-toggle-menu'\)\?\.addEventListener/.test(i18n),
+    "the menu's language control is not wired to the language switch");
+});
 ok("the research paper carries both languages for every block", () => {
   const en = (research.match(/data-en=/g) || []).length;
   const bn = (research.match(/data-bn=/g) || []).length;
@@ -183,6 +282,9 @@ ok("the paper renders its own translations", () => {
 // both languages — and the diagram's digits are held to it. This is the
 // check that would have caught "seventeen lenses" over a fifteen-lens
 // atlas and "fifteen test suites" over twenty-four.
+/** The number as Bengali digits, grouped as the paper groups it. */
+const bnDigits = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  .replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[d]);
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const collageSrc = readFileSync("src/collage.ts", "utf8");
 const satelliteSrc = readFileSync("src/satellite.ts", "utf8");
@@ -232,11 +334,19 @@ const assertEnClaims = (phrase, expected) => {
   }
 };
 
+/**
+ * Bengali has interchangeable spellings for some numerals — আটাশ and আঠাশ
+ * are both twenty-eight — so the comparison folds the letters that writers
+ * vary before it looks. The check is about the number being claimed, not
+ * about one spelling of it.
+ */
+const bnFold = (text) => text.replace(/\u09a0/g, "\u099f");
+
 const assertBnClaim = (pair, phraseBn, expected) => {
   assert.ok(BN_NUM[expected] !== undefined,
     `extend BN_NUM in this test: the count is now ${expected}`);
-  const want = `${BN_NUM[expected]}টি ${phraseBn}`;
-  assert.ok(pair.bn.includes(want),
+  const want = bnFold(`${BN_NUM[expected]}টি ${phraseBn}`);
+  assert.ok(bnFold(pair.bn).includes(want),
     `the Bengali twin says "${pair.bn.slice(0, 70)}…" — expected "${want}"`);
 };
 
@@ -260,6 +370,17 @@ ok("the paper's lens count matches the atlas", () => {
   assertBnClaim(pairFor("map lenses"), "মানচিত্র লেন্স", lenses.length);
   assert.ok(research.includes(`>${lenses.length} lenses</text>`),
     `the diagram does not say "${lenses.length} lenses"`);
+});
+
+ok("the paper's route count matches the Worker", () => {
+  const worker = readFileSync("src/index.ts", "utf8");
+  const routes = [...worker.matchAll(/url\.pathname\s*===\s*"([^"]+)"/g)].map(m => m[1]);
+  assert.ok(routes.length > 0, "no routes parsed from the Worker");
+  // The count is of distinct routes, not of the places they are matched.
+  const distinct = new Set(routes);
+  assert.equal(distinct.size, routes.length, "a route is matched twice in the Worker");
+  assertEnClaims("routes on a single Worker", distinct.size);
+  assertBnClaim(pairFor("routes on a single Worker"), "রুট", distinct.size);
 });
 
 ok("the paper's test-suite count matches the release gate", () => {
@@ -294,6 +415,35 @@ ok("the paper's GIBS instrument count matches the collage", () => {
     "the diagram does not name the reanalysis model separately from the satellites");
 });
 
+ok("the paper's published-layer count matches the vendored catalogue", () => {
+  // The catalogue is refreshed from NASA's capabilities document, so its
+  // layer count moves whenever GIBS publishes more. The paper's number must
+  // move with it, in both languages, or it is a stale claim about a source.
+  const catalogue = JSON.parse(readFileSync("scripts/fixtures/gibs-catalogue.json", "utf8"));
+  const layers = catalogue.layerCount;
+  assert.ok(Number.isInteger(layers) && layers > 0, "the catalogue has no layer count");
+
+  // English, in the attribute and in the body.
+  const en = `(${layers.toLocaleString("en-GB")} published layers, no key)`;
+  const enSites = (research.match(new RegExp(en.replace(/[()]/g, "\\$&"), "g")) || []).length;
+  assert.ok(enSites > 0,
+    `the paper does not state the catalogue's ${layers.toLocaleString("en-GB")} published layers`);
+  assert.ok(enSites >= 2,
+    "the paper states the layer count in only one of its two English places");
+
+  // Bengali, in the same sentence.
+  const bn = `(প্রকাশিত ${bnDigits(layers)} স্তর`;
+  assert.ok(research.includes(bn),
+    `the paper's Bengali twin does not state ${bnDigits(layers)} layers`);
+
+  // And no other layer count may be claimed anywhere in the paper.
+  const claims = [...research.matchAll(/\(([0-9][0-9,]{2,}) published layers/g)].map((m) => m[1]);
+  for (const c of claims) {
+    assert.equal(c.replace(/,/g, ""), String(layers),
+      `the paper claims ${c} published layers but the catalogue holds ${layers}`);
+  }
+});
+
 ok("the paper's collage counts match the code", () => {
   const signals = collageSrc.match(/const DOMAIN_SIGNALS[^=]*= \{([\s\S]*?)\n\};/);
   assert.ok(signals, "DOMAIN_SIGNALS did not parse");
@@ -315,6 +465,73 @@ ok("the paper's collage counts match the code", () => {
   const want = `${BN_NUM[domains.length]}টি ক্ষেত্র ও ${BN_NUM[instruments.length]}টি যন্ত্র`;
   const pair = pairFor("side by side for one district");
   assert.ok(pair.bn.includes(want), `the Bengali twin does not say "${want}"`);
+});
+
+ok("the paper's population figure is the one the atlas measures", () => {
+  // The abstract used to say "23 million people" — a headcount the atlas does
+  // not measure and cannot source. The figure it prints now is the sum of the
+  // published WorldPop grid this atlas serves, so it is derived here from
+  // that grid rather than trusted.
+  const grid = JSON.parse(readFileSync("public/data/people-grid.json", "utf8"));
+  const column = grid.columns.indexOf("population");
+  assert.ok(column > 0, "the published population grid has no population column");
+  const values = grid.cells.map((c) => c[column]).filter((v) => typeof v === "number");
+  assert.ok(values.length > 0, "the published population grid carries no counts");
+  const total = values.reduce((a, b) => a + b, 0);
+  const millions = (total / 1e6).toFixed(1);
+  assert.equal(Number(millions) * 1e6 > 1e6, true, "the grid does not hold a city's worth of people");
+
+  // English, in the attribute and in the body.
+  const en = `about ${millions} million people`;
+  assert.ok(research.includes(en),
+    `the paper does not state the grid's ${millions} million people`);
+  assert.ok((research.match(new RegExp(en.replace(/[.]/g, "\\."), "g")) || []).length >= 2,
+    "the paper states the population in only one of its two English places");
+
+  // Bengali, in the same sentence.
+  const bn = `প্রায় ${bnDigits(Number(millions))} মিলিয়ন মানুষ`;
+  assert.ok(research.includes(bn),
+    `the paper's Bengali twin does not state ${bnDigits(Number(millions))} million people`);
+
+  // No other population headcount may be claimed anywhere in the paper.
+  const claims = [...research.matchAll(/([0-9]+(?:\.[0-9]+)?) million people/g)].map((m) => m[1]);
+  for (const c of claims) {
+    assert.equal(c, millions,
+      `the paper claims ${c} million people but the published grid holds ${millions} million`);
+  }
+});
+
+ok("the paper's places, freshness windows and cadence match the Worker", () => {
+  const areas = JSON.parse(readFileSync("public/dhaka-areas.json", "utf8"));
+  const snapshots = readFileSync("src/snapshots.ts", "utf8");
+  const worker = readFileSync("src/index.ts", "utf8");
+
+  // The places the collage measures over.
+  assertEnClaims("places carry all seven instruments", areas.length);
+  assertBnClaim(pairFor("places carry all seven instruments"), "জায়গা", areas.length);
+
+  // The freshness window and the point at which a snapshot stops being
+  // served, read from the snapshot policy rather than from the prose.
+  const fresh = snapshots.match(/const FRESH_MS = (\d+) \* 3600000/);
+  const maxAge = snapshots.match(/const MAX_AGE_MS = (\d+) \* 86400000/);
+  assert.ok(fresh && maxAge, "the snapshot policy does not state its windows");
+  assertEnClaims("hours is fresh", Number(fresh[1]));
+  assertEnClaims("days it is not served at all", Number(maxAge[1]));
+  const freshPair = pairFor("hours is fresh");
+  assert.ok(freshPair.bn.includes(`${BN_NUM[Number(fresh[1])]} ঘণ্টার`),
+    `the Bengali twin does not say ${BN_NUM[Number(fresh[1])]} hours`);
+  const stalePair = pairFor("days it is not served at all");
+  assert.ok(stalePair.bn.includes(`${BN_NUM[Number(maxAge[1])]} দিনের`),
+    `the Bengali twin does not say ${BN_NUM[Number(maxAge[1])]} days`);
+
+  // The collector's cadence, from the Worker's own schedule.
+  const cron = worker.match(/15 \* 60 \* 1000/);
+  assert.ok(cron, "the Worker does not schedule a fifteen-minute collection");
+  assert.ok(/every fifteen minutes/.test(research),
+    "the paper no longer states the collector's fifteen-minute cadence");
+  const cronPair = pairFor("every fifteen minutes");
+  assert.ok(cronPair.bn.includes(`${BN_NUM[15]} মিনিটে`),
+    "the Bengali twin does not say fifteen minutes");
 });
 
 console.log(`✓ Walk and paper contract: ${checks} checks passed — camera ownership, stated limits, bilingual itinerary, bilingual paper, flat diagram geometry and code-derived counts`);

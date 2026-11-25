@@ -45,7 +45,7 @@ tests:
 
 ## 2 · NASA GIBS — the workhorse
 
-**Global Imagery Browse Services.** 1,330 layers, no key, no registration, no
+**Global Imagery Browse Services.** 1,332 layers, no key, no registration, no
 rate limit that we hit. Every layer is a WMTS tile service in EPSG:3857 with
 `GoogleMapsCompatible` tile matrices, so the tile arithmetic is the standard
 web-mercator pyramid.
@@ -336,7 +336,7 @@ and no longer does:
 
 ## 6 · Keeping this honest
 
-- `scripts/refresh-gibs-catalogue.mjs` — refreshes the 1,330-layer catalogue
+- `scripts/refresh-gibs-catalogue.mjs` — refreshes the 1,332-layer catalogue
   and the per-layer observation dates.
 - `scripts/refresh-gibs-colormaps.mjs` — walks the capabilities document,
   follows each layer's colour-map href, and writes the value tables.
