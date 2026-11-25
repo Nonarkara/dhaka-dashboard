@@ -275,7 +275,7 @@ function showValue(
 }
 
 /** The order domains are listed in, and their signal grouping. */
-const DOMAIN_SIGNALS: Record<string, string[]> = {
+export const DOMAIN_SIGNALS: Record<string, string[]> = {
   // One instrument per domain, so two domains never print the same
   // measurement as their own finding. Seven instruments, seven domains.
   environment: ["MODIS_Terra_Land_Surface_Temp_Day_TES"],

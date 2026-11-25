@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import {deflateSync} from 'node:zlib';
 import { readFileSync,readdirSync } from 'node:fs';
-import {collectSnapshot,readSnapshot,snapshotDelivery,sourceHealth,observationHistory,SNAPSHOT_SCHEMA} from '../src/snapshots.ts';
+import {collectSnapshot,readSnapshot,snapshotDelivery,sourceHealth,observationHistory,historicalSnapshot,SNAPSHOT_SCHEMA} from '../src/snapshots.ts';
 import {samplingWindow,groundResolutionM,measureLayer,MEASURED_LAYERS,tileForPoint} from '../src/satellite.ts';
 import {selectSolar} from '../src/solar-resource.ts';
 import worker from '../src/index.ts';
 import {fetchSource} from '../src/source-fetch.ts';
 import {readingsFromMeasurements} from '../src/collage.ts';
+import {makePublicationFixture,refreshPublicationReadings as refreshReadings} from './fixtures/publication-snapshot.mjs';
+import {PUBLICATION_DISTRICT_IDS,PUBLICATION_INSTRUMENTS,PUBLICATION_CONTRACT_VERSION,PUBLICATION_CLOCK_SKEW_MS,LEGACY_NIGHT_INSTRUMENT,validateCollagePublication} from '../src/publication-contract.ts';
 
 class DB {
   sql=new DatabaseSync(':memory:'); failBatch=false;
@@ -22,10 +24,13 @@ class Bucket {
 }
 const db=new DB(), bucket=new Bucket();
 const env={OBSERVATION_DB:db,OBSERVATION_ARCHIVE:bucket,ASSETS:{fetch:url=>Response.json(JSON.parse(readFileSync(String(url).includes('dhaka-areas')?'public/dhaka-areas.json':'public/dhaka-economy.geojson','utf8')))}};
-const make=()=>({status:'ok',timestamp:new Date().toISOString(),provenance:'mixed',city:'Dhaka',domains:Array.from({length:7},(_,i)=>({id:String(i)})),corridors:[{id:'stored-corridor',status:'ok',night_radiance_nw:0}],measured:98,total:98,reasonCode:null,districts:Array.from({length:14},(_,i)=>({id:'place-'+i,lat:23.8,lng:90.4,name:'place',name_bn:'স্থান',category:'',headline:'',headline_bn:'',readings:[],measurements:Array.from({length:7},(_,j)=>({layerId:'signal-'+j,status:'ok',value:j===0?0:1,unit:'mm',observationDate:'2026-10-29',period:null,vintage:null,coverage:1,reasonCode:null}))}))});
+const make=()=>makePublicationFixture({observationDate:'2026-10-29'});
+
 const due=()=>db.sql.exec("UPDATE collector_state SET lease_until=0,last_success_at=NULL");
+assert.deepEqual([...PUBLICATION_DISTRICT_IDS].sort(),JSON.parse(readFileSync("public/dhaka-areas.json","utf8")).map(place=>place.id).sort(),"publication districts must match the maintained district registry");
+validateCollagePublication(make());
 const initial=await collectSnapshot(env,async()=>make()); assert.equal(initial,'published');
-const first=await readSnapshot(env);assert.equal(first.delivery.status,'fresh');assert.equal(first.districts[0].measurements[0].value,0);
+const first=await readSnapshot(env);assert.equal(first.delivery.status,'fresh');assert.equal(first.districts[0].measurements[5].value,0);
 const initialId=first.delivery.snapshotId;
 let outbound=0;const real=globalThis.fetch;
 let acquisitionCalls=0;
@@ -41,10 +46,114 @@ try{
 for(const broken of [()=>{throw Error('offline');},()=>({...make(),measured:1}),()=>({...make(),districts:make().districts.slice(1)}),()=>{const d=make();d.districts[0].measurements[0].value=null;return d;}]){
  due();assert.equal(await collectSnapshot(env,async()=>broken()),'failed');assert.equal((await readSnapshot(env)).delivery.snapshotId,initialId);
 }
+// Publication must reject substitutions, not merely count seven arbitrary names.
+const rejectCases = [
+  ['publication-city',d=>d.city='Another city'],
+  ['publication-tier',d=>d.provenance='measured'],
+  ['district-substitution',d=>d.districts[0].id='invented-district'],
+  ['district-duplicate',d=>d.districts[0].id=d.districts[1].id],
+  ['domain-substitution',d=>d.domains[0].id='invented-domain'],
+  ['reading-substitution',d=>d.districts[0].readings[0].domain='invented-domain'],
+  ['instrument-substitution',d=>d.districts[0].measurements[0].layerId='invented-instrument'],
+  ['instrument-duplicate',d=>d.districts[0].measurements[0].layerId=d.districts[0].measurements[1].layerId],
+  ['instrument-domain',d=>d.districts[0].measurements[1].domain='governance'],
+  ['wrong-unit',d=>d.districts[0].measurements[1].unit='degC'],
+  ['palette-range',d=>Object.assign(d.districts[0].measurements[1],{value:99999,mean:99999,min:99999,max:99999})],
+  ['statistics-range',d=>d.districts[0].measurements[1].max=99999],
+  ['percentage-range',d=>Object.assign(d.districts[0].measurements[5],{value:101,mean:101,min:101,max:101})],
+  ['solar-zero',d=>Object.assign(d.districts[0].measurements[6],{value:0,mean:0,min:0,max:0})],
+  ['solar-period',d=>d.districts[0].measurements[6].period=null],
+  ['invalid-date',d=>d.districts[0].measurements[1].observationDate='2026-02-31'],
+  ['future-date',d=>d.districts[0].measurements[1].observationDate='2099-01-01'],
+  ['future-collection',d=>d.timestamp='2099-01-01T00:00:00Z'],
+  ['future-collection-and-observation',d=>{d.timestamp='2099-01-01T00:00:00Z';d.districts[0].measurements[1].observationDate='2098-01-01';}],
+  ['measured-tier-substitution',d=>d.districts[0].measurements[1].provenance='modeled'],
+  ['reference-tier-substitution',d=>d.districts[0].measurements[5].provenance='measured'],
+  ['solar-tier-substitution',d=>d.districts[0].measurements[6].provenance='measured'],
+  ['missing-source',d=>delete d.districts[0].measurements[1].source],
+  ['foreign-source-host',d=>d.districts[0].measurements[1].sourceUrl='https://example.invalid/fake'],
+  ['fake-source-name',d=>d.districts[0].measurements[1].source='Measured by invented authority'],
+  ['source-credentials',d=>d.districts[0].measurements[1].sourceUrl='https://user:password@gibs.earthdata.nasa.gov/'],
+  ['basis-source',d=>d.districts[0].readings[0].basis.source='Invented source'],
+  ['basis-source-url',d=>d.districts[0].readings[0].basis.sourceUrl='https://example.invalid/'],
+  ['basis-tier',d=>d.districts[0].readings[0].basis.provenance='modeled'],
+  ['basis-sampling',d=>d.districts[0].readings[0].basis.sampling={type:'point-window',radiusPx:100,bbox:[0,0,1,1],scope:'invented area'}],
+  ['basis-resolution',d=>d.districts[0].readings[0].basis.resolutionM=1],
+  ['basis-coverage',d=>d.districts[0].readings[0].basis.coverage=0.1],
+  ['invalid-coverage',d=>d.districts[0].measurements[1].coverage=1.1],
+  ['wrong-method',d=>d.districts[0].measurements[1].processingMethod='invented-method'],
+  ['wrong-reading-signal',d=>d.districts[0].readings[0].signals=[d.districts[0].measurements[4].layerId]],
+  ['missing-reading-signal',d=>d.districts[0].readings[0].signals=[]],
+  ['hidden-successful-reading',d=>Object.assign(d.districts[0].readings[0],{status:'unavailable',basis:null,reading:null,reading_bn:null,reasonCode:'invented-absence'})],
+  ['invented-basis',d=>d.districts[0].readings[0].basis.value=99999],
+  ['healthy-with-reason',d=>d.districts[0].measurements[0].reasonCode='upstream-failed'],
+  ['unavailable-with-number',d=>{d.districts[0].measurements[0].status='unavailable';d.districts[0].measurements[0].reasonCode='cloud';}],
+  ['inconsistent-count',d=>d.measured--],
+  ['inconsistent-status',d=>d.status='partial'],
+];
+for(const [name,change] of rejectCases){
+  const bad=make();change(bad);
+  assert.throws(()=>validateCollagePublication(bad),/(invalid|insufficient)-snapshot-/,name);
+  due();assert.equal(await collectSnapshot(env,async()=>bad),'failed',name+' published');
+  assert.equal((await readSnapshot(env)).delivery.snapshotId,initialId,name+' replaced the prior good snapshot');
+}
+const fixedNow=Date.parse('2026-11-25T12:00:00Z'),dated=make();dated.timestamp=new Date(fixedNow).toISOString();
+assert.doesNotThrow(()=>validateCollagePublication(dated,{now:fixedNow}));
+const clockSkew=structuredClone(dated);clockSkew.timestamp=new Date(fixedNow+PUBLICATION_CLOCK_SKEW_MS).toISOString();
+assert.doesNotThrow(()=>validateCollagePublication(clockSkew,{now:fixedNow}),'bounded publisher clock skew is accepted');
+clockSkew.timestamp=new Date(fixedNow+PUBLICATION_CLOCK_SKEW_MS+1).toISOString();
+assert.throws(()=>validateCollagePublication(clockSkew,{now:fixedNow}),/invalid-snapshot-timestamp/);
+const futureLegacy=structuredClone(dated);futureLegacy.timestamp='2099-01-01T00:00:00Z';
+assert.throws(()=>validateCollagePublication(futureLegacy,{legacy:true,now:fixedNow}),/invalid-snapshot-timestamp/,'legacy compatibility cannot bless future collection times');
+const reordered=make(),sampling=reordered.districts[0].readings[0].basis.sampling;
+reordered.districts[0].readings[0].basis.sampling=Object.fromEntries(Object.entries(sampling).reverse());
+assert.doesNotThrow(()=>validateCollagePublication(reordered),'equivalent sampling metadata may use a different key order');
+const half=make();let unavailable=0;
+for(const place of half.districts)for(const m of place.measurements)if(unavailable++<49)Object.assign(m,{status:'unavailable',value:null,min:null,max:null,mean:null,coverage:0,samples:0,reasonCode:'cloud'});
+half.measured=49;half.status='partial';half.reasonCode='some-signals-unavailable';refreshReadings(half);
+assert.doesNotThrow(()=>validateCollagePublication(half),'the publication coverage rule remains50percent');
+assert.throws(()=>validateCollagePublication({...half,measured:48}),/insufficient-snapshot-coverage/);
+const currentObject=JSON.parse(bucket.objects.get('snapshots/v3/'+initialId+'.json').body);
+assert.equal(currentObject.publicationContractVersion,PUBLICATION_CONTRACT_VERSION);
+assert.ok(currentObject.data.districts.every(d=>d.measurements.every(m=>m.processingMethod===PUBLICATION_INSTRUMENTS.find(spec=>spec.id===m.layerId).processingMethod)));
+const firstHistory=await observationHistory(env,PUBLICATION_DISTRICT_IDS[0],PUBLICATION_INSTRUMENTS[0].id);
+assert.equal(firstHistory.records[0].metadata.processingMethod,'gibs-palette-window-mean-v1','new acquisition method is preserved in history metadata');
+// Original schema3 archives are validated against an explicit legacy contract,
+// not relabelled with today's sensor or assigned a guessed processing method.
+const legacy=JSON.parse(JSON.stringify(make()).replaceAll(PUBLICATION_INSTRUMENTS[0].id,LEGACY_NIGHT_INSTRUMENT));
+assert.doesNotThrow(()=>validateCollagePublication(legacy,{legacy:true}));
+const unknownLegacy=structuredClone(legacy);
+for(const place of unknownLegacy.districts){
+  for(const measurement of place.measurements)for(const field of ['source','sourceUrl','provenance','sampling'])delete measurement[field];
+  for(const reading of place.readings)if(reading.basis)for(const field of ['source','sourceUrl','provenance','sampling'])delete reading.basis[field];
+}
+assert.doesNotThrow(()=>validateCollagePublication(unknownLegacy,{legacy:true}),'original legacy metadata may remain unknown');
+assert.ok(unknownLegacy.districts.every(place=>place.measurements.every(measurement=>measurement.source===undefined&&measurement.provenance===undefined&&measurement.processingMethod===undefined)),'legacy validation must not invent metadata');
+assert.throws(()=>validateCollagePublication(legacy),/invalid-snapshot-instrument-identities/);
+const mixed=structuredClone(legacy);mixed.districts[0]=make().districts[0];
+assert.throws(()=>validateCollagePublication(mixed,{legacy:true}),/invalid-snapshot-mixed-night-instruments/);
+const legacyId=crypto.randomUUID(),legacyKey='snapshots/v3/'+legacyId+'.json';
+legacy.timestamp='2026-10-30T00:00:00Z';
+const legacyObject={schemaVersion:3,id:legacyId,collectedAt:'2026-10-30T00:00:00Z',data:legacy};
+await bucket.put(legacyKey,JSON.stringify(legacyObject));
+db.sql.prepare('INSERT INTO snapshots(id,collected_at,object_key,schema_version,measured,total) VALUES (?,?,?,?,?,?)').run(legacyId,legacyObject.collectedAt,legacyKey,3,98,98);
+const archived=await historicalSnapshot(env,legacyId);
+assert.equal(archived.status,'historical');assert.equal(archived.publicationContractVersion,null);
+assert.deepEqual(archived.data,legacy,'legacy evidence was rewritten');
+assert.ok(archived.data.districts.every(d=>d.measurements.every(m=>m.processingMethod===undefined)),'historical methods must not be invented');
+const badVersion={...legacyObject,publicationContractVersion:999};await bucket.put(legacyKey,JSON.stringify(badVersion));
+assert.equal((await historicalSnapshot(env,legacyId)).reasonCode,'invalid-snapshot-contract-version');
+await bucket.put(legacyKey,JSON.stringify({...legacyObject,collectedAt:new Date().toISOString(),publicationContractVersion:1,data:make()}));
+assert.equal((await historicalSnapshot(env,legacyId)).reasonCode,'invalid-snapshot-processing-method','new contract methods cannot silently disappear');
+await bucket.put(legacyKey,JSON.stringify({...legacyObject,collectedAt:'2099-01-01T00:00:00Z'}));
+assert.equal((await historicalSnapshot(env,legacyId)).reasonCode,'invalid-snapshot-timestamp','historical wrappers cannot declare future collection');
+await bucket.put(legacyKey,JSON.stringify(legacyObject));
+console.log('✓ Publication contract: expected identities, units, decoded bounds, dates, null/reason envelopes, method recording and original schema3 sensor compatibility.');
+
 due();bucket.fail=true;assert.equal(await collectSnapshot(env,async()=>make()),'failed');bucket.fail=false;assert.equal((await readSnapshot(env)).delivery.snapshotId,initialId);
 due();db.failBatch=true;assert.equal(await collectSnapshot(env,async()=>make()),'failed');assert.equal((await readSnapshot(env)).delivery.snapshotId,initialId);
 // A partial but substantial snapshot is published; missing values remain null.
-due();const partial=make();for(let i=0;i<14;i++){const m=partial.districts[i].measurements[0];m.status='unavailable';m.value=null;m.reasonCode='cloud';}partial.measured=84;partial.status='partial';
+due();const partial=make();for(let i=0;i<14;i++){const m=partial.districts[i].measurements[0];m.status='unavailable';m.value=null;m.min=null;m.max=null;m.mean=null;m.samples=0;m.coverage=0;m.reasonCode='cloud';}partial.measured=84;partial.status='partial';partial.reasonCode='some-signals-unavailable';refreshReadings(partial);
 assert.equal(await collectSnapshot(env,async()=>partial),'published');assert.equal((await readSnapshot(env)).districts[0].measurements[0].value,null);
 // Lease guards prevent an expired older collector replacing a newer result.
 due();let release;const slow=collectSnapshot(env,()=>new Promise(resolve=>{release=()=>resolve(make());}));
@@ -77,7 +186,7 @@ assert.equal((await sourceHealth(env)).collector.last_scheduled_at,new Date(sche
 const currentCopy=(await (await worker.fetch(new Request('https://test.invalid/api/atlas/collage'),env)).json()).domains;
 assert.equal(currentCopy.find(d=>d.id==='energy').question,'What is the regional long-term solar resource?');
 assert.equal(currentCopy.find(d=>d.id==='economy').question,'How bright is this sampled area at night?');
-const history=await observationHistory(env,'place-0','signal-0');assert.ok(history.records.length>=2);assert.ok(history.records.some(r=>r.value===0));
+const history=await observationHistory(env,PUBLICATION_DISTRICT_IDS[0],PUBLICATION_INSTRUMENTS[5].id);assert.ok(history.records.length>=2);assert.ok(history.records.some(r=>r.value===0));
 assert.ok((await sourceHealth(env)).runs.some(r=>r.status==='failed'));
 const sample=samplingWindow(23.81,90.412,12,7);assert.equal(sample.radiusPx,7);assert.ok(sample.bbox[0]<90.412&&sample.bbox[2]>90.412&&sample.bbox[1]<23.81&&sample.bbox[3]>23.81);
 assert.ok(Math.abs(groundResolutionM(7,60)/groundResolutionM(7,0)-0.5)<1e-9);

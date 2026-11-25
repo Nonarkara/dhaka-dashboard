@@ -1,32 +1,27 @@
 import type { CollageResult } from "./collage.js";
 import { withSourceArchive } from "./source-fetch.js";
+import { PUBLICATION_CONTRACT_VERSION, PUBLICATION_CLOCK_SKEW_MS, validateCollagePublication, recordPublicationMethods } from "./publication-contract.js";
 
 export interface SnapshotEnv { OBSERVATION_ARCHIVE?: R2Bucket; OBSERVATION_DB?: D1Database }
 export const SNAPSHOT_SCHEMA = 3;
 const REFRESH_MS = 2 * 3600000;
 const FRESH_MS = 4 * 3600000;
 const MAX_AGE_MS = 7 * 86400000;
-interface StoredSnapshot { schemaVersion: number; id: string; collectedAt: string; data: CollageResult }
+interface StoredSnapshot { schemaVersion: number; publicationContractVersion?: number; id: string; collectedAt: string; data: CollageResult }
 export interface Delivery { status: "fresh" | "stale"; collectedAt: string; ageSeconds: number; snapshotId: string; source: "persistent-snapshot"; reasonCode: string | null }
 
-/** Validate publication completeness, separately from any scientific warning threshold. */
+/** Preserve the existing public validator entry point for current publications. */
 export function validateCollage(data: CollageResult): void {
-  if (!data || !Array.isArray(data.districts) || data.districts.length !== 14 || data.domains?.length !== 7 ||
-      data.total !== 98 || data.measured < Math.ceil(data.total / 2)) throw Error("insufficient-snapshot-coverage");
-  const ids = new Set<string>();
-  let measured = 0;
-  for (const place of data.districts) {
-    if (ids.has(place.id) || !Number.isFinite(place.lat) || !Number.isFinite(place.lng) || place.measurements?.length !== 7) throw Error("invalid-snapshot-shape");
-    ids.add(place.id);
-    if (new Set(place.measurements.map(m => m.layerId)).size !== 7) throw Error("duplicate-snapshot-instrument");
-    for (const m of place.measurements) {
-      if (m.status === "ok") {
-        if (!Number.isFinite(m.value) || !m.unit || !(m.observationDate || m.vintage || m.period)) throw Error("invalid-snapshot-measurement");
-        measured++;
-      } else if (m.status !== "unavailable" || m.value !== null || !m.reasonCode) throw Error("invalid-snapshot-missing-value");
-    }
-  }
-  if (measured !== data.measured) throw Error("invalid-snapshot-count");
+  validateCollagePublication(data);
+}
+
+function validateStoredSnapshot(snapshot: StoredSnapshot, now = Date.now()): void {
+  if (snapshot.schemaVersion !== SNAPSHOT_SCHEMA ||
+      (snapshot.publicationContractVersion !== undefined && snapshot.publicationContractVersion !== PUBLICATION_CONTRACT_VERSION)) throw Error("invalid-snapshot-contract-version");
+  const collectedAt = Date.parse(snapshot.collectedAt);
+  if (!Number.isFinite(collectedAt) || collectedAt > now + PUBLICATION_CLOCK_SKEW_MS ||
+      Date.parse(snapshot.data?.timestamp) > collectedAt + PUBLICATION_CLOCK_SKEW_MS) throw Error("invalid-snapshot-timestamp");
+  validateCollagePublication(snapshot.data, { legacy: snapshot.publicationContractVersion === undefined, requireMethods: snapshot.publicationContractVersion === PUBLICATION_CONTRACT_VERSION, now });
 }
 
 export function snapshotDelivery(snapshot: StoredSnapshot, now = Date.now()): Delivery | null {
@@ -41,14 +36,15 @@ export function snapshotDelivery(snapshot: StoredSnapshot, now = Date.now()): De
 export async function readSnapshot(env: SnapshotEnv): Promise<(CollageResult & { delivery: Delivery }) | null> {
   if (!env.OBSERVATION_DB || !env.OBSERVATION_ARCHIVE) return null;
   try {
-    const row = await env.OBSERVATION_DB.prepare("SELECT s.object_key FROM collector_state c JOIN snapshots s ON c.published_id=s.id WHERE c.name='collage'").first<{ object_key: string }>();
+    const row = await env.OBSERVATION_DB.prepare("SELECT s.id,s.object_key FROM collector_state c JOIN snapshots s ON c.published_id=s.id WHERE c.name='collage'").first<{ id: string; object_key: string }>();
     if (!row) return null;
     const object = await env.OBSERVATION_ARCHIVE.get(row.object_key);
     if (!object) return null;
     const snapshot = await object.json<StoredSnapshot>();
+    if (snapshot.id !== row.id) throw Error("invalid-snapshot-identity");
     const delivery = snapshotDelivery(snapshot);
     if (!delivery) return null;
-    validateCollage(snapshot.data);
+    validateStoredSnapshot(snapshot);
     return { ...snapshot.data, delivery };
   } catch { return null; }
 }
@@ -74,9 +70,10 @@ export async function collectSnapshot(env: SnapshotEnv, build: () => Promise<Col
       rawCount++;
     }, build);
     validateCollage(data);
+    recordPublicationMethods(data);
     const collectedAt = new Date().toISOString();
     const key = `snapshots/v${SNAPSHOT_SCHEMA}/${id}.json`;
-    const snapshot: StoredSnapshot = { schemaVersion: SNAPSHOT_SCHEMA, id, collectedAt, data };
+    const snapshot: StoredSnapshot = { schemaVersion: SNAPSHOT_SCHEMA, publicationContractVersion: PUBLICATION_CONTRACT_VERSION, id, collectedAt, data };
     await bucket.put(key, JSON.stringify(snapshot), { httpMetadata: { contentType: "application/json" } });
     // The immutable object must exist first. All published rows and the pointer
     // commit in one D1 transaction, conditional on still owning the lease.
@@ -139,6 +136,8 @@ export async function historicalSnapshot(env: SnapshotEnv, id: string) {
     const object = row && await env.OBSERVATION_ARCHIVE.get(row.object_key);
     if (!object) return {status:"unavailable",reasonCode:"historical-snapshot-not-found",timestamp:new Date().toISOString()};
     const stored = await object.json<StoredSnapshot>();
-    return {status:"historical",schemaVersion:stored.schemaVersion,snapshotId:stored.id,collectedAt:stored.collectedAt,data:stored.data};
-  } catch { return {status:"unavailable",reasonCode:"snapshot-storage-unreachable",timestamp:new Date().toISOString()}; }
+    if (stored.id !== id) throw Error("invalid-snapshot-identity");
+    validateStoredSnapshot(stored);
+    return {status:"historical",schemaVersion:stored.schemaVersion,publicationContractVersion:stored.publicationContractVersion ?? null,snapshotId:stored.id,collectedAt:stored.collectedAt,data:stored.data};
+  } catch (error) { return {status:"unavailable",reasonCode:error instanceof Error && error.message.startsWith("invalid-snapshot-") ? error.message : "snapshot-storage-unreachable",timestamp:new Date().toISOString()}; }
 }
