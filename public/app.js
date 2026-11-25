@@ -33,6 +33,25 @@
   let parliamentSnapshot = null;
   let parliamentSourceReady = false;
   let cityHeightReady = false;
+  let cityHeightSummary = null;
+  let parliamentPending = null;
+  let parliamentError = null;
+  let lastRequestedArea = null;
+  const PARLIAMENT_BOUNDS = [90.369,23.752,90.388,23.773]; // captured source extent, not an administrative boundary
+  const inspectionLayers = new Set();
+  const hoverLayers = new Set();
+  let openingAreaIntent = true;
+  const referenceFailures = new Map();
+  const referencePending = new Map();
+  let solarTimer = null;
+  let watchTimer = null;
+  let watchPending = null;
+  let watchController = null;
+  let watchRevision = 0;
+  let watchScheduleToken = 0;
+  let watchCheckedAt = 0;
+  let searchController = null;
+  let searchRevision = 0;
   const tr = (en, bn) => document.documentElement.lang === "bn" ? bn : en;
 
   const $ = sel => document.querySelector(sel);
@@ -270,7 +289,7 @@
         attributionControl: true
       });
 
-      for (const event of ['dragstart','zoomstart','rotatestart','pitchstart']) map.on(event, e => { if (e?.originalEvent) stopMapMotion(); });
+      for (const event of ['dragstart','zoomstart','rotatestart','pitchstart']) map.on(event, e => { if (e?.originalEvent) { cancelCameraWork(); stopMapMotion(); } });
       map.getCanvas?.().addEventListener?.('pointerdown', stopMapMotion);
       // The atlas exposes its map so that the layout audit can measure the
       // real camera and the real source features instead of guessing at
@@ -292,8 +311,9 @@
         // audit waits for this before it measures a surface.
         get idle() { return mapIdle; },
       };
-      map.getCanvas?.().addEventListener?.('wheel', stopMapMotion, {passive:true});
+      map.getCanvas?.().addEventListener?.('wheel', () => { cancelCameraWork(); stopMapMotion(); }, {passive:true});
       map.getCanvas?.().addEventListener?.('keydown', event => {
+        cancelCameraWork();
         if (currentLens === 'walk' && /^(w|a|s|d|arrowup|arrowdown|arrowleft|arrowright)$/i.test(event.key || '')) return;
         stopMapMotion();
       });
@@ -324,7 +344,7 @@
       // One handler per event: the camera has moved, so the screen is no
       // longer the settled one the count was read from.
       for (const event of ['dragstart','zoomstart','rotatestart','pitchstart']) {
-        map.on(event, e => { mapIdle = false; if (e?.originalEvent) stopMapMotion(); });
+        map.on(event, e => { mapIdle = false; if (e?.originalEvent) { cancelCameraWork(); stopMapMotion(); } });
       }
       map.on("movestart", () => { mapIdle = false; });
       map.on("moveend", scheduleWalkPanel);
@@ -347,25 +367,21 @@
       }
 
 
-      // Dismiss overlay when map renders or on error
-      map.on("load", async () => {
-        hideLoading();
+      // Local evidence starts at style readiness, independently of slow imagery.
+      map.on("load", hideLoading);
+      map.once("style.load", () => {
+        styleReady = true;
         window.AtlasForecast?.attach(map);
         window.AtlasPeople?.attach(map);
-        // The sun is placed over the city as soon as the style can carry it,
-        // and re-placed every minute, because the sun moves.
-        applySolarLight();
-        const keepTheSunMoving = () => setTimeout(() => {
-          applySolarLight();
-          keepTheSunMoving();
-        }, 60000);
-        keepTheSunMoving();
-        await Promise.all([loadDataLayers(), loadParliamentBuildings(), loadCityHeights()]);
+        applyLens(currentLens);
+        wireBuildingInspection();
+        applyGroundColour();
+        scheduleSolar();
+        loadCityHeights();
+        loadDataLayers();
+        maybeLoadParliament();
+        const el = $("#atlas-map-loading"); if (el) el.style.pointerEvents = "none";
       });
-
-      // Reveal the map on its first frame after the style is parsed; imagery fills in progressively.
-      // map.loaded() and map.isStyleLoaded() both wait for every pitched-horizon tile (13–22 s).
-      map.once("style.load", () => { styleReady = true; applyLens(currentLens); wireBuildingInspection(); applyGroundColour(); const el = $("#atlas-map-loading"); if (el) el.style.pointerEvents = "none"; });
       map.on("render", () => {
         if (styleReady) hideLoading();
       });
@@ -505,8 +521,34 @@
     };
   }
 
+  function nearParliament() {
+    if (!map || map.getZoom() < 14) return false;
+    const b = map.getBounds(), [w,s,e,n] = PARLIAMENT_BOUNDS;
+    return b.getWest() < e && b.getEast() > w && b.getSouth() < n && b.getNorth() > s;
+  }
+
+  function detailFailure() {
+    const status = $("#atlas-layer-status");
+    if (!status) return;
+    status.hidden = false;
+    status.textContent = tr("Parliament detail unavailable · detail-footprints-unavailable. Streamed footprints remain.", "সংসদের বিস্তারিত অনুপলব্ধ · detail-footprints-unavailable। মূল সীমারেখা রয়ে গেছে।");
+    if (status.appendChild && typeof document.createElement === "function") {
+      const retry = document.createElement("button"); retry.type = "button"; retry.className = "atlas-btn";
+      retry.textContent = tr("Retry detail", "বিস্তারিত আবার আনুন");
+      retry.addEventListener("click", () => loadParliamentBuildings({retry:true})); status.appendChild(retry);
+    }
+  }
+
+  function maybeLoadParliament() {
+    if (!styleReady || !map || parliamentSnapshot) return;
+    if (currentLens !== "heritage" && lastRequestedArea !== "parliament" && !nearParliament()) return;
+    if (parliamentError) { detailFailure(); return; }
+    loadParliamentBuildings();
+  }
+
   function syncBuildingVisibility() {
     if (!map) return;
+    maybeLoadParliament();
     const is3D = $("#atlas-view")?.value !== "2d";
     // Never mask batched polygon tiles by ID or unsupported polygon `within`.
     // Switch the whole layer only when the whole viewport fits inside detail coverage.
@@ -545,6 +587,13 @@
     }
   }
 
+  function renderSkylineCoverage() {
+    const node=$("#atlas-skyline-coverage-summary"); if(!node)return;
+    if(!cityHeightReady || !cityHeightSummary){node.textContent=tr("Source-height inventory unavailable · city-heights-unavailable. Unknown heights stay flat.","উচ্চতার তথ্য অনুপলব্ধ · city-heights-unavailable। অজানা উচ্চতা সমতল থাকে।");return;}
+    const count=walkNumber(cityHeightSummary.count),areas=walkNumber(cityHeightSummary.areas);
+    node.textContent=tr(`${count} source-height footprints in ${areas} capture areas. Partial coverage; not a survey. Captured ${cityHeightSummary.capturedAt.slice(0,10)}.`,`${areas}টি সংগৃহীত এলাকায় ${count}টি উৎসের উচ্চতাসহ সীমারেখা। আংশিক তথ্য; জরিপ নয়। সংগ্রহ ${cityHeightSummary.capturedAt.slice(0,10)}।`);
+  }
+
   async function loadCityHeights() {
     try {
       const response = await fetch("/data/city-height-buildings.geojson", {signal: AbortSignal.timeout(15000)});
@@ -560,16 +609,25 @@
       map.addLayer({id:"city-height-buildings",type:"fill-extrusion",source:"city-heights",minzoom:14,
         paint:{...buildingPaint("height_m", "min_height_m"),"fill-extrusion-opacity":1}},"city-buildings");
       cityHeightReady = true;
+      cityHeightSummary = {count:data.features.length,areas:data.metadata.inputs?.length || null,capturedAt:data.metadata.retrieved_at};
+      renderSkylineCoverage();
       map.on("click","city-height-buildings", event => {if(event.features?.[0]) showInspectionHUD("building",event.features[0].properties);});
       syncBuildingVisibility();
     } catch (error) {
       cityHeightReady = false;
+      renderSkylineCoverage();
       syncBuildingVisibility();
       console.warn("Source-height skyline unavailable; unknown footprints remain flat",error);
     }
   }
 
-  async function loadParliamentBuildings() {
+  function loadParliamentBuildings({retry = false} = {}) {
+    if (parliamentSnapshot && map.getSource("parliament-detail")) return Promise.resolve();
+    if (parliamentPending) return parliamentPending;
+    if (parliamentError && !retry) return Promise.resolve();
+    parliamentError = null;
+    let onData = null;
+    const task = (async () => {
     try {
       const res = await fetch("/data/parliament-buildings.geojson", { signal: AbortSignal.timeout(15000) });
       if (!res.ok) throw new Error("detail-footprints-unavailable");
@@ -577,8 +635,7 @@
       if (data.type !== "FeatureCollection" || !data.features?.length || data.bbox?.length !== 4
         || !data.features.some(f => f.id === "relation/18085267")) throw new Error("invalid-detail-footprints");
       data.features.forEach(f => { f.properties.use_class = window.DhakaDesign?.classify(f.properties) || "unknown"; });
-      parliamentSnapshot = data;
-      const onData = async event => {
+      onData = async event => {
         if (event.sourceId === "parliament-detail" && event.isSourceLoaded) {
           parliamentSourceReady = true;
           map.off("sourcedata", onData);
@@ -592,6 +649,7 @@
         paint:{"fill-color":window.DhakaDesign?.paint || "#b4b0a3","fill-opacity":0.65}},"city-buildings");
       map.addLayer({ id: "parliament-buildings", type: "fill-extrusion", source: "parliament-detail", minzoom: 14,
         layout: { visibility: "none" }, paint: buildingPaint("height_m", "min_height_m") }, "city-buildings");
+      parliamentSnapshot = data;
       // The source can finish before the layer is attached.
       if (map.isSourceLoaded("parliament-detail")) {
         parliamentSourceReady = true;
@@ -601,10 +659,20 @@
         if (event.features?.[0]) showInspectionHUD("building", event.features[0].properties);
       });
     } catch (error) {
+      if (onData) map.off("sourcedata", onData);
+      for (const id of ["parliament-buildings","parliament-footprints"]) if (map.getLayer(id)) map.removeLayer(id);
+      if (map.getSource("parliament-detail")) map.removeSource("parliament-detail");
+      parliamentSnapshot = null;
       parliamentSourceReady = false;
+      parliamentError = "detail-footprints-unavailable";
+      detailFailure();
       syncBuildingVisibility();
       console.warn("Parliament detail unavailable; retaining streamed buildings", error);
     }
+    })();
+    parliamentPending = task;
+    task.finally(() => { if (parliamentPending === task) parliamentPending = null; });
+    return task;
   }
 
   /**
@@ -633,10 +701,35 @@
   // The inherited procedural sketch lives at /parliament-reference.html.
   // It has no traceable dimensions and must never replace mapped geometry.
 
-  async function loadDataLayers() {
+  function renderReferenceStatus() {
+    const status = $("#atlas-reference-status");
+    if (!status) return;
+    status.hidden = referenceFailures.size === 0;
+    status.textContent = "";
+    const labels = {landmarks:tr("Landmarks","স্থাপনা"),rivers:tr("Rivers","নদী"),transit:tr("Transit","পরিবহন"),economy:tr("Economy","অর্থনীতি"),areas:tr("Districts","এলাকা")};
+    for (const [kind, failure] of referenceFailures) {
+      const text = `${labels[kind]} · reference-${kind}-unavailable · ${failure}`;
+      if (!status.appendChild || typeof document.createElement !== "function") { status.textContent += text; continue; }
+      const row=document.createElement("span"); row.textContent=text+" ";
+      const retry=document.createElement("button"); retry.type="button"; retry.className="atlas-btn";
+      retry.textContent=tr("Retry","আবার চেষ্টা"); retry.addEventListener("click",()=>loadDataLayers(kind)); row.appendChild(retry);status.appendChild(row);
+    }
+  }
+
+  function loadReference(kind, work, only) {
+    if (only && only !== kind) return Promise.resolve();
+    if (referencePending.has(kind)) return referencePending.get(kind);
+    const task=work().finally(()=>{referencePending.delete(kind);renderReferenceStatus();});
+    referencePending.set(kind,task); return task;
+  }
+
+  async function loadDataLayers(only = null) {
+    return Promise.allSettled([
+    loadReference("landmarks", async () => {
     // 1. Landmarks
     try {
       const resLandmarks = await fetch("/dhaka-landmarks.geojson", { signal: AbortSignal.timeout(10000) });
+      if (!resLandmarks.ok) throw new Error("reference-source-unavailable");
       if (resLandmarks.ok) {
         landmarksData = await resLandmarks.json();
         if (!map.getSource("landmarks")) {
@@ -683,13 +776,21 @@
           });
         }
       }
+      referenceFailures.delete("landmarks");
     } catch (e) {
+      referenceFailures.set("landmarks", new Date().toISOString());
       console.warn("Could not load landmarks layer:", e);
     }
-
+    renderReferenceStatus();
+    setupClickInspectors();
+    syncReferenceLayers();
+    syncBuildingVisibility();
+    }, only),
+    loadReference("rivers", async () => {
     // 2. Rivers & Khals
     try {
       const resRivers = await fetch("/dhaka-rivers.geojson", { signal: AbortSignal.timeout(10000) });
+      if (!resRivers.ok) throw new Error("reference-source-unavailable");
       if (resRivers.ok) {
         riversData = await resRivers.json();
         if (!map.getSource("rivers")) {
@@ -721,13 +822,21 @@
           });
         }
       }
+      referenceFailures.delete("rivers");
     } catch (e) {
+      referenceFailures.set("rivers", new Date().toISOString());
       console.warn("Could not load rivers layer:", e);
     }
-
+    renderReferenceStatus();
+    setupClickInspectors();
+    syncReferenceLayers();
+    syncBuildingVisibility();
+    }, only),
+    loadReference("transit", async () => {
     // 3. Transit & MRT Line 6
     try {
       const resTransit = await fetch("/dhaka-mrt.geojson", { signal: AbortSignal.timeout(10000) });
+      if (!resTransit.ok) throw new Error("reference-source-unavailable");
       if (resTransit.ok) {
         transitData = await resTransit.json();
         if (!map.getSource("transit")) {
@@ -771,13 +880,21 @@
           });
         }
       }
+      referenceFailures.delete("transit");
     } catch (e) {
+      referenceFailures.set("transit", new Date().toISOString());
       console.warn("Could not load transit layer:", e);
     }
-
+    renderReferenceStatus();
+    setupClickInspectors();
+    syncReferenceLayers();
+    syncBuildingVisibility();
+    }, only),
+    loadReference("economy", async () => {
     // 4. Economy & Industry
     try {
       const resEconomy = await fetch("/dhaka-economy.geojson", { signal: AbortSignal.timeout(10000) });
+      if (!resEconomy.ok) throw new Error("reference-source-unavailable");
       if (resEconomy.ok) {
         economyData = await resEconomy.json();
         if (!map.getSource("economy")) {
@@ -796,13 +913,21 @@
           });
         }
       }
+      referenceFailures.delete("economy");
     } catch (e) {
+      referenceFailures.set("economy", new Date().toISOString());
       console.warn("Could not load economy layer:", e);
     }
-
+    renderReferenceStatus();
+    setupClickInspectors();
+    syncReferenceLayers();
+    syncBuildingVisibility();
+    }, only),
+    loadReference("areas", async () => {
     // 5. Curated Areas for Quick Jump
     try {
       const resAreas = await fetch("/dhaka-areas.json", { signal: AbortSignal.timeout(10000) });
+      if (!resAreas.ok) throw new Error("reference-source-unavailable");
       if (resAreas.ok) {
         areasData = await resAreas.json();
         populateQuickJump(areasData);
@@ -810,39 +935,46 @@
         window.AtlasWalk?.attach(map, areasData);
         const areaId = new URLSearchParams(window.location.search).get("area");
         const initialArea = areasData.find(area => area.id === areaId);
-        if (initialArea && currentLens === "city") flyToArea(initialArea, 0);
+        if (initialArea && currentLens === "city" && openingAreaIntent && !lastRequestedArea) flyToArea(initialArea, 0);
+        openingAreaIntent = false;
       }
+      referenceFailures.delete("areas");
     } catch (e) {
+      referenceFailures.set("areas", new Date().toISOString());
       console.warn("Could not load areas json:", e);
     }
-
+    renderReferenceStatus();
     setupClickInspectors();
-    applyLens(currentLens);
+    syncReferenceLayers();
+    syncBuildingVisibility();
+    }, only)
+    ]);
   }
 
   function setupClickInspectors() {
-    map.on("click", "landmarks-points", e => {
+    if (map.getLayer("landmarks-points") && !inspectionLayers.has("landmarks-points")) { inspectionLayers.add("landmarks-points"); map.on("click", "landmarks-points", e => {
       if (!e.features || !e.features[0]) return;
       showInspectionHUD("landmark", e.features[0].properties);
-    });
+    }); }
 
-    map.on("click", "rivers-gauges", e => {
+    if (map.getLayer("rivers-gauges") && !inspectionLayers.has("rivers-gauges")) { inspectionLayers.add("rivers-gauges"); map.on("click", "rivers-gauges", e => {
       if (!e.features || !e.features[0]) return;
       showInspectionHUD("gauge", e.features[0].properties);
-    });
+    }); }
 
-    map.on("click", "transit-stations", e => {
+    if (map.getLayer("transit-stations") && !inspectionLayers.has("transit-stations")) { inspectionLayers.add("transit-stations"); map.on("click", "transit-stations", e => {
       if (!e.features || !e.features[0]) return;
       showInspectionHUD("station", e.features[0].properties);
-    });
+    }); }
 
-    map.on("click", "economy-hubs", e => {
+    if (map.getLayer("economy-hubs") && !inspectionLayers.has("economy-hubs")) { inspectionLayers.add("economy-hubs"); map.on("click", "economy-hubs", e => {
       if (!e.features || !e.features[0]) return;
       showInspectionHUD("economy", e.features[0].properties);
-    });
+    }); }
 
     ["landmarks-points", "rivers-gauges", "transit-stations", "economy-hubs"].forEach(layerId => {
-      if (map.getLayer(layerId)) {
+      if (map.getLayer(layerId) && !hoverLayers.has(layerId)) {
+        hoverLayers.add(layerId);
         map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
         map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
       }
@@ -1299,12 +1431,43 @@
       : "Street scene render by Location Scout (oyasumi-gamedev.com) · OpenStreetMap / OpenFreeMap. Its geometry and access assumptions are separate. Opens in a new tab.";
   }
 
+  function syncReferenceLayers() {
+    if (!map) return;
+    const isBn = document.documentElement.lang === "bn";
+    if (map.getLayer("rivers-lines")) {
+      map.setLayoutProperty("rivers-lines", "visibility", (currentLens === "rivers" || currentLens === "city") ? "visible" : "none");
+    }
+    if (map.getLayer("rivers-gauges")) {
+      map.setLayoutProperty("rivers-gauges", "visibility", (currentLens === "rivers" || currentLens === "city") ? "visible" : "none");
+    }
+    if (map.getLayer("mrt-track")) {
+      map.setLayoutProperty("mrt-track", "visibility", (currentLens === "transit" || currentLens === "city") ? "visible" : "none");
+    }
+    if (map.getLayer("expressway-track")) {
+      map.setLayoutProperty("expressway-track", "visibility", (currentLens === "transit" || currentLens === "city") ? "visible" : "none");
+    }
+    if (map.getLayer("transit-stations")) {
+      map.setLayoutProperty("transit-stations", "visibility", (currentLens === "transit" || currentLens === "city") ? "visible" : "none");
+    }
+    if (map.getLayer("economy-hubs")) {
+      map.setLayoutProperty("economy-hubs", "visibility", (currentLens === "economy" || currentLens === "city") ? "visible" : "none");
+    }
+    if (map.getLayer("landmarks-labels")) {
+      map.setLayoutProperty("landmarks-labels", "visibility", (currentLens === "heritage" || currentLens === "city") ? "visible" : "none");
+      map.setLayoutProperty("landmarks-labels", "text-field", ["coalesce", ["get", isBn ? "name_bn" : "name"], ["get", "name"]]);
+    }
+    if (map.getLayer("landmarks-points")) {
+      map.setLayoutProperty("landmarks-points", "visibility", (currentLens === "heritage" || currentLens === "city") ? "visible" : "none");
+    }
+  }
+
   function applyLens(lensId, { moveCamera = lensId !== currentLens } = {}) {
     // A lens the atlas does not have — a stale bookmark, a renamed view —
     // must land on a real lens rather than on a map with nothing drawn.
     const wanted = LENS_STORIES[lensId] ? lensId : "city";
     lensId = wanted;
     stopMapMotion();
+    if (lensId !== currentLens) cancelCameraWork();
     currentLens = lensId;
     const token = ++lensToken;
     if ($("#atlas-lens")) $("#atlas-lens").value = lensId;
@@ -1344,24 +1507,7 @@
     window.AtlasPeople?.activate(lensId);
     if (["haze", "rain", "radar"].includes(lensId)) loadLensEvidence(lensId);
 
-    if (map.getLayer("rivers-lines")) {
-      map.setLayoutProperty("rivers-lines", "visibility", (lensId === "rivers" || lensId === "city") ? "visible" : "none");
-    }
-    if (map.getLayer("rivers-gauges")) {
-      map.setLayoutProperty("rivers-gauges", "visibility", (lensId === "rivers" || lensId === "city") ? "visible" : "none");
-    }
-    if (map.getLayer("mrt-track")) {
-      map.setLayoutProperty("mrt-track", "visibility", (lensId === "transit" || lensId === "city") ? "visible" : "none");
-    }
-    if (map.getLayer("expressway-track")) {
-      map.setLayoutProperty("expressway-track", "visibility", (lensId === "transit" || lensId === "city") ? "visible" : "none");
-    }
-    if (map.getLayer("transit-stations")) {
-      map.setLayoutProperty("transit-stations", "visibility", (lensId === "transit" || lensId === "city") ? "visible" : "none");
-    }
-    if (map.getLayer("economy-hubs")) {
-      map.setLayoutProperty("economy-hubs", "visibility", (lensId === "economy" || lensId === "city") ? "visible" : "none");
-    }
+    syncReferenceLayers();
     // The street-level massing belongs to the walkthrough and street lens.
     // Every other lens must see the city as the atlas draws it.
     if (map.getLayer("walk-massing")) {
@@ -1376,13 +1522,6 @@
       }
     }
     syncBuildingVisibility();
-    if (map.getLayer("landmarks-labels")) {
-      map.setLayoutProperty("landmarks-labels", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
-      map.setLayoutProperty("landmarks-labels", "text-field", ["coalesce", ["get", isBn ? "name_bn" : "name"], ["get", "name"]]);
-    }
-    if (map.getLayer("landmarks-points")) {
-      map.setLayoutProperty("landmarks-points", "visibility", (lensId === "heritage" || lensId === "city") ? "visible" : "none");
-    }
 
     if (GIBS_LAYERS[lensId]) {
       applyGibsOverlay(lensId, token);
@@ -1427,7 +1566,7 @@
     }
   }
 
-  async function loadLensEvidence(lens) {
+  async function loadLensEvidence(lens, requestToken = lensToken) {
     const status = $("#atlas-layer-status");
     if (status) {
       status.hidden = false;
@@ -1439,12 +1578,12 @@
         const res = await fetch("https://api.rainviewer.com/public/weather-maps.json", { signal: AbortSignal.timeout(10000) });
         if (!res.ok) throw new Error("radar-unavailable");
         const data = await res.json();
-        if (currentLens !== lens) return;
+        if (currentLens !== lens || requestToken !== lensToken) return;
         const frames = data.radar?.past || [];
         if (!frames.length || !data.host?.startsWith("https://")) throw new Error("radar-no-frame");
         let fIdx = frames.length - 1;
         function showRadarFrame(i) {
-          if (currentLens !== "radar" || !map) return;
+          if (currentLens !== "radar" || requestToken !== lensToken || !map) return;
           const fr = frames[i];
           const tileUrl = `${data.host}${fr.path}/256/{z}/{x}/{y}/2/1_1.png`;
           if (map.getLayer("rain-radar")) map.removeLayer("rain-radar");
@@ -1478,7 +1617,7 @@
       } else if (lens === "rain") {
         const res = await fetch("/api/atlas/rainfall", { signal: AbortSignal.timeout(15000) });
         const data = await res.json();
-        if (currentLens !== lens) return;
+        if (currentLens !== lens || requestToken !== lensToken) return;
         if (!res.ok || data.status !== "ok" || !data.catchments?.length) throw new Error(data.reasonCode || "feed-unavailable");
         if (status) status.textContent = tr("Modeled rainfall · next 24 h: ", "মডেলভিত্তিক বৃষ্টি · পরের ২৪ ঘণ্টা: ") + data.catchments.map(p => `${isBn ? p.name_bn || p.name : p.name}: ${p.rain_24h_sum_mm?.toFixed(1)} mm`).join(" · ");
         const geojson = {
@@ -1553,7 +1692,7 @@
       } else if (lens === "haze") {
         const res = await fetch("/api/atlas/wind", { signal: AbortSignal.timeout(15000) });
         const data = await res.json();
-        if (currentLens !== lens) return;
+        if (currentLens !== lens || requestToken !== lensToken) return;
         const wind = data?.data?.current;
         const windSpeed = Number.isFinite(wind?.wind_speed_10m) ? Number(wind.wind_speed_10m).toFixed(1) : null;
         const windDir = Number.isFinite(wind?.wind_direction_10m) ? Math.round(wind.wind_direction_10m) : null;
@@ -1572,7 +1711,7 @@
         // output.
       }
     } catch {
-      if (currentLens === lens && status) status.textContent = tr("Evidence unavailable for this lens. No current observation is shown.", "এই স্তরের উপাত্ত অনুপলব্ধ। বর্তমান পর্যবেক্ষণ দেখানো হচ্ছে না।");
+      if (currentLens === lens && requestToken === lensToken && status) status.textContent = tr("Evidence unavailable for this lens. No current observation is shown.", "এই স্তরের উপাত্ত অনুপলব্ধ। বর্তমান পর্যবেক্ষণ দেখানো হচ্ছে না।");
     }
   }
 
@@ -1598,8 +1737,12 @@
   }
 
   function wireUIEvents() {
-    document.addEventListener?.('visibilitychange', () => { if (document.hidden) stopMapMotion(); });
-    window.addEventListener('pagehide', stopMapMotion);
+    document.addEventListener?.('visibilitychange', () => {
+      if (document.hidden) { stopMapMotion(); pauseBackground(); }
+      else { scheduleWatch(); scheduleSolar(); }
+    });
+    window.addEventListener('pagehide', () => { stopMapMotion(); pauseBackground(); });
+    window.addEventListener('pageshow', () => { if (!document.hidden) { scheduleWatch(); scheduleSolar(); } });
     window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', stopMapMotion);
     $("#atlas-lens")?.addEventListener("change", e => applyLens(e.target.value));
 
@@ -1635,6 +1778,8 @@
       applyLens(currentLens);
       populateQuickJump(areasData);
       renderCityWatch();
+      renderSkylineCoverage();
+      renderReferenceStatus();
     });
 
     // The map's ground follows the theme, so the page is one surface.
@@ -1643,16 +1788,26 @@
     });
   }
 
+  function cancelCameraWork() {
+    openingAreaIntent = false;
+    searchRevision++; searchController?.abort(); searchController = null;
+  }
+
   async function performSearch(query) {
+    openingAreaIntent = false;
+    searchController?.abort(); const controller = new AbortController(); searchController = controller;
+    const revision = ++searchRevision;
     try {
-      const res = await fetch(`/api/atlas/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/atlas/search?q=${encodeURIComponent(query)}`, {signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)])});
       if (!res.ok) return;
       const data = await res.json();
+      if (revision !== searchRevision || controller.signal.aborted || document.hidden) return;
       if (data.results && data.results.length > 0) {
         const first = data.results[0];
-        if (map) {
+        const lon = Number(first.lon), lat = Number(first.lat);
+        if (map && Number.isFinite(lon) && Number.isFinite(lat) && lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90) {
           map.flyTo({
-            center: [Number(first.lon), Number(first.lat)],
+            center: [lon, lat],
             zoom: 15,
             pitch: 50,
             duration: 250
@@ -1666,6 +1821,9 @@
 
   function flyToArea(area, duration = 250) {
     if (!map) return;
+    cancelCameraWork();
+    lastRequestedArea = area.id;
+    if (area.id === "parliament" && styleReady) loadParliamentBuildings();
     const is3D = $("#atlas-view")?.value !== "2d";
     const zoom = (area.zoom || 15) + (area.id === "parliament" ? Math.max(0, Math.log2(map.getContainer().clientWidth / 768)) : 0);
     map.flyTo({ center: [area.lng, area.lat], zoom,
@@ -1748,13 +1906,55 @@
     }
   }
 
-  async function pollCityWatch() {
-    try {
-      const res = await fetch("/api/atlas/watch", { signal: AbortSignal.timeout(15000) });
-      if (!res.ok) throw new Error("Watch unavailable");
-      watchData = await res.json();
-    } catch { watchData = null; }
-    renderCityWatch();
+  function scheduleSolar() {
+    clearTimeout(solarTimer); solarTimer = null;
+    if (document.hidden || !styleReady) return;
+    applySolarLight();
+    solarTimer = setTimeout(scheduleSolar, 60000);
+  }
+
+  function pollCityWatch() {
+    if (document.hidden) return Promise.resolve();
+    if (watchPending) return watchPending;
+    const revision = watchRevision;
+    const controller = new AbortController(); watchController = controller;
+    const task = (async () => {
+      try {
+        const res = await fetch("/api/atlas/watch", {signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)])});
+        if (!res.ok) throw new Error("Watch unavailable");
+        const body = await res.json();
+        if (revision !== watchRevision || document.hidden) return;
+        watchData = body; watchCheckedAt = Date.now();
+      } catch {
+        if (revision !== watchRevision || document.hidden) return;
+        watchData = null;
+      }
+      renderCityWatch();
+    })();
+    watchPending = task;
+    task.finally(() => { if (watchPending === task) { watchPending = null; watchController = null; } });
+    return task;
+  }
+
+  function scheduleWatch() {
+    clearTimeout(watchTimer); watchTimer = null;
+    const scheduleToken = ++watchScheduleToken;
+    if (document.hidden) return;
+    const age = Date.now() - watchCheckedAt;
+    if (age >= 5 * 60000) {
+      watchData = null; renderCityWatch();
+      const revision = watchRevision;
+      pollCityWatch().finally(() => {
+        if (!document.hidden && revision === watchRevision && scheduleToken === watchScheduleToken) watchTimer = setTimeout(scheduleWatch, 5 * 60000);
+      });
+    } else watchTimer = setTimeout(scheduleWatch, Math.max(1000,5 * 60000 - age));
+  }
+
+  function pauseBackground() {
+    clearTimeout(watchTimer); watchTimer = null;
+    clearTimeout(solarTimer); solarTimer = null;
+    watchRevision++; watchScheduleToken++; watchController?.abort(); watchController = null; watchPending = null;
+    searchRevision++; searchController?.abort(); searchController = null;
   }
 
   function bootAtlas() {
@@ -1776,8 +1976,7 @@
     });
 
     wireUIEvents();
-    pollCityWatch();
-    setInterval(pollCityWatch, 5 * 60 * 1000);
+    scheduleWatch();
     window.AtlasInstruments?.start();
     window.AtlasWalk?.start();
     window.AtlasCollage?.start();

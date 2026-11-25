@@ -37,13 +37,15 @@ class LedgerElement {
 function descendants(element) {return element.children.flatMap(child=>[child,...descendants(child)]);}
 async function renderLedger(payload,language='en',offline=false,withBand=true) {
   const strip=new LedgerElement('div'),desk=new LedgerElement('div'),listeners={};
+  let openLedger;const dialog={open:false,addEventListener(){}},opener={addEventListener:(name,fn)=>openLedger=fn};
   const document={documentElement:{lang:language},createElement:tag=>new LedgerElement(tag),
-    querySelector:selector=>selector==='#atlas-instruments'?(withBand?strip:null):selector==='#atlas-national-data'?desk:null,
+    querySelector:selector=>selector==='#atlas-instruments'?(withBand?strip:null):selector==='#atlas-national-data'?desk:selector==='#national-data-dialog'?dialog:selector==='[data-open="national-data-dialog"]'?opener:null,
     querySelectorAll:selector=>selector==='.instrument-clock'?[...descendants(strip),...descendants(desk)].filter(el=>el.className==='instrument-clock'):[]};
   const window={addEventListener:(name,fn)=>listeners[name]=fn};
-  vm.runInNewContext(readFileSync('public/instruments.js','utf8'),{window,document,Intl,Date,AbortSignal,setInterval(){},fetch:async()=>{if(offline)throw Error('offline');return {ok:true,json:async()=>payload};}});
+  vm.runInNewContext(readFileSync('public/instruments.js','utf8'),{window,document,Intl,Date,AbortSignal,AbortController,clearInterval(){},setInterval(){},fetch:async()=>{if(offline)throw Error('offline');return {ok:true,json:async()=>payload};}});
   window.AtlasInstruments.start();
   const initialText=desk.textContent;
+  dialog.open=true;await openLedger();
   // load() is started by the public boot interface and intentionally returns
   // no network promise. Drain its two resolved fetch/JSON continuations.
   await new Promise(resolve=>setImmediate(resolve));

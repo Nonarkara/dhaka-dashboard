@@ -49,7 +49,7 @@ if (!html.includes("<noscript>")) {
 // The splash must lift on the first styled frame, and the failure screen may only appear
 // when the style itself never loaded. Slow tiles once showed "Map unavailable" on a working map.
 const appJs = readFileSync(join(root, "public", "app.js"), "utf8");
-if (/(loaded|isStyleLoaded)\(\)\)\s*hideLoading/.test(appJs) || !/once\("style\.load"[^\n]*styleReady = true/.test(appJs) || !/if \(styleReady\) hideLoading/.test(appJs)) {
+if (/(loaded|isStyleLoaded)\(\)\)\s*hideLoading/.test(appJs) || !/once\("style\.load",\s*\(\)\s*=>\s*\{\s*styleReady = true/.test(appJs) || !/if \(styleReady\) hideLoading/.test(appJs)) {
   console.error("FAIL: loader must hide once style.load fired, not on map.loaded()/isStyleLoaded() (both wait for all tiles)");
   process.exit(1);
 }

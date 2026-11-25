@@ -64,7 +64,9 @@
     { id: 'industry', from: 6 },
   ];
 
-  let data, started = false;
+  let data, started = false, pending = null, requestController = null;
+  let clockTimer = null, refreshTimer = null, requestGeneration = 0, lastAttempt = 0, needsRefresh = true, failureReason = null;
+  const REFRESH_MS = 30 * 60 * 1000;
   let serverOffsetMs = null;
 
   function format(value, kind, compact = false) {
@@ -214,6 +216,11 @@
       'বাংলাদেশ · জাতীয় তথ্যসূত্র। বার্ষিক পরিসংখ্যান ও দৈনিক বিনিময় হারের নিজস্ব তারিখ রয়েছে।',
     ));
     desk.appendChild(note);
+    if (failureReason) {
+      desk.appendChild(make('p', `${tr('Latest request unavailable; reporting dates remain with retained readings.', 'সর্বশেষ অনুরোধ অনুপলব্ধ; সংরক্ষিত পাঠের তথ্যকাল সঙ্গে আছে।')} · ${failureReason}`));
+      const retry = make('button', tr('Retry national data', 'জাতীয় তথ্য আবার আনুন'), 'atlas-btn');
+      retry.type = 'button'; retry.onclick = load; desk.appendChild(retry);
+    }
 
     const localClock = make('p', `${clockBasis()}: `);
     localClock.appendChild(make('time', '', 'instrument-clock'));
@@ -253,23 +260,69 @@
         show(id, data?.macro?.find(reading => reading.id === id), false, group));
       desk.appendChild(group);
     }
-    clock();
+    if (!document.hidden) clock();
+  }
+
+  function relevant() {
+    return !document.hidden && (Boolean($('#atlas-instruments')) || $('#national-data-dialog')?.open === true);
   }
 
   async function load() {
-    try {
-      const res = await fetch('/api/atlas/instruments', { signal: AbortSignal.timeout(20000) });
-      if (!res.ok) throw Error('national-request-failed');
-      const body = await res.json();
-      if (!Array.isArray(body.macro) || typeof body.timestamp !== 'string' || !Number.isFinite(Date.parse(body.timestamp))) throw Error('invalid-national-response');
-      data = body;
-      // A valid response timestamp permits a labeled synchronization offset.
-      serverOffsetMs = new Date(body.timestamp).getTime() - Date.now();
-    } catch {
-      serverOffsetMs = null;
-      data = { macro: [], timestamp: new Date().toISOString() };
+    if (!relevant()) return;
+    if (pending) return pending;
+    const controller = new AbortController();
+    requestController = controller;
+    const token = ++requestGeneration;
+    lastAttempt = Date.now(); needsRefresh = false;
+    const timeout = AbortSignal.timeout(20000);
+    const operation = Promise.resolve().then(async () => {
+      try {
+        const res = await fetch('/api/atlas/instruments', {signal: AbortSignal.any([controller.signal, timeout])});
+        if (!res.ok) throw Error('national-request-failed');
+        const body = await res.json();
+        if (!Array.isArray(body.macro) || typeof body.timestamp !== 'string' || !Number.isFinite(Date.parse(body.timestamp))) throw Error('invalid-national-response');
+        if (token !== requestGeneration || controller.signal.aborted || !relevant()) return;
+        data = body; failureReason = null;
+        // The offset belongs only to this successful, currently owned request.
+        serverOffsetMs = new Date(body.timestamp).getTime() - Date.now();
+      } catch (error) {
+        if (token !== requestGeneration || controller.signal.aborted || !relevant()) return;
+        serverOffsetMs = null;
+        failureReason = timeout.aborted ? 'national-request-timeout' : 'national-request-failed';
+        if (!data) data = {macro: [], timestamp: new Date().toISOString()};
+      } finally {
+        if (requestController === controller) requestController = null;
+        if (pending === operation) pending = null;
+        if (token === requestGeneration && relevant()) render();
+      }
+    });
+    pending = operation;
+    return operation;
+  }
+
+  function stopTimers() {
+    if (clockTimer !== null) clearInterval(clockTimer);
+    if (refreshTimer !== null) clearInterval(refreshTimer);
+    clockTimer = refreshTimer = null;
+  }
+  function visibleTimers() {
+    stopTimers();
+    if (!relevant()) return;
+    clock();
+    clockTimer = setInterval(clock, 1000);
+    refreshTimer = setInterval(load, REFRESH_MS);
+  }
+  function visibilityChanged() {
+    if (!relevant()) {
+      stopTimers();
+      if (pending) {
+        needsRefresh = true; requestGeneration++;
+        requestController?.abort(); requestController = null; pending = null;
+      }
+    } else {
+      visibleTimers();
+      if (needsRefresh || !data || Date.now() - lastAttempt >= REFRESH_MS) load();
     }
-    render();
   }
 
   window.AtlasInstruments = {
@@ -278,9 +331,10 @@
       if (started) return;
       started = true;
       render();
-      load();
-      setInterval(clock, 1000);
-      setInterval(load, 30 * 60 * 1000);
+      document.addEventListener?.('visibilitychange', visibilityChanged);
+      $('#national-data-dialog')?.addEventListener('close', visibilityChanged);
+      document.querySelector('[data-open="national-data-dialog"]')?.addEventListener('click', () => Promise.resolve().then(visibilityChanged));
+      visibilityChanged();
       window.addEventListener('atlas:language', render);
     },
   };

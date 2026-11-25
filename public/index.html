@@ -77,9 +77,14 @@
     </header>
 
     <div class="atlas-map-wrap">
-      <aside class="atlas-map-key"><div id="building-key"></div>    <details class="atlas-lens-story"><summary>Map evidence</summary>
+      <aside class="atlas-map-key"><div id="building-key"></div><p id="atlas-layer-status" class="atlas-layer-status" role="status" hidden></p>    <details class="atlas-lens-story"><summary>Map evidence</summary>
       <strong id="atlas-lens-title">Read the city, from skyline to street</strong>
       <span id="atlas-lens-description">Choose a map lens. Sources and valid times stay with the evidence.</span>
+      <span id="atlas-reference-status" role="status" hidden></span>
+      <details class="skyline-coverage"><summary>Skyline coverage</summary>
+        <p id="atlas-skyline-coverage-summary">Source-height inventory loading…</p>
+        <a href="/data/skyline-coverage.json" target="_blank" rel="noopener">Coverage &amp; source review (JSON) ↗</a>
+      </details>
     </details>
 
       <details id="people-key" class="people-key" hidden></details>
@@ -119,7 +124,6 @@
         <span class="loading-text">Loading Dhaka 3D Atlas &amp; Layers…</span>
       </div>
 
-      <p id="atlas-layer-status" class="atlas-layer-status" role="status" hidden></p>
       <aside class="atlas-observation-hud" id="atlas-observation-hud" hidden aria-label="Selected spatial feature details"></aside>
 
       <section class="atlas-watch" id="atlas-watch" aria-label="City watch">

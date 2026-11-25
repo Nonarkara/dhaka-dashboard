@@ -154,3 +154,7 @@ lateSelection.api.activate('walk'); lateSelection.api.attach(lateSelection.map, 
 lateSelection.api.attach(lateSelection.map, areaData);
 assert.equal(lateSelection.map.center.lng, areaData.find(a => a.id === 'chawkbazar').lng, 'explicit next selection wins over the opening URL');
 console.log('✓ Walk area links: Parliament/Tejgaon registry coordinates, delayed attachment, invalid fallback, and manual/language/navigation ownership');
+
+const demand = harness();
+assert.equal(demand.requests,0,'inactive walk does not fetch a hidden collage');
+demand.api.activate('walk');assert.equal(demand.requests,1,'first walk activation loads its evidence once');

@@ -47,7 +47,8 @@ function harness({attach=true}={}) {
     return elements.get(id);
   }
   element('people-key'); element('atlas-observation-hud');
-  const document = {documentElement:{lang:'en'}, getElementById:id=>elements.get(id) || null};
+  const documentEvents = new Map(), timeoutControllers = [];
+  const document = {documentElement:{lang:'en'}, hidden:false, addEventListener:(name,fn)=>documentEvents.set(name,fn), getElementById:id=>elements.get(id) || null};
   const layers=new Map(), sources=new Map(), listeners=new Map(); let failLayer=false, offline=false, corrupt=false, calls=0, release;
   const gate = new Promise(resolve=>release=resolve); let block=false;
   const map = {getLayer:id=>layers.get(id),getSource:id=>sources.get(id),getStyle:()=>({layers:[{id:'city-buildings',type:'fill-extrusion'}]}),addSource(id,s){sources.set(id,s);},removeSource(id){sources.delete(id);},
@@ -55,14 +56,14 @@ function harness({attach=true}={}) {
   const fixtureManifest = structuredClone(manifest);
   const bodies = {'people-grid.json':JSON.stringify(fixtureGrid),'facilities.geojson':JSON.stringify(fixtureFacilities)};
   for(const [name,body] of Object.entries(bodies)) fixtureManifest.assets[name].sha256=createHash('sha256').update(body).digest('hex');
-  const context={window:{},document,Intl,TextDecoder,crypto:webcrypto,console:{warn(){}},fetch:async url=>{
-    calls++;if(block)await gate;if(offline)throw Error('offline');
+  const context={window:{},document,Intl,TextDecoder,crypto:webcrypto,AbortController,AbortSignal:{any:AbortSignal.any,timeout(){const controller=new AbortController();timeoutControllers.push(controller);return controller.signal;}},console:{warn(){}},fetch:async (url,options)=>{
+    calls++;if(block)await Promise.race([gate,new Promise((_,reject)=>{if(options.signal.aborted)reject(options.signal.reason);else options.signal.addEventListener('abort',()=>reject(options.signal.reason),{once:true});})]);if(offline)throw Error('offline');
     if(url==='/api/atlas/people')return Response.json(fixtureManifest);
     const name=String(url).split('/').pop().split('?')[0];return new Response(corrupt ? '{}' : bodies[name]);
   }};
   vm.runInNewContext(read('public/people.js').toString(),context);
   const api=context.window.AtlasPeople;if(attach)api.attach(map);
-  return {api,map,elements,document,layers,sources,listeners,get calls(){return calls;},set offline(v){offline=v;},set corrupt(v){corrupt=v;},set fail(v){failLayer=v;},set block(v){block=v;},release};
+  return {api,map,elements,document,layers,sources,listeners,get calls(){return calls;},set offline(v){offline=v;},set corrupt(v){corrupt=v;},set fail(v){failLayer=v;},set block(v){block=v;},release, expire(){timeoutControllers.at(-1).abort(new DOMException('timeout','TimeoutError'));}, visibility(hidden){document.hidden=hidden;return documentEvents.get('visibilitychange')();}};
 }
 let early=harness({attach:false});await early.api.activate('people');assert.equal(early.calls,0);await early.api.attach(early.map);assert.equal(early.layers.size,3,'early selection must load when the map attaches');
 let h=harness();await h.api.activate('city');assert.equal(h.calls,0,'inactive lens must not fetch');
@@ -94,6 +95,17 @@ assert.equal(h.elements.get('people-key').dataset.reasonCode,'reference-layer-un
 h.offline=false;await h.api.activate('people');assert.equal(h.layers.size,3,'offline retry failed');
 assert.equal(h.elements.get('people-key').dataset.reasonCode,undefined);
 h=harness();h.corrupt=true;await h.api.activate('people');assert.equal(h.layers.size,0,'mixed version bytes must be rejected');
+
+// A real abortable hung source must release its attempt and permit fresh Retry.
+h=harness();h.block=true;const timed=h.api.activate('people');h.expire();await timed;
+assert.equal(h.elements.get('people-key').dataset.reasonCode,'reference-request-timeout');
+assert.equal(h.elements.get('people-retry').hidden,false);
+h.block=false;await h.elements.get('people-retry').onclick();assert.equal(h.layers.size,3,'timeout Retry must not reuse the rejected pending promise');
+// A hidden or left lens cancels pending work; returning gets exactly one new attempt.
+h=harness();h.block=true;const hiddenLoad=h.api.activate('people');h.visibility(true);await hiddenLoad;
+assert.equal(h.layers.size,0);h.block=false;await h.visibility(false);assert.equal(h.layers.size,3);
+const callsBefore=h.calls;h.visibility(true);await h.visibility(false);assert.equal(h.calls,callsBefore,'visibility return reuses verified cached reference data');
+console.log('✓ Population request ownership: finite timeout, fresh Retry, hidden-page cancellation and verified-cache return.');
 
 const request=new Request('https://test.invalid/api/atlas/people');
 const response=await worker.fetch(request,{ASSETS:{fetch:async()=>Response.json(manifest)}});

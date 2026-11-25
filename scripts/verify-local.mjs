@@ -42,6 +42,7 @@ const REQUIRED_FILES = [
   "public/dhaka-mrt.geojson",
   "public/data/parliament-buildings.geojson",
   "public/data/city-height-buildings.geojson",
+  "public/data/skyline-coverage.json",
   "public/dhaka-economy.geojson",
   "public/vendor/maplibre-6.4.1/maplibre-gl.mjs",
   "public/vendor/maplibre-6.4.1/maplibre-gl.css",
@@ -66,6 +67,7 @@ const JSON_FILES = [
   "public/dhaka-mrt.geojson",
   "public/data/parliament-buildings.geojson",
   "public/data/city-height-buildings.geojson",
+  "public/data/skyline-coverage.json",
   "public/dhaka-economy.geojson"
 ];
 

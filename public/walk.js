@@ -539,6 +539,7 @@
     standing = false;
     atBookmark = false;
     if (active) {
+      if (!collage) loadCollage();
       document.addEventListener('keydown', onKeyDown, { passive: false });
       document.addEventListener('keyup', onKeyUp);
       document.addEventListener('visibilitychange', onVisibility);
@@ -605,7 +606,7 @@
       render();
       // The collage is fetched once, however many times the district list
       // arrives and re-attaches the module.
-      if (!collage) loadCollage();
+      if (active && !collage) loadCollage();
     },
     /** The next stop on the itinerary. */
     next() { goToStop(stopIndex + 1); },

@@ -1,6 +1,8 @@
 (function () {
   'use strict';
-  let map, active = false, data, pending, generation = 0, selected, filterValue = 'all';
+  let map, active = false, data, pending, requestController, generation = 0, selected, filterValue = 'all';
+  let failureReason = null;
+  const REQUEST_TIMEOUT_MS = 15000;
   const ids = ['people-cells', 'people-borders', 'people-facilities'];
   const tr = (en, bn) => document.documentElement.lang === 'bn' ? bn : en;
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -83,24 +85,52 @@
     document.getElementById('people-retry').onclick = () => activate('people');
     filter();
   }
-  async function fetchJSON(url) {
-    const r = await fetch(url); if (!r.ok) throw Error(`HTTP ${r.status}`); return r.json();
+  function cancelRequest() {
+    requestController?.abort();
+    requestController = null;
+    pending = null;
   }
   async function load() {
-    if (!pending) pending = (async () => {
-      const manifest = await fetchJSON('/api/atlas/people');
+    if (data) return data;
+    if (pending) return pending;
+    const controller = new AbortController();
+    requestController = controller;
+    const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+    const signal = AbortSignal.any([controller.signal, timeout]);
+    const request = async url => {
+      const response = await fetch(url, {signal});
+      if (!response.ok) throw Error(`HTTP ${response.status}`);
+      return response;
+    };
+    const operation = (async () => {
+      const manifest = await (await request('/api/atlas/people')).json();
+      if (!manifest?.assets || !manifest.population?.year || !manifest.facilities?.observedAt) throw Error('Invalid reference manifest');
       const [grid, facilities] = await Promise.all(['people-grid.json', 'facilities.geojson'].map(async name => {
-        const asset = manifest.assets[name], response = await fetch(asset.url + '?v=' + asset.sha256);
-        if (!response.ok) throw Error(`HTTP ${response.status}`);
+        const asset = manifest.assets[name];
+        if (!asset || typeof asset.url !== 'string' || !/^[a-f0-9]{64}$/.test(asset.sha256)) throw Error('Invalid reference asset');
+        const response = await request(asset.url + '?v=' + asset.sha256);
         const bytes = await response.arrayBuffer();
         const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), v => v.toString(16).padStart(2, '0')).join('');
         if (digest !== asset.sha256) throw Error('Reference asset hash mismatch');
         return JSON.parse(new TextDecoder().decode(bytes));
       }));
-      if (!Array.isArray(grid.cells) || !grid.cells.length || facilities.type !== 'FeatureCollection' || !Array.isArray(facilities.features) || !manifest.population?.year || !manifest.facilities?.observedAt) throw Error('Invalid reference data');
-      data = {manifest, grid, facilities}; return data;
-    })().catch(error => {pending = null; throw error;});
-    return pending;
+      if (!Array.isArray(grid.cells) || !grid.cells.length || facilities.type !== 'FeatureCollection' || !Array.isArray(facilities.features)) throw Error('Invalid reference data');
+      // A cancelled attempt cannot replace a newer retry, even if its source ignores abort.
+      if (signal.aborted || requestController !== controller) throw signal.reason || Error('Reference request cancelled');
+      data = {manifest, grid, facilities};
+      return data;
+    })();
+    pending = operation;
+    try { return await operation; }
+    catch (error) {
+      if (timeout.aborted && !controller.signal.aborted) {
+        const timedOut = Error('Reference request timed out'); timedOut.reasonCode = 'reference-request-timeout'; throw timedOut;
+      }
+      throw error;
+    } finally {
+      if (pending === operation) pending = null;
+      if (requestController === controller) requestController = null;
+    }
   }
   function install() {
     if (ids.every(id => map.getLayer(id))) return;
@@ -126,9 +156,11 @@
   async function activate(lens) {
     const prior = active && lens === 'people' ? selected : null;
     active = lens === 'people'; const token = ++generation;
+    if (!active) cancelRequest();
+    else failureReason = null;
     hideSelection(); render();
     for (const id of ids) if (map?.getLayer(id)) map.setLayoutProperty(id, 'visibility', active ? 'visible' : 'none');
-    if (!active || !map) return;
+    if (!active || !map || document.hidden) return;
     try {
       await load(); if (!active || token !== generation) return;
       install(); render();
@@ -138,9 +170,10 @@
     } catch (error) {
       if (active && token === generation) {
         clearLayers();
-        if (panel()) {panel().dataset.status='unavailable';panel().dataset.reasonCode='reference-layer-unavailable';panel().dataset.checkedAt=new Date().toISOString();}
+        failureReason = error.reasonCode || 'reference-layer-unavailable';
+        if (panel()) {panel().dataset.status='unavailable';panel().dataset.reasonCode=failureReason;panel().dataset.checkedAt=new Date().toISOString();}
         const status = document.getElementById('people-status');
-        if (status) {status.hidden=false;status.textContent=tr('Reference layers unavailable.', 'তথ্যসূত্র স্তর অনুপলব্ধ।');}
+        if (status) {status.hidden=false;status.textContent=tr('Reference layers unavailable.', 'তথ্যসূত্র স্তর অনুপলব্ধ।') + ' · ' + failureReason;}
         const retry = document.getElementById('people-retry');
         if (retry) retry.hidden = false;
         for (const id of ['people-cell', 'people-filter']) {const control=document.getElementById(id);if(control)control.disabled=true;}
@@ -148,5 +181,9 @@
       }
     }
   }
+  document.addEventListener?.('visibilitychange', () => {
+    if (document.hidden) { generation++; cancelRequest(); }
+    else if (active && map) return activate('people');
+  });
   window.AtlasPeople = {attach(value) {if (map) map.off('click', inspectClick); map = value; map.on('click', inspectClick); if (active) return activate('people');}, activate};
 })();

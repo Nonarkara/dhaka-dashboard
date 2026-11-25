@@ -582,8 +582,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-menu-body .atlas-control-label { align-items:stretch; text-align:left; }
 .atlas-menu-body > * { flex-shrink:0; }
 .atlas-header:has(.atlas-menu[open]) { z-index:100; }
-/* Imagery credit must stay visible on phones: the watch strip sits above the attribution control. */
-@media (max-width: 768px) { .atlas-watch { bottom: 34px; right: 100px; } }
+/* Imagery credit owns its own bottom row (see below), so on phones the watch strip may use the map's full width. */
 
 /* Exact forecast values stay available without relying on bar hover or colour. */
 .air-data-table { margin-top:8px; }
@@ -598,9 +597,13 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 /* Values wrap as complete evidence: the AQI band is part of the reading. */
 .atlas-watch-item { flex-wrap:wrap; pointer-events:auto; }
 .atlas-watch-item strong { white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; text-align:right; }
+/* MSH on phones: one reading per row, value on its label's line. In a 2×2 grid a long
+   AQI band stretched its row-mate into an empty box and broke Bengali words mid-syllable. */
 @media (max-width:768px) {
-  .atlas-watch-item { gap:3px 5px; min-height:44px; }
-  .atlas-watch-item strong { flex:1 1 100%; }
+  .atlas-watch-grid { grid-template-columns:1fr; }
+  .atlas-watch-item { flex-wrap:nowrap; align-items:baseline; gap:6px; min-height:32px; padding:4px 8px; }
+  .atlas-watch-item .watch-label { flex:none; }
+  .atlas-watch-item strong { flex:1 1 auto; min-width:0; overflow-wrap:break-word; }
 }
 
 /* Let enlarged text earn additional header rows instead of clipping a control. */
@@ -608,7 +611,7 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-lens-choice { flex:1 1 9ch; }
 .atlas-lens-choice select { min-height:40px; height:auto; padding-top:4px; padding-bottom:4px; }
 .atlas-menu-summary,#language-toggle { height:auto; min-height:40px; line-height:1.3; }
-.atlas-lens-choice { min-width:min(100%,calc(var(--text-body) * 10)); }
+.atlas-lens-choice { min-width:min(100%,calc(var(--text-body) * 6)); }
 
 /* Source attribution owns a separate bottom row at every viewport size. */
 .atlas-watch { bottom:calc(var(--map-credit-height, 24px) + 18px); }
@@ -623,3 +626,15 @@ html[lang="bn"] { --font-sans: "Hind Siliguri", "Barlow Semi Condensed", sans-se
 .atlas-walk-step { min-height:32px; white-space:normal; overflow:visible; text-overflow:clip; }
 .atlas-map-key { max-height:calc(100% - var(--map-credit-height,24px) - var(--map-watch-height,120px) - 40px); overflow:auto; }
 .atlas-walk-place { margin:0; padding:5px 6px 2px; font-size:var(--text-body); font-weight:600; line-height:1.3; }
+
+/* Optional evidence stays with its action, inside the requested desk. */
+.skyline-coverage { margin-top:4px; }
+.skyline-coverage > summary,.collage-evidence > summary { min-height:32px; padding:5px 0; cursor:pointer; }
+.skyline-coverage p,.collage-evidence p,.collage-evidence ul { margin:4px 0; }
+.collage-evidence { max-width:100%; }
+.collage-evidence select { max-width:100%; color:var(--ink); background:var(--bg); border:1px solid var(--line); font:inherit; }
+.collage-evidence button,.collage-evidence label { white-space:normal; overflow-wrap:break-word; }
+#atlas-reference-status > span { display:block; margin-top:4px; }
+
+/* Source failures share the scrollable map instrument; they cannot cover its controls. */
+.atlas-map-key .atlas-layer-status { position:static; margin:4px 8px; padding:4px 0; max-width:100%; border:0; border-top:1px solid var(--line); overflow-wrap:anywhere; }

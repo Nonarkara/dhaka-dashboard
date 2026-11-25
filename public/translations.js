@@ -2,6 +2,9 @@
 // Keys are the canonical English source strings.
 
 window.ATLAS_BN = {
+  "Skyline coverage": "ভবনের উচ্চতার তথ্যের আওতা",
+  "Source-height inventory loading…": "উচ্চতার তথ্য লোড হচ্ছে…",
+  "Coverage & source review (JSON) ↗": "আওতা ও উৎস যাচাই (JSON) ↗",
   "Low-angle map exploration": "নিচু কোণের মানচিত্র দেখা",
   "Source heights only; unknown flat. Not a walking route.": "শুধু উৎসের উচ্চতা; অজানা সমতল। হাঁটার পথ নয়।",
   "Published/source-tag heights; partial coverage, not surveyed": "প্রকাশিত/উৎসের উচ্চতা; আংশিক তথ্য, জরিপ নয়",

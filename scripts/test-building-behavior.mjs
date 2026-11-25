@@ -24,14 +24,14 @@ for(const f of detail.features) {
     assert.ok(ring.every(p=>p.length===2 && p.every(Number.isFinite)));
   }
 }
-function app({offline=false,search='',rainfall=null}={}) {
+function app({offline=false,search='',rainfall=null,inside=true,fetchOverride=null}={}) {
   const elements=new Map(['atlas-view','atlas-lens-title','atlas-lens-description','atlas-layer-status','atlas-observation-hud','radar-play','radar-output'].map(id=>[id,{value:'3d',textContent:'',hidden:true,classList:{remove(){}},addEventListener(){}}]));
   elements.get('atlas-layer-status').querySelector=s=>elements.get(s==='#radar-play'?'radar-play':'radar-output');
-  const ticks=new Map(), events={};let tickId=0;
+  const ticks=new Map(), timeouts=new Map(), events={},requests=[];let tickId=0;
   let map;
   class MapStub {
-    constructor(options){this.layers=new Map(options.style.layers.map(l=>[l.id,l]));this.sources=new Map();this.options=options;this.events=new Map();this.inside=true;this.zoom=16.7;this.ready=false;map=this;}
-    on(type,...args){this.events.set(type,args.at(-1));}
+    constructor(options){this.layers=new Map(options.style.layers.map(l=>[l.id,l]));this.sources=new Map();this.options=options;this.events=new Map();this.eventRegistrations=[];this.inside=inside;this.zoom=16.7;this.ready=false;map=this;}
+    on(type,...args){this.eventRegistrations.push([type,args[0]]);this.events.set(type,args.at(-1));}
     once(type,...args){this.events.set(type,args.at(-1));}
     off(type){this.events.delete(type);}
     addControl(){}
@@ -49,7 +49,7 @@ function app({offline=false,search='',rainfall=null}={}) {
     isSourceLoaded(){return this.ready;}
     getZoom(){return this.zoom;}
     getContainer(){return {clientWidth:this.width||390};}
-    getBounds(){const [w,s,e,n]=detail.bbox;return {getWest:()=>this.inside?w+.002:w-.1,getSouth:()=>s+.002,getEast:()=>e-.002,getNorth:()=>n-.002};}
+    getBounds(){const [w,s,e,n]=detail.bbox;return {getWest:()=>this.inside?w+.002:90.40,getSouth:()=>this.inside?s+.002:23.767,getEast:()=>this.inside?e-.002:90.414,getNorth:()=>this.inside?n-.002:23.775};}
     flyTo(options){this.camera=options;}
   }
   const window={maplibregl:{Map:MapStub,NavigationControl:class{}},location:{search},addEventListener:(event,fn)=>events[event]=fn};
@@ -68,11 +68,13 @@ function app({offline=false,search='',rainfall=null}={}) {
   };}}
   const context={
     window,
-    document:{documentElement:{lang:'en'},hidden:false,querySelector:s=>elements.get(s.slice(1))||null,querySelectorAll:()=>[],addEventListener:(event,fn)=>events[event]=fn},
-    URLSearchParams,AbortSignal,console:{warn(){}},setTimeout(){},setInterval(fn){ticks.set(++tickId,fn);return tickId;},clearInterval(id){ticks.delete(id);},
+    document:{documentElement:{lang:'en',dataset:{theme:'dark'}},hidden:false,querySelector:s=>elements.get(s.slice(1))||null,querySelectorAll:()=>[],addEventListener:(event,fn)=>events[event]=fn},
+    URLSearchParams,AbortSignal,AbortController,console:{warn(){}},setTimeout(fn,ms){timeouts.set(++tickId,{fn,ms});return tickId;},clearTimeout(id){timeouts.delete(id);},setInterval(fn){ticks.set(++tickId,fn);return tickId;},clearInterval(id){ticks.delete(id);},
     OffscreenCanvas:FakeCanvas,
     createImageBitmap:async blob=>({width:4,height:4,blank:!!blob.blank,close(){}}),
-    fetch:async url=>{
+    fetch:async (url,options)=>{
+      requests.push(url);
+      if(fetchOverride){const overridden=fetchOverride(url,options);if(overridden!==undefined)return await overridden;}
       if(offline)throw new Error('offline');
       const blank=isBlank(url);
       return {ok:true,status:200,headers:{get:()=>blank?'1611':'59778'},
@@ -81,10 +83,10 @@ function app({offline=false,search='',rainfall=null}={}) {
     },
   };
   let source=read('public/app.js');
-  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadDataLayers,loadParliamentBuildings,loadCityHeights,flyToArea,buildingPaint,showInspectionHUD,loadLensEvidence,pauseRadar,wireUIEvents};})();';
+  source=source.slice(0,source.indexOf('  // Safe boot:'))+'window.test={initMap,applyLens,syncBuildingVisibility,loadDataLayers,loadParliamentBuildings,loadCityHeights,flyToArea,buildingPaint,showInspectionHUD,loadLensEvidence,pauseRadar,wireUIEvents,performSearch,scheduleWatch,pauseBackground,scheduleSolar};})();';
   vm.runInNewContext(source,context);
   window.test.initMap();
-  return {api:window.test,map,elements,maplibre:window.maplibregl,ticks,events,window,document:context.document};
+  return {api:window.test,map,elements,maplibre:window.maplibregl,ticks,timeouts,events,window,requests,document:context.document};
 }
 let {api,map,elements,maplibre}=app();
 for(const lens of ['city','heritage','rivers','transit','economy','air','haze','rain','radar','cloud','night','water']) {
@@ -273,3 +275,91 @@ assert.equal(map.getLayoutProperty('city-height-buildings','visibility'),'none')
 assert.equal(map.getLayoutProperty('walk-massing','visibility'),'none','2D must suppress every extrusion');
 ({api,map}=app({offline:true}));await api.loadCityHeights();assert.ok(!map.getLayer('city-height-buildings'),'failed height feed cannot invent a skyline');
 console.log('✓ Skyline: source-backed tower geometry, height conflicts, visible opening zoom, 2D and offline refusal.');
+
+// Startup is independent of basemap load and unrelated registry latency.
+const pause=new Promise(()=>{});
+const startup=app({inside:false,search:'?area=tejgaon',fetchOverride:url=>url.includes('dhaka-rivers')||url.includes('dhaka-economy')?pause:undefined});
+startup.map.events.get('style.load')();
+await new Promise(r=>setTimeout(r,0));
+assert.ok(startup.map.getLayer('city-height-buildings'),'source-backed skyline starts at style readiness, without basemap load');
+assert.ok(startup.requests.includes('/dhaka-areas.json'),'district request is not serially blocked');
+assert.equal(startup.map.camera.zoom,16.5,'authored district positioning completes despite hung rivers/economy');
+assert.ok(!startup.requests.includes('/data/parliament-buildings.geojson'),'Tejgaon does not pay for Parliament detail');
+startup.map.inside=true; startup.api.syncBuildingVisibility(); startup.api.syncBuildingVisibility();
+await new Promise(r=>setTimeout(r,0));
+assert.equal(startup.requests.filter(u=>u.includes('parliament-buildings')).length,1,'entering detail extent shares one source request');
+startup.api.syncBuildingVisibility();assert.equal(startup.requests.filter(u=>u.includes('parliament-buildings')).length,1,'completed detail is retained');
+console.log('✓ Startup: style-ready skyline, parallel district loading under stalled feeds and lazy single-flight Parliament detail.');
+
+// Late initial-area and search responses cannot take the camera back from input.
+let finishAreas;
+const areaResponse=new Promise(r=>finishAreas=r);
+const manual=app({inside:false,search:'?area=parliament',fetchOverride:url=>url.includes('dhaka-areas')?areaResponse:undefined});
+manual.map.events.get('style.load')();
+manual.map.events.get('dragstart')({originalEvent:{}});
+const manualCamera=manual.map.camera;
+finishAreas({ok:true,json:async()=>JSON.parse(read('public/dhaka-areas.json'))});await new Promise(r=>setTimeout(r,0));
+assert.equal(manual.map.camera,manualCamera,'late URL district does not override a native drag');
+let finishSearch;
+const searchResponse=new Promise(r=>finishSearch=r);
+const searchCase=app({inside:false,fetchOverride:url=>url.includes('/api/atlas/search')?searchResponse:undefined});
+const searching=searchCase.api.performSearch('Dhaka');searchCase.api.applyLens('people');const selectedCamera=searchCase.map.camera;
+finishSearch({ok:true,json:async()=>({results:[{lat:'23.7',lon:'90.4'}]})});await searching;
+assert.equal(searchCase.map.camera,selectedCamera,'late search does not override a newer lens');
+
+// A completed explicit search also retires an unfinished opening URL intent.
+let finishOpeningAreas;
+const deferredOpeningAreas=new Promise(r=>finishOpeningAreas=r);
+const searchBeforeAreas=app({inside:false,search:'?area=parliament',fetchOverride:url=>url.includes('dhaka-areas')?deferredOpeningAreas:url.includes('/api/atlas/search')?Promise.resolve({ok:true,json:async()=>({results:[{lat:'23.8',lon:'90.45'}]})}):undefined});
+searchBeforeAreas.map.events.get('style.load')();await searchBeforeAreas.api.performSearch('Gulshan');
+const searchedCamera=searchBeforeAreas.map.camera;
+finishOpeningAreas({ok:true,json:async()=>JSON.parse(read('public/dhaka-areas.json'))});await new Promise(r=>setTimeout(r,0));
+assert.equal(searchBeforeAreas.map.camera,searchedCamera,'late opening district cannot override an explicit completed search');
+
+// Repeated registry completions and Retry do not multiply hover handlers.
+const bindings=app({inside:false});await bindings.api.loadDataLayers();await bindings.api.loadDataLayers('rivers');
+for(const id of ['landmarks-points','rivers-gauges','transit-stations','economy-hubs']){
+ assert.ok(bindings.map.eventRegistrations.filter(([type,layer])=>type==='mouseenter'&&layer===id).length<=1);
+}
+const recovery=app({inside:false});const add=recovery.map.addLayer.bind(recovery.map);let fail=true;
+recovery.map.addLayer=(layer,before)=>{if(fail&&layer.id==='parliament-buildings'){fail=false;throw Error('source creation failed');}add(layer,before);};
+await recovery.api.loadParliamentBuildings();assert.ok(!recovery.map.getSource('parliament-detail'),'partial failed detail is cleared');
+await recovery.api.loadParliamentBuildings({retry:true});assert.ok(recovery.map.getLayer('parliament-buildings'),'Retry reconstructs a partially failed source');
+const background=app({inside:false});background.api.wireUIEvents();background.api.scheduleWatch();background.api.scheduleWatch();await new Promise(r=>setTimeout(r,0));
+assert.equal(background.requests.filter(u=>u==='/api/atlas/watch').length,1,'equivalent active requests coalesce');
+assert.equal([...background.timeouts.values()].filter(t=>t.ms===5*60000).length,1,'one recurring refresh owner');
+background.document.hidden=true;background.events.visibilitychange();
+assert.equal([...background.timeouts.values()].filter(t=>t.ms===5*60000||t.ms===60000).length,0,'hidden page has no recurring watch/solar work');
+console.log('✓ Async ownership: manual camera intent, late search refusal, single hover bindings, partial-source Retry and hidden refresh cleanup.');
+
+// Returning to a lens does not give its earlier request ownership again.
+const settleLensReview=()=>new Promise(resolve=>setImmediate(resolve));
+const rainSettlers=[];
+const rainGeneration=app({inside:false,fetchOverride:url=>url==='/api/atlas/rainfall'?new Promise(resolve=>rainSettlers.push(resolve)):undefined});
+rainGeneration.api.applyLens('rain');rainGeneration.api.applyLens('city');rainGeneration.api.applyLens('rain');
+assert.equal(rainSettlers.length,2);
+const rainFixture=value=>({ok:true,json:async()=>({status:'ok',catchments:[{id:'fixture',name:'Query',lat:23.7,lng:90.4,status:'ok',rain_24h_sum_mm:value,source:'Regression fixture'}]})});
+rainSettlers[1](rainFixture(2));await settleLensReview();
+assert.equal(rainGeneration.map.getSource('catchment-rain').data.features[0].properties.rain_24h_sum_mm,2);
+rainSettlers[0](rainFixture(99));await settleLensReview();
+assert.equal(rainGeneration.map.getSource('catchment-rain').data.features[0].properties.rain_24h_sum_mm,2,'older Rain request cannot overwrite a later Rain activation');
+
+// A provider deliberately ignores abort: generation ownership still protects
+// the visible reading, and repeated page restoration owns exactly one timer.
+const watchSettlers=[];
+const restoredWatch=app({inside:false,fetchOverride:url=>url==='/api/atlas/watch'?new Promise(resolve=>watchSettlers.push(resolve)):undefined});
+const airValue={textContent:''};restoredWatch.elements.set('atlas-watch-air-value',airValue);
+restoredWatch.api.wireUIEvents();restoredWatch.api.scheduleWatch();restoredWatch.api.scheduleWatch();
+assert.equal(watchSettlers.length,1);
+restoredWatch.document.hidden=true;restoredWatch.events.visibilitychange();
+restoredWatch.document.hidden=false;restoredWatch.events.visibilitychange();assert.equal(watchSettlers.length,2);
+const watchFixture=(value,category)=>({ok:true,json:async()=>({indicators:{airQuality:{us_aqi:value,category,status:'neutral'}}})});
+watchSettlers[1](watchFixture(50,'Good'));await settleLensReview();
+watchSettlers[0](watchFixture(199,'Unhealthy'));await settleLensReview();
+assert.match(airValue.textContent,/AQI 50/,'late hidden-page reading cannot replace newer visible evidence');
+restoredWatch.events.pageshow();restoredWatch.events.pageshow();await settleLensReview();
+assert.equal(watchSettlers.length,2,'fresh repeated page restoration does not refetch');
+assert.equal([...restoredWatch.timeouts.values()].filter(t=>t.ms>60000&&t.ms<=5*60000).length,1,'one remaining-delay refresh timer survives repeated restoration');
+restoredWatch.document.hidden=true;restoredWatch.events.visibilitychange();
+assert.equal([...restoredWatch.timeouts.values()].filter(t=>t.ms>=60000&&t.ms<=5*60000).length,0,'hidden restoration leaves no watch or solar timer');
+console.log('✓ Lens/watch generations: Rain→City→Rain, ignored aborts, visible return and repeated page restoration remain owned.');

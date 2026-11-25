@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "status": "reference",
+  "capturedAt": "2026-11-23T05:38:48.459454+00:00",
+  "reviewedAt": "2026-11-25",
+  "sourceHeightFootprints": 276,
+  "captureAreas": [
+    {
+      "bbox": [
+        90.41,
+        23.775,
+        90.422,
+        23.798
+      ],
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/map?bbox=90.4100000,23.7750000,90.4220000,23.7980000",
+      "capturedAt": "2026-11-23T05:38:48.459454+00:00",
+      "heightCandidates": 2
+    },
+    {
+      "bbox": [
+        90.414,
+        23.726,
+        90.422,
+        23.735
+      ],
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/map?bbox=90.4140000,23.7260000,90.4220000,23.7350000",
+      "capturedAt": "2026-11-23T05:37:52.961795+00:00",
+      "heightCandidates": 4
+    },
+    {
+      "bbox": [
+        90.403,
+        23.765,
+        90.411,
+        23.774
+      ],
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/map?bbox=90.4030000,23.7650000,90.4110000,23.7740000",
+      "capturedAt": "2026-11-23T05:38:32.945631+00:00",
+      "heightCandidates": 271
+    }
+  ],
+  "methods": {
+    "osmHeightTag": 275,
+    "publishedProjectHeight": 1
+  },
+  "heightConflicts": [
+    {
+      "featureId": "relation/12770867",
+      "name": "Shanta Pinnacle",
+      "heightM": 152.3,
+      "osmHeightM": 120,
+      "reason": "OSM height tag is 120 m; project manager publishes 152.3 m. Published project height is used; this is not an independent survey.",
+      "sourceUrl": "https://ascentis.build/project/pinnacle-raising-the-standard-for-high-rise-construction-in-bangladesh/"
+    }
+  ],
+  "omittedInputObjects": 1,
+  "coverageNote": "Selected height-tagged source buildings in three dated map captures near Motijheel, Tejgaon and Gulshan. Not a complete inventory or citywide coverage; combined bbox is an envelope, not continuous captured coverage. Absence is not evidence that a building or high-rise does not exist.",
+  "geometryNote": "Actual source footprints, closed ways and complete multipolygons; courtyards retained. Uniform-height footprint prisms are not architectural models or roof profiles.",
+  "license": "OpenStreetMap geometry and tags: ODbL-1.0; published height is an attributed factual value, no third-party model or imagery copied.",
+  "review": {
+    "checkedAt": "2026-11-25",
+    "scope": "Ten named candidates in Gulshan, Banani and Motijheel; source review only, not a citywide building census.",
+    "reuse": "Attributed factual findings only; no third-party model, image, contact directory or guessed coordinates are copied.",
+    "candidates": [
+      {
+        "name": "City Centre",
+        "area": "Motijheel",
+        "classification": "usable",
+        "sourceUrl": "https://www.openstreetmap.org/way/686702285",
+        "finding": "Existing captured OSM footprint and explicit height tag support the current 118 m reference prism. This is community mapping, not an independent height survey.",
+        "heightM": 118,
+        "existingFeatureId": "way/686702285",
+        "action": "retain-existing",
+        "newGeometryImported": false
+      },
+      {
+        "name": "Gulshan Centre Point",
+        "area": "Gulshan 2",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://www.united.com.bd/our-concerns/gulshan-centre-point/",
+        "finding": "Developer identifies the property and reports B2+B1+G+22. This review did not establish explicit metre height and an eligible matched source footprint. Floors are not converted to metres.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      },
+      {
+        "name": "The Westin Dhaka",
+        "area": "Gulshan 2",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://www.marriott.com/en-us/hotels/dacwi-the-westin-dhaka/overview/",
+        "finding": "Operator identifies the hotel at Plot 01, Road 45. The reviewed page does not establish explicit metre height or an eligible footprint match.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      },
+      {
+        "name": "Sheraton Dhaka",
+        "area": "Banani",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://www.marriott.com/en-us/hotels/dacsi-sheraton-dhaka/rooms/",
+        "finding": "Operator identifies the property at 44 Kemal Ataturk Avenue. Address and hotel rooms do not establish source height or a matched building polygon.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      },
+      {
+        "name": "Renaissance Dhaka Gulshan Hotel",
+        "area": "Gulshan",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://www.marriott.com/en-us/destinations/bangladesh/dhaka.mi",
+        "finding": "Operator lists this Gulshan property. This review has no explicit metre height and no eligible source geometry match.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      },
+      {
+        "name": "Doreen Towers / Crowne Plaza Dhaka Gulshan",
+        "area": "Gulshan 2",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://doreen.com/hotels-resorts/",
+        "corroborationUrl": "https://www.ihgplc.com/en/news-and-media/news-releases/2023/crowne-plaza-hotels-and-resorts-launches-in-bangladesh",
+        "finding": "Owner and operator identify Doreen properties in Gulshan 2. Multiple towers/suites require an exact footprint match; neither reviewed source supplies an eligible metre height here.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      },
+      {
+        "name": "City Bank Center",
+        "area": "Gulshan 1",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://www.citybankplc.com/dtp/terms-of-use",
+        "corroborationUrl": "https://www.citybankplc.com/upload/nis/City-Bank-Citizen-Charter-2025.pdf",
+        "finding": "The bank identifies registered headquarters at 28 Gulshan Avenue and other functions at 136 Gulshan Avenue. Do not conflate office functions or buildings. Exact polygon identity and explicit height remain unresolved.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      },
+      {
+        "name": "Eastern Bank headquarters",
+        "area": "Gulshan",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://ebl.com.bd/locator",
+        "finding": "Operator identifies its head office at 100 Gulshan Avenue. The reviewed source does not establish an explicit metre height or matched footprint.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      },
+      {
+        "name": "Dhaka Bank headquarters",
+        "area": "Gulshan 1",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://dhakabank.com.bd/contact-us/",
+        "finding": "Operator identifies headquarters at plot CWS(C)-10, Bir Uttam A K Khandakar Road. An address is not proof of building height, footprint or access.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      },
+      {
+        "name": "Navana Tower",
+        "area": "Gulshan",
+        "classification": "insufficient-evidence",
+        "sourceUrl": "https://navanarealestate.com/contact",
+        "finding": "The reviewed developer contact page does not establish this exact tower's identity, metre height or eligible geometry. No developer-office address is substituted for the candidate building.",
+        "heightM": null,
+        "action": "leave-unmapped-height",
+        "newGeometryImported": false
+      }
+    ],
+    "newGeometryImported": 0
+  }
+}
